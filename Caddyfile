@@ -1,0 +1,39 @@
+# Global caddy config options must be first
+{
+  admin off
+  auto_https off
+}
+
+# Bind to port 82
+:82
+
+# Serve static files
+file_server
+
+# Fallback to index.html for everything but assets
+@html {
+  not path *.js *.css *.png *.svg
+
+  file index.html
+}
+
+rewrite @html {http.matchers.file.relative}
+
+# Don't cache index.html and set CSP
+header @html Cache-Control no-store
+header @html Content-Security-Policy "
+  default-src 'self';
+  connect-src
+    http://localhost:17001/get-users-stateless
+    https://api.bitpop.dev/get-users-stateless
+    https://api.bitclout.com/get-users-stateless
+    https://api.bitclout.green/get-users-stateless
+    https://api.bitclout.blue/get-users-stateless;
+  img-src 'self' data:;
+  style-src 'self' 'unsafe-inline'
+    https://fonts.googleapis.com
+    https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css;
+  font-src 'self'
+    https://fonts.googleapis.com
+    https://fonts.gstatic.com
+    https://ka-f.fontawesome.com;"

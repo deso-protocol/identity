@@ -1,0 +1,170 @@
+<app-banner></app-banner>
+
+<div class="container home-container">
+  <div class="fs-24px font-weight-bold">
+    Sign up on {{ globalVars.hostname }}
+  </div>
+
+  <!-- Step 1 -->
+  <div *ngIf="stepNum == 1">
+    <div class="pt-15px fs-15px fc-muted">STEP 1 of 4</div>
+    <div class="fs-24px font-weight-bold pt-15px">Store your seed phrase</div>
+    <div class="fs-18px mt-15px">Write, download, print, or copy it somewhere safe.</div>
+    <div class="fc-red fs-18px pt-15px">If you lose your seed phrase your account will be lost forever.</div>
+    <div class="w-100 mt-30px fs-15px border border-color-grey"
+         style="border-radius: 3px">
+      <div *ngIf="!entropyService.advancedOpen" class="p-15px">{{ entropyService.temporaryEntropy.mnemonic }}</div>
+      <div class="fc-red px-15px" *ngIf="!entropyService.advancedOpen && hasAdvancedEntropyError">
+        Please fix errors in your advanced entropy configuration.</div>
+      <div class="fc-red px-15px" *ngIf="!entropyService.advancedOpen && !hasAdvancedEntropyError && entropyService.temporaryEntropy.extraText.length > 0">
+        Note that you have added a passphrase in the advanced menu.</div>
+      <div class="d-flex align-items-center justify-content-between p-15px sign-up__grey-background">
+        <div class="d-flex align-items-center">
+          <button (click)="stepOneCopy()"
+                  class="btn btn-primary font-weight-bold fs-15px sign-up__cp-button-override"
+                  style="height: 36px; 75px;
+                         line-height: 15px;
+                         border-radius: 3px;">
+            Copy
+          </button>
+          <button (click)="stepOneDownload()"
+                  class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up__cp-button-override"
+                  style="height: 36px; 75px;
+                         line-height: 15px;
+                         border-radius: 3px;">
+            Download
+          </button>
+          <button (click)="stepOnePrint()"
+                  class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up__cp-button-override"
+                  style="height: 36px; 75px;
+                         line-height: 15px;
+                         border-radius: 3px;">
+            Print
+          </button>
+          <i *ngIf="seedCopied" class="far fa-check-circle fa-lg fc-blue ml-10px"></i>
+        </div>
+        <div class="fc-blue fs-13px cursor-pointer" *ngIf="!entropyService.advancedOpen"
+             (click)="entropyService.advancedOpen = true">Advanced</div>
+        <div class="fc-blue fs-13px cursor-pointer" *ngIf="entropyService.advancedOpen"
+             (click)="entropyService.advancedOpen = false">Simple</div>
+      </div>
+      <div class="sign-up__grey-background">
+        <app-sign-up-entropy *ngIf="entropyService.advancedOpen"></app-sign-up-entropy>
+      </div>
+    </div>
+    <div class="d-flex pt-15px justify-content-end">
+      <button *ngIf="!hasAdvancedEntropyError"
+              (click)="stepOneNext()"
+              class="btn btn-primary font-weight-bold fs-15px"
+              style="height: 36px; 75px;
+                     line-height: 15px;
+                     border-radius: 3px;">
+        Next
+      </button>
+      <button *ngIf="hasAdvancedEntropyError"
+              (click)="stepOneNext()"
+              class="btn btn-primary font-weight-bold fs-15px"
+              style="height: 36px; 75px;
+                     line-height: 15px;
+                     border-radius: 3px;" disabled>
+        Next
+      </button>
+    </div>
+
+    <!--Spacer (for mobile)-->
+    <!-- If the "create a post" blue circle is showing, it will overlap the "Next" button. Adding space-->
+    <!-- down here gives the user enough space to scroll down to reveal the next button.-->
+    <!-- This works for now, but we should do something better long term, e.g. hide the blue circle
+         on this page.-->
+    <div style="padding-bottom: 85px"></div>
+  </div>
+
+  <!-- Step 2 -->
+  <div *ngIf="stepNum == 2">
+    <div class="pt-15px fs-15px fc-muted">STEP 2 of 4</div>
+    <div class="fs-24px font-weight-bold pt-15px">Verify your seed phrase</div>
+    <div class="fc-red fs-18px mt-15px">Never share your seed phrase with anyone.</div>
+    <div class="fc-red fs-18px pt-15px"><b>If you lose your seed phrase your account will be lost forever.</b></div>
+    <div class="form-group pt-10px">
+      <textarea [(ngModel)]="mnemonicCheck"
+                class="form-control fs-15px"
+                rows="4"></textarea>
+    </div>
+    <div class="fs-15px pt-15px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
+      Enter your passphrase:
+    </div>
+    <div class="form-group pt-10px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
+      <textarea [(ngModel)]="extraTextCheck"
+                class="form-control fs-15px"
+                rows="4"></textarea>
+    </div>
+    <div class="d-flex align-items-center" style="margin-top: -15px">
+      <div class="fs-12px mt-15px text-grey6">
+        By proceeding, you agree to the
+        <a [routerLink]="'/'"
+           queryParamsHandling="merge">Terms Of Service.</a>
+      </div>
+    </div>
+    <div class="d-flex pt-15px justify-content-between">
+      <button (click)="stepTwoBack()"
+              class="btn btn-outline-primary font-weight-bold fs-15px"
+              style="height: 36px; 75px;
+                     line-height: 15px;
+                     border-radius: 3px;">
+        Back
+      </button>
+      <div>
+        <button *ngIf="entropyService.temporaryEntropy.mnemonic == mnemonicCheck
+                       && entropyService.temporaryEntropy.extraText == extraTextCheck"
+                (click)="stepTwoNext()"
+                class="btn btn-primary font-weight-bold fs-15px ml-10px"
+                style="height: 36px; 75px;
+                       line-height: 15px;
+                       border-radius: 3px;">
+          Next
+        </button>
+        <button *ngIf="entropyService.temporaryEntropy.mnemonic != mnemonicCheck
+                       || entropyService.temporaryEntropy.extraText != extraTextCheck"
+                class="btn btn-primary font-weight-bold fs-15px ml-10px"
+                style="height: 36px; 75px;
+                       line-height: 15px;
+                       border-radius: 3px;" disabled>
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!--Spacer (for mobile)-->
+    <!-- If the "create a post" blue circle is showing, it will overlap the "Next" button. Adding space-->
+    <!-- down here gives the user enough space to scroll down to reveal the next button.-->
+    <!-- This works for now, but we should do something better long term, e.g. hide the blue circle
+         on this page.-->
+    <div style="padding-bottom: 85px"></div>
+  </div>
+
+  <!-- Step 3 -->
+  <div *ngIf="stepNum === 3">
+
+    <div>
+      <div class="fs-18px mt-30px">
+        Select an access level
+      </div>
+
+      <ul class="list-group mt-15px">
+        <li class="list-group-item list-group-item-action cursor-pointer" (click)="selectedLevel = 1" [ngClass]="{active: selectedLevel === 1}">Read-only</li>
+        <li class="list-group-item list-group-item-action fc-muted disabled">Require approval for every transaction</li>
+        <li class="list-group-item list-group-item-action fc-muted disabled">Require approval for large transactions</li>
+        <li class="list-group-item list-group-item-action cursor-pointer" (click)="selectedLevel = 4" [ngClass]="{active: selectedLevel === 4}">Full signing access</li>
+      </ul>
+    </div>
+
+    <div class="d-flex justify-content-end mt-15px">
+      <button (click)="clickSignup()"
+              class="btn btn-primary font-weight-bold fs-15px"
+              [disabled]="selectedLevel > 4 || selectedLevel < 1">
+        Sign up on {{ globalVars.hostname }}
+      </button>
+    </div>
+    <div style="padding-bottom: 85px"></div>
+  </div>
+</div>

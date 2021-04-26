@@ -1,0 +1,13 @@
+<div class="full-screen d-flex justify-content-center align-items-center flex-column" (click)="tapToUnlock()">
+  <div class="p-20px">
+    <img class="home-logo" src="/assets/camelcase_logo.svg">
+  </div>
+  <div class="p-20px" *ngIf="identityService.browserSupported">
+    Tap anywhere to unlock your wallet.
+  </div>
+  <div class="p-20px text-center" *ngIf="!identityService.browserSupported">
+    Your browser is either not supported or not configured correctly.
+    <br><br>
+    Please allow access to local storage or 3rd-party cookies.
+  </div>
+</div>

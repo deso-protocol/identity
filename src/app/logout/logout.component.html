@@ -1,0 +1,19 @@
+<app-banner></app-banner>
+
+<div class="container home-container">
+  <div class="fs-24px font-weight-bold ml-15px">
+    Log out of {{ globalVars.hostname }}
+  </div>
+  <div class="p-15px">
+    <p class="pb-15px">
+      Logging out revokes any permissions you've granted on {{ globalVars.hostname }}.
+    </p>
+    <p class="pb-15px">
+      Your account will stay logged in on identity.bitclout.com.
+    </p>
+    <div class="d-flex align-items-end justify-content-end">
+      <button type="button" class="btn btn-secondary mr-10px" (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="onSubmit()">Logout</button>
+    </div>
+  </div>
+</div>
