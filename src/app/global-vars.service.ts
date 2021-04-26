@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import {Network} from '../types/identity';
+import {environment} from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GlobalVarsService {
-  static fullAccessHostnames = ['bitclout.com', 'bitclout.green'];
-  static noAccessHostnames = [''];
+  static fullAccessHostnames = environment.full_access_hostnames;
+  static noAccessHostnames = environment.no_access_hostnames;
 
   network = Network.mainnet;
   hostname = '';
@@ -26,5 +27,10 @@ export class GlobalVarsService {
       // Most browsers block access to window.top when in an iframe
       return true;
     }
+  }
+
+  // tslint:disable-next-line:typedef
+  get environment() {
+    return environment;
   }
 }
