@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // We must be in an iframe OR opened with window.open
-    if (!this.inTab() && !this.inFrame()) {
+    if (!this.globalVars.inTab && !this.globalVars.inFrame()) {
       window.location.href = 'https://bitclout.com';
       return;
     }
@@ -38,18 +38,5 @@ export class AppComponent implements OnInit {
         this.globalVars.network = Network.testnet;
       }
     });
-  }
-
-  inTab(): boolean {
-    return !!window.opener;
-  }
-
-  inFrame(): boolean {
-    try {
-      return window.self !== window.top;
-    } catch (e) {
-      // Most browsers block access to window.top when in an iframe
-      return true;
-    }
   }
 }

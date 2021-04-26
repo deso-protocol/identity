@@ -1,6 +1,6 @@
 <app-banner></app-banner>
 
-<div class="container home-container">
+<div class="container home-container" *ngIf="globalVars.inTab">
   <div class="fs-24px font-weight-bold">
     Sign up on {{ globalVars.hostname }}
   </div>

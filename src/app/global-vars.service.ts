@@ -11,10 +11,20 @@ export class GlobalVarsService {
   network = Network.mainnet;
   hostname = '';
 
+  inTab = !!window.opener;
+
   constructor() { }
 
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
   }
 
+  inFrame(): boolean {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      // Most browsers block access to window.top when in an iframe
+      return true;
+    }
+  }
 }
