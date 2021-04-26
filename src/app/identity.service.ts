@@ -17,9 +17,6 @@ export class IdentityService {
   // All outbound request promises we still need to resolve
   private outboundRequests: {[key: string]: any} = {};
 
-  // Opener can be null, parent is never null
-  private currentWindow = opener || parent;
-
   // Embed component checks for browser support
   browserSupported = true;
 
@@ -28,7 +25,7 @@ export class IdentityService {
     private globalVars: GlobalVarsService,
     private cookieService: CookieService,
   ) {
-    window.addEventListener('message', (event) => this.handleMessage(event));
+    this.globalVars.getWindow().addEventListener('message', (event) => this.handleMessage(event));
   }
 
   // Outgoing Messages
@@ -216,7 +213,7 @@ export class IdentityService {
     const subject = new Subject();
     this.outboundRequests[id] = subject;
 
-    this.currentWindow.postMessage({
+    this.globalVars.getCurrentWindow().postMessage({
       id,
       service: 'identity',
       method,
@@ -228,7 +225,7 @@ export class IdentityService {
 
   // Respond to a received message
   private respond(id: string, payload: any): void {
-    this.currentWindow.postMessage({
+    this.globalVars.getCurrentWindow().postMessage({
       id,
       service: 'identity',
       payload
@@ -237,7 +234,7 @@ export class IdentityService {
 
   // Transmit a message without expecting a response
   private cast(method: string, payload?: any): void {
-    this.currentWindow.postMessage({
+    this.globalVars.getCurrentWindow().postMessage({
       id: null,
       service: 'identity',
       method,

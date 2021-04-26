@@ -59,7 +59,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   stepOnePrint(): void {
-    window.print();
+    this.globalVars.getWindow().print();
   }
 
   stepOneNext(): void {
