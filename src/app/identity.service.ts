@@ -17,9 +17,6 @@ export class IdentityService {
   // All outbound request promises we still need to resolve
   private outboundRequests: {[key: string]: any} = {};
 
-  // Opener can be null, parent is never null
-  private currentWindow = opener || parent;
-
   // Embed component checks for browser support
   browserSupported = true;
 
@@ -28,7 +25,7 @@ export class IdentityService {
     private globalVars: GlobalVarsService,
     private cookieService: CookieService,
   ) {
-    window.addEventListener('message', (event) => this.handleMessage(event));
+    this.globalVars.getWindow().addEventListener('message', (event) => this.handleMessage(event));
   }
 
   // Outgoing Messages
@@ -97,7 +94,7 @@ export class IdentityService {
 
   // Decrypt is async so we can use await.
   // Do we wanna define all handleAction functions as async?
-  private async handleDecrypt(data: any): Promise<void> {
+  private handleDecrypt(data: any): void {
     const { id, payload: { encryptedSeedHex, encryptedHexes } } = data;
     const privateKey = this.cryptoService.encryptedSeedHexToPrivateKey(encryptedSeedHex, this.globalVars.hostname);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer();
@@ -106,8 +103,7 @@ export class IdentityService {
     for (const encryptedHex of encryptedHexes) {
       const encryptedBytes = new Buffer(encryptedHex, 'hex');
       try {
-        const decryptedTest = await ecies.decrypt(privateKeyBuffer, encryptedBytes);
-        decryptedHexes[encryptedHex] = decryptedTest;
+        decryptedHexes[encryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes);
       } catch (e) {
         console.error(e);
       }
@@ -216,7 +212,7 @@ export class IdentityService {
     const subject = new Subject();
     this.outboundRequests[id] = subject;
 
-    this.currentWindow.postMessage({
+    this.globalVars.getCurrentWindow().postMessage({
       id,
       service: 'identity',
       method,
@@ -228,7 +224,7 @@ export class IdentityService {
 
   // Respond to a received message
   private respond(id: string, payload: any): void {
-    this.currentWindow.postMessage({
+    this.globalVars.getCurrentWindow().postMessage({
       id,
       service: 'identity',
       payload
@@ -237,7 +233,7 @@ export class IdentityService {
 
   // Transmit a message without expecting a response
   private cast(method: string, payload?: any): void {
-    this.currentWindow.postMessage({
+    this.globalVars.getCurrentWindow().postMessage({
       id: null,
       service: 'identity',
       method,

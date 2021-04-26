@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EmbedComponent } from './embed.component';
+import {CookieModule} from 'ngx-cookie';
 
 describe('EmbedComponent', () => {
   let component: EmbedComponent;
@@ -8,7 +9,8 @@ describe('EmbedComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EmbedComponent ]
+      declarations: [ EmbedComponent ],
+      imports: [ CookieModule.forRoot() ],
     })
     .compileComponents();
   });

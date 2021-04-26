@@ -11,7 +11,7 @@ export class GlobalVarsService {
   network = Network.mainnet;
   hostname = '';
 
-  inTab = !!window.opener;
+  inTab = !!this.getOpener();
 
   constructor() { }
 
@@ -21,10 +21,28 @@ export class GlobalVarsService {
 
   inFrame(): boolean {
     try {
-      return window.self !== window.top;
+      return this.getWindow().self !== this.getWindow().top;
     } catch (e) {
       // Most browsers block access to window.top when in an iframe
       return true;
     }
   }
+
+  getWindow(): Window {
+    return window;
+  }
+
+  getOpener(): Window {
+    return this.getWindow().opener;
+  }
+
+  getParent(): Window {
+    return this.getWindow().parent;
+  }
+
+  getCurrentWindow(): Window {
+    // Opener can be null, parent is never null
+    return this.getOpener() || this.getParent();
+  }
+
 }
