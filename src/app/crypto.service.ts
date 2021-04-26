@@ -113,7 +113,7 @@ export class CryptoService {
    privateKeyToBitcloutPublicKey(privateKey: EC.KeyPair, network: Network): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitclout;
     const key = privateKey.getPublic().encode('array', true);
-    const prefixAndKey = Uint8Array.from([...prefix, ...key]);
+    const prefixAndKey = Buffer.from([...prefix, ...key]);
 
     return bs58check.encode(prefixAndKey);
   }
@@ -122,7 +122,7 @@ export class CryptoService {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitcoin;
     // @ts-ignore TODO: add "identifier" to type definition
     const identifier = keychain.identifier;
-    const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
+    const prefixAndKey = Buffer.from([...prefix, ...identifier]);
 
     return bs58check.encode(prefixAndKey);
   }

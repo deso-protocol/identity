@@ -109,9 +109,6 @@ export class IdentityService {
       }
     }
 
-    console.log('hey');
-    console.log(decryptedHexes);
-
     this.respond(id, {
       decryptedHexes
     });

@@ -149,4 +149,12 @@ describe('IdentityService', () => {
     //   [encryptedHex]: message,
     // });
   });
+
+  it('can handle info', () => {
+    // TODO
+  });
+
+  it('can handle jwt', () => {
+    // TODO
+  });
 });
