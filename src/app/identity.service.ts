@@ -94,7 +94,7 @@ export class IdentityService {
 
   // Decrypt is async so we can use await.
   // Do we wanna define all handleAction functions as async?
-  private async handleDecrypt(data: any): Promise<void> {
+  private handleDecrypt(data: any): void {
     const { id, payload: { encryptedSeedHex, encryptedHexes } } = data;
     const privateKey = this.cryptoService.encryptedSeedHexToPrivateKey(encryptedSeedHex, this.globalVars.hostname);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer();
@@ -103,12 +103,14 @@ export class IdentityService {
     for (const encryptedHex of encryptedHexes) {
       const encryptedBytes = new Buffer(encryptedHex, 'hex');
       try {
-        const decryptedTest = await ecies.decrypt(privateKeyBuffer, encryptedBytes);
-        decryptedHexes[encryptedHex] = decryptedTest;
+        decryptedHexes[encryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes);
       } catch (e) {
         console.error(e);
       }
     }
+
+    console.log('hey');
+    console.log(decryptedHexes);
 
     this.respond(id, {
       decryptedHexes

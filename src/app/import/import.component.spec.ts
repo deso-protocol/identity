@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ImportComponent } from './import.component';
+import {CookieModule} from 'ngx-cookie';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {BannerComponent} from '../banner/banner.component';
 
 describe('ImportComponent', () => {
   let component: ImportComponent;
@@ -8,7 +11,11 @@ describe('ImportComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ImportComponent ]
+      declarations: [ ImportComponent, BannerComponent ],
+      imports: [
+        CookieModule.forRoot(),
+        HttpClientTestingModule,
+      ],
     })
     .compileComponents();
   });
