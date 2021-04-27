@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
 import {BackendAPIService} from '../backend-api.service';
+import {GlobalVarsService} from '../global-vars.service';
 
 @Component({
   selector: 'app-import',
@@ -15,6 +16,7 @@ export class ImportComponent implements OnInit {
     private accountService: AccountService,
     private identityService: IdentityService,
     private backendApi: BackendAPIService,
+    public globalVars: GlobalVarsService
   ) { }
 
   ngOnInit(): void {
