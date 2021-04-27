@@ -5,8 +5,8 @@ import HDKey from 'hdkey';
 import {ec as EC} from 'elliptic';
 import bs58check from 'bs58check';
 import {CookieService} from 'ngx-cookie';
-import {createCipher, createDecipher, randomBytes} from 'crypto';
-import {Network} from '../types/identity';
+import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
+import {AccessLevel, Network} from '../types/identity';
 
 @Injectable({
   providedIn: 'root'
@@ -37,8 +37,22 @@ export class CryptoService {
     return randomBytes(32).toString('hex');
   }
 
+  seedHexEncryptionStorageKey(hostname: string): string {
+    return `seed-hex-key-${hostname}`;
+  }
+
+  hasSeedHexEncryptionKey(hostname: string): boolean {
+    const storageKey = this.seedHexEncryptionStorageKey(hostname);
+
+    if (this.mustUseStorageAccess()) {
+      return !!this.cookieService.get(storageKey);
+    } else {
+      return !!localStorage.getItem(storageKey);
+    }
+  }
+
   seedHexEncryptionKey(hostname: string): string {
-    const storageKey = `seed-hex-key-${hostname}`;
+    const storageKey = this.seedHexEncryptionStorageKey(hostname);
     let encryptionKey;
 
     if (this.mustUseStorageAccess()) {
@@ -78,6 +92,19 @@ export class CryptoService {
     return decipher.update(Buffer.from(encryptedSeedHex, 'hex')).toString();
   }
 
+  accessLevelHmac(accessLevel: AccessLevel, seedHex: string): string {
+    const hmac = createHmac('sha256', seedHex);
+    return hmac.update(accessLevel.toString()).digest().toString('hex');
+  }
+
+  validAccessLevelHmac(hmac: string, accessLevel: AccessLevel, hostname: string): boolean {
+    if (!hmac || !hostname) {
+      return false;
+    }
+
+    return hmac === this.accessLevelHmac(accessLevel, hostname);
+  }
+
   encryptedSeedHexToPrivateKey(encryptedSeedHex: string, domain: string): EC.KeyPair {
     const seedHex = this.decryptSeedHex(encryptedSeedHex, domain);
     return this.seedHexToPrivateKey(seedHex);
@@ -110,7 +137,7 @@ export class CryptoService {
     return ec.keyFromPrivate(seedHex);
   }
 
-   privateKeyToBitcloutPublicKey(privateKey: EC.KeyPair, network: Network): string {
+  privateKeyToBitcloutPublicKey(privateKey: EC.KeyPair, network: Network): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitclout;
     const key = privateKey.getPublic().encode('array', true);
     const prefixAndKey = Uint8Array.from([...prefix, ...key]);

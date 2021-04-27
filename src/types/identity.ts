@@ -12,6 +12,7 @@ export interface PublicUserInfo {
   encryptedSeedHex: string;
   network: Network;
   accessLevel: AccessLevel;
+  accessLevelHmac: string;
 }
 
 export enum Network {
@@ -20,9 +21,19 @@ export enum Network {
 }
 
 export enum AccessLevel {
+  // User revoked permissions
   None = 0,
-  ReadOnly = 1,
-  ApproveAll = 2,
-  ApproveLarge = 3,
+
+  // Node can prove identity (using JWT token)
+  Identity = 1,
+
+  // Node can prove identity and decrypt messages
+  Messages = 2,
+
+  // Node can prove identity, decrypt messages, and sign small transactions without approval:
+  // Like, Post, Follow, Update Profile
+  SignSmall = 3,
+
+  // Node can sign all transactions without approval
   Full = 4,
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Network} from '../types/identity';
+import {AccessLevel, Network} from '../types/identity';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,7 @@ export class GlobalVarsService {
 
   network = Network.mainnet;
   hostname = '';
+  accessLevelRequest = AccessLevel.SignSmall;
 
   inTab = !!window.opener;
 

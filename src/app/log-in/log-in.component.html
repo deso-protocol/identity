@@ -70,14 +70,30 @@
 
     <div *ngIf="showAccessLevels">
       <div class="fs-18px mt-30px">
-        Select an access level
+        <b>{{ globalVars.hostname }}</b> is requesting access to:
       </div>
 
-      <ul class="list-group mt-15px">
-        <li class="list-group-item list-group-item-action cursor-pointer" (click)="selectLevel(1)" [ngClass]="{active: selectedLevel === 1}">Read-only</li>
-        <li class="list-group-item list-group-item-action fc-muted disabled">Require approval for every transaction</li>
-        <li class="list-group-item list-group-item-action fc-muted disabled">Require approval for large transactions</li>
-        <li class="list-group-item list-group-item-action cursor-pointer" (click)="selectLevel(4)" [ngClass]="{active: selectedLevel === 4}">Full signing access</li>
+      <ul class="list-group list-group-flush mt-15px">
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest >= 1">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 1">❌</span>
+          Your public key and profile
+        </li>
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
+          Decrypt all received messages
+        </li>
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
+          Sign small transactions without approval
+        </li>
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
+          Sign large transactions without approval
+        </li>
       </ul>
     </div>
 

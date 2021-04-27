@@ -37,6 +37,10 @@ export class AppComponent implements OnInit {
       if (params.testnet) {
         this.globalVars.network = Network.testnet;
       }
+
+      if (params.accessLevelRequest) {
+        this.globalVars.accessLevelRequest = params.accessLevelRequest;
+      }
     });
   }
 }
