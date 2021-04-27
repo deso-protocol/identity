@@ -7,7 +7,7 @@ import {environment} from '../environments/environment';
   providedIn: 'root'
 })
 export class BackendAPIService {
-  endpoint = `https://${environment.node_api_hostname}`;
+  endpoint = `https://${environment.nodeApiHostname}`;
 
   constructor(
     private httpClient: HttpClient,

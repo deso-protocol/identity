@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     // We must be in an iframe OR opened with window.open
     if (!this.globalVars.inTab && !this.globalVars.inFrame()) {
-      window.location.href = `https://${this.globalVars.environment.node_hostname}`;
+      window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
       return;
     }
 

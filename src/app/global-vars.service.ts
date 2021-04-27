@@ -6,8 +6,8 @@ import {environment} from '../environments/environment';
   providedIn: 'root'
 })
 export class GlobalVarsService {
-  static fullAccessHostnames = environment.full_access_hostnames;
-  static noAccessHostnames = environment.no_access_hostnames;
+  static fullAccessHostnames = environment.fullAccessHostnames;
+  static noAccessHostnames = environment.noAccessHostnames;
 
   network = Network.mainnet;
   hostname = '';
