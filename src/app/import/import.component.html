@@ -2,11 +2,11 @@
 
 <div class="container home-container">
   <div class="fs-24px font-weight-bold">
-    bitclout.com
+    {{ globalVars.environment.nodeHostname }}
   </div>
 
   <div class="fs-18px pt-15px">
-    Grant <b>bitclout.com</b> full signing privileges for these accounts:
+    Grant <b>{{ globalVars.environment.nodeHostname }}</b> full signing privileges for these accounts:
   </div>
 
   <ul class="list-group pt-15px">
