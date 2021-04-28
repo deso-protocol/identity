@@ -180,12 +180,14 @@ export class IdentityService {
   }
 
   private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
-    const { payload: { accessLevel, accessLevelHmac }} = data;
+    const { payload: { encryptedSeedHex, accessLevel, accessLevelHmac }} = data;
     if (accessLevel < requiredAccessLevel) {
+      console.log('less');
       return false;
     }
 
-    return this.cryptoService.validAccessLevelHmac(accessLevelHmac, accessLevel, this.globalVars.hostname);
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    return this.cryptoService.validAccessLevelHmac(accessLevel, seedHex, accessLevelHmac);
   }
 
   private approve(data: any, accessLevel: AccessLevel): boolean {

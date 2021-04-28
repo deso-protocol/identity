@@ -97,12 +97,12 @@ export class CryptoService {
     return hmac.update(accessLevel.toString()).digest().toString('hex');
   }
 
-  validAccessLevelHmac(hmac: string, accessLevel: AccessLevel, hostname: string): boolean {
-    if (!hmac || !hostname) {
+  validAccessLevelHmac(accessLevel: AccessLevel, seedHex: string, hmac: string): boolean {
+    if (!hmac || !seedHex) {
       return false;
     }
 
-    return hmac === this.accessLevelHmac(accessLevel, hostname);
+    return hmac === this.accessLevelHmac(accessLevel, seedHex);
   }
 
   encryptedSeedHexToPrivateKey(encryptedSeedHex: string, domain: string): EC.KeyPair {

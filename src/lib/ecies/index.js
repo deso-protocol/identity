@@ -20,7 +20,7 @@ function assert(condition, message) {
 }
 
 // The KDF as implemented in Parity
-export const kdf = async function(secret, outputLength) {
+export const kdf = function(secret, outputLength) {
   let ctr = 1;
   let written = 0;
   let result = Buffer.from('');
@@ -38,7 +38,7 @@ export const kdf = async function(secret, outputLength) {
 // Get the AES-128-CTR browser implementation
 
 const aesCtrEncrypt = function(counter, key, data) {
-  const cipher = createCipheriv('aes-256-gcm', key, counter);
+  const cipher = createCipheriv('aes-128-ctr', key, counter);
   return cipher.update(data).toString();
 }
 
@@ -84,61 +84,62 @@ export const verify = function(publicKey, msg, sig) {
 
 //ECDH
 export const derive = function(privateKeyA, publicKeyB) {
-  return new Promise(function(resolve) {
-    assert(Buffer.isBuffer(privateKeyA), "Bad input");
-    assert(Buffer.isBuffer(publicKeyB), "Bad input");
-    assert(privateKeyA.length === 32, "Bad private key");
-    assert(publicKeyB.length === 65, "Bad public key");
-    assert(publicKeyB[0] === 4, "Bad public key");
-    const keyA = ec.keyFromPrivate(privateKeyA);
-    const keyB = ec.keyFromPublic(publicKeyB);
-    const Px = keyA.derive(keyB.getPublic());  // BN instance
-    resolve(new Buffer(Px.toArray()));
-  });
+  assert(Buffer.isBuffer(privateKeyA), "Bad input");
+  assert(Buffer.isBuffer(publicKeyB), "Bad input");
+  assert(privateKeyA.length === 32, "Bad private key");
+  assert(publicKeyB.length === 65, "Bad public key");
+  assert(publicKeyB[0] === 4, "Bad public key");
+  const keyA = ec.keyFromPrivate(privateKeyA);
+  const keyB = ec.keyFromPublic(publicKeyB);
+  const Px = keyA.derive(keyB.getPublic());  // BN instance
+  return new Buffer(Px.toArray());
 };
 
 
 // Encrypt AES-128-CTR and serialise as in Parity
-// Serialisation: <ephemPubKey><IV><CipherText><HMAC>
-export const encrypt = async function(publicKeyTo, msg, opts) {
+// Serialization: <ephemPubKey><IV><CipherText><HMAC>
+export const encrypt = function(publicKeyTo, msg, opts) {
   opts = opts || {};
   const ephemPrivateKey = opts.ephemPrivateKey || randomBytes(32);
   const ephemPublicKey = getPublic(ephemPrivateKey);
-  const sharedPx = await derive(ephemPrivateKey, publicKeyTo);
-  const hash = await kdf(sharedPx, 32);
+
+  const sharedPx = derive(ephemPrivateKey, publicKeyTo);
+  const hash = kdf(sharedPx, 32);
   const iv = opts.iv || randomBytes(16);
   const encryptionKey = hash.slice(0, 16);
-  const macKey = await sha256(hash.slice(16));
-  const ciphertext = await aesCtrEncrypt(iv, encryptionKey, msg);
-  const dataToMac = Buffer.concat([iv, ciphertext]);
-  const HMAC = await hmacSha256Sign(macKey, dataToMac);
-  return Buffer.concat([ephemPublicKey,iv,ciphertext,HMAC]);
+
+  // Generate hmac
+  const macKey = createHash("sha256").update(hash.slice(16)).digest();
+  const ciphertext = aesCtrEncrypt(iv, encryptionKey, msg);
+  const dataToMac = Buffer.from([...iv, ...ciphertext]);
+  const HMAC = hmacSha256Sign(macKey, dataToMac);
+
+  return Buffer.from([...ephemPublicKey, ...iv, ...ciphertext, ...HMAC]);
 };
 
 // Decrypt serialised AES-128-CTR
-export const decrypt = async function(privateKey, encrypted) {
+export const decrypt = function(privateKey, encrypted) {
   const metaLength = 1 + 64 + 16 + 32;
   assert(encrypted.length > metaLength, "Invalid Ciphertext. Data is too small")
   assert(encrypted[0] >= 2 && encrypted[0] <= 4, "Not valid ciphertext.")
 
-  // deserialise
-  const ephemPublicKey = encrypted.slice(0,65);
+  // deserialize
+  const ephemPublicKey = encrypted.slice(0, 65);
   const cipherTextLength = encrypted.length - metaLength;
-  const iv = encrypted.slice(65,65 + 16);
-  const cipherAndIv = encrypted.slice(65, 65+16+ cipherTextLength);
+  const iv = encrypted.slice(65, 65 + 16);
+  const cipherAndIv = encrypted.slice(65, 65 + 16 + cipherTextLength);
   const ciphertext = cipherAndIv.slice(16);
-  const msgMac = encrypted.slice(65+16+ cipherTextLength);
+  const msgMac = encrypted.slice(65 + 16 + cipherTextLength);
 
   // check HMAC
-  const px = await derive(privateKey, ephemPublicKey);
-  const hash = await kdf(px,32);
+  const px = derive(privateKey, ephemPublicKey);
+  const hash = kdf(px,32);
   const encryptionKey = hash.slice(0, 16);
   const macKey = createHash("sha256").update(hash.slice(16)).digest()
   const dataToMac = Buffer.from(cipherAndIv);
-  const hmacGood = await hmacSha256Sign(macKey, dataToMac);
+  const hmacGood = hmacSha256Sign(macKey, dataToMac);
   assert(hmacGood.equals(msgMac), "Incorrect MAC");
 
   // decrypt message
-  const plainText = await aesCtrDecrypt(iv, encryptionKey, ciphertext);
-  return plainText;
+  return aesCtrDecrypt(iv, encryptionKey, ciphertext);
 };
