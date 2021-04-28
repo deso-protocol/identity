@@ -11,7 +11,7 @@ export class GlobalVarsService {
 
   network = Network.mainnet;
   hostname = '';
-  accessLevelRequest = AccessLevel.SignSmall;
+  accessLevelRequest = AccessLevel.ApproveAll;
 
   inTab = !!window.opener;
 

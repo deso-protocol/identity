@@ -144,7 +144,7 @@
     <div>
       <div class="fs-15px fc-muted">STEP 3 of 4</div>
       <div class="fs-24px mt-30px">
-        <b>{{ globalVars.hostname }}</b> is requesting access to:
+        <b>{{ globalVars.hostname }}</b> is requesting:
       </div>
 
       <ul class="list-group list-group-flush mt-15px">
@@ -168,7 +168,7 @@
     <div class="d-flex justify-content-end mt-15px">
       <button (click)="clickSignup()"
               class="btn btn-primary font-weight-bold fs-15px"
-              [disabled]="globalVars.accessLevelRequest > 4 || globalVars.accessLevelRequest < 1">
+              [disabled]="globalVars.accessLevelRequest > 4 || globalVars.accessLevelRequest < 2">
         Sign up on {{ globalVars.hostname }}
       </button>
     </div>
