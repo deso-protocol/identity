@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GlobalVarsService} from './global-vars.service';
 import {IdentityService} from './identity.service';
-import {Network} from '../types/identity';
+import {AccessLevel, Network} from '../types/identity';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +29,10 @@ export class AppComponent implements OnInit {
 
     this.identityService.initialize().subscribe(res => {
       this.globalVars.hostname = res.hostname;
+      if (this.globalVars.isFullAccessHostname()) {
+        this.globalVars.accessLevelRequest = AccessLevel.Full;
+      }
+
       this.loading = false;
     });
 

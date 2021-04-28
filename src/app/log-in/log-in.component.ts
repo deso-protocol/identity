@@ -106,10 +106,7 @@ export class LogInComponent implements OnInit {
       return;
     }
 
-    if (!this.globalVars.isFullAccessHostname()) {
-      this.accountService.setAccessLevel(this.selectedAccount, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-    }
-
+    this.accountService.setAccessLevel(this.selectedAccount, this.globalVars.hostname, this.globalVars.accessLevelRequest);
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.selectedAccount,
