@@ -49,8 +49,6 @@ export class ApproveComponent implements OnInit {
       this.transaction = Transaction.fromBytes(txBytes)[0];
       this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
 
-      console.log(this.transaction);
-
       this.generateTransactionDescription();
     });
   }

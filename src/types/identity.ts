@@ -24,15 +24,14 @@ export enum AccessLevel {
   // User revoked permissions
   None = 0,
 
-  // Node can prove identity (using JWT token)
-  Identity = 1,
+  // Unused
+  Unused = 1,
 
-  // Node can prove identity and decrypt messages
-  Messages = 2,
+  // Approval required for all transactions
+  ApproveAll = 2,
 
-  // Node can prove identity, decrypt messages, and sign small transactions without approval:
-  // Like, Post, Follow, Update Profile
-  SignSmall = 3,
+  // Approval required for buys, sends, and sells
+  ApproveLarge = 3,
 
   // Node can sign all transactions without approval
   Full = 4,

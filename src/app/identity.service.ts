@@ -6,6 +6,20 @@ import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
 import {SigningService} from './signing.service';
+import {
+  Transaction,
+  TransactionMetadataBasicTransfer,
+  TransactionMetadataBitcoinExchange,
+  TransactionMetadataCreatorCoin,
+  TransactionMetadataFollow,
+  TransactionMetadataLike,
+  TransactionMetadataPrivateMessage,
+  TransactionMetadataSubmitPost,
+  TransactionMetadataSwapIdentity,
+  TransactionMetadataUpdateBitcoinUSDExchangeRate,
+  TransactionMetadataUpdateGlobalParams,
+  TransactionMetadataUpdateProfile
+} from '../lib/bitclout/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -54,15 +68,6 @@ export class IdentityService {
 
   // Incoming Messages
 
-  private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
-    const { payload: { accessLevel, accessLevelHmac }} = data;
-    if (accessLevel < requiredAccessLevel) {
-      return false;
-    }
-
-    return this.cryptoService.validAccessLevelHmac(accessLevelHmac, accessLevel, this.globalVars.hostname);
-  }
-
   private handleBurn(data: any): void {
     if (!this.approve(data, AccessLevel.Full)) {
       return;
@@ -78,11 +83,12 @@ export class IdentityService {
   }
 
   private handleSign(data: any): void {
-    if (!this.approve(data, AccessLevel.Full)) {
+    const { id, payload: { encryptedSeedHex, transactionHex } } = data;
+    const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+    if (!this.approve(data, requiredAccessLevel)) {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, transactionHex } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
     const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
 
@@ -92,7 +98,7 @@ export class IdentityService {
   }
 
   private handleDecrypt(data: any): void {
-    if (!this.approve(data, AccessLevel.Messages)) {
+    if (!this.approve(data, AccessLevel.ApproveAll)) {
       return;
     }
 
@@ -106,7 +112,7 @@ export class IdentityService {
   }
 
   private handleJwt(data: any): void {
-    if (!this.approve(data, AccessLevel.Identity)) {
+    if (!this.approve(data, AccessLevel.ApproveAll)) {
       return;
     }
 
@@ -145,6 +151,41 @@ export class IdentityService {
       hasStorageAccess,
       browserSupported: this.browserSupported,
     });
+  }
+
+  // Access levels
+
+  private getRequiredAccessLevel(transactionHex: string): AccessLevel {
+    const txBytes = new Buffer(transactionHex, 'hex');
+    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+
+    switch (transaction.metadata.constructor) {
+      case TransactionMetadataBasicTransfer:
+      case TransactionMetadataBitcoinExchange:
+      case TransactionMetadataUpdateBitcoinUSDExchangeRate:
+      case TransactionMetadataCreatorCoin:
+      case TransactionMetadataSwapIdentity:
+      case TransactionMetadataUpdateGlobalParams:
+        return AccessLevel.Full;
+
+      case TransactionMetadataFollow:
+      case TransactionMetadataPrivateMessage:
+      case TransactionMetadataSubmitPost:
+      case TransactionMetadataUpdateProfile:
+      case TransactionMetadataLike:
+        return AccessLevel.ApproveLarge;
+    }
+
+    return AccessLevel.Full;
+  }
+
+  private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
+    const { payload: { accessLevel, accessLevelHmac }} = data;
+    if (accessLevel < requiredAccessLevel) {
+      return false;
+    }
+
+    return this.cryptoService.validAccessLevelHmac(accessLevelHmac, accessLevel, this.globalVars.hostname);
   }
 
   private approve(data: any, accessLevel: AccessLevel): boolean {

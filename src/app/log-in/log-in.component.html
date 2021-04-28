@@ -75,24 +75,19 @@
 
       <ul class="list-group list-group-flush mt-15px">
         <li class="list-group-item">
-          <span *ngIf="globalVars.accessLevelRequest >= 1">✅</span>
-          <span *ngIf="globalVars.accessLevelRequest < 1">❌</span>
-          Your public key and profile
-        </li>
-        <li class="list-group-item">
           <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
           <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
-          Decrypt all received messages
+          Require approval for all transactions
         </li>
         <li class="list-group-item">
           <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
           <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
-          Sign small transactions without approval
+          Only require approval to move money
         </li>
         <li class="list-group-item">
           <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
           <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
-          Sign large transactions without approval
+          Full signing access
         </li>
       </ul>
     </div>
