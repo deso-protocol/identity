@@ -5,10 +5,10 @@ export const bufToUvarint64 = (buffer: Buffer): [number, Buffer] => {
   for (let i = 0; true; i++) {
       const byte = buffer[i];
 
-      if (i > 9 || i == 9 && byte > 1) throw new Error('uint64 overflow');
+      if (i > 9 || i == 9 && byte > 1) { throw new Error('uint64 overflow'); }
 
       if (byte < 0x80) {
-        return [x | byte << s, buffer.slice(i+1)];
+        return [Number(BigInt(x) | BigInt(byte) << BigInt(s)), buffer.slice(i + 1)];
       }
 
       x |= (byte & 0x7F) << s;
