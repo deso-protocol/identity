@@ -17,6 +17,7 @@ import {AccountService} from './account.service';
 import {EntropyService} from './entropy.service';
 import { LogInComponent } from './log-in/log-in.component';
 import {HttpClientModule} from '@angular/common/http';
+import { ApproveComponent } from './approve/approve.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import {HttpClientModule} from '@angular/common/http';
     SignUpComponent,
     SignUpEntropyComponent,
     LogInComponent,
+    ApproveComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, Network, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {CookieService} from 'ngx-cookie';
 
 @Injectable({
   providedIn: 'root'
@@ -13,36 +14,37 @@ export class AccountService {
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
+    private cookieService: CookieService,
   ) { }
 
   // Getters
 
   getPublicKeys(): any {
-    return Object.keys(this.getPrivateUsers());
+    return Object.keys(this.getPrivateUsers(this.globalVars.network));
   }
 
   getEncryptedUsers(): {[key: string]: PublicUserInfo} {
     const hostname = this.globalVars.hostname;
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getPrivateUsers(this.globalVars.network);
     const publicUsers: {[key: string]: PublicUserInfo} = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
       const privateUser = privateUsers[publicKey];
       const accessLevel = this.getAccessLevel(publicKey, hostname);
-
-      let encryptedSeedHex = '';
-      if (accessLevel === AccessLevel.Full) {
-        encryptedSeedHex = this.cryptoService.encryptSeedHex(privateUser.seedHex, hostname);
-      } else if (accessLevel === AccessLevel.None) {
+      if (accessLevel === AccessLevel.None) {
         continue;
       }
+
+      const encryptedSeedHex = this.cryptoService.encryptSeedHex(privateUser.seedHex, hostname);
+      const accessLevelHmac = this.cryptoService.accessLevelHmac(accessLevel, privateUser.seedHex);
 
       publicUsers[publicKey] = {
         hasExtraText: privateUser.extraText?.length > 0,
         btcDepositAddress: privateUser.btcDepositAddress,
         encryptedSeedHex,
-        accessLevel,
         network: privateUser.network,
+        accessLevel,
+        accessLevelHmac,
       };
     }
 
@@ -100,13 +102,13 @@ export class AccountService {
 
   // Private / Sensitive
 
-  private getPrivateUsers(): {[key: string]: PrivateUserInfo} {
+  private getPrivateUsers(network?: Network): {[key: string]: PrivateUserInfo} {
     const privateUsers = JSON.parse(localStorage.getItem(AccountService.usersStorageKey) || '{}');
     const filteredPrivateUsers: {[key: string]: PrivateUserInfo} = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
       const privateUser = privateUsers[publicKey];
-      if (privateUser.network !== this.globalVars.network) {
+      if (network && privateUser.network !== network) {
         continue;
       }
 

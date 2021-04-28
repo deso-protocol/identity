@@ -14,7 +14,6 @@ import {RouteNames} from '../app-routing.module';
 })
 export class SignUpComponent implements OnInit, OnDestroy {
   stepNum = 1;
-  selectedLevel = 0;
   seedCopied = false;
   advancedOpen = false;
   mnemonicCheck = '';
@@ -98,7 +97,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   clickSignup(): void {
-    this.accountService.setAccessLevel(this.publicKeyAdded, this.globalVars.hostname, this.selectedLevel);
+    this.accountService.setAccessLevel(this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
     this.completeFlow();
   }
 

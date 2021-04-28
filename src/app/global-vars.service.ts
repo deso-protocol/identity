@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Network} from '../types/identity';
+import {AccessLevel, Network} from '../types/identity';
 import {environment} from '../environments/environment';
 
 @Injectable({
@@ -11,6 +11,7 @@ export class GlobalVarsService {
 
   network = Network.mainnet;
   hostname = '';
+  accessLevelRequest = AccessLevel.ApproveAll;
 
   inTab = !!window.opener;
 

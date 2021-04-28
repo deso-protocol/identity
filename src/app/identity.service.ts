@@ -1,14 +1,25 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import { v4 as uuid } from 'uuid';
-import {PublicUserInfo} from '../types/identity';
-import * as sha256 from 'sha256';
-import KeyEncoder from 'key-encoder';
-import * as jsonwebtoken from 'jsonwebtoken';
+import {v4 as uuid} from 'uuid';
+import {AccessLevel, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import * as ecies from '../lib/ecies';
 import {CookieService} from 'ngx-cookie';
+import {SigningService} from './signing.service';
+import {
+  Transaction,
+  TransactionMetadataBasicTransfer,
+  TransactionMetadataBitcoinExchange,
+  TransactionMetadataCreatorCoin,
+  TransactionMetadataFollow,
+  TransactionMetadataLike,
+  TransactionMetadataPrivateMessage,
+  TransactionMetadataSubmitPost,
+  TransactionMetadataSwapIdentity,
+  TransactionMetadataUpdateBitcoinUSDExchangeRate,
+  TransactionMetadataUpdateGlobalParams,
+  TransactionMetadataUpdateProfile
+} from '../lib/bitclout/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +38,7 @@ export class IdentityService {
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
     private cookieService: CookieService,
+    private signingService: SigningService,
   ) {
     window.addEventListener('message', (event) => this.handleMessage(event));
   }
@@ -45,6 +57,7 @@ export class IdentityService {
     users: {[key: string]: PublicUserInfo},
     publicKeyAdded?: string,
     signedUp?: boolean
+    signedTransactionHex?: string,
   }): void {
     this.cast('login', payload);
   }
@@ -56,15 +69,13 @@ export class IdentityService {
   // Incoming Messages
 
   private handleBurn(data: any): void {
-    const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
-    const privateKey = this.cryptoService.encryptedSeedHexToPrivateKey(encryptedSeedHex, this.globalVars.hostname);
-    const signedHashes = [];
-
-    for (const unsignedHash of unsignedHashes) {
-      const signature = privateKey.sign(unsignedHash);
-      const signatureBytes = new Buffer(signature.toDER());
-      signedHashes.push(signatureBytes.toString('hex'));
+    if (!this.approve(data, AccessLevel.Full)) {
+      return;
     }
+
+    const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const signedHashes = this.signingService.signBurn(seedHex, unsignedHashes);
 
     this.respond(id, {
       signedHashes,
@@ -73,45 +84,27 @@ export class IdentityService {
 
   private handleSign(data: any): void {
     const { id, payload: { encryptedSeedHex, transactionHex } } = data;
-    const privateKey = this.cryptoService.encryptedSeedHexToPrivateKey(encryptedSeedHex, this.globalVars.hostname);
+    const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+    if (!this.approve(data, requiredAccessLevel)) {
+      return;
+    }
 
-    const transactionBytes = new Buffer(transactionHex, 'hex');
-    const transactionHash = new Buffer(sha256.x2(transactionBytes), 'hex');
-    const signature = privateKey.sign(transactionHash);
-    const signatureBytes = new Buffer(signature.toDER());
-    const signatureLength = this.cryptoService.uintToBuf(signatureBytes.length);
-
-    const signedTransactionBytes = Buffer.concat([
-      // This slice is bad. We need to remove the existing signature length field prior to appending the new one.
-      // Once we have frontend transaction construction we won't need to do this.
-      transactionBytes.slice(0, -1),
-      signatureLength,
-      signatureBytes,
-    ]);
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
 
     this.respond(id, {
-      signature,
-      signedTransactionHex: signedTransactionBytes.toString('hex'),
+      signedTransactionHex,
     });
   }
 
-  // Decrypt is async so we can use await.
-  // Do we wanna define all handleAction functions as async?
-  private async handleDecrypt(data: any): Promise<void> {
-    const { id, payload: { encryptedSeedHex, encryptedHexes } } = data;
-    const privateKey = this.cryptoService.encryptedSeedHexToPrivateKey(encryptedSeedHex, this.globalVars.hostname);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
-
-    const decryptedHexes: { [key: string]: any } = {};
-    for (const encryptedHex of encryptedHexes) {
-      const encryptedBytes = new Buffer(encryptedHex, 'hex');
-      try {
-        const decryptedTest = await ecies.decrypt(privateKeyBuffer, encryptedBytes);
-        decryptedHexes[encryptedHex] = decryptedTest;
-      } catch (e) {
-        console.error(e);
-      }
+  private handleDecrypt(data: any): void {
+    if (!this.approve(data, AccessLevel.ApproveAll)) {
+      return;
     }
+
+    const { id, payload: { encryptedSeedHex, encryptedHexes } } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexes);
 
     this.respond(id, {
       decryptedHexes
@@ -119,12 +112,13 @@ export class IdentityService {
   }
 
   private handleJwt(data: any): void {
+    if (!this.approve(data, AccessLevel.ApproveAll)) {
+      return;
+    }
+
     const { id, payload: { encryptedSeedHex } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-
-    const keyEncoder = new KeyEncoder('secp256k1');
-    const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
-    const jwt = jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: 60 });
+    const jwt = this.signingService.signJWT(seedHex);
 
     this.respond(id, {
       jwt
@@ -155,8 +149,55 @@ export class IdentityService {
 
     this.respond(event.data.id, {
       hasStorageAccess,
-      browserSupported: this.browserSupported
+      browserSupported: this.browserSupported,
     });
+  }
+
+  // Access levels
+
+  private getRequiredAccessLevel(transactionHex: string): AccessLevel {
+    const txBytes = new Buffer(transactionHex, 'hex');
+    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+
+    switch (transaction.metadata.constructor) {
+      case TransactionMetadataBasicTransfer:
+      case TransactionMetadataBitcoinExchange:
+      case TransactionMetadataUpdateBitcoinUSDExchangeRate:
+      case TransactionMetadataCreatorCoin:
+      case TransactionMetadataSwapIdentity:
+      case TransactionMetadataUpdateGlobalParams:
+        return AccessLevel.Full;
+
+      case TransactionMetadataFollow:
+      case TransactionMetadataPrivateMessage:
+      case TransactionMetadataSubmitPost:
+      case TransactionMetadataUpdateProfile:
+      case TransactionMetadataLike:
+        return AccessLevel.ApproveLarge;
+    }
+
+    return AccessLevel.Full;
+  }
+
+  private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
+    const { payload: { accessLevel, accessLevelHmac }} = data;
+    if (accessLevel < requiredAccessLevel) {
+      return false;
+    }
+
+    return this.cryptoService.validAccessLevelHmac(accessLevelHmac, accessLevel, this.globalVars.hostname);
+  }
+
+  private approve(data: any, accessLevel: AccessLevel): boolean {
+    const hasAccess = this.hasAccessLevel(data, accessLevel);
+    const hasEncryptionKey = this.cryptoService.hasSeedHexEncryptionKey(this.globalVars.hostname);
+
+    if (!hasAccess || !hasEncryptionKey) {
+      this.respond(data.id, { approvalRequired: true });
+      return false;
+    }
+
+    return true;
   }
 
   // Message handling

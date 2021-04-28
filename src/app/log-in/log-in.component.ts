@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
 import {CryptoService} from '../crypto.service';
@@ -26,7 +26,6 @@ export class LogInComponent implements OnInit {
   canLogin = false;
   showAccessLevels = true;
   selectedAccount = '';
-  selectedLevel = 0;
 
   allUsers: {[key: string]: any} = {};
 
@@ -68,22 +67,16 @@ export class LogInComponent implements OnInit {
 
   selectAccount(publicKey: string): void {
     this.selectedAccount = publicKey;
-    this.selectedLevel = this.accountService.getAccessLevel(publicKey, this.globalVars.hostname);
-    this.setCanLogin();
-  }
-
-  selectLevel(level: number): void {
-    this.selectedLevel = level;
     this.setCanLogin();
   }
 
   setCanLogin(): void {
     if (this.globalVars.isFullAccessHostname()) {
-      this.selectedLevel = AccessLevel.Full;
       this.showAccessLevels = false;
     }
 
-    this.canLogin = !!(this.globalVars.hostname && this.selectedAccount && this.selectedLevel);
+    const validAccessLevel = Object.values(AccessLevel).includes(this.globalVars.accessLevelRequest);
+    this.canLogin = !!(this.globalVars.hostname && validAccessLevel && this.selectedAccount);
   }
 
   clickLoadAccount(): void {
@@ -113,7 +106,10 @@ export class LogInComponent implements OnInit {
       return;
     }
 
-    this.accountService.setAccessLevel(this.selectedAccount, this.globalVars.hostname, this.selectedLevel);
+    if (!this.globalVars.isFullAccessHostname()) {
+      this.accountService.setAccessLevel(this.selectedAccount, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    }
+
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.selectedAccount,

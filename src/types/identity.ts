@@ -12,6 +12,7 @@ export interface PublicUserInfo {
   encryptedSeedHex: string;
   network: Network;
   accessLevel: AccessLevel;
+  accessLevelHmac: string;
 }
 
 export enum Network {
@@ -20,9 +21,18 @@ export enum Network {
 }
 
 export enum AccessLevel {
+  // User revoked permissions
   None = 0,
-  ReadOnly = 1,
+
+  // Unused
+  Unused = 1,
+
+  // Approval required for all transactions
   ApproveAll = 2,
+
+  // Approval required for buys, sends, and sells
   ApproveLarge = 3,
+
+  // Node can sign all transactions without approval
   Full = 4,
 }

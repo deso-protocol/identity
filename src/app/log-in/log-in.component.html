@@ -70,14 +70,25 @@
 
     <div *ngIf="showAccessLevels">
       <div class="fs-18px mt-30px">
-        Select an access level
+        <b>{{ globalVars.hostname }}</b> is requesting:
       </div>
 
-      <ul class="list-group mt-15px">
-        <li class="list-group-item list-group-item-action cursor-pointer" (click)="selectLevel(1)" [ngClass]="{active: selectedLevel === 1}">Read-only</li>
-        <li class="list-group-item list-group-item-action fc-muted disabled">Require approval for every transaction</li>
-        <li class="list-group-item list-group-item-action fc-muted disabled">Require approval for large transactions</li>
-        <li class="list-group-item list-group-item-action cursor-pointer" (click)="selectLevel(4)" [ngClass]="{active: selectedLevel === 4}">Full signing access</li>
+      <ul class="list-group list-group-flush mt-15px">
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
+          Require approval for all transactions
+        </li>
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
+          Only require approval to move money
+        </li>
+        <li class="list-group-item">
+          <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
+          <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
+          Full signing access
+        </li>
       </ul>
     </div>
 
