@@ -56,11 +56,11 @@
 
     <ul class="list-group mt-15px">
       <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccount(item.key)" [ngClass]="{active: selectedAccount === item.key}">
-        <div class="d-flex justify-content-between w-100">
-          <div *ngIf="!item.value.username" class="overflow-hidden" style="flex: 1 1 auto;">{{ item.key }}</div>
+        <div class="w-100">
+          <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}</div>
           <div *ngIf="item.value.username" class="d-flex align-items-center">
             <div class="avatar mr-15px" [style.background-image]="'url(' + item.value.profilePic + ')'"></div>
-            <div>{{ item.value.username }}</div>
+            <div class="text-truncate">{{ item.value.username }}</div>
           </div>
         </div>
       </li>
