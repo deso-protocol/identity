@@ -110,19 +110,6 @@ export class CryptoService {
     return this.seedHexToPrivateKey(seedHex);
   }
 
-  uintToBuf(uint: number): Buffer {
-    const result = [];
-
-    while (uint >= 0x80) {
-      result.push((uint & 0xFF) | 0x80);
-      uint >>>= 7;
-    }
-
-    result.push(uint | 0);
-
-    return new Buffer(result);
-  }
-
   mnemonicToKeychain(mnemonic: string, extraText?: string): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0');
