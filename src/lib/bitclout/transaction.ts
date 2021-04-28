@@ -3,7 +3,7 @@ import { ArrayOf, Boolean, ChunkBuffer, Enum, FixedBuffer, Record, Uint8, Uvarin
 
 export class TransactionInput extends BinaryRecord {
   @Transcode(FixedBuffer(32))
-  id: Buffer = Buffer.alloc(0) 
+  id: Buffer = Buffer.alloc(0)
 
   @Transcode(Uvarint64)
   index: number = 0;
@@ -162,6 +162,17 @@ export class TransactionMetadataSwapIdentity extends BinaryRecord {
 
 export class TransactionMetadataUpdateGlobalParams extends BinaryRecord {}
 
+export class TransactionMetadataCreatorCoinTransfer extends BinaryRecord {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  creatorCoinToTransferNanos = 0;
+
+  @Transcode(VarBuffer)
+  receiverPublicKey: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -175,6 +186,7 @@ export const TransactionTypeMetadataMap = {
   11: TransactionMetadataCreatorCoin,
   12: TransactionMetadataSwapIdentity,
   13: TransactionMetadataUpdateGlobalParams,
+  14: TransactionMetadataCreatorCoinTransfer,
 };
 
 export class Transaction<T> extends BinaryRecord {

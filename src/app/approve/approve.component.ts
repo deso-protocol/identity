@@ -8,7 +8,7 @@ import {
   Transaction,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
-  TransactionMetadataCreatorCoin,
+  TransactionMetadataCreatorCoin, TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
@@ -140,6 +140,10 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataUpdateGlobalParams:
         description = 'update global params';
+        break;
+
+      case TransactionMetadataCreatorCoinTransfer:
+        description = 'transfer a creator coin';
         break;
     }
 

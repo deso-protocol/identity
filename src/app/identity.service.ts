@@ -10,7 +10,7 @@ import {
   Transaction,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
-  TransactionMetadataCreatorCoin,
+  TransactionMetadataCreatorCoin, TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
@@ -164,6 +164,7 @@ export class IdentityService {
       case TransactionMetadataBitcoinExchange:
       case TransactionMetadataUpdateBitcoinUSDExchangeRate:
       case TransactionMetadataCreatorCoin:
+      case TransactionMetadataCreatorCoinTransfer:
       case TransactionMetadataSwapIdentity:
       case TransactionMetadataUpdateGlobalParams:
         return AccessLevel.Full;
