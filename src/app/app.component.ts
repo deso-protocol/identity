@@ -43,7 +43,12 @@ export class AppComponent implements OnInit {
       }
 
       if (params.accessLevelRequest) {
-        this.globalVars.accessLevelRequest = params.accessLevelRequest;
+        if (!isNaN(params.accessLevelRequest)) {
+          this.globalVars.accessLevelRequest = parseInt(params.accessLevelRequest);
+        }
+        else {
+          this.globalVars.accessLevelRequest = params.accessLevelRequest;
+        }
       }
     });
   }
