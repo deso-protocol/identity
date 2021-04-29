@@ -13,8 +13,6 @@ export class GlobalVarsService {
   hostname = '';
   accessLevelRequest = AccessLevel.ApproveAll;
 
-  inTab = !!window.opener;
-
   constructor() { }
 
   isFullAccessHostname(): boolean {

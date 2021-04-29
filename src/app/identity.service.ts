@@ -259,32 +259,46 @@ export class IdentityService {
     const subject = new Subject();
     this.outboundRequests[id] = subject;
 
-    this.currentWindow.postMessage({
+    this.postMessage({
       id,
       service: 'identity',
       method,
       payload,
-    }, '*');
+    });
 
     return subject;
   }
 
   // Respond to a received message
   private respond(id: string, payload: any): void {
-    this.currentWindow.postMessage({
+    this.postMessage({
       id,
       service: 'identity',
       payload
-    }, '*');
+    });
   }
 
   // Transmit a message without expecting a response
   private cast(method: string, payload?: any): void {
-    this.currentWindow.postMessage({
+    this.postMessage({
       id: null,
       service: 'identity',
       method,
       payload,
-    }, '*');
+    });
+  }
+
+  // Post message to correct client
+  private postMessage(message: any): void {
+    // iOS Webview with registered "appInterface" handler
+    if (this.currentWindow.webkit?.messageHandlers?.appInterface !== undefined) {
+      this.currentWindow.webkit.messageHandlers.appInterface.postMessage(message, '*');
+      // Android Webview with registered "appInterface" handler
+    } else if (this.currentWindow.appInterface !== undefined) {
+      this.currentWindow.appInterface.postMessage(JSON.stringify(message), '*');
+      // Web
+    } else {
+      this.currentWindow.postMessage(message, '*');
+    }
   }
 }

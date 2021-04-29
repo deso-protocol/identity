@@ -21,12 +21,6 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // We must be in an iframe OR opened with window.open
-    if (!this.globalVars.inTab && !this.globalVars.inFrame()) {
-      window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
-      return;
-    }
-
     this.identityService.initialize().subscribe(res => {
       this.globalVars.hostname = res.hostname;
       if (this.globalVars.isFullAccessHostname()) {
