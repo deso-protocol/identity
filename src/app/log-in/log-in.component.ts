@@ -6,6 +6,7 @@ import {EntropyService} from '../entropy.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {BackendAPIService} from '../backend-api.service';
 import {AccessLevel} from '../../types/identity';
+import HDNode from 'hdkey';
 
 @Component({
   selector: 'app-log-in',
@@ -85,8 +86,23 @@ export class LogInComponent implements OnInit {
       return;
     }
 
-    const network = this.globalVars.network;
     const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonic, this.extraText);
+    const keychainNonStandard = this.cryptoService.mnemonicToKeychain(this.mnemonic, this.extraText, true);
+
+    // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
+    this.addKeychain(keychain, false);
+    this.addKeychain(keychainNonStandard, true);
+
+    // Load metadata for the users
+    this.loadUsers();
+
+    // Clear the form
+    this.mnemonic = '';
+    this.extraText = '';
+  }
+
+  addKeychain(keychain: HDNode, nonStandard: boolean): void {
+    const network = this.globalVars.network;
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
@@ -96,9 +112,8 @@ export class LogInComponent implements OnInit {
       extraText: this.extraText,
       btcDepositAddress,
       network,
+      nonStandard,
     });
-
-    this.loadUsers();
   }
 
   clickLogin(): void {

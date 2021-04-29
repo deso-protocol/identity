@@ -80,6 +80,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
       extraText: this.extraTextCheck,
       btcDepositAddress,
       network,
+      nonStandard: false,
     });
 
     // TODO: handle sign-ups on 3rd party nodes properly

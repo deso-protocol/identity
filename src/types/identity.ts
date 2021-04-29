@@ -4,6 +4,7 @@ export interface PrivateUserInfo {
   extraText: string;
   btcDepositAddress: string;
   network: Network;
+  nonStandard: boolean;
 }
 
 export interface PublicUserInfo {
