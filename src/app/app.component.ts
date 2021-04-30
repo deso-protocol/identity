@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
       }
 
       if (params.accessLevelRequest) {
-        this.globalVars.accessLevelRequest = params.accessLevelRequest;
+        this.globalVars.accessLevelRequest = parseInt(params.accessLevelRequest, 10);
       }
     });
   }
