@@ -2,6 +2,8 @@ FROM node:14.15.5-alpine3.13 AS identity
 
 WORKDIR /identity
 
+RUN apk add git
+
 COPY ./package.json .
 COPY ./package-lock.json .
 
