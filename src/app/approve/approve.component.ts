@@ -113,12 +113,20 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataFollow:
         const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
-        description = `follow ${this.keyName(followedKey)}`;
+        if (this.transaction.metadata.isUnfollow) {
+          description = `unfollow ${this.keyName(followedKey)}`;
+        } else {
+          description = `follow ${this.keyName(followedKey)}`;
+        }
         break;
         
       case TransactionMetadataBlock:
         const blockedKey = this.base58KeyCheck(this.transaction.metadata.blockedPublicKey);
-        description = `block ${this.keyName(blockedKey)}`;
+        if (this.transaction.metadata.isUnblock) {
+          description = `unblock ${this.keyName(blockedKey)}`;
+        } else {
+          description = `block ${this.keyName(blockedKey)}`;
+        }
         break;
       case TransactionMetadataLike:
         if (this.transaction.metadata.isUnlike) {
