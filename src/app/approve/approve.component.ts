@@ -10,6 +10,7 @@ import {
   TransactionMetadataBitcoinExchange,
   TransactionMetadataCreatorCoin, TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
+  TransactionMetadataBlock,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
@@ -114,7 +115,11 @@ export class ApproveComponent implements OnInit {
         const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
         description = `follow ${this.keyName(followedKey)}`;
         break;
-
+        
+      case TransactionMetadataBlock:
+        const blockedKey = this.base58KeyCheck(this.transaction.metadata.blockedPublicKey);
+        description = `block ${this.keyName(blockedKey)}`;
+        break;
       case TransactionMetadataLike:
         if (this.transaction.metadata.isUnlike) {
           description = 'unlike a post';

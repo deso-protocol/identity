@@ -121,6 +121,14 @@ export class TransactionMetadataFollow extends BinaryRecord {
   isUnfollow: boolean = false;
 }
 
+export class TransactionMetadataBlock extends BinaryRecord {
+  @Transcode(FixedBuffer(33))
+  blockedPublicKey: Buffer = Buffer.alloc(0);
+  
+  @Transcode(Boolean)
+  isUnblock: boolean = false;
+}
+
 export class TransactionMetadataLike extends BinaryRecord {
   @Transcode(FixedBuffer(32))
   likedPostHash: Buffer = Buffer.alloc(0);
@@ -187,6 +195,7 @@ export const TransactionTypeMetadataMap = {
   12: TransactionMetadataSwapIdentity,
   13: TransactionMetadataUpdateGlobalParams,
   14: TransactionMetadataCreatorCoinTransfer,
+  15: TransactionMetadataBlock,
 };
 
 export class Transaction<T> extends BinaryRecord {
