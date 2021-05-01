@@ -28,7 +28,6 @@ export class ImportComponent implements OnInit {
           extraText: identity.ExtraText,
           btcDepositAddress: identity.BtcDepositAddress,
           network: identity.Network,
-          // It could be non-standard but we have no way of knowing
         });
       }
 
