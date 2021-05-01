@@ -29,7 +29,6 @@ export class ImportComponent implements OnInit {
           btcDepositAddress: identity.BtcDepositAddress,
           network: identity.Network,
           // It could be non-standard but we have no way of knowing
-          nonStandard: false,
         });
       }
 

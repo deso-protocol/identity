@@ -91,7 +91,7 @@ export class LogInComponent implements OnInit {
     const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonic, this.extraText);
     const keychainNonStandard = this.cryptoService.mnemonicToKeychain(this.mnemonic, this.extraText, true);
 
-    this.addKeychain(keychain, false);
+    this.addKeychain(keychain);
 
     // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
     if (keychain.publicKey !== keychainNonStandard.publicKey) {
@@ -105,11 +105,11 @@ export class LogInComponent implements OnInit {
         const user = res.UserList[0];
         if (user.ProfileEntryResponse || user.BalanceNanos > 0) {
           // Add the non-standard key if the user has a profile or a balance
-          this.addKeychain(keychainNonStandard, true);
+          this.addKeychain(keychainNonStandard);
         }
       }, () => {
         // Add the non-standard key if we encounter an error
-        this.addKeychain(keychainNonStandard, true);
+        this.addKeychain(keychainNonStandard);
       });
 
     }
@@ -119,7 +119,7 @@ export class LogInComponent implements OnInit {
     this.extraText = '';
   }
 
-  addKeychain(keychain: HDNode, nonStandard: boolean): void {
+  addKeychain(keychain: HDNode): void {
     const network = this.globalVars.network;
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
@@ -130,7 +130,6 @@ export class LogInComponent implements OnInit {
       extraText: this.extraText,
       btcDepositAddress,
       network,
-      nonStandard,
     });
 
     this.selectAccount(publicKeyAdded);
