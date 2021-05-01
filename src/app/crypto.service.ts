@@ -110,9 +110,10 @@ export class CryptoService {
     return this.seedHexToPrivateKey(seedHex);
   }
 
-  mnemonicToKeychain(mnemonic: string, extraText?: string): HDNode {
+  mnemonicToKeychain(mnemonic: string, extraText?: string, nonStandard?: boolean): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
-    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0');
+    // @ts-ignore
+    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0', nonStandard);
   }
 
   keychainToSeedHex(keychain: HDNode): string {
