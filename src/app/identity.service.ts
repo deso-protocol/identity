@@ -183,7 +183,6 @@ export class IdentityService {
   private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
     const { payload: { encryptedSeedHex, accessLevel, accessLevelHmac }} = data;
     if (accessLevel < requiredAccessLevel) {
-      console.log('less');
       return false;
     }
 
