@@ -11,6 +11,8 @@ export class AccountService {
   private static usersStorageKey = 'users';
   private static levelsStorageKey = 'levels';
 
+  private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
+
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
@@ -20,12 +22,12 @@ export class AccountService {
   // Getters
 
   getPublicKeys(): any {
-    return Object.keys(this.getPrivateUsers(this.globalVars.network));
+    return Object.keys(this.getPrivateUsers());
   }
 
   getEncryptedUsers(): {[key: string]: PublicUserInfo} {
     const hostname = this.globalVars.hostname;
-    const privateUsers = this.getPrivateUsers(this.globalVars.network);
+    const privateUsers = this.getPrivateUsers();
     const publicUsers: {[key: string]: PublicUserInfo} = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
@@ -72,7 +74,7 @@ export class AccountService {
   // Modifiers
 
   addUser(userInfo: PrivateUserInfo): string {
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getPrivateUsersRaw();
     const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
     const publicKey = this.cryptoService.privateKeyToBitcloutPublicKey(privateKey, userInfo.network);
 
@@ -84,7 +86,7 @@ export class AccountService {
   }
 
   deleteUser(publicKey: string): void {
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getPrivateUsersRaw();
 
     delete privateUsers[publicKey];
 
@@ -102,13 +104,21 @@ export class AccountService {
 
   // Private / Sensitive
 
-  private getPrivateUsers(network?: Network): {[key: string]: PrivateUserInfo} {
-    const privateUsers = JSON.parse(localStorage.getItem(AccountService.usersStorageKey) || '{}');
+  private getPrivateUsers(): {[key: string]: PrivateUserInfo} {
+    const privateUsers = this.getPrivateUsersRaw();
     const filteredPrivateUsers: {[key: string]: PrivateUserInfo} = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
       const privateUser = privateUsers[publicKey];
-      if (network && privateUser.network !== network) {
+
+      // Only include users from the current network
+      if (privateUser.network !== this.globalVars.network) {
+        continue;
+      }
+
+      // Get rid of some users who have invalid public keys
+      if (!publicKey.match(AccountService.publicKeyRegex)) {
+        this.deleteUser(publicKey);
         continue;
       }
 
@@ -116,5 +126,9 @@ export class AccountService {
     }
 
     return filteredPrivateUsers;
+  }
+
+  private getPrivateUsersRaw(): {[key: string]: PrivateUserInfo} {
+    return JSON.parse(localStorage.getItem(AccountService.usersStorageKey) || '{}');
   }
 }
