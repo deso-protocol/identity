@@ -97,8 +97,7 @@
     <div class="d-flex align-items-center" style="margin-top: -15px">
       <div class="fs-12px mt-15px text-grey6">
         By proceeding, you agree to the
-        <a [routerLink]="'/'"
-           queryParamsHandling="merge">Terms Of Service.</a>
+        <a (click)="clickTos()" class="font-weight-bold cursor-pointer">Terms of Service</a>.
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-between">

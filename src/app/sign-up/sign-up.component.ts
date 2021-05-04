@@ -4,8 +4,7 @@ import {CryptoService} from '../crypto.service';
 import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
 import {GlobalVarsService} from '../global-vars.service';
-import {Router} from '@angular/router';
-import {RouteNames} from '../app-routing.module';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-sign-up',
@@ -99,6 +98,15 @@ export class SignUpComponent implements OnInit, OnDestroy {
   clickSignup(): void {
     this.accountService.setAccessLevel(this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
     this.completeFlow();
+  }
+
+  clickTos(): void {
+    const h = 700;
+    const w = 600;
+    const y = window.outerHeight / 2 + window.screenY - h / 2;
+    const x = window.outerWidth / 2 + window.screenX - w / 2;
+
+    window.open(`https://${environment.nodeHostname}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
   }
 
   completeFlow(): void {
