@@ -21,21 +21,6 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      if (params.webview) {
-        this.globalVars.webview = true;
-      }
-
-      // Store testnet for duration of this session
-      if (params.testnet) {
-        this.globalVars.network = Network.testnet;
-      }
-
-      if (params.accessLevelRequest) {
-        this.globalVars.accessLevelRequest = parseInt(params.accessLevelRequest, 10);
-      }
-    });
-
     this.identityService.initialize().subscribe(res => {
       this.globalVars.hostname = res.hostname;
       if (this.globalVars.isFullAccessHostname()) {
@@ -49,6 +34,21 @@ export class AppComponent implements OnInit {
       }
 
       this.loading = false;
+    });
+
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params.webview) {
+        this.globalVars.webview = true;
+      }
+
+      // Store testnet for duration of this session
+      if (params.testnet) {
+        this.globalVars.network = Network.testnet;
+      }
+
+      if (params.accessLevelRequest) {
+        this.globalVars.accessLevelRequest = parseInt(params.accessLevelRequest, 10);
+      }
     });
   }
 }
