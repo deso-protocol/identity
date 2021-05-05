@@ -290,13 +290,14 @@ export class IdentityService {
 
   // Post message to correct client
   private postMessage(message: any): void {
-    // iOS Webview with registered "bitcloutIdentityAppInterface" handler
-    if (this.currentWindow.webkit?.messageHandlers?.bitcloutIdentityAppInterface !== undefined) {
-      this.currentWindow.webkit.messageHandlers.bitcloutIdentityAppInterface.postMessage(message, '*');
-      // Android Webview with registered "bitcloutIdentityAppInterface" handler
-    } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
-      this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
-      // Web
+    if (this.globalVars.webview) {
+      if (this.currentWindow.webkit?.messageHandlers?.bitcloutIdentityAppInterface !== undefined) {
+        // iOS Webview with registered "bitcloutIdentityAppInterface" handler
+        this.currentWindow.webkit.messageHandlers.bitcloutIdentityAppInterface.postMessage(message, '*');
+      } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
+        // Android Webview with registered "bitcloutIdentityAppInterface" handler
+        this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+      }
     } else {
       this.currentWindow.postMessage(message, '*');
     }

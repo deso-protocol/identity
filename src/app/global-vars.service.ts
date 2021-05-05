@@ -14,6 +14,7 @@ export class GlobalVarsService {
   accessLevelRequest = AccessLevel.ApproveAll;
 
   inTab = !!window.opener;
+  webview = false;
 
   constructor() { }
 

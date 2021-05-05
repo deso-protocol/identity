@@ -22,11 +22,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
-      // We must be in an iframe OR opened with window.open OR running in a webview
-      if (!params.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
-        window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
-        return;
+      if (params.webview) {
+        this.globalVars.webview = true;
       }
+
       // Store testnet for duration of this session
       if (params.testnet) {
         this.globalVars.network = Network.testnet;
@@ -41,6 +40,12 @@ export class AppComponent implements OnInit {
       this.globalVars.hostname = res.hostname;
       if (this.globalVars.isFullAccessHostname()) {
         this.globalVars.accessLevelRequest = AccessLevel.Full;
+      }
+
+      // We must be a webview OR in an iframe OR opened with window.open
+      if (!this.globalVars.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
+        window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
+        return;
       }
 
       this.loading = false;
