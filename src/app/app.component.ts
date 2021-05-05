@@ -22,26 +22,27 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.identityService.initialize().subscribe(res => {
-      this.globalVars.hostname = res.hostname;
-      if (this.globalVars.isFullAccessHostname()) {
-        this.globalVars.accessLevelRequest = AccessLevel.Full;
-      }
-
       // We must be a webview OR in an iframe OR opened with window.open
       if (!this.globalVars.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
         window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
         return;
       }
 
+      // Store hostname and adjust accessLevelRequest accordingly
+      this.globalVars.hostname = res.hostname;
+      if (this.globalVars.isFullAccessHostname()) {
+        this.globalVars.accessLevelRequest = AccessLevel.Full;
+      }
+
       this.loading = false;
     });
 
+    // Store various parameters for duration of this session
     this.activatedRoute.queryParams.subscribe(params => {
       if (params.webview) {
         this.globalVars.webview = true;
       }
 
-      // Store testnet for duration of this session
       if (params.testnet) {
         this.globalVars.network = Network.testnet;
       }
