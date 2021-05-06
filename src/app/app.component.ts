@@ -21,13 +21,14 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // We must be in an iframe OR opened with window.open
-    if (!this.globalVars.inTab && !this.globalVars.inFrame()) {
-      window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
-      return;
-    }
-
     this.identityService.initialize().subscribe(res => {
+      // We must be a webview OR in an iframe OR opened with window.open
+      if (!this.globalVars.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
+        window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
+        return;
+      }
+
+      // Store hostname and adjust accessLevelRequest accordingly
       this.globalVars.hostname = res.hostname;
       if (this.globalVars.isFullAccessHostname()) {
         this.globalVars.accessLevelRequest = AccessLevel.Full;
@@ -36,8 +37,12 @@ export class AppComponent implements OnInit {
       this.loading = false;
     });
 
-    // Store testnet for duration of this session
+    // Store various parameters for duration of this session
     this.activatedRoute.queryParams.subscribe(params => {
+      if (params.webview) {
+        this.globalVars.webview = true;
+      }
+
       if (params.testnet) {
         this.globalVars.network = Network.testnet;
       }

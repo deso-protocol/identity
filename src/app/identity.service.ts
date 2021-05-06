@@ -259,32 +259,47 @@ export class IdentityService {
     const subject = new Subject();
     this.outboundRequests[id] = subject;
 
-    this.currentWindow.postMessage({
+    this.postMessage({
       id,
       service: 'identity',
       method,
       payload,
-    }, '*');
+    });
 
     return subject;
   }
 
   // Respond to a received message
   private respond(id: string, payload: any): void {
-    this.currentWindow.postMessage({
+    this.postMessage({
       id,
       service: 'identity',
       payload
-    }, '*');
+    });
   }
 
   // Transmit a message without expecting a response
   private cast(method: string, payload?: any): void {
-    this.currentWindow.postMessage({
+    this.postMessage({
       id: null,
       service: 'identity',
       method,
       payload,
-    }, '*');
+    });
+  }
+
+  // Post message to correct client
+  private postMessage(message: any): void {
+    if (this.globalVars.webview) {
+      if (this.currentWindow.webkit?.messageHandlers?.bitcloutIdentityAppInterface !== undefined) {
+        // iOS Webview with registered "bitcloutIdentityAppInterface" handler
+        this.currentWindow.webkit.messageHandlers.bitcloutIdentityAppInterface.postMessage(message, '*');
+      } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
+        // Android Webview with registered "bitcloutIdentityAppInterface" handler
+        this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+      }
+    } else {
+      this.currentWindow.postMessage(message, '*');
+    }
   }
 }
