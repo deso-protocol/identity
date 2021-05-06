@@ -21,18 +21,25 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      // Store various parameters for duration of this session
-      if (params.webview) {
-        this.globalVars.webview = true;
-      }
+    const params = new URLSearchParams(window.location.search);
+    const accessLevelRequest = params.get('accessLevelRequest');
 
-      if (params.testnet) {
-        this.globalVars.network = Network.testnet;
-      }
+    if (accessLevelRequest) {
+      this.globalVars.accessLevelRequest = parseInt(accessLevelRequest, 10);
+    }
 
-      if (params.accessLevelRequest) {
-        this.globalVars.accessLevelRequest = parseInt(params.accessLevelRequest, 10);
+    if (params.get('webview')) {
+      this.globalVars.webview = true;
+    }
+
+    if (params.get('testnet')) {
+      this.globalVars.network = Network.testnet;
+    }
+
+    this.identityService.initialize().subscribe(res => {
+      this.globalVars.hostname = res.hostname;
+      if (this.globalVars.isFullAccessHostname()) {
+        this.globalVars.accessLevelRequest = AccessLevel.Full;
       }
 
       // We must be in an iframe OR opened with window.open OR running in a webview
@@ -41,14 +48,7 @@ export class AppComponent implements OnInit {
         return;
       }
 
-      this.identityService.initialize().subscribe(res => {
-        this.globalVars.hostname = res.hostname;
-        if (this.globalVars.isFullAccessHostname()) {
-          this.globalVars.accessLevelRequest = AccessLevel.Full;
-        }
-
-        this.loading = false;
-      });
+      this.loading = false;
     });
   }
 }
