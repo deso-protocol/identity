@@ -21,35 +21,34 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.identityService.initialize().subscribe(res => {
-      // We must be a webview OR in an iframe OR opened with window.open
-      if (!this.globalVars.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
-        window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
-        return;
-      }
+    const params = new URLSearchParams(window.location.search);
+    const accessLevelRequest = params.get('accessLevelRequest');
 
-      // Store hostname and adjust accessLevelRequest accordingly
+    if (accessLevelRequest) {
+      this.globalVars.accessLevelRequest = parseInt(accessLevelRequest, 10);
+    }
+
+    if (params.get('webview')) {
+      this.globalVars.webview = true;
+    }
+
+    if (params.get('testnet')) {
+      this.globalVars.network = Network.testnet;
+    }
+
+    this.identityService.initialize().subscribe(res => {
       this.globalVars.hostname = res.hostname;
       if (this.globalVars.isFullAccessHostname()) {
         this.globalVars.accessLevelRequest = AccessLevel.Full;
       }
 
+      // We must be in an iframe OR opened with window.open OR running in a webview
+      if (!this.globalVars.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
+        window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
+        return;
+      }
+
       this.loading = false;
-    });
-
-    // Store various parameters for duration of this session
-    this.activatedRoute.queryParams.subscribe(params => {
-      if (params.webview) {
-        this.globalVars.webview = true;
-      }
-
-      if (params.testnet) {
-        this.globalVars.network = Network.testnet;
-      }
-
-      if (params.accessLevelRequest) {
-        this.globalVars.accessLevelRequest = parseInt(params.accessLevelRequest, 10);
-      }
     });
   }
 }
