@@ -3,7 +3,6 @@ import {ActivatedRoute} from '@angular/router';
 import {GlobalVarsService} from './global-vars.service';
 import {IdentityService} from './identity.service';
 import {AccessLevel, Network} from '../types/identity';
-import {skip} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -22,8 +21,7 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // The first emission of queryParams is always empty as it starts with an empty BehaviourSubject
-    this.activatedRoute.queryParams.pipe(skip(1)).subscribe(params => {
+    this.activatedRoute.queryParams.subscribe(params => {
       // Store various parameters for duration of this session
       if (params.webview) {
         this.globalVars.webview = true;
