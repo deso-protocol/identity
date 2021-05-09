@@ -36,19 +36,19 @@ export class AppComponent implements OnInit {
       this.globalVars.network = Network.testnet;
     }
 
-    this.identityService.initialize().subscribe(res => {
-      this.globalVars.hostname = res.hostname;
-      if (this.globalVars.isFullAccessHostname()) {
-        this.globalVars.accessLevelRequest = AccessLevel.Full;
-      }
+    if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
+      // We must be running in a webview OR opened with window.open OR in an iframe to initialize
+      this.identityService.initialize().subscribe(res => {
+        this.globalVars.hostname = res.hostname;
+        if (this.globalVars.isFullAccessHostname()) {
+          this.globalVars.accessLevelRequest = AccessLevel.Full;
+        }
 
-      // We must be in an iframe OR opened with window.open OR running in a webview
-      if (!this.globalVars.webview && !this.globalVars.inTab && !this.globalVars.inFrame()) {
-        window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
-        return;
-      }
-
-      this.loading = false;
-    });
+        this.loading = false;
+      });
+    } else {
+      // Identity currently doesn't have any management UIs that can be accessed directly
+      window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
+    }
   }
 }
