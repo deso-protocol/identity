@@ -3,6 +3,6 @@ export const environment = {
   hostname: 'identity.bitclout.com',
   nodeHostname: 'bitclout.com',
   nodeApiHostname: 'api.bitclout.com',
-  fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'localhost'],
+  fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost'],
   noAccessHostnames: [''],
 };
