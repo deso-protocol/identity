@@ -2,29 +2,30 @@
 
   <!-- Intro Text -->
   <div class="fs-15px">
-    The following displays the entropy (random numbers) used to generate the seed phrase above.
+    The following displays the entropy (random numbers) used to generate the "forever password" (seed phrase) above.
+    BitClout refers to seed phrases as "forever passwords" to make them more understandable and convey their permanence.
     The entropy below was generated using a random number generator, but you can edit the
-    fields below to use your own randomness to generate the seed phrase (you can't go wrong
+    fields below to use your own randomness to generate the forever password (you can't go wrong
     with a set of dice). You can also enter
-    your own seed phrase directly if you prefer.
+    your own forever password directly if you prefer.
     <div class="pt-15px">
     </div>
     Because there is a standard for generating seed phrases for Bitcoin (called
     <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>),
-    and because we use this same standard to generate BitClout seed phrases,
-    BitClout seed phrases can also be used with any Bitcoin wallet that implements
+    and because we use this same standard to generate BitClout forever passwords,
+    BitClout forever passwords can also be used with any Bitcoin wallet that implements
     this standard under the m/44'/0'/0'/0/0 derivation path (e.g.
     <a target="_blank" href="https://wallet.mycelium.com/">Mycelium</a>,
     <a target="_blank" href="https://electrum.org">Electrum</a>).
     Similarly, any standard
-    Bitcoin seed phrase you have can also be used as an BitClout seed phrase. Of course, all
+    Bitcoin seed phrase you have can also be used as a BitClout forever password. Of course, all
     of this can be verified using a tool like the
     <a target="_blank" href="https://iancoleman.io/bip39/">Ian Coleman mnemonic generator</a>
     (must click "show entropy details") so you know this generator is doing what it says it is.
   </div>
 
   <div class="form-group pt-15px">
-    <div>Custom seed phrase (must be
+    <div>Custom forever password (must be
       <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
       mnemonic):</div>
     <div class="fc-red" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</div>

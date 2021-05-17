@@ -7,7 +7,7 @@
     </div>
 
     <div class="fs-18px mt-15px">
-      Enter your secret phrase to load your account
+      Enter your forever password to load your account
     </div>
 
     <div *ngIf="loginError" class="alert alert-danger mt-15px">
@@ -18,7 +18,7 @@
       <textarea [(ngModel)]="mnemonic"
                 class="form-control fs-15px"
                 rows="4"
-                placeholder="Enter your secret phrase here."></textarea>
+                placeholder="Enter your forever password here."></textarea>
     </div>
 
     <div *ngIf="advancedOpen" class="fs-15px">
