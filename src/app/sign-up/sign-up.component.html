@@ -4,9 +4,9 @@
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
     <div class="fs-15px fc-muted">STEP 1 of 4</div>
-    <div class="fs-24px font-weight-bold pt-15px">Store your seed phrase</div>
+    <div class="fs-24px font-weight-bold pt-15px">Store your forever password</div>
     <div class="fs-18px mt-15px">Write, download, print, or copy it somewhere safe.</div>
-    <div class="fc-red fs-18px pt-15px">If you lose your seed phrase your account will be lost forever.</div>
+    <div class="fc-red fs-18px pt-15px">If you lose your forever password your account will be lost forever.</div>
     <div class="w-100 mt-30px fs-15px border border-color-grey"
          style="border-radius: 3px">
       <div *ngIf="!entropyService.advancedOpen" class="p-15px">{{ entropyService.temporaryEntropy.mnemonic }}</div>
@@ -78,9 +78,9 @@
   <!-- Step 2 -->
   <div *ngIf="stepNum == 2">
     <div class="fs-15px fc-muted">STEP 2 of 4</div>
-    <div class="fs-24px font-weight-bold pt-15px">Verify your seed phrase</div>
-    <div class="fc-red fs-18px mt-15px">Never share your seed phrase with anyone.</div>
-    <div class="fc-red fs-18px pt-15px"><b>If you lose your seed phrase your account will be lost forever.</b></div>
+    <div class="fs-24px font-weight-bold pt-15px">Verify your forever password</div>
+    <div class="fc-red fs-18px mt-15px">Never share your forever password with anyone.</div>
+    <div class="fc-red fs-18px pt-15px"><b>If you lose your forever password your account will be lost forever.</b></div>
     <div class="form-group pt-10px">
       <textarea [(ngModel)]="mnemonicCheck"
                 class="form-control fs-15px"
