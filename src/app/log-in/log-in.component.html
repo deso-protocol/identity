@@ -77,17 +77,22 @@
         <li class="list-group-item">
           <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
           <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
-          Require approval for all transactions
+          Access my basic information
+          <div class="fs-14px text-muted">Includes public key, BTC deposit address, and any other public information.</div>
         </li>
         <li class="list-group-item">
           <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
           <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
-          Only require approval to move money
+          Post, message, like, and follow
+          <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest === 3"><b>{{ globalVars.hostname }}</b> may edit my profile, create posts and reclouts, like and unlike posts, follow and unfollow accounts, and read and send messages on my behalf.</div>
+          <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 3"><b>{{ globalVars.hostname }}</b> can not edit my profile, create posts or reclouts, like or unlike posts, follow or unfollow accounts, or read or send messages on my behalf.</div>
         </li>
         <li class="list-group-item">
           <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
           <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
-          Full signing access
+          Unrestricted access
+          <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest === 4"><b>{{ globalVars.hostname }}</b> may buy, sell, and send coins without explicit approval.</div>
+          <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 4"><b>{{ globalVars.hostname }}</b> can not buy, sell, or send coins without my explicit approval.</div>
         </li>
       </ul>
     </div>
