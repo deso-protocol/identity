@@ -3,10 +3,10 @@
 <div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview">
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
-    <div class="fs-15px fc-muted">STEP 1 of 4</div>
-    <div class="fs-24px font-weight-bold pt-15px">Store your forever password</div>
+    <div class="fs-15px fc-muted">STEP 1 of 2</div>
+    <div class="fs-24px font-weight-bold pt-15px">Store your seed phrase</div>
     <div class="fs-18px mt-15px">Write, download, print, or copy it somewhere safe.</div>
-    <div class="fc-red fs-18px pt-15px">If you lose your forever password your account will be lost forever.</div>
+    <div class="fc-red fs-18px pt-15px">If you lose your seed phrase your account will be lost forever.</div>
     <div class="w-100 mt-30px fs-15px border border-color-grey"
          style="border-radius: 3px">
       <div *ngIf="!entropyService.advancedOpen" class="p-15px">{{ entropyService.temporaryEntropy.mnemonic }}</div>
@@ -77,10 +77,10 @@
 
   <!-- Step 2 -->
   <div *ngIf="stepNum == 2">
-    <div class="fs-15px fc-muted">STEP 2 of 4</div>
-    <div class="fs-24px font-weight-bold pt-15px">Verify your forever password</div>
-    <div class="fc-red fs-18px mt-15px">Never share your forever password with anyone.</div>
-    <div class="fc-red fs-18px pt-15px"><b>If you lose your forever password your account will be lost forever.</b></div>
+    <div class="fs-15px fc-muted">STEP 2 of 2</div>
+    <div class="fs-24px font-weight-bold pt-15px">Verify your seed phrase</div>
+    <div class="fc-red fs-18px mt-15px">Never share your seed phrase with anyone.</div>
+    <div class="fc-red fs-18px pt-15px"><b>If you lose your seed phrase your account will be lost forever.</b></div>
     <div class="form-group pt-10px">
       <textarea [(ngModel)]="mnemonicCheck"
                 class="form-control fs-15px"
@@ -134,43 +134,6 @@
     <!-- down here gives the user enough space to scroll down to reveal the next button.-->
     <!-- This works for now, but we should do something better long term, e.g. hide the blue circle
          on this page.-->
-    <div style="padding-bottom: 85px"></div>
-  </div>
-
-  <!-- Step 3 -->
-  <div *ngIf="stepNum === 3">
-
-    <div>
-      <div class="fs-15px fc-muted">STEP 3 of 4</div>
-      <div class="fs-24px mt-30px">
-        <b>{{ globalVars.hostname }}</b> is requesting:
-      </div>
-
-      <ul class="list-group list-group-flush mt-15px">
-        <li class="list-group-item">
-          <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
-          <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
-          Require approval for all transactions
-        </li>
-        <li class="list-group-item">
-          <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
-          <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
-          Only require approval to move money
-        </li>
-        <li class="list-group-item">
-          <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
-          <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
-          Full signing access
-        </li>
-      </ul>
-
-    <div class="d-flex justify-content-end mt-15px">
-      <button (click)="clickSignup()"
-              class="btn btn-primary font-weight-bold fs-15px"
-              [disabled]="globalVars.accessLevelRequest > 4 || globalVars.accessLevelRequest < 2">
-        Sign up on {{ globalVars.hostname }}
-      </button>
-    </div>
     <div style="padding-bottom: 85px"></div>
   </div>
 </div>

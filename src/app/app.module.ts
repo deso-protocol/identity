@@ -18,6 +18,8 @@ import {EntropyService} from './entropy.service';
 import { LogInComponent } from './log-in/log-in.component';
 import {HttpClientModule} from '@angular/common/http';
 import { ApproveComponent } from './approve/approve.component';
+import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
+import { GoogleComponent } from './auth/google/google.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,8 @@ import { ApproveComponent } from './approve/approve.component';
     SignUpEntropyComponent,
     LogInComponent,
     ApproveComponent,
+    LogInSeedComponent,
+    GoogleComponent,
   ],
   imports: [
     BrowserModule,

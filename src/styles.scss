@@ -70,6 +70,7 @@ h2,h3,h4,h5,h6,p {
 .fs-2 { font-size: 2rem }
 .fs-3 { font-size: 1.75rem }
 
+.fs-30px { font-size: 30px; }
 .fs-25px { font-size: 25px; }
 .fs-24px { font-size: 24px; }
 .fs-20px { font-size: 20px; }
@@ -265,4 +266,29 @@ h2,h3,h4,h5,h6,p {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+.log-in-google,
+.log-in-seed,
+.sign-up-google,
+.sign-up-seed {
+  height: 72px;
+  width: 290px;
+  background-size: 290px 72px;
+}
+
+.log-in-google {
+  background-image: url(/assets/log_in_google.png);
+}
+
+.log-in-seed {
+  background-image: url(/assets/log_in_seed.png);
+}
+
+.sign-up-google {
+  background-image: url(/assets/sign_up_google.png);
+}
+
+.sign-up-seed {
+  background-image: url(/assets/sign_up_seed.png);
 }
