@@ -7,14 +7,17 @@ import bs58check from 'bs58check';
 import {CookieService} from 'ngx-cookie';
 import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
 import {AccessLevel, Network} from '../types/identity';
+import { GlobalVarsService } from './global-vars.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CryptoService {
 
-  constructor(private cookieService: CookieService) {
-  }
+  constructor(
+    private cookieService: CookieService,
+    private globalVars: GlobalVarsService
+    ) {}
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -29,7 +32,7 @@ export class CryptoService {
 
   // Safari only lets us store things in cookies
   mustUseStorageAccess(): boolean {
-    return typeof document.hasStorageAccess === 'function';
+    return typeof document.hasStorageAccess === 'function' && !this.globalVars.webview;
   }
 
   // 32 bytes = 256 bits is plenty of entropy for encryption
