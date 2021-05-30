@@ -297,6 +297,9 @@ export class IdentityService {
       } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
         // Android Webview with registered "bitcloutIdentityAppInterface" handler
         this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+      } else if (this.currentWindow.ReactNativeWebView !== undefined) {
+        // React Native Webview with registered "ReactNativeWebView" handler
+        this.currentWindow.ReactNativeWebView.postMessage(JSON.stringify(message));
       }
     } else {
       this.currentWindow.postMessage(message, '*');
