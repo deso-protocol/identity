@@ -19,7 +19,6 @@ import { LogInComponent } from './log-in/log-in.component';
 import {HttpClientModule} from '@angular/common/http';
 import { ApproveComponent } from './approve/approve.component';
 import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
-import { GoogleComponent } from './auth/google/google.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +33,6 @@ import { GoogleComponent } from './auth/google/google.component';
     LogInComponent,
     ApproveComponent,
     LogInSeedComponent,
-    GoogleComponent,
   ],
   imports: [
     BrowserModule,

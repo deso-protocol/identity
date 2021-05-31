@@ -1,21 +1,16 @@
 import {Injectable, NgZone} from '@angular/core';
-import {GoogleApiService} from './google-api.service';
 import {Observable, Observer, of} from 'rxjs';
-import {mergeMap} from 'rxjs/operators';
 
 import GoogleDriveFiles = gapi.client.drive.FilesResource;
 import {GoogleAuthService} from './google-auth.service';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoogleDriveService {
 
-  private googleDriveFiles: GoogleDriveFiles | undefined = undefined;
-
   constructor(private googleAuth: GoogleAuthService, private httpClient: HttpClient) {
-    this.getFiles().subscribe();
   }
 
   public uploadFile(fileName: string, fileContents: string): Observable<any> {
@@ -36,20 +31,27 @@ export class GoogleDriveService {
       form, { headers: { Authorization: `Bearer ${accessToken}` }});
   }
 
-  public getFiles(): Observable<GoogleDriveFiles> {
-    if (!this.googleDriveFiles) {
-      return this.googleAuth.getAuth().pipe(mergeMap(() => this.loadGoogleDrive()));
-    }
-    return of(this.googleDriveFiles);
+  public listFiles(fileName: string): Observable<any> {
+    const accessToken = gapi.auth.getToken().access_token;
+    let httpParams = new HttpParams();
+
+    httpParams = httpParams.append('q', `name = '${fileName}'`);
+    httpParams = httpParams.append('pageSize', '100');
+    httpParams = httpParams.append('fields', 'files(id, name)');
+    httpParams = httpParams.append('spaces', 'appDataFolder');
+
+    return this.httpClient.get<any>(
+      `https://www.googleapis.com/drive/v3/files?${httpParams.toString()}`,
+      { headers: { Authorization: `Bearer ${accessToken}` }});
   }
 
-  private loadGoogleDrive(): Observable<GoogleDriveFiles> {
-    return new Observable((observer: Observer<GoogleDriveFiles>) => {
-      gapi.client.load('drive', 'v3', () => {
-        this.googleDriveFiles = gapi.client.drive.files;
-        observer.next(this.googleDriveFiles);
-        observer.complete();
-      });
-    });
+  public getFile(fileId: string): Observable<any> {
+    const accessToken = gapi.auth.getToken().access_token;
+    let httpParams = new HttpParams();
+    httpParams = httpParams.append('alt', 'media');
+
+    return this.httpClient.get<any>(
+      `https://www.googleapis.com/drive/v3/files/${fileId}?${httpParams.toString()}`,
+      { headers: { Authorization: `Bearer ${accessToken}` }});
   }
 }
