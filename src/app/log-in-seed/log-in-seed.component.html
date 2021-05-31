@@ -1,0 +1,50 @@
+<app-banner></app-banner>
+
+<div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview">
+  <div class="font-weight-bold fs-30px mb-20px">
+    Log in to {{ globalVars.hostname }}
+  </div>
+
+  <p class="fs-18px mt-15px">
+    Enter your seed phrase to load your account
+  </p>
+  <p class="fs-18px mt-15px">
+    You can also
+    <a [routerLink]="['/', 'sign-up']">create a new seed phrase</a>
+    to sign up anonymously
+  </p>
+
+  <div *ngIf="loginError" class="alert alert-danger mt-15px">
+    {{ loginError }}
+  </div>
+
+  <div class="form-group pr-15px mt-15px">
+    <textarea [(ngModel)]="mnemonic"
+              class="form-control fs-15px"
+              rows="4"
+              placeholder="Enter your seed phrase"></textarea>
+  </div>
+
+  <div *ngIf="advancedOpen" class="fs-15px">
+    If you have a passphrase, enter it below.
+  </div>
+  <div *ngIf="advancedOpen" class="form-group pr-15px pt-15px">
+    <textarea [(ngModel)]="extraText"
+              class="form-control fs-15px"
+              rows="4"
+              placeholder="Enter your passphrase"></textarea>
+  </div>
+
+  <div class="w-100 d-flex justify-content-between pr-15px">
+    <div *ngIf="!advancedOpen"
+         (click)="advancedOpen = true"
+         class="fc-blue fs-15px cursor-pointer font-weight-bold">Advanced</div>
+    <div *ngIf="advancedOpen"
+         (click)="advancedOpen = false"
+         class="fc-blue fs-15px cursor-pointer font-weight-bold">Simple</div>
+    <button (click)="clickLoadAccount()"
+            class="btn btn-primary font-weight-bold fs-15px">
+      Load Account
+    </button>
+  </div>
+</div>

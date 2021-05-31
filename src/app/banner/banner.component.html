@@ -1,4 +1,4 @@
-<div class="identity-banner" *ngIf="!globalVars.webview">
+<div class="identity-banner mb-30px" *ngIf="!globalVars.webview">
   <div class="container d-flex justify-content-center align-items-center">
     <div class="mr-20px font-emoji">&#9757;</div>
     <div>Always verify you are on {{ globalVars.environment.hostname }}</div>
@@ -6,13 +6,10 @@
   </div>
 </div>
 
-<div class="container home-container d-flex justify-content-between align-items-center my-30px">
-  <div class="">
+<div class="container home-container d-flex justify-content-between align-items-center">
+  <div>
     <img src="/assets/camelcase_logo.svg" class="home-logo"/>
   </div>
-  <div>
-    <a [routerLink]="['/', 'log-in']">Log In</a>
-    &middot;
-    <a [routerLink]="['/', 'sign-up']">Sign Up</a>
-  </div>
+
+  <a [routerLink]="['/', 'log-in']">Log In</a>
 </div>

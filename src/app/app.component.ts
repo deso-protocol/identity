@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // load params
     const params = new URLSearchParams(window.location.search);
     const accessLevelRequest = params.get('accessLevelRequest');
 

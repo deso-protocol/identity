@@ -4,6 +4,7 @@ export interface PrivateUserInfo {
   extraText: string;
   btcDepositAddress: string;
   network: Network;
+  googleUser?: GoogleUserInfo;
 }
 
 export interface PublicUserInfo {
@@ -13,6 +14,13 @@ export interface PublicUserInfo {
   network: Network;
   accessLevel: AccessLevel;
   accessLevelHmac: string;
+}
+
+export interface GoogleUserInfo {
+  id: string;
+  email: string;
+  name: string;
+  imageUrl: string;
 }
 
 export enum Network {

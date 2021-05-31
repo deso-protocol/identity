@@ -21,7 +21,8 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "types": ["gapi", "gapi.auth2", "gapi.client", "gapi.client.drive"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

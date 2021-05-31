@@ -5,6 +5,7 @@ import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {environment} from '../../environments/environment';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-sign-up',
@@ -26,6 +27,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private identityService: IdentityService,
     public globalVars: GlobalVarsService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -81,23 +83,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
       network,
     });
 
-    // TODO: handle sign-ups on 3rd party nodes properly
-    if (this.globalVars.isFullAccessHostname()) {
-      this.completeFlow();
-    } else {
-      this.stepNum = 3;
-    }
+    this.router.navigate(['/log-in']);
   }
 
   stepTwoBack(): void {
     this.extraTextCheck = "";
     this.mnemonicCheck = "";
     this.stepNum = 1;
-  }
-
-  clickSignup(): void {
-    this.accountService.setAccessLevel(this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-    this.completeFlow();
   }
 
   clickTos(): void {
@@ -107,14 +99,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const x = window.outerWidth / 2 + window.screenX - w / 2;
 
     window.open(`https://${environment.nodeHostname}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
-  }
-
-  completeFlow(): void {
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: this.publicKeyAdded,
-      signedUp: true
-    });
   }
 
   copyText(val: string): void {
