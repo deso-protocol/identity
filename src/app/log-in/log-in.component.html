@@ -6,7 +6,7 @@
   </div>
 
   <div class="d-flex align-items-center flex-column">
-    <button class="btn btn-default log-in-google" (click)="launchGoogle()"></button>
+    <button class="btn btn-default log-in-google" (click)="launchGoogle()" *ngIf="!globalVars.hideGoogle"></button>
 
     <ul class="list-group mt-15px">
       <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccount(item.key)">

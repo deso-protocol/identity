@@ -15,6 +15,7 @@ export class GlobalVarsService {
 
   inTab = !!window.opener;
   webview = false;
+  hideGoogle = false;
 
   constructor() { }
 

@@ -37,6 +37,10 @@ export class AppComponent implements OnInit {
       this.globalVars.network = Network.testnet;
     }
 
+    if (params.get('hideGoogle')) {
+      this.globalVars.hideGoogle = true;
+    }
+
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
