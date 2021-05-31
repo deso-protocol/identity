@@ -10,9 +10,7 @@ export class GoogleApiService {
   private node: HTMLScriptElement | undefined;
   private observers: Observer<boolean>[] = [];
 
-  constructor() {
-    this.loadGapi().subscribe();
-  }
+  constructor() {}
 
   public onLoad(): Observable<boolean> {
     return this.loadGapi();
@@ -25,6 +23,7 @@ export class GoogleApiService {
         observer.complete();
       } else if (!this.node) {
         // script element has not yet been added to document
+        this.observers.push(observer);
         this.node = document.createElement('script');
         this.node.async = true;
         this.node.src = this.gapiUrl;

@@ -29,6 +29,10 @@ export class LogInComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Load the auth API immediately so it's ready when we click the button
+    this.googleAuth.getAuth().subscribe();
+
+    // Load profile pictures and usernames
     this.loadUsers();
   }
 

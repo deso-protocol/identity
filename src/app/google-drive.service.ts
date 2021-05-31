@@ -12,15 +12,9 @@ import {HttpClient} from '@angular/common/http';
 })
 export class GoogleDriveService {
 
-  private files: GoogleDriveFiles | undefined = undefined;
+  private googleDriveFiles: GoogleDriveFiles | undefined = undefined;
 
-  constructor(
-    private googleAuth: GoogleAuthService,
-    private httpClient: HttpClient,
-  ) {
-    console.log('constructing');
-    this.getFiles().subscribe();
-  }
+  constructor(private googleAuth: GoogleAuthService, private httpClient: HttpClient) {}
 
   public uploadFile(fileName: string, fileContents: string): Observable<any> {
     const file = new Blob([fileContents], {type: 'text/plain'});
@@ -41,19 +35,17 @@ export class GoogleDriveService {
   }
 
   public getFiles(): Observable<GoogleDriveFiles> {
-    if (!this.files) {
+    if (!this.googleDriveFiles) {
       return this.googleAuth.getAuth().pipe(mergeMap(() => this.loadGoogleDrive()));
     }
-    return of(this.files);
+    return of(this.googleDriveFiles);
   }
 
   private loadGoogleDrive(): Observable<GoogleDriveFiles> {
     return new Observable((observer: Observer<GoogleDriveFiles>) => {
-      console.log('loading drive');
       gapi.client.load('drive', 'v3', () => {
-        console.log('loaded drive');
-        this.files = gapi.client.drive.files;
-        observer.next(this.files);
+        this.googleDriveFiles = gapi.client.drive.files;
+        observer.next(this.googleDriveFiles);
         observer.complete();
       });
     });

@@ -15,11 +15,7 @@ export class GoogleAuthService {
 
   private googleAuth: GoogleAuth | undefined = undefined;
 
-  constructor(private googleApi: GoogleApiService, private zone: NgZone) {
-    this.googleApi.onLoad().subscribe(() => {
-      this.loadGapiAuth().subscribe();
-    });
-  }
+  constructor(private googleApi: GoogleApiService) {}
 
   public getAuth(): Observable<GoogleAuth> {
     if (!this.googleAuth) {
