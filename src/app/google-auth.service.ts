@@ -9,8 +9,8 @@ import GoogleAuth = gapi.auth2.GoogleAuth;
 })
 export class GoogleAuthService {
   // Client ID and API key from the Developer Console
-  private static CLIENT_ID = '48709226407-k7rqrs3ubc80ab8ej267kccjpfpm94rk.apps.googleusercontent.com';
-  private static API_KEY = 'AIzaSyCZsKyOLrQTxUT4OTKek-0mL53sBVXlb6A';
+  private static CLIENT_ID = '48709226407-vuriktl4ub77gl5ifbsbsm3d2jnrshvt.apps.googleusercontent.com';
+  private static API_KEY = 'AIzaSyBZ5cttLVWM0wXawdGKMYkbJ3SbBM4BpuE';
   public static DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 
   private googleAuth: GoogleAuth | undefined = undefined;
