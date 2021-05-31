@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {GlobalVarsService} from '../global-vars.service';
-import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-banner',
@@ -9,19 +8,8 @@ import {Router} from "@angular/router";
 })
 export class BannerComponent implements OnInit {
 
-  constructor(
-    public globalVars: GlobalVarsService,
-    private router: Router,
-  ) { }
+  constructor(public globalVars: GlobalVarsService) { }
 
   ngOnInit(): void {
-  }
-
-  isSignUpRoute(): boolean {
-    return this.router.url.includes('/sign-up');
-  }
-
-  isLoginRoute(): boolean {
-    return this.router.url.includes('/log-in-seed');
   }
 }
