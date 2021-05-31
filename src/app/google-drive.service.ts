@@ -14,7 +14,9 @@ export class GoogleDriveService {
 
   private googleDriveFiles: GoogleDriveFiles | undefined = undefined;
 
-  constructor(private googleAuth: GoogleAuthService, private httpClient: HttpClient) {}
+  constructor(private googleAuth: GoogleAuthService, private httpClient: HttpClient) {
+    this.getFiles().subscribe();
+  }
 
   public uploadFile(fileName: string, fileContents: string): Observable<any> {
     const file = new Blob([fileContents], {type: 'text/plain'});

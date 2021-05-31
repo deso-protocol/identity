@@ -15,7 +15,9 @@ export class GoogleAuthService {
 
   private googleAuth: GoogleAuth | undefined = undefined;
 
-  constructor(private googleApi: GoogleApiService) {}
+  constructor(private googleApi: GoogleApiService) {
+    this.getAuth().subscribe();
+  }
 
   public getAuth(): Observable<GoogleAuth> {
     if (!this.googleAuth) {

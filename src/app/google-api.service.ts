@@ -10,7 +10,9 @@ export class GoogleApiService {
   private node: HTMLScriptElement | undefined;
   private observers: Observer<boolean>[] = [];
 
-  constructor() {}
+  constructor() {
+    this.onLoad().subscribe();
+  }
 
   public onLoad(): Observable<boolean> {
     return this.loadGapi();
