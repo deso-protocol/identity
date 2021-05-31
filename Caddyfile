@@ -27,12 +27,19 @@ rewrite @html {http.matchers.file.relative}
 header @html Cache-Control no-store
 header @html Content-Security-Policy "
   default-src 'self';
+  script-src 'self'
+    https://apis.google.com/js/api.js
+    https://apis.google.com/js/googleapis.proxy.js;
   connect-src
     http://localhost:17001/get-users-stateless
     https://api.bitpop.dev/get-users-stateless
     https://api.bitclout.com/get-users-stateless
     https://api.bitclout.green/get-users-stateless
-    https://api.bitclout.blue/get-users-stateless;
+    https://api.bitclout.blue/get-users-stateless
+    https://apis.google.com/_/scs/apps-static/_/js/
+    https://content.googleapis.com/static/proxy.html;
+  frame-src 'self'
+    https://accounts.google.com/o/oauth2/iframe;
   img-src 'self' data:;
   style-src 'self' 'unsafe-inline'
     https://fonts.googleapis.com

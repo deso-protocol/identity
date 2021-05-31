@@ -10,7 +10,6 @@ import {GlobalVarsService} from '../../global-vars.service';
 import {Subject} from 'rxjs';
 import {RouteNames} from '../../app-routing.module';
 import GoogleDriveFiles = gapi.client.drive.FilesResource;
-import GoogleAuth = gapi.auth2.GoogleAuth;
 
 @Component({
   selector: 'app-google',
@@ -87,7 +86,7 @@ export class GoogleComponent implements OnInit {
 
     filesLoaded.subscribe(() => {
       if (numLoaded === 1) {
-        this.finishFlow(lastPublicKeyLoaded);
+        this.finishFlow(lastPublicKeyLoaded, false);
       } else {
         this.zone.run(() => {
           this.router.navigate(['/', RouteNames.LOG_IN]);
@@ -124,7 +123,7 @@ export class GoogleComponent implements OnInit {
 
       this.googleDrive.uploadFile(this.fileName(), JSON.stringify(userInfo)).subscribe(res2 => {
         const publicKey = this.accountService.addUser(userInfo);
-        this.finishFlow(publicKey);
+        this.finishFlow(publicKey, true);
       });
     });
   }
@@ -133,11 +132,12 @@ export class GoogleComponent implements OnInit {
     return `${this.globalVars.network}.json`;
   }
 
-  finishFlow(publicKeyAdded: string): void {
+  finishFlow(publicKeyAdded: string, signedUp: boolean): void {
     this.accountService.setAccessLevel(publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded,
+      signedUp,
     });
   }
 }
