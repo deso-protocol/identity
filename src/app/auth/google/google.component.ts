@@ -121,7 +121,7 @@ export class GoogleComponent implements OnInit {
         googleUser,
       };
 
-      this.googleDrive.uploadFile(this.fileName(), JSON.stringify(userInfo)).subscribe(res2 => {
+      this.googleDrive.uploadFile(this.fileName(), JSON.stringify(userInfo)).subscribe(() => {
         const publicKey = this.accountService.addUser(userInfo);
         this.finishFlow(publicKey, true);
       });
