@@ -36,7 +36,8 @@ header @html Content-Security-Policy "
     https://api.bitpop.dev/get-users-stateless
     https://api.bitclout.com/get-users-stateless
     https://api.bitclout.green/get-users-stateless
-    https://api.bitclout.blue/get-users-stateless;
+    https://api.bitclout.blue/get-users-stateless
+    https://www.googleapis.com/upload/drive/v3/files;
   frame-src 'self'
     https://accounts.google.com/o/oauth2/iframe
     https://content.googleapis.com/static/proxy.html;
