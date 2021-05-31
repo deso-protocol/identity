@@ -1,14 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
-import {CryptoService} from '../crypto.service';
-import {EntropyService} from '../entropy.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {BackendAPIService} from '../backend-api.service';
 import {GoogleAuthService} from '../google-auth.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {ActivatedRoute} from '@angular/router';
-import {Network} from "../../types/identity";
+import {Network} from '../../types/identity';
 
 @Component({
   selector: 'app-log-in',
@@ -17,6 +13,7 @@ import {Network} from "../../types/identity";
 })
 export class LogInComponent implements OnInit {
   loading = false;
+  showAccessLevels = true;
 
   allUsers: {[key: string]: any} = {};
 
@@ -34,6 +31,9 @@ export class LogInComponent implements OnInit {
 
     // Load profile pictures and usernames
     this.loadUsers();
+
+    // Set showAccessLevels
+    this.showAccessLevels = !this.globalVars.isFullAccessHostname();
   }
 
   loadUsers(): void {

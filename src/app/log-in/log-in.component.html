@@ -22,30 +22,32 @@
     </ul>
   </div>
 
-  <div class="fs-18px mt-30px">
-    Logging in grants <b>{{ globalVars.hostname }}</b> access to:
-  </div>
+  <div *ngIf="showAccessLevels">
+    <div class="fs-18px mt-30px">
+      Logging in grants <b>{{ globalVars.hostname }}</b> access to:
+    </div>
 
-  <ul class="list-group list-group-flush mt-15px">
-    <li class="list-group-item">
-      <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
-      <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
-      My basic information
-      <div class="fs-14px text-muted"><b>{{ globalVars.hostname }}</b> can access my public key and any other public information</div>
-    </li>
-    <li class="list-group-item">
-      <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
-      <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
-      Post, message, like, and follow on my behalf
-      <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 3"><b>{{ globalVars.hostname }}</b> will require approval to post, message, like, and follow</div>
-      <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest >= 3"><b>{{ globalVars.hostname }}</b> may post, message, like, and follow without requiring approval</div>
-    </li>
-    <li class="list-group-item">
-      <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
-      <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
-      Buy, sell, and send coins on my behalf
-      <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 4"><b>{{ globalVars.hostname }}</b> will require approval to buy, sell, or send coins</div>
-      <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest === 4"><b>{{ globalVars.hostname }}</b> may buy, sell, and send coins without requiring approval</div>
-    </li>
-  </ul>
+    <ul class="list-group list-group-flush mt-15px">
+      <li class="list-group-item">
+        <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
+        <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
+        My basic information
+        <div class="fs-14px text-muted"><b>{{ globalVars.hostname }}</b> can access my public key and any other public information</div>
+      </li>
+      <li class="list-group-item">
+        <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
+        <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
+        Post, message, like, and follow on my behalf
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 3"><b>{{ globalVars.hostname }}</b> will require approval to post, message, like, and follow</div>
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest >= 3"><b>{{ globalVars.hostname }}</b> may post, message, like, and follow without requiring approval</div>
+      </li>
+      <li class="list-group-item">
+        <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
+        <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
+        Buy, sell, and send coins on my behalf
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 4"><b>{{ globalVars.hostname }}</b> will require approval to buy, sell, or send coins</div>
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest === 4"><b>{{ globalVars.hostname }}</b> may buy, sell, and send coins without requiring approval</div>
+      </li>
+    </ul>
+  </div>
 </div>
