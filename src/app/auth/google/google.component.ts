@@ -39,7 +39,9 @@ export class GoogleComponent implements OnInit {
 
       this.zone.run(() => {
         if (hashParams.get('scope')?.includes(GoogleAuthService.DRIVE_SCOPE)) {
-          this.createOrLoadAccount();
+          setTimeout(() => {
+            this.createOrLoadAccount();
+          }, 1000);
         } else {
           this.router.navigate(['/', RouteNames.LOG_IN]);
         }
@@ -49,19 +51,21 @@ export class GoogleComponent implements OnInit {
 
   createOrLoadAccount(): void {
     this.googleDrive.getFiles().subscribe(googleDriveFiles => {
-      googleDriveFiles.list({
-        spaces: 'appDataFolder',
-        fields: 'files(id, name)',
-        pageSize: 100,
-        q: `name = '${this.fileName()}'`
-      }).then((res: any) => {
-        const files = res.result.files;
-        if (files.length > 0) {
-          this.loadAccount(googleDriveFiles, files);
-        } else {
-          this.createAccount();
-        }
-      });
+      setTimeout(() => {
+        googleDriveFiles.list({
+          spaces: 'appDataFolder',
+          fields: 'files(id, name)',
+          pageSize: 100,
+          q: `name = '${this.fileName()}'`
+        }).then((res: any) => {
+          const files = res.result.files;
+          if (files.length > 0) {
+            this.loadAccount(googleDriveFiles, files);
+          } else {
+            this.createAccount();
+          }
+        });
+      }, 1000);
     });
   }
 
