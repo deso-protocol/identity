@@ -36,11 +36,14 @@ export class GoogleComponent implements OnInit {
   ngOnInit(): void {
     this.route.fragment.subscribe((params) => {
       const hashParams = new URLSearchParams(params);
-      if (hashParams.get('scope')?.includes(GoogleAuthService.DRIVE_SCOPE)) {
-        this.createOrLoadAccount();
-      } else {
-       this.router.navigate(['/', RouteNames.LOG_IN]);
-      }
+
+      this.zone.run(() => {
+        if (hashParams.get('scope')?.includes(GoogleAuthService.DRIVE_SCOPE)) {
+          this.createOrLoadAccount();
+        } else {
+          this.router.navigate(['/', RouteNames.LOG_IN]);
+        }
+      });
     });
   }
 
