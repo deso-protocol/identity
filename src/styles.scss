@@ -292,3 +292,44 @@ h2,h3,h4,h5,h6,p {
 .sign-up-seed {
   background-image: url(/assets/sign_up_seed.png);
 }
+
+.google-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px
+}
+
+.google-ball {
+  width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  margin: 0 10px;
+
+  animation: 2s bounce ease infinite;
+}
+
+.google-ball.blue {
+  background-color: #4285F5;
+}
+
+.google-ball.red {
+  background-color: #EA4436;
+  animation-delay: .25s;
+}
+
+.google-ball.yellow {
+  background-color: #FBBD06;
+  animation-delay: .5s;
+}
+
+.google-ball.green {
+  background-color: #34A952;
+  animation-delay: .75s;
+}
+
+@keyframes bounce {
+    50% {
+        transform: translateY(25px);
+    }
+}

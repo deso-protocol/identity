@@ -5,10 +5,7 @@ import {CryptoService} from "../crypto.service";
 import {EntropyService} from "../entropy.service";
 import {GlobalVarsService} from "../global-vars.service";
 import {BackendAPIService} from "../backend-api.service";
-import {GoogleAuthService} from "../google-auth.service";
-import {GoogleDriveService} from "../google-drive.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {AccessLevel} from "../../types/identity";
+import {Router} from "@angular/router";
 import HDNode from "hdkey";
 import {RouteNames} from "../app-routing.module";
 
