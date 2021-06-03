@@ -8,7 +8,6 @@ import { HomeComponent } from './home/home.component';
 import {FormsModule} from '@angular/forms';
 import {IdentityService} from './identity.service';
 import {CookieModule} from 'ngx-cookie';
-import { ImportComponent } from './import/import.component';
 import { LogoutComponent } from './logout/logout.component';
 import { BannerComponent } from './banner/banner.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
@@ -26,7 +25,6 @@ import { GoogleComponent } from './auth/google/google.component';
     AppComponent,
     EmbedComponent,
     HomeComponent,
-    ImportComponent,
     LogoutComponent,
     BannerComponent,
     SignUpComponent,
