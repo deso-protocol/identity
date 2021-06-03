@@ -5,21 +5,25 @@
     Log in to {{ globalVars.hostname }}
   </div>
 
-  <div class="d-flex align-items-center flex-column">
-    <button class="btn btn-default log-in-google" (click)="launchGoogle()" *ngIf="!globalVars.hideGoogle"></button>
-
-    <ul class="list-group mt-15px">
-      <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccount(item.key)">
-        <div class="w-100">
-          <div *ngIf="!item.value.username">{{ item.key | slice:0:30 }}&hellip;</div>
-          <div *ngIf="item.value.username" class="d-flex align-items-center">
-            <div class="avatar mr-15px" [style.background-image]="'url(' + item.value.profilePic + ')'"></div>
-            <div class="text-truncate">{{ item.value.username }}</div>
+  <div class="row">
+    <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">
+      <ul class="list-group mt-7px mb-30px">
+        <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccount(item.key)">
+          <div class="w-100">
+            <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>
+            <div *ngIf="item.value.username" class="d-flex align-items-center">
+              <div class="avatar mr-15px" [style.background-image]="'url(' + item.value.profilePic + ')'"></div>
+              <div class="text-truncate">{{ item.value.username }}</div>
+            </div>
           </div>
-        </div>
-      </li>
-      <li class="list-group-item list-group-item-action cursor-pointer text-center" [routerLink]="['/', 'load-seed']">Log in with seed phrase</li>
-    </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="d-flex align-items-center flex-column" *ngIf="!globalVars.hideGoogle" [class.col-sm-6]="hasUsers" [class.col-sm-12]="!hasUsers">
+      <button class="btn btn-default log-in-google mb-30px" (click)="launchGoogle()"></button>
+      <button class="btn btn-default log-in-seed" [routerLink]="['/load-seed']"></button>
+      <button class="btn btn-default sign-up-seed" [routerLink]="['/sign-up']"></button>
+    </div>
   </div>
 
   <div *ngIf="showAccessLevels">

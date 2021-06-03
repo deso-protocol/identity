@@ -19,6 +19,7 @@ export class LogInComponent implements OnInit {
   showAccessLevels = true;
 
   allUsers: {[key: string]: any} = {};
+  hasUsers = false;
 
   constructor(
     private accountService: AccountService,
@@ -43,6 +44,7 @@ export class LogInComponent implements OnInit {
     for (const publicKey of publicKeys) {
       this.allUsers[publicKey] = {};
     }
+    this.hasUsers = publicKeys.length > 0;
 
     if (publicKeys.length > 0) {
       this.backendApi.GetUsersStateless(publicKeys).subscribe(res2 => {
