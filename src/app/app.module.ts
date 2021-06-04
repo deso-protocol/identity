@@ -11,7 +11,6 @@ import {CookieModule} from 'ngx-cookie';
 import { LogoutComponent } from './logout/logout.component';
 import { BannerComponent } from './banner/banner.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
-import { SignUpEntropyComponent } from './sign-up-entropy/sign-up-entropy.component';
 import {AccountService} from './account.service';
 import {EntropyService} from './entropy.service';
 import { LogInComponent } from './log-in/log-in.component';
@@ -28,7 +27,6 @@ import { GoogleComponent } from './auth/google/google.component';
     LogoutComponent,
     BannerComponent,
     SignUpComponent,
-    SignUpEntropyComponent,
     LogInComponent,
     ApproveComponent,
     LogInSeedComponent,
