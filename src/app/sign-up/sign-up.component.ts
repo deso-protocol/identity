@@ -19,7 +19,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
-  publicKeyAdded = '';
 
   // Advanced tab
   advancedOpen = false;
@@ -74,7 +73,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
-    this.publicKeyAdded = this.accountService.addUser({
+    const publicKeyAdded = this.accountService.addUser({
       seedHex,
       mnemonic: this.mnemonicCheck,
       extraText: this.extraTextCheck,
@@ -82,7 +81,11 @@ export class SignUpComponent implements OnInit, OnDestroy {
       network,
     });
 
-    this.router.navigate(['/log-in']);
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded,
+      signedUp: true,
+    });
   }
 
   stepTwoBack(): void {
