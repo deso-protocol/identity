@@ -1,6 +1,39 @@
-<div class="google-wrapper">
+<div class="google-wrapper" *ngIf="loading">
   <div class="google-ball blue"></div>
   <div class="google-ball red"></div>
   <div class="google-ball yellow"></div>
   <div class="google-ball green"></div>
+</div>
+
+<div *ngIf="!loading">
+  <app-banner></app-banner>
+
+  <div class="container home-container">
+    <div class="fs-24px font-weight-bold pt-15px">Optional: Save your recovery code</div>
+    <div class="fs-18px mt-15px">You can use this seed phrase to login if you lose access to your Google account.</div>
+    <div class="fc-red fs-18px pt-15px">Do not share this with anyone.</div>
+    <div class="w-100 mt-30px fs-15px border border-color-grey"
+         style="border-radius: 3px">
+      <div class="p-15px border-bottom border-color-grey">{{ mnemonic }}</div>
+      <div class="d-flex align-items-center justify-content-between flex-wrap mb-15px ml-15px mr-15px">
+        <div class="d-flex align-items-center mt-15px">
+          <button (click)="copySeed()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
+            Copy
+          </button>
+          <button (click)="downloadSeed()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
+            Download
+          </button>
+          <button (click)="printSeed()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
+            Print
+          </button>
+          <span *ngIf="seedCopied" class="ml-10px">✅</span>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex pt-15px justify-content-end">
+      <button (click)="finishFlow(true)" class="btn btn-primary font-weight-bold fs-15px sign-up-btn">
+        Continue to {{ globalVars.hostname }}
+      </button>
+    </div>
+  </div>
 </div>

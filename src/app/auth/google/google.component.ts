@@ -8,6 +8,7 @@ import {EntropyService} from '../../entropy.service';
 import {GoogleDriveService} from '../../google-drive.service';
 import {GlobalVarsService} from '../../global-vars.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TextService} from "../../text.service";
 
 @Component({
   selector: 'app-google',
@@ -16,6 +17,11 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 export class GoogleComponent implements OnInit {
 
+  loading = true;
+  seedCopied = false;
+  publicKey = '';
+  mnemonic = '';
+
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -23,10 +29,24 @@ export class GoogleComponent implements OnInit {
     private entropyService: EntropyService,
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
+    private textService: TextService,
     private router: Router,
     private zone: NgZone,
     private route: ActivatedRoute,
   ) { }
+
+  copySeed(): void {
+    this.textService.copyText(this.mnemonic);
+    this.seedCopied = true;
+  }
+
+  downloadSeed(): void {
+    this.textService.downloadText(this.mnemonic, 'bitclout-seed.txt');
+  }
+
+  printSeed(): void {
+    window.print();
+  }
 
   ngOnInit(): void {
     this.route.fragment.subscribe((params) => {
@@ -50,13 +70,12 @@ export class GoogleComponent implements OnInit {
 
   loadAccounts(files: any): void {
     const filesLoaded = new Subject();
-    let lastPublicKeyLoaded = '';
     let numLoaded = 0;
 
     for (const file of files) {
       this.googleDrive.getFile(file.id).subscribe(fileContents => {
         try {
-          lastPublicKeyLoaded = this.accountService.addUser(fileContents);
+          this.publicKey = this.accountService.addUser(fileContents);
         } catch (err) {
           console.error(err);
         }
@@ -71,7 +90,7 @@ export class GoogleComponent implements OnInit {
 
     filesLoaded.subscribe(() => {
       if (numLoaded === 1) {
-        this.finishFlow(lastPublicKeyLoaded, false);
+        this.finishFlow(false);
       } else {
         this.zone.run(() => {
           this.router.navigate(['/', RouteNames.LOG_IN]);
@@ -81,33 +100,36 @@ export class GoogleComponent implements OnInit {
   }
 
   createAccount(): void {
-    const mnemonic = this.entropyService.temporaryEntropy.mnemonic;
+    // store the new mnemonic in our component to be extra safe
+    this.mnemonic = this.entropyService.temporaryEntropy.mnemonic;
+
+    const mnemonic = this.mnemonic;
     const extraText = '';
     const network = this.globalVars.network;
-    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+    const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonic, extraText);
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
     const userInfo = {
-      seedHex,
       mnemonic,
       extraText,
+      seedHex,
       btcDepositAddress,
       network,
       google: true,
     };
 
     this.googleDrive.uploadFile(this.fileName(), JSON.stringify(userInfo)).subscribe(() => {
-      const publicKey = this.accountService.addUser(userInfo);
-      this.finishFlow(publicKey, true);
+      this.publicKey = this.accountService.addUser(userInfo);
+      this.loading = false;
     });
   }
 
-  finishFlow(publicKeyAdded: string, signedUp: boolean): void {
-    this.accountService.setAccessLevel(publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+  finishFlow(signedUp: boolean): void {
+    this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded,
+      publicKeyAdded: this.publicKey,
       signedUp,
     });
   }

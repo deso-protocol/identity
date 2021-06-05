@@ -8,11 +8,6 @@
   <p class="fs-18px mt-15px">
     Enter your seed phrase to load your account
   </p>
-  <p class="fs-18px mt-15px">
-    You can also
-    <a [routerLink]="['/', 'sign-up']">create a new seed phrase</a>
-    to sign up anonymously
-  </p>
 
   <div *ngIf="loginError" class="alert alert-danger mt-15px">
     {{ loginError }}

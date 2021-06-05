@@ -7,62 +7,99 @@
     <div class="fs-24px font-weight-bold pt-15px">Store your seed phrase</div>
     <div class="fs-18px mt-15px">Write, download, print, or copy it somewhere safe.</div>
     <div class="fc-red fs-18px pt-15px">If you lose your seed phrase your account will be lost forever.</div>
-    <div class="w-100 mt-30px fs-15px border border-color-grey"
-         style="border-radius: 3px">
-      <div *ngIf="!entropyService.advancedOpen" class="p-15px">{{ entropyService.temporaryEntropy.mnemonic }}</div>
-      <div class="fc-red px-15px" *ngIf="!entropyService.advancedOpen && hasAdvancedEntropyError">
+    <div class="w-100 mt-30px fs-15px border border-color-grey" style="border-radius: 3px">
+      <div *ngIf="!entropyService.advancedOpen" class="p-15px border-bottom border-color-grey">{{ entropyService.temporaryEntropy.mnemonic }}</div>
+      <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && hasEntropyError()">
         Please fix errors in your advanced entropy configuration.</div>
-      <div class="fc-red px-15px" *ngIf="!entropyService.advancedOpen && !hasAdvancedEntropyError && entropyService.temporaryEntropy.extraText.length > 0">
+      <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && !hasEntropyError() && entropyService.temporaryEntropy.extraText.length > 0">
         Note that you have added a passphrase in the advanced menu.</div>
-      <div class="d-flex align-items-center justify-content-between p-15px sign-up__grey-background">
+      <div class="d-flex align-items-center justify-content-between p-15px">
         <div class="d-flex align-items-center">
-          <button (click)="stepOneCopy()"
-                  class="btn btn-primary font-weight-bold fs-15px sign-up__cp-button-override"
-                  style="height: 36px; 75px;
-                         line-height: 15px;
-                         border-radius: 3px;">
+          <button (click)="stepOneCopy()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
             Copy
           </button>
-          <button (click)="stepOneDownload()"
-                  class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up__cp-button-override"
-                  style="height: 36px; 75px;
-                         line-height: 15px;
-                         border-radius: 3px;">
+          <button (click)="stepOneDownload()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
             Download
           </button>
-          <button (click)="stepOnePrint()"
-                  class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up__cp-button-override"
-                  style="height: 36px; 75px;
-                         line-height: 15px;
-                         border-radius: 3px;">
+          <button (click)="stepOnePrint()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
             Print
           </button>
-          <i *ngIf="seedCopied" class="far fa-check-circle fa-lg fc-blue ml-10px"></i>
+          <span *ngIf="seedCopied" class="ml-10px">✅</span>
         </div>
-        <div class="fc-blue fs-13px cursor-pointer" *ngIf="!entropyService.advancedOpen"
-             (click)="entropyService.advancedOpen = true">Advanced</div>
-        <div class="fc-blue fs-13px cursor-pointer" *ngIf="entropyService.advancedOpen"
-             (click)="entropyService.advancedOpen = false">Simple</div>
+        <div class="fc-blue fs-13px cursor-pointer" *ngIf="!entropyService.advancedOpen" (click)="entropyService.advancedOpen = true">Advanced</div>
+        <div class="fc-blue fs-13px cursor-pointer" *ngIf="entropyService.advancedOpen" (click)="entropyService.advancedOpen = false">Simple</div>
       </div>
-      <div class="sign-up__grey-background">
-        <app-sign-up-entropy *ngIf="entropyService.advancedOpen"></app-sign-up-entropy>
+      <div class="border-top border-color-grey" *ngIf="entropyService.advancedOpen">
+        <div class="w-100 p-15px">
+          <div class="fs-15px">
+            <p>
+              The following displays the entropy (random numbers) used to generate the "seed phrase" above.
+              The entropy below was generated using a random number generator, but you can edit the
+              fields below to use your own randomness to generate the seed phrase (you can't go wrong
+              with a set of dice). You can also enter your own seed phrase directly if you prefer.
+            </p>
+
+            <p class="pt-15px">
+              Because there is a standard for generating seed phrases for Bitcoin (called
+              <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>),
+              and because we use this same standard to generate BitClout seed phrases,
+              BitClout seed phrases can also be used with any Bitcoin wallet that implements
+              this standard under the m/44'/0'/0'/0/0 derivation path (e.g.
+              <a target="_blank" href="https://wallet.mycelium.com/">Mycelium</a>,
+              <a target="_blank" href="https://electrum.org">Electrum</a>).
+              Similarly, any standard
+              Bitcoin seed phrase you have can also be used as a BitClout seed phrase. Of course, all
+              of this can be verified using a tool like the
+              <a target="_blank" href="https://iancoleman.io/bip39/">Ian Coleman mnemonic generator</a>
+              (must click "show entropy details") so you know this generator is doing what it says it is.
+            </p>
+          </div>
+
+          <div class="form-group pt-15px">
+            <p>Custom seed phrase (must be
+              <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
+              mnemonic):</p>
+            <p class="fc-red py-10px" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</p>
+            <textarea [(ngModel)]="entropyService.temporaryEntropy.mnemonic"
+                      (ngModelChange)="checkMnemonic()"
+                      class="form-control fs-15px"
+                      rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <p>Passphrase:</p>
+            <textarea [(ngModel)]="entropyService.temporaryEntropy.extraText"
+                      (ngModelChange)="normalizeExtraText()"
+                      class="form-control fs-15px"
+                      rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <p>Custom Entropy (hex = base16 = [0-9a-f]):</p>
+            <p class="fc-red  py-10px" *ngIf="showEntropyHexError">
+              Entropy value must be a hexadecimal value with a total number of characters
+              that is a multiple of 8, less than 128, and greater than 32.</p>
+            <textarea [(ngModel)]="entropyService.temporaryEntropy.customEntropyHex"
+                      (ngModelChange)="checkEntropyHex()"
+                      class="form-control fs-15px"
+                      rows="2"></textarea>
+          </div>
+
+          <button (click)="getNewEntropy()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
+            Regenerate
+          </button>
+        </div>
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-end">
-      <button *ngIf="!hasAdvancedEntropyError"
+      <button *ngIf="!hasEntropyError()"
               (click)="stepOneNext()"
-              class="btn btn-primary font-weight-bold fs-15px"
-              style="height: 36px; 75px;
-                     line-height: 15px;
-                     border-radius: 3px;">
+              class="btn btn-primary font-weight-bold fs-15px sign-up-btn">
         Next
       </button>
-      <button *ngIf="hasAdvancedEntropyError"
+      <button *ngIf="hasEntropyError()"
               (click)="stepOneNext()"
-              class="btn btn-primary font-weight-bold fs-15px"
-              style="height: 36px; 75px;
-                     line-height: 15px;
-                     border-radius: 3px;" disabled>
+              class="btn btn-primary font-weight-bold fs-15px sign-up-btn" disabled>
         Next
       </button>
     </div>
@@ -102,28 +139,19 @@
     </div>
     <div class="d-flex pt-15px justify-content-between">
       <button (click)="stepTwoBack()"
-              class="btn btn-outline-primary font-weight-bold fs-15px"
-              style="height: 36px; 75px;
-                     line-height: 15px;
-                     border-radius: 3px;">
+              class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
         Back
       </button>
       <div>
         <button *ngIf="entropyService.temporaryEntropy.mnemonic == mnemonicCheck
                        && entropyService.temporaryEntropy.extraText == extraTextCheck"
                 (click)="stepTwoNext()"
-                class="btn btn-primary font-weight-bold fs-15px ml-10px"
-                style="height: 36px; 75px;
-                       line-height: 15px;
-                       border-radius: 3px;">
+                class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn">
           Next
         </button>
         <button *ngIf="entropyService.temporaryEntropy.mnemonic != mnemonicCheck
                        || entropyService.temporaryEntropy.extraText != extraTextCheck"
-                class="btn btn-primary font-weight-bold fs-15px ml-10px"
-                style="height: 36px; 75px;
-                       line-height: 15px;
-                       border-radius: 3px;" disabled>
+                class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn" disabled>
           Next
         </button>
       </div>
