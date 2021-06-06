@@ -80,4 +80,12 @@ export class LogInComponent implements OnInit {
       publicKeyAdded: publicKey,
     });
   }
+
+  clearAccounts(): void {
+    const publicKeys = this.accountService.getPublicKeys();
+    for (const key of publicKeys) {
+      this.accountService.deleteUser(key);
+    }  
+    window.location.reload()
+  }
 }
