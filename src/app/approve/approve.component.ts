@@ -79,15 +79,16 @@ export class ApproveComponent implements OnInit {
 
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
-        let sendKey = 'unknown';
-        let sendAmount = 'unknown';
+        const outputs = [];
         for (const output of this.transaction.outputs) {
-          if (output.publicKey !== this.transaction.publicKey) {
-            sendKey = this.base58KeyCheck(output.publicKey);
-            sendAmount = `${output.amountNanos / 1e9}`;
+          // Skip the change output
+          if (!Buffer.compare(output.publicKey, this.transaction.publicKey)) {
+            const sendKey = this.base58KeyCheck(output.publicKey);
+            const sendAmount = `${output.amountNanos / 1e9}`;
+            outputs.push(`${sendAmount} CLOUT to ${sendKey}`);
           }
         }
-        description = `send ${sendAmount} bitclout to ${sendKey}`;
+        description = `send ${outputs.join(', ')}`;
         break;
 
       case TransactionMetadataBitcoinExchange:
