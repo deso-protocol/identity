@@ -82,7 +82,9 @@ export class ApproveComponent implements OnInit {
         let sendKey = 'unknown';
         let sendAmount = 'unknown';
         for (const output of this.transaction.outputs) {
-          if (output.publicKey !== this.transaction.publicKey) {
+          if (
+            !this.equalUInt8Arrays(output.publicKey, this.transaction.publicKey)
+          ) {
             sendKey = this.base58KeyCheck(output.publicKey);
             sendAmount = `${output.amountNanos / 1e9}`;
           }
@@ -157,5 +159,23 @@ export class ApproveComponent implements OnInit {
   base58KeyCheck(keyBytes: Uint8Array): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[this.globalVars.network].bitclout;
     return bs58check.encode(Buffer.from([...prefix, ...keyBytes]));
+  }
+  
+  
+  //obtained from https://stackoverflow.com/a/52181275
+  equalUInt8Arrays(a: Uint8Array, b: Uint8Array): Boolean {
+    if (a instanceof ArrayBuffer) a = new Uint8Array(a, 0);
+    if (b instanceof ArrayBuffer) b = new Uint8Array(b, 0);
+
+    if (a.byteLength != b.byteLength) return false;
+
+    const ua = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
+    const ub = new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
+
+    for (let i = ua.length; -1 < i; i -= 1) {
+      if (ua[i] !== ub[i]) return false;
+    }
+
+    return true;
   }
 }
