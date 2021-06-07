@@ -19,8 +19,8 @@
         </li>
       </ul>
     </div>
-    <div class="d-flex align-items-center flex-column" *ngIf="!globalVars.hideGoogle" [class.col-sm-6]="hasUsers" [class.col-sm-12]="!hasUsers">
-      <button class="btn btn-default log-in-google mb-30px" (click)="launchGoogle()"></button>
+    <div class="d-flex align-items-center flex-column" [class.col-sm-6]="hasUsers" [class.col-sm-12]="!hasUsers">
+      <button class="btn btn-default log-in-google mb-30px" (click)="launchGoogle()" *ngIf="!globalVars.hideGoogle"></button>
       <button class="btn btn-default log-in-seed" [routerLink]="['/load-seed']"></button>
       <button class="btn btn-default sign-up-seed" [routerLink]="['/sign-up']"></button>
     </div>
