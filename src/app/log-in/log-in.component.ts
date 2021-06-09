@@ -18,6 +18,10 @@ export class LogInComponent implements OnInit {
   loading = false;
   showAccessLevels = true;
 
+  //clear account checks
+  clearAccountsStep = 1;
+  clearAccountCheck = '';
+
   allUsers: {[key: string]: any} = {};
   hasUsers = false;
 
@@ -87,5 +91,15 @@ export class LogInComponent implements OnInit {
       this.accountService.deleteUser(key);
     }  
     window.location.reload()
+  }
+
+  clearAccountsConfirm(): void {
+    this.clearAccountsStep=2;
+    this.clearAccountCheck='';
+  }
+  
+  clearAccountsCancel(): void {
+    this.clearAccountsStep=1;
+    this.clearAccountCheck='';
   }
 }
