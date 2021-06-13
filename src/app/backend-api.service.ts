@@ -23,4 +23,7 @@ export class BackendAPIService {
       },
     );
   }
+  GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {
+    return `${this.endpoint}/get-single-profile-picture/${PublicKeyBase58Check}`;
+  }
 }
