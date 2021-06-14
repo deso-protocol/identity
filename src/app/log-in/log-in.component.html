@@ -12,7 +12,7 @@
           <div class="w-100">
             <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>
             <div *ngIf="item.value.username" class="d-flex align-items-center">
-              <div class="avatar mr-15px" [style.background-image]="'url(' + item.value.profilePic + ')'"></div>
+              <div class="avatar mr-15px" [appAvatar]="item.key"></div>
               <div class="text-truncate">{{ item.value.username }}</div>
             </div>
           </div>
