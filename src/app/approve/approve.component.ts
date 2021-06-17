@@ -81,8 +81,8 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataBasicTransfer:
         const outputs = [];
         for (const output of this.transaction.outputs) {
-          // Skip the change output
-          if (!Buffer.compare(output.publicKey, this.transaction.publicKey)) {
+          // Skip the change output. 0 means the buffers are equal
+          if (Buffer.compare(output.publicKey, this.transaction.publicKey) !== 0) {
             const sendKey = this.base58KeyCheck(output.publicKey);
             const sendAmount = `${output.amountNanos / 1e9}`;
             outputs.push(`${sendAmount} CLOUT to ${sendKey}`);
