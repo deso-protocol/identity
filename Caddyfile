@@ -28,11 +28,16 @@ header @html Cache-Control no-store
 header @html Content-Security-Policy "
   default-src 'self';
   connect-src
-    http://localhost:17001/get-users-stateless
-    https://api.bitpop.dev/get-users-stateless
-    https://api.bitclout.com/get-users-stateless
-    https://api.bitclout.green/get-users-stateless
-    https://api.bitclout.blue/get-users-stateless
+    http://localhost:17001/api/v0/get-users-stateless
+    https://bitpop.dev/api/v0/get-users-stateless
+    https://bitclout.com/api/v0/get-users-stateless
+    https://bitclout.green/api/v0/get-users-stateless
+    https://bitclout.blue/api/v0/get-users-stateless
+    http://localhost:17001/api/v0/get-single-profile-picture/
+    https://bitpop.dev/api/v0/get-single-profile-picture/
+    https://bitclout.com/api/v0/get-single-profile-picture/
+    https://bitclout.green/api/v0/get-single-profile-picture/
+    https://bitclout.blue/api/v0/get-single-profile-picture/
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files;
