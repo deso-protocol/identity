@@ -17,7 +17,7 @@ export class AvatarDirective implements OnChanges {
   }
 
   ngOnChanges(changes: any): void {
-    if (changes.avatar && changes.avatar !== this.appAvatar) {
+    if (changes.appAvatar && changes.appAvatar !== this.appAvatar) {
       this.setAvatar();
     }
   }
