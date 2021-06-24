@@ -18,7 +18,7 @@ export class SigningService {
   signJWT(seedHex: string): string {
     const keyEncoder = new KeyEncoder('secp256k1');
     const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
-    return jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: 60 });
+    return jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: 60 * 10 });
   }
 
   decryptMessages(seedHex: string, encryptedHexes: string[]): { [key: string]: any } {
