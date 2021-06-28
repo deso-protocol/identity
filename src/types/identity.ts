@@ -37,3 +37,7 @@ export enum AccessLevel {
   // Node can sign all transactions without approval
   Full = 4,
 }
+
+export interface GoogleAuthState {
+  webview: boolean;
+}

@@ -7,7 +7,7 @@ import {Network} from '../../types/identity';
 import {CryptoService} from '../crypto.service';
 import {EntropyService} from '../entropy.service';
 import {GoogleDriveService} from '../google-drive.service';
-import {RouteNames} from "../app-routing.module";
+import {RouteNames} from '../app-routing.module';
 
 @Component({
   selector: 'app-log-in',
@@ -69,6 +69,10 @@ export class LogInComponent implements OnInit {
     oauthUri.searchParams.append('client_id', GoogleDriveService.CLIENT_ID);
     oauthUri.searchParams.append('scope', GoogleDriveService.DRIVE_SCOPE);
     oauthUri.searchParams.append('response_type', 'token');
+    // pass on webview state to Google OAuth state
+    // https://stackoverflow.com/questions/7722062/google-oauth-2-0-redirect-uri-with-several-parameters
+    const stateString = btoa(JSON.stringify({webview: this.globalVars.webview}));
+    oauthUri.searchParams.append('state', stateString);
 
     window.location.href = oauthUri.toString();
   }
