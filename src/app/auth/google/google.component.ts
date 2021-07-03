@@ -8,7 +8,8 @@ import {EntropyService} from '../../entropy.service';
 import {GoogleDriveService} from '../../google-drive.service';
 import {GlobalVarsService} from '../../global-vars.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TextService} from "../../text.service";
+import {TextService} from '../../text.service';
+import {GoogleAuthState} from '../../../types/identity';
 
 @Component({
   selector: 'app-google',
@@ -138,3 +139,17 @@ export class GoogleComponent implements OnInit {
     return `${this.globalVars.network}.json`;
   }
 }
+
+export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAuthState => {
+  const defaultStateParams = { webview: false, testnet: false };
+  try {
+    const stateParamsString = hashParams?.get('state');
+    const stateParams: GoogleAuthState = stateParamsString ? JSON.parse(atob(stateParamsString)) : null;
+    if (stateParams) {
+      return stateParams;
+    }
+  } catch (e) {
+    console.error('Failed to parse state passed from Google');
+  }
+  return defaultStateParams;
+};

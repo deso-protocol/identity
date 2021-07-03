@@ -3,6 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {GlobalVarsService} from './global-vars.service';
 import {IdentityService} from './identity.service';
 import {AccessLevel, Network} from '../types/identity';
+import {getStateParamsFromGoogle} from './auth/google/google.component';
 
 @Component({
   selector: 'app-root',
@@ -23,17 +24,27 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     // load params
     const params = new URLSearchParams(window.location.search);
+
+    // grab hash parameters from window and not activatedRoute because init is run before detecting fragment
+    let hashParams;
+    if (window.location.hash && window.location.hash.length > 1){
+      // hash includes the hashtag symbol so use substring to remove it
+      hashParams = new URLSearchParams(window.location.hash.substring(1));
+    }
+
     const accessLevelRequest = params.get('accessLevelRequest');
 
     if (accessLevelRequest) {
       this.globalVars.accessLevelRequest = parseInt(accessLevelRequest, 10);
     }
 
-    if (params.get('webview')) {
+
+    const stateParamsFromGoogle = getStateParamsFromGoogle(hashParams);
+    if (params.get('webview') || stateParamsFromGoogle.webview) {
       this.globalVars.webview = true;
     }
 
-    if (params.get('testnet')) {
+    if (params.get('testnet') || stateParamsFromGoogle.testnet) {
       this.globalVars.network = Network.testnet;
     }
 
