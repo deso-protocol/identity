@@ -69,9 +69,13 @@ export class LogInComponent implements OnInit {
     oauthUri.searchParams.append('client_id', GoogleDriveService.CLIENT_ID);
     oauthUri.searchParams.append('scope', GoogleDriveService.DRIVE_SCOPE);
     oauthUri.searchParams.append('response_type', 'token');
+    // TODO: Investigate using this parameter to defend against CSRF attacks
     // pass on webview state to Google OAuth state
     // https://stackoverflow.com/questions/7722062/google-oauth-2-0-redirect-uri-with-several-parameters
-    const stateString = btoa(JSON.stringify({webview: this.globalVars.webview}));
+    const stateString = btoa(JSON.stringify({
+      webview: this.globalVars.webview,
+      testnet: this.globalVars.network === Network.testnet
+    }));
     oauthUri.searchParams.append('state', stateString);
 
     window.location.href = oauthUri.toString();

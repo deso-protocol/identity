@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
       this.globalVars.webview = true;
     }
 
-    if (params.get('testnet')) {
+    if (params.get('testnet') || stateParamsFromGoogle.testnet) {
       this.globalVars.network = Network.testnet;
     }
 
