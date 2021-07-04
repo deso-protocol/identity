@@ -5,6 +5,7 @@ import * as ecies from '../lib/ecies';
 import {CryptoService} from './crypto.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
+import {decryptShared} from '../lib/ecies';
 
 @Injectable({
   providedIn: 'root'
@@ -21,17 +22,52 @@ export class SigningService {
     return jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: 60 * 10 });
   }
 
-  decryptMessages(seedHex: string, encryptedHexes: string[]): { [key: string]: any } {
+  encryptMessage(seedHex: string, recipientPubkeyBase58Check: string, message: string): string {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+
+    const publicKeyBuffer = this.cryptoService.publicKeyBase58CheckToECBuffer(recipientPubkeyBase58Check);
+    try {
+      const encryptedMessage = ecies.encryptShared(privateKeyBuffer, publicKeyBuffer, message);
+      return encryptedMessage.toString('hex');
+    } catch (e) {
+      console.error(e);
+    }
+    return '';
+  }
+
+  // Decrypt messages encrypted with shared secret
+  // @param encryptedHexesAndPublicKeys : { EncryptedHex: string, PublicKey: string }
+  decryptMessages(seedHex: string, encryptedHexesAndPublicKeys: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer();
 
     const decryptedHexes: { [key: string]: any } = {};
-    for (const encryptedHex of encryptedHexes) {
+    for (const encryptedHexAndPublicKey of encryptedHexesAndPublicKeys) {
+      const encryptedHex = encryptedHexAndPublicKey.EncryptedHex;
+      const publicKey = encryptedHexAndPublicKey.PublicKey;
       const encryptedBytes = new Buffer(encryptedHex, 'hex');
-      try {
-        decryptedHexes[encryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes);;
-      } catch (e) {
-        console.error(e);
+      const publicKeyBytes = this.cryptoService.publicKeyBase58CheckToECBuffer(publicKey);
+
+      // Check if message was encrypted using shared secret
+      if (encryptedHexAndPublicKey.V2){
+        try {
+          decryptedHexes[encryptedHex] = ecies.decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes).toString();
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        // If message was encrypted using public key, check who
+        // sent it to determine if message is decryptable
+        try {
+          if (!encryptedHexAndPublicKey.IsSender) {
+            decryptedHexes[encryptedHex] = ecies.decryptLegacy(privateKeyBuffer, encryptedBytes).toString();
+          } else {
+            decryptedHexes[encryptedHex] = '';
+          }
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
 

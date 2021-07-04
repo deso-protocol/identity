@@ -10,7 +10,8 @@ import {
   Transaction,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
-  TransactionMetadataCreatorCoin, TransactionMetadataCreatorCoinTransfer,
+  TransactionMetadataCreatorCoin,
+  TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
@@ -97,14 +98,28 @@ export class IdentityService {
     });
   }
 
+  // Encrypt with shared secret
+  private handleEncrypt(data: any): void{
+    if (!this.approve(data, AccessLevel.ApproveAll)){
+      return;
+    }
+
+    const { id, payload: { encryptedSeedHex, recipientPubkey, message} } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPubkey, message);
+    this.respond(id, {
+      encryptedMessage
+    });
+  }
+
   private handleDecrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, encryptedHexes } } = data;
+    const { id, payload: { encryptedSeedHex, encryptedHexesAndPublicKeys } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexes);
+    const decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexesAndPublicKeys);
 
     this.respond(id, {
       decryptedHexes
@@ -224,6 +239,8 @@ export class IdentityService {
 
     if (method === 'burn') {
       this.handleBurn(data);
+    } else if (method === 'encrypt'){
+      this.handleEncrypt(data);
     } else if (method === 'decrypt') {
       this.handleDecrypt(data);
     } else if (method === 'sign') {

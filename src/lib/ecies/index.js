@@ -36,13 +36,27 @@ export const kdf = function(secret, outputLength) {
 
 // AES-128-CTR is used in the Parity implementation
 // Get the AES-128-CTR browser implementation
-
 const aesCtrEncrypt = function(counter, key, data) {
+  const cipher = createCipheriv('aes-128-ctr', key, counter);
+  const firstChunk = cipher.update(data);
+  const secondChunk = cipher.final();
+  return Buffer.concat([firstChunk, secondChunk]);
+}
+
+const aesCtrDecrypt = function(counter, key, data) {
+  const cipher = createDecipheriv('aes-128-ctr', key, counter);
+  const firstChunk = cipher.update(data);
+  const secondChunk = cipher.final();
+  return Buffer.concat([firstChunk, secondChunk]);
+}
+
+// Legacy AES-128-CTR without second chunk
+const aesCtrEncryptLegacy = function(counter, key, data) {
   const cipher = createCipheriv('aes-128-ctr', key, counter);
   return cipher.update(data).toString();
 }
 
-const aesCtrDecrypt = function(counter, key, data) {
+const aesCtrDecryptLegacy = function(counter, key, data) {
   const cipher = createDecipheriv('aes-128-ctr', key, counter);
   return cipher.update(data).toString();
 }
@@ -143,3 +157,74 @@ export const decrypt = function(privateKey, encrypted) {
   // decrypt message
   return aesCtrDecrypt(iv, encryptionKey, ciphertext);
 };
+
+// Encrypt AES-128-CTR and serialise as in Parity
+// Serialization: <ephemPubKey><IV><CipherText><HMAC>
+export const encryptLegacy = function(publicKeyTo, msg, opts) {
+  opts = opts || {};
+  const ephemPrivateKey = opts.ephemPrivateKey || randomBytes(32);
+  const ephemPublicKey = getPublic(ephemPrivateKey);
+
+  const sharedPx = derive(ephemPrivateKey, publicKeyTo);
+  const hash = kdf(sharedPx, 32);
+  const iv = opts.iv || randomBytes(16);
+  const encryptionKey = hash.slice(0, 16);
+
+  // Generate hmac
+  const macKey = createHash("sha256").update(hash.slice(16)).digest();
+  const ciphertext = aesCtrEncryptLegacy(iv, encryptionKey, msg);
+  const dataToMac = Buffer.from([...iv, ...ciphertext]);
+  const HMAC = hmacSha256Sign(macKey, dataToMac);
+
+  return Buffer.from([...ephemPublicKey, ...iv, ...ciphertext, ...HMAC]);
+};
+
+// Decrypt serialised AES-128-CTR
+export const decryptLegacy = function(privateKey, encrypted) {
+  const metaLength = 1 + 64 + 16 + 32;
+  assert(encrypted.length > metaLength, "Invalid Ciphertext. Data is too small")
+  assert(encrypted[0] >= 2 && encrypted[0] <= 4, "Not valid ciphertext.")
+
+  // deserialize
+  const ephemPublicKey = encrypted.slice(0, 65);
+  const cipherTextLength = encrypted.length - metaLength;
+  const iv = encrypted.slice(65, 65 + 16);
+  const cipherAndIv = encrypted.slice(65, 65 + 16 + cipherTextLength);
+  const ciphertext = cipherAndIv.slice(16);
+  const msgMac = encrypted.slice(65 + 16 + cipherTextLength);
+
+  // check HMAC
+  const px = derive(privateKey, ephemPublicKey);
+  const hash = kdf(px,32);
+  const encryptionKey = hash.slice(0, 16);
+  const macKey = createHash("sha256").update(hash.slice(16)).digest()
+  const dataToMac = Buffer.from(cipherAndIv);
+  const hmacGood = hmacSha256Sign(macKey, dataToMac);
+  assert(hmacGood.equals(msgMac), "Incorrect MAC");
+
+  // decrypt message
+  return aesCtrDecryptLegacy(iv, encryptionKey, ciphertext);
+};
+
+
+// Encrypt AES-128-CTR and serialise as in Parity
+// Using ECDH shared secret KDF
+// Serialization: <ephemPubKey><IV><CipherText><HMAC>
+export const encryptShared = function(privateKeySender, publicKeyRecipient, msg, opts){
+  const sharedPx = derive(privateKeySender, publicKeyRecipient)
+  const sharedPrivateKey = kdf(sharedPx, 32);
+  const sharedPublicKey = getPublic(sharedPrivateKey);
+
+  return encrypt(sharedPublicKey, msg, opts);
+}
+
+// Decrypt serialised AES-128-CTR
+// Using ECDH shared secret KDF
+export const decryptShared = function(privateKeyRecipient, publicKeySender, encrypted) {
+  const sharedPx = derive(privateKeyRecipient, publicKeySender);
+  const sharedPrivateKey = kdf(sharedPx, 32);
+
+  return decrypt(sharedPrivateKey, encrypted);
+}
+
+// @petern was here

@@ -136,6 +136,21 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
+  // Decode public key base58check to Buffer of secp256k1 public key
+  publicKeyBase58CheckToECBuffer(publicKeyBase58Check: string): Buffer {
+    // Sanity check similar to Base58CheckDecodePrefix from core/lib/base58.go
+    if (publicKeyBase58Check.length < 5){
+      throw new Error('Failed to decode public key');
+    }
+    const decoded = bs58check.decode(publicKeyBase58Check);
+    const payload = Uint8Array.from(decoded).slice(3);
+
+    const ec = new EC('secp256k1');
+    const publicKey = ec.keyFromPublic(payload, 'array');
+
+    return new Buffer(publicKey.getPublic('array'));
+  }
+
   keychainToBtcAddress(keychain: HDNode, network: Network): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitcoin;
     // @ts-ignore TODO: add "identifier" to type definition
