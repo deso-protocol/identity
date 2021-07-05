@@ -117,9 +117,17 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, encryptedHexesAndPublicKeys } } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexesAndPublicKeys);
+    const seedHex = this.cryptoService.decryptSeedHex(data.payload.encryptedSeedHex, this.globalVars.hostname);
+    const id = data.id;
+
+    let decryptedHexes;
+    if (data.payload.encryptedHexes){
+      const encryptedHexes = data.payload.encryptedHexes;
+      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexes);
+    } else {
+      const encryptedHexesAndPublicKeys = data.payload.encryptedHexesAndPublicKeys;
+      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexesAndPublicKeys);
+    }
 
     this.respond(id, {
       decryptedHexes

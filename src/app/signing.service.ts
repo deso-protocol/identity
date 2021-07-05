@@ -61,7 +61,8 @@ export class SigningService {
         // sent it to determine if message is decryptable
         try {
           if (!encryptedHexAndPublicKey.IsSender) {
-            decryptedHexes[encryptedHex] = ecies.decryptLegacy(privateKeyBuffer, encryptedBytes).toString();
+            const opts = {legacy: true};
+            decryptedHexes[encryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes, opts).toString();
           } else {
             decryptedHexes[encryptedHex] = '';
           }
