@@ -37,41 +37,57 @@ export class SigningService {
   }
 
   // Decrypt messages encrypted with shared secret
-  // @param encryptedHexesAndPublicKeys : { EncryptedHex: string, PublicKey: string }
-  decryptMessages(seedHex: string, encryptedHexesAndPublicKeys: any): { [key: string]: any } {
+  // @param encryptedHex : {
+  //     EncryptedHex: string,
+  //     PublicKey: string,
+  //     IsSender: bool,
+  //     V2: bool,
+  // }
+  // [Legacy] @param encryptedHex : string
+  decryptMessages(seedHex: string, encryptedHexes: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer();
 
     const decryptedHexes: { [key: string]: any } = {};
-    for (const encryptedHexAndPublicKey of encryptedHexesAndPublicKeys) {
-      const encryptedHex = encryptedHexAndPublicKey.EncryptedHex;
-      const publicKey = encryptedHexAndPublicKey.PublicKey;
-      const encryptedBytes = new Buffer(encryptedHex, 'hex');
-      const publicKeyBytes = this.cryptoService.publicKeyBase58CheckToECBuffer(publicKey);
-
-      // Check if message was encrypted using shared secret
-      if (encryptedHexAndPublicKey.V2){
+    for (const encryptedHex of encryptedHexes) {
+      // Legacy clients use old decryption
+      if (typeof encryptedHex === 'string') {
+        const encryptedBytes = new Buffer(encryptedHex, 'hex');
+        const opts = {legacy: true};
         try {
-          decryptedHexes[encryptedHex] = ecies.decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes).toString();
-        } catch (e) {
+          decryptedHexes[encryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes, opts).toString();
+        } catch (e){
           console.error(e);
         }
-      } else {
-        // If message was encrypted using public key, check who
-        // sent it to determine if message is decryptable
-        try {
-          if (!encryptedHexAndPublicKey.IsSender) {
-            const opts = {legacy: true};
-            decryptedHexes[encryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes, opts).toString();
-          } else {
-            decryptedHexes[encryptedHex] = '';
+      } else if (typeof encryptedHex === 'object') {
+        // Version:2 clients use shared secret or legacy decryption
+        // based on encryptedHex.V2
+        const publicKey = encryptedHex.PublicKey;
+        const publicKeyBytes = this.cryptoService.publicKeyBase58CheckToECBuffer(publicKey);
+        const encryptedBytes = new Buffer(encryptedHex.EncryptedHex, 'hex');
+        // Check if message was encrypted using shared secret
+        if (encryptedHex.V2) {
+          try {
+            decryptedHexes[encryptedHex.EncryptedHex] = ecies.decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes).toString();
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
+        } else {
+          // If message was encrypted using public key, check who
+          // sent it to determine if message is decryptable
+          try {
+            if (!encryptedHex.IsSender) {
+              const opts = {legacy: true};
+              decryptedHexes[encryptedHex.EncryptedHex] = ecies.decrypt(privateKeyBuffer, encryptedBytes, opts).toString();
+            } else {
+              decryptedHexes[encryptedHex.EncryptedHex] = '';
+            }
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
     }
-
     return decryptedHexes;
   }
 
