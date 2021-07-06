@@ -104,9 +104,9 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, recipientPubkey, message} } = data;
+    const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPubkey, message);
+    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPublicKey, message);
     this.respond(id, {
       encryptedMessage
     });
@@ -122,11 +122,13 @@ export class IdentityService {
 
     let decryptedHexes;
     if (data.payload.encryptedHexes){
+      // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexes);
+      decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
     } else {
-      const encryptedHexesAndPublicKeys = data.payload.encryptedHexesAndPublicKeys;
-      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexesAndPublicKeys);
+      // Shared secret decryption
+      const encryptedMessages = data.payload.encryptedMessages;
+      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
     }
 
     this.respond(id, {

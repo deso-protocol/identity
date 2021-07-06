@@ -192,5 +192,3 @@ export const decryptShared = function(privateKeyRecipient, publicKeySender, encr
   opts.legacy = false;
   return decrypt(sharedPrivateKey, encrypted, opts);
 }
-
-// @petern was here
