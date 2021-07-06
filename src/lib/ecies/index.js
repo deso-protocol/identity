@@ -36,13 +36,27 @@ export const kdf = function(secret, outputLength) {
 
 // AES-128-CTR is used in the Parity implementation
 // Get the AES-128-CTR browser implementation
-
 const aesCtrEncrypt = function(counter, key, data) {
+  const cipher = createCipheriv('aes-128-ctr', key, counter);
+  const firstChunk = cipher.update(data);
+  const secondChunk = cipher.final();
+  return Buffer.concat([firstChunk, secondChunk]);
+}
+
+const aesCtrDecrypt = function(counter, key, data) {
+  const cipher = createDecipheriv('aes-128-ctr', key, counter);
+  const firstChunk = cipher.update(data);
+  const secondChunk = cipher.final();
+  return Buffer.concat([firstChunk, secondChunk]);
+}
+
+// Legacy AES-128-CTR without second chunk
+const aesCtrEncryptLegacy = function(counter, key, data) {
   const cipher = createCipheriv('aes-128-ctr', key, counter);
   return cipher.update(data).toString();
 }
 
-const aesCtrDecrypt = function(counter, key, data) {
+const aesCtrDecryptLegacy = function(counter, key, data) {
   const cipher = createDecipheriv('aes-128-ctr', key, counter);
   return cipher.update(data).toString();
 }
@@ -110,7 +124,13 @@ export const encrypt = function(publicKeyTo, msg, opts) {
 
   // Generate hmac
   const macKey = createHash("sha256").update(hash.slice(16)).digest();
-  const ciphertext = aesCtrEncrypt(iv, encryptionKey, msg);
+
+  let ciphertext;
+  if (opts.legacy){
+    ciphertext = aesCtrEncryptLegacy(iv, encryptionKey, msg);
+  } else {
+    ciphertext = aesCtrEncrypt(iv, encryptionKey, msg);
+  }
   const dataToMac = Buffer.from([...iv, ...ciphertext]);
   const HMAC = hmacSha256Sign(macKey, dataToMac);
 
@@ -118,7 +138,8 @@ export const encrypt = function(publicKeyTo, msg, opts) {
 };
 
 // Decrypt serialised AES-128-CTR
-export const decrypt = function(privateKey, encrypted) {
+export const decrypt = function(privateKey, encrypted, opts) {
+  opts = opts || {};
   const metaLength = 1 + 64 + 16 + 32;
   assert(encrypted.length > metaLength, "Invalid Ciphertext. Data is too small")
   assert(encrypted[0] >= 2 && encrypted[0] <= 4, "Not valid ciphertext.")
@@ -141,5 +162,33 @@ export const decrypt = function(privateKey, encrypted) {
   assert(hmacGood.equals(msgMac), "Incorrect MAC");
 
   // decrypt message
-  return aesCtrDecrypt(iv, encryptionKey, ciphertext);
+  if (opts.legacy){
+    return aesCtrDecryptLegacy(iv, encryptionKey, ciphertext);
+  } else {
+    return aesCtrDecrypt(iv, encryptionKey, ciphertext);
+  }
 };
+
+// Encrypt AES-128-CTR and serialise as in Parity
+// Using ECDH shared secret KDF
+// Serialization: <ephemPubKey><IV><CipherText><HMAC>
+export const encryptShared = function(privateKeySender, publicKeyRecipient, msg, opts){
+  opts = opts || {};
+  const sharedPx = derive(privateKeySender, publicKeyRecipient)
+  const sharedPrivateKey = kdf(sharedPx, 32);
+  const sharedPublicKey = getPublic(sharedPrivateKey);
+
+  opts.legacy = false;
+  return encrypt(sharedPublicKey, msg, opts);
+}
+
+// Decrypt serialised AES-128-CTR
+// Using ECDH shared secret KDF
+export const decryptShared = function(privateKeyRecipient, publicKeySender, encrypted, opts) {
+  opts = opts || {};
+  const sharedPx = derive(privateKeyRecipient, publicKeySender);
+  const sharedPrivateKey = kdf(sharedPx, 32);
+
+  opts.legacy = false;
+  return decrypt(sharedPrivateKey, encrypted, opts);
+}
