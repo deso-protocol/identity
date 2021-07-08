@@ -149,6 +149,7 @@ export class IdentityService {
 
     this.respond(event.data.id, {
       hasStorageAccess,
+      hasLocalStorageAccess,
       browserSupported: this.browserSupported,
     });
   }
