@@ -45,15 +45,20 @@ export class LogInSeedComponent implements OnInit {
   }
 
   clickLoadAccount(): void {
-    if (!this.entropyService.isValidMnemonic(this.mnemonic)) {
+    // Store mnemonic and extraText locally because we clear them below and otherwise
+    // they don't get saved in local storage reliably
+    const mnemonic = this.mnemonic;
+    const extraText = this.extraText;
+
+    if (!this.entropyService.isValidMnemonic(mnemonic)) {
       this.loginError = 'Invalid mnemonic';
       return;
     }
 
-    const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonic, this.extraText);
-    const keychainNonStandard = this.cryptoService.mnemonicToKeychain(this.mnemonic, this.extraText, true);
+    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+    const keychainNonStandard = this.cryptoService.mnemonicToKeychain(mnemonic, extraText, true);
 
-    this.addKeychain(keychain);
+    this.addKeychain(keychain, mnemonic, extraText);
 
     // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
     if (keychain.publicKey !== keychainNonStandard.publicKey) {
@@ -67,7 +72,7 @@ export class LogInSeedComponent implements OnInit {
         const user = res.UserList[0];
         if (user.ProfileEntryResponse || user.BalanceNanos > 0 || user.UsersYouHODL?.length) {
           // Add the non-standard key if the user has a profile, a balance, or holdings
-          this.addKeychain(keychainNonStandard);
+          this.addKeychain(keychainNonStandard, mnemonic, extraText);
         }
       });
     }
@@ -79,15 +84,15 @@ export class LogInSeedComponent implements OnInit {
     this.router.navigate(['/', RouteNames.LOG_IN]);
   }
 
-  addKeychain(keychain: HDNode): void {
+  addKeychain(keychain: HDNode, mnemonic: string, extraText: string): void {
     const network = this.globalVars.network;
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
     this.accountService.addUser({
       seedHex,
-      mnemonic: this.mnemonic,
-      extraText: this.extraText,
+      mnemonic,
+      extraText,
       btcDepositAddress,
       network,
     });
