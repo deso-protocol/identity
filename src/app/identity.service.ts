@@ -173,7 +173,9 @@ export class IdentityService {
     this.browserSupported = hasCookieAccess || hasLocalStorageAccess;
 
     this.respond(event.data.id, {
+      hasCookieAccess,
       hasStorageAccess,
+      hasLocalStorageAccess,
       browserSupported: this.browserSupported,
     });
   }
