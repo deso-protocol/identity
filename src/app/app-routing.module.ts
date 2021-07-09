@@ -5,7 +5,6 @@ import { HomeComponent } from './home/home.component';
 import { LogoutComponent } from './logout/logout.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { LogInComponent } from './log-in/log-in.component';
-// todo anna: figure out the route...
 import { ClearAccountComponent } from './clear-account/clear-account.component';
 import { ApproveComponent } from './approve/approve.component';
 import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
@@ -15,6 +14,7 @@ export class RouteNames {
   public static EMBED = 'embed';
   public static LOGOUT = 'logout';
   public static SIGN_UP = 'sign-up';
+  public static CLEAR_ACCOUNT = 'clear-account';
   public static LOG_IN = 'log-in';
   public static LOAD_SEED = 'load-seed';
   public static APPROVE = 'approve';
@@ -27,6 +27,11 @@ const routes: Routes = [
   { path: RouteNames.LOGOUT, component: LogoutComponent, pathMatch: 'full' },
   { path: RouteNames.SIGN_UP, component: SignUpComponent, pathMatch: 'full' },
   { path: RouteNames.LOG_IN, component: LogInComponent, pathMatch: 'full' },
+  {
+    path: RouteNames.CLEAR_ACCOUNT,
+    component: ClearAccountComponent,
+    pathMatch: 'full',
+  },
   {
     path: RouteNames.LOAD_SEED,
     component: LogInSeedComponent,
