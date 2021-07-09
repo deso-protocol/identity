@@ -1,13 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {EmbedComponent} from './embed/embed.component';
-import {HomeComponent} from './home/home.component';
-import {LogoutComponent} from './logout/logout.component';
-import {SignUpComponent} from './sign-up/sign-up.component';
-import {LogInComponent} from './log-in/log-in.component';
-import {ApproveComponent} from './approve/approve.component';
-import {LogInSeedComponent} from './log-in-seed/log-in-seed.component';
-import {GoogleComponent} from './auth/google/google.component';
+import { EmbedComponent } from './embed/embed.component';
+import { HomeComponent } from './home/home.component';
+import { LogoutComponent } from './logout/logout.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
+import { LogInComponent } from './log-in/log-in.component';
+// todo anna: figure out the route...
+import { ClearAccountComponent } from './clear-account/clear-account.component';
+import { ApproveComponent } from './approve/approve.component';
+import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
+import { GoogleComponent } from './auth/google/google.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -25,13 +27,21 @@ const routes: Routes = [
   { path: RouteNames.LOGOUT, component: LogoutComponent, pathMatch: 'full' },
   { path: RouteNames.SIGN_UP, component: SignUpComponent, pathMatch: 'full' },
   { path: RouteNames.LOG_IN, component: LogInComponent, pathMatch: 'full' },
-  { path: RouteNames.LOAD_SEED, component: LogInSeedComponent, pathMatch: 'full' },
+  {
+    path: RouteNames.LOAD_SEED,
+    component: LogInSeedComponent,
+    pathMatch: 'full',
+  },
   { path: RouteNames.APPROVE, component: ApproveComponent, pathMatch: 'full' },
-  { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
+  {
+    path: RouteNames.AUTH_GOOGLE,
+    component: GoogleComponent,
+    pathMatch: 'full',
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
