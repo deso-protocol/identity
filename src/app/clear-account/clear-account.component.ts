@@ -1,30 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AccountService } from '../account.service';
 import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
-import { Network } from '../../types/identity';
 import { CryptoService } from '../crypto.service';
 import { EntropyService } from '../entropy.service';
 import { GoogleDriveService } from '../google-drive.service';
-import { RouteNames } from '../app-routing.module';
 
-// todo anna: remove login code
 @Component({
   selector: 'app-clear-account',
   templateUrl: './clear-account.component.html',
   styleUrls: ['./clear-account.component.scss'],
 })
-export class ClearAccountComponent implements OnInit {
+export class ClearAccountComponent {
+  allUsers: { [key: string]: any } = {};
+  clearAccountCheck = '';
+  hasUsers = false;
   loading = false;
   showAccessLevels = true;
-
-  //clear account checks
-  clearAccountsStep = 1;
-  clearAccountCheck = '';
-
-  allUsers: { [key: string]: any } = {};
-  hasUsers = false;
 
   constructor(
     private accountService: AccountService,
@@ -36,62 +29,6 @@ export class ClearAccountComponent implements OnInit {
     private backendApi: BackendAPIService
   ) {}
 
-  ngOnInit(): void {
-    // Load profile pictures and usernames
-    this.loadUsers();
-
-    // Set showAccessLevels
-    this.showAccessLevels = !this.globalVars.isFullAccessHostname();
-  }
-
-  loadUsers(): void {
-    const publicKeys = this.accountService.getPublicKeys();
-    for (const publicKey of publicKeys) {
-      this.allUsers[publicKey] = {};
-    }
-    this.hasUsers = publicKeys.length > 0;
-
-    if (publicKeys.length > 0) {
-      this.backendApi.GetUsersStateless(publicKeys).subscribe((res2) => {
-        for (const user of res2.UserList) {
-          this.allUsers[user.PublicKeyBase58Check] = {
-            username: user.ProfileEntryResponse?.Username,
-            profilePic: user.ProfileEntryResponse?.ProfilePic,
-          };
-        }
-      });
-    }
-  }
-
-  launchGoogle(): void {
-    const redirectUri = new URL(
-      `${window.location.origin}/${RouteNames.AUTH_GOOGLE}`
-    );
-    if (this.globalVars.network === Network.testnet) {
-      redirectUri.searchParams.append('testnet', 'true');
-    }
-
-    const oauthUri = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    oauthUri.searchParams.append('redirect_uri', redirectUri.toString());
-    oauthUri.searchParams.append('client_id', GoogleDriveService.CLIENT_ID);
-    oauthUri.searchParams.append('scope', GoogleDriveService.DRIVE_SCOPE);
-    oauthUri.searchParams.append('response_type', 'token');
-
-    window.location.href = oauthUri.toString();
-  }
-
-  selectAccount(publicKey: string): void {
-    this.accountService.setAccessLevel(
-      publicKey,
-      this.globalVars.hostname,
-      this.globalVars.accessLevelRequest
-    );
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: publicKey,
-    });
-  }
-
   clearAccounts(): void {
     const publicKeys = this.accountService.getPublicKeys();
     for (const key of publicKeys) {
@@ -100,13 +37,7 @@ export class ClearAccountComponent implements OnInit {
     window.location.reload();
   }
 
-  clearAccountsConfirm(): void {
-    this.clearAccountsStep = 2;
-    this.clearAccountCheck = '';
-  }
-
   clearAccountsCancel(): void {
-    this.clearAccountsStep = 1;
     this.clearAccountCheck = '';
   }
 }
