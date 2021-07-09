@@ -1,7 +1,6 @@
 <app-banner></app-banner>
 
-<!-- TODO ANNA: figure out if we need other html around this... -->
-
+<div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview">
   <!-- Step 2 for Clear Account Confirmation -->
   <div *ngIf="clearAccountsStep == 2">
     <div class="fs-15px fc-muted">Confirming this step will remove your login data from your browser. If you use a
@@ -34,4 +33,3 @@
 
     </div>
   </div>
-  
