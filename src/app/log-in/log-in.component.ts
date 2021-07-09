@@ -4,8 +4,6 @@ import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
 import { Network } from '../../types/identity';
-import { CryptoService } from '../crypto.service';
-import { EntropyService } from '../entropy.service';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 
@@ -15,21 +13,14 @@ import { RouteNames } from '../app-routing.module';
   styleUrls: ['./log-in.component.scss'],
 })
 export class LogInComponent implements OnInit {
-  loading = false;
-  showAccessLevels = true;
-
-  //clear account checks
-  clearAccountCheck = '';
-
   allUsers: { [key: string]: any } = {};
   hasUsers = false;
+  loading = false;
+  showAccessLevels = true;
 
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
-    private cryptoService: CryptoService,
-    private entropyService: EntropyService,
-    private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService
   ) {}
@@ -88,14 +79,6 @@ export class LogInComponent implements OnInit {
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: publicKey,
     });
-  }
-
-  clearAccounts(): void {
-    const publicKeys = this.accountService.getPublicKeys();
-    for (const key of publicKeys) {
-      this.accountService.deleteUser(key);
-    }
-    window.location.reload();
   }
 
   clearAccountsConfirm(): void {
