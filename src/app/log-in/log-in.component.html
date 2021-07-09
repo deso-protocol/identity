@@ -1,18 +1,22 @@
 <app-banner></app-banner>
 
 <div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview">
-  <div class="font-weight-bold fs-30px mb-20px">
+  <div class="font-weight-bold fs-30px mb-20px" *ngIf="clearAccountsStep == 1">
     Log in to {{ globalVars.hostname }}
   </div>
+  <div class="font-weight-bold fs-30px mb-20px" *ngIf="clearAccountsStep == 2">
+    Wipe Login Data
+  </div>
 
-  <div class="row">
+  <div class="row" *ngIf="clearAccountsStep == 1">
     <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">
       <ul class="list-group mt-7px mb-30px">
-        <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccount(item.key)">
+        <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer"
+          (click)="selectAccount(item.key)">
           <div class="w-100">
             <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>
             <div *ngIf="item.value.username" class="d-flex align-items-center">
-              <div class="avatar mr-15px" [appAvatar]="item.key"></div>
+              <div class="avatar mr-15px" [style.background-image]="'url(' + item.value.profilePic + ')'"></div>
               <div class="text-truncate">{{ item.value.username }}</div>
             </div>
           </div>
@@ -20,9 +24,12 @@
       </ul>
     </div>
     <div class="d-flex align-items-center flex-column" [class.col-sm-6]="hasUsers" [class.col-sm-12]="!hasUsers">
-      <button class="btn btn-default log-in-google mb-30px" (click)="launchGoogle()" *ngIf="!globalVars.hideGoogle"></button>
+      <button class="btn btn-default log-in-google mb-30px" (click)="launchGoogle()"
+        *ngIf="!globalVars.hideGoogle"></button>
       <button class="btn btn-default log-in-seed" [routerLink]="['/load-seed']"></button>
       <button class="btn btn-default sign-up-seed" [routerLink]="['/sign-up']"></button>
+      <button *ngIf="hasUsers" class="btn btn-default mt-30px" (click)="clearAccountsConfirm()">❌ Wipe Login
+        Data</button>
     </div>
   </div>
 
@@ -36,22 +43,60 @@
         <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
         <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
         My basic information
-        <div class="fs-14px text-muted"><b>{{ globalVars.hostname }}</b> can access my public key and any other public information</div>
+        <div class="fs-14px text-muted"><b>{{ globalVars.hostname }}</b> can access my public key and any other public
+          information</div>
       </li>
       <li class="list-group-item">
         <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
         <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
         Post, message, like, and follow on my behalf
-        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 3"><b>{{ globalVars.hostname }}</b> will require approval to post, message, like, and follow</div>
-        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest >= 3"><b>{{ globalVars.hostname }}</b> may post, message, like, and follow without requiring approval</div>
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 3"><b>{{ globalVars.hostname }}</b> will
+          require approval to post, message, like, and follow</div>
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest >= 3"><b>{{ globalVars.hostname }}</b> may
+          post, message, like, and follow without requiring approval</div>
       </li>
       <li class="list-group-item">
         <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
         <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
         Buy, sell, and send coins on my behalf
-        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 4"><b>{{ globalVars.hostname }}</b> will require approval to buy, sell, or send coins</div>
-        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest === 4"><b>{{ globalVars.hostname }}</b> may buy, sell, and send coins without requiring approval</div>
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest < 4"><b>{{ globalVars.hostname }}</b> will
+          require approval to buy, sell, or send coins</div>
+        <div class="fs-14px text-muted" *ngIf="globalVars.accessLevelRequest === 4"><b>{{ globalVars.hostname }}</b> may
+          buy, sell, and send coins without requiring approval</div>
       </li>
     </ul>
   </div>
-</div>
+
+  <!-- Step 2 for Clear Account Confirmation -->
+  <div *ngIf="clearAccountsStep == 2">
+    <div class="fs-15px fc-muted">Confirming this step will remove your login data from your browser. If you use a
+      seedphrase to login to your account, make sure you have recorded this securely.</div>
+    <div class="fc-red fs-18px pt-15px">Enter "<b>i understand log me out</b>" to confirm you really want to wipe your
+      login data!</div>
+    <div class="form-group pt-10px">
+      <textarea [(ngModel)]="clearAccountCheck" class="form-control fs-15px" rows="4"></textarea>
+    </div>
+    <div class="d-flex align-items-center" style="margin-top: -15px">
+      <div class="fs-12px mt-15px text-grey6">
+        By proceeding, you agree that you will need to re-enter your seed phrase on login to access your account.
+      </div>
+    </div>
+    <div class="d-flex pt-15px justify-content-between">
+      <button (click)="clearAccountsCancel()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
+        Back
+      </button>
+      <div>
+        <button *ngIf="clearAccountCheck == 'i understand log me out'" (click)="clearAccounts()"
+          class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn">
+          Next
+        </button>
+        <!-- Show blocked button if text entered does not = required text-->
+        <button *ngIf="clearAccountCheck !== 'i understand log me out'"
+          class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn" disabled>
+          Next
+        </button>
+      </div>
+
+    </div>
+  </div>
+  

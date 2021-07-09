@@ -1,24 +1,28 @@
-import {Component, OnInit} from '@angular/core';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {BackendAPIService} from '../backend-api.service';
-import {Network} from '../../types/identity';
-import {CryptoService} from '../crypto.service';
-import {EntropyService} from '../entropy.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {RouteNames} from '../app-routing.module';
+import { Component, OnInit } from '@angular/core';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { BackendAPIService } from '../backend-api.service';
+import { Network } from '../../types/identity';
+import { CryptoService } from '../crypto.service';
+import { EntropyService } from '../entropy.service';
+import { GoogleDriveService } from '../google-drive.service';
+import { RouteNames } from '../app-routing.module';
 
 @Component({
   selector: 'app-log-in',
   templateUrl: './log-in.component.html',
-  styleUrls: ['./log-in.component.scss']
+  styleUrls: ['./log-in.component.scss'],
 })
 export class LogInComponent implements OnInit {
   loading = false;
   showAccessLevels = true;
 
-  allUsers: {[key: string]: any} = {};
+  //clear account checks
+  clearAccountsStep = 1;
+  clearAccountCheck = '';
+
+  allUsers: { [key: string]: any } = {};
   hasUsers = false;
 
   constructor(
@@ -28,8 +32,8 @@ export class LogInComponent implements OnInit {
     private entropyService: EntropyService,
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
-    private backendApi: BackendAPIService,
-  ) { }
+    private backendApi: BackendAPIService
+  ) {}
 
   ngOnInit(): void {
     // Load profile pictures and usernames
@@ -47,7 +51,7 @@ export class LogInComponent implements OnInit {
     this.hasUsers = publicKeys.length > 0;
 
     if (publicKeys.length > 0) {
-      this.backendApi.GetUsersStateless(publicKeys).subscribe(res2 => {
+      this.backendApi.GetUsersStateless(publicKeys).subscribe((res2) => {
         for (const user of res2.UserList) {
           this.allUsers[user.PublicKeyBase58Check] = {
             username: user.ProfileEntryResponse?.Username,
@@ -59,7 +63,9 @@ export class LogInComponent implements OnInit {
   }
 
   launchGoogle(): void {
-    const redirectUri = new URL(`${window.location.origin}/${RouteNames.AUTH_GOOGLE}`);
+    const redirectUri = new URL(
+      `${window.location.origin}/${RouteNames.AUTH_GOOGLE}`
+    );
     if (this.globalVars.network === Network.testnet) {
       redirectUri.searchParams.append('testnet', 'true');
     }
@@ -69,23 +75,37 @@ export class LogInComponent implements OnInit {
     oauthUri.searchParams.append('client_id', GoogleDriveService.CLIENT_ID);
     oauthUri.searchParams.append('scope', GoogleDriveService.DRIVE_SCOPE);
     oauthUri.searchParams.append('response_type', 'token');
-    // TODO: Investigate using this parameter to defend against CSRF attacks
-    // pass on webview state to Google OAuth state
-    // https://stackoverflow.com/questions/7722062/google-oauth-2-0-redirect-uri-with-several-parameters
-    const stateString = btoa(JSON.stringify({
-      webview: this.globalVars.webview,
-      testnet: this.globalVars.network === Network.testnet
-    }));
-    oauthUri.searchParams.append('state', stateString);
 
     window.location.href = oauthUri.toString();
   }
 
   selectAccount(publicKey: string): void {
-    this.accountService.setAccessLevel(publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    this.accountService.setAccessLevel(
+      publicKey,
+      this.globalVars.hostname,
+      this.globalVars.accessLevelRequest
+    );
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: publicKey,
     });
+  }
+
+  clearAccounts(): void {
+    const publicKeys = this.accountService.getPublicKeys();
+    for (const key of publicKeys) {
+      this.accountService.deleteUser(key);
+    }
+    window.location.reload();
+  }
+
+  clearAccountsConfirm(): void {
+    this.clearAccountsStep = 2;
+    this.clearAccountCheck = '';
+  }
+
+  clearAccountsCancel(): void {
+    this.clearAccountsStep = 1;
+    this.clearAccountCheck = '';
   }
 }
