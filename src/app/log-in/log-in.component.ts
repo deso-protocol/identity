@@ -19,7 +19,6 @@ export class LogInComponent implements OnInit {
   showAccessLevels = true;
 
   //clear account checks
-  clearAccountsStep = 1;
   clearAccountCheck = '';
 
   allUsers: { [key: string]: any } = {};
@@ -100,12 +99,6 @@ export class LogInComponent implements OnInit {
   }
 
   clearAccountsConfirm(): void {
-    this.clearAccountsStep = 2;
-    this.clearAccountCheck = '';
-  }
-
-  clearAccountsCancel(): void {
-    this.clearAccountsStep = 1;
-    this.clearAccountCheck = '';
+    // todo anna: route to ClearAccountComponent
   }
 }
