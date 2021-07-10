@@ -13,6 +13,7 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import { AccountService } from './account.service';
 import { EntropyService } from './entropy.service';
 import { LogInComponent } from './log-in/log-in.component';
+import { ClearAccountComponent } from './clear-account/clear-account.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ApproveComponent } from './approve/approve.component';
 import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
@@ -28,6 +29,7 @@ import { AvatarDirective } from './avatar/avatar.directive';
     BannerComponent,
     SignUpComponent,
     LogInComponent,
+    ClearAccountComponent,
     ApproveComponent,
     LogInSeedComponent,
     GoogleComponent,
