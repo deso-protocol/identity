@@ -15,7 +15,6 @@ import { RouteNames } from '../app-routing.module';
 export class LogInComponent implements OnInit {
   allUsers: { [key: string]: any } = {};
   hasUsers = false;
-  loading = false;
   showAccessLevels = true;
 
   constructor(
