@@ -11,7 +11,7 @@
     securely.
   </div>
   <div class="fc-red fs-18px pt-15px">
-    Enter "<b>i understand log me out</b>" to confirm you want to clear your
+    Enter "<b>I understand log me out</b>" to confirm you want to clear your
     login data.
   </div>
   <div class="form-group pt-10px">
@@ -36,15 +36,16 @@
     </button>
     <div>
       <button
-        *ngIf="clearAccountCheck == 'i understand log me out'"
+        *ngIf="clearAccountCheck == 'I understand log me out'"
         (click)="clearAccounts()"
         class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn"
+        [routerLink]="['/log-in']"
       >
         Confirm
       </button>
       <!-- Show blocked button if text entered does not equal required text-->
       <button
-        *ngIf="clearAccountCheck !== 'i understand log me out'"
+        *ngIf="clearAccountCheck !== 'I understand log me out'"
         class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn"
         disabled
       >

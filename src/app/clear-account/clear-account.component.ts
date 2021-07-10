@@ -34,7 +34,6 @@ export class ClearAccountComponent {
     for (const key of publicKeys) {
       this.accountService.deleteUser(key);
     }
-    window.location.reload();
   }
 
   clearAccountsCancel(): void {
