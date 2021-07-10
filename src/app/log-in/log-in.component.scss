@@ -1,3 +1,23 @@
 .log-in-clear-data {
   text-decoration: underline;
 }
+
+.log-in-google,
+.log-in-seed,
+.sign-up-seed {
+  height: 72px;
+  width: 290px;
+  background-size: 290px 72px;
+}
+
+.log-in-google {
+  background-image: url(/assets/log_in_google.png);
+}
+
+.log-in-seed {
+  background-image: url(/assets/log_in_seed.png);
+}
+
+.sign-up-seed {
+  background-image: url(/assets/sign_up_seed.png);
+}
