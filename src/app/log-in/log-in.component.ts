@@ -80,8 +80,4 @@ export class LogInComponent implements OnInit {
       publicKeyAdded: publicKey,
     });
   }
-
-  clearAccountsConfirm(): void {
-    // todo anna: route to ClearAccountComponent
-  }
 }

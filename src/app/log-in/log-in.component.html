@@ -52,7 +52,7 @@
       <button
         *ngIf="hasUsers"
         class="btn btn-default mt-30px"
-        (click)="clearAccountsConfirm()"
+        [routerLink]="['/clear-account']"
       >
         ❌ Wipe Login Data
       </button>
