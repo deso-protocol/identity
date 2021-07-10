@@ -4,9 +4,8 @@
   class="container home-container"
   *ngIf="globalVars.inTab || globalVars.webview"
 >
-  <!-- todo anna: (i) tooltip? -->
   <div class="font-weight-bold fs-30px mb-20px">Clear Login Data</div>
-  <div class="fs-15px fc-muted">
+  <div class="fs-15px">
     Confirming this step will remove your login data from your browser. If you
     use a seedphrase to login to your account, make sure you have recorded this
     securely.
@@ -30,8 +29,8 @@
   </div>
   <div class="d-flex pt-15px justify-content-between">
     <button
-      (click)="clearAccountsCancel()"
       class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn"
+      [routerLink]="['/log-in']"
     >
       Back
     </button>
@@ -41,15 +40,15 @@
         (click)="clearAccounts()"
         class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn"
       >
-        Next
+        Confirm
       </button>
-      <!-- Show blocked button if text entered does not = required text-->
+      <!-- Show blocked button if text entered does not equal required text-->
       <button
         *ngIf="clearAccountCheck !== 'i understand log me out'"
         class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn"
         disabled
       >
-        Next
+        Confirm
       </button>
     </div>
   </div>
