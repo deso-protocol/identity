@@ -193,6 +193,51 @@ export class TransactionMetadataCreateNFT extends BinaryRecord {
   nftRoyaltyToCoinBasisPoints = 0;
 }
 
+export class TransactionMetadataUpdateNFT extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  nftPostHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+
+  @Transcode(Boolean)
+  isForSale: boolean = false;
+
+  @Transcode(Uvarint64)
+  minBidAmountNanos: number = 0;
+}
+
+export class TransactionMetadataAcceptNFTBid extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  nftPostHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+
+  @Transcode(VarBuffer)
+  bidderPKID: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  bidAmountNanos: number = 0;
+
+  @Transcode(VarBuffer)
+  encryptedUnlockableText: Buffer = Buffer.alloc(0);
+
+  @Transcode(ArrayOf(TransactionInput))
+  bidderInputs: TransactionInput[] = [];
+}
+
+export class TransactionMetadataNFTBid extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  nftPostHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+
+  @Transcode(Uvarint64)
+  bidAmountNanos: number = 0;
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -208,9 +253,9 @@ export const TransactionTypeMetadataMap = {
   13: TransactionMetadataUpdateGlobalParams,
   14: TransactionMetadataCreatorCoinTransfer,
 	15: TransactionMetadataCreateNFT,
-	//16: TransactionMetadataUpdateNFT,
-	//17: TransactionMetadataAcceptNFTBid,
-	//18: TransactionMetadataNFTBid,
+	16: TransactionMetadataUpdateNFT,
+	17: TransactionMetadataAcceptNFTBid,
+	18: TransactionMetadataNFTBid,
 };
 
 export class Transaction<T> extends BinaryRecord {
