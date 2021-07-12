@@ -8,6 +8,7 @@ import {environment} from '../environments/environment';
 })
 export class BackendAPIService {
   endpoint = `https://${environment.nodeHostname}/api/v0`;
+  exchange = `https://${environment.nodeHostname}/api/v1`;
 
   constructor(
     private httpClient: HttpClient,
@@ -23,7 +24,14 @@ export class BackendAPIService {
       },
     );
   }
+
   GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {
     return `${this.endpoint}/get-single-profile-picture/${PublicKeyBase58Check}`;
+  }
+
+  GetBlockTipHeight(): Observable<any> {
+    return this.httpClient.get<any>(
+      `${this.exchange}`
+    );
   }
 }

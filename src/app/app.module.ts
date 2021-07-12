@@ -19,6 +19,7 @@ import { ApproveComponent } from './approve/approve.component';
 import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
 import { GoogleComponent } from './auth/google/google.component';
 import { AvatarDirective } from './avatar/avatar.directive';
+import { DeriveComponent } from './derive/derive.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { AvatarDirective } from './avatar/avatar.directive';
     LogInSeedComponent,
     GoogleComponent,
     AvatarDirective,
+    DeriveComponent,
   ],
   imports: [
     BrowserModule,

@@ -70,6 +70,8 @@ h2,h3,h4,h5,h6,p {
 .fs-2 { font-size: 2rem }
 .fs-3 { font-size: 1.75rem }
 
+.fs-underline { text-decoration: underline }
+
 .fs-30px { font-size: 30px; }
 .fs-25px { font-size: 25px; }
 .fs-24px { font-size: 24px; }
@@ -91,6 +93,7 @@ h2,h3,h4,h5,h6,p {
 .lh-12px { line-height: 12px; }
 .roboto-regular { font-family: 'Roboto' }
 .roboto-mono { font-family: 'Roboto Mono' }
+
 
 // Custom border classes.
 .border-color-grey { border-color: $border-grey; }

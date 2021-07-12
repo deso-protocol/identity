@@ -1,8 +1,12 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, Network, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedUserInfo, Network, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CookieService} from 'ngx-cookie';
+import {EntropyService} from './entropy.service';
+import {SigningService} from './signing.service';
+import sha256 from 'sha256';
+import {ec as EC} from 'elliptic';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +21,8 @@ export class AccountService {
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
     private cookieService: CookieService,
+    private entropyService: EntropyService,
+    private signingService: SigningService
   ) { }
 
   // Getters
@@ -69,6 +75,35 @@ export class AccountService {
     } else {
       return AccessLevel.None;
     }
+  }
+
+  getDerivedUser(publicKey: string, blockHeight: number): DerivedUserInfo{
+    const privateUser = this.getPrivateUsers()[publicKey];
+
+    if (!this.entropyService.temporaryEntropy.mnemonic) {
+      this.entropyService.setNewTemporaryEntropy();
+    }
+    const derivedMnemonic = this.entropyService.temporaryEntropy?.mnemonic;
+    const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
+    const derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
+    const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
+    const derivedPublicKey = this.cryptoService.privateKeyToBitcloutPublicKey(derivedPrivateKey, privateUser.network);
+
+    // Ask community for this number
+    const expirationBlock = blockHeight + 2500;
+
+    const accessHash = sha256.x2(derivedPrivateKey + expirationBlock.toString());
+    const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];
+
+    return {
+      btcDepositAddress: privateUser.btcDepositAddress,
+      derivedPublicKey,
+      derivedSeedHex,
+      expirationBlock,
+      accessSignature,
+      network: privateUser.network,
+      publicKey
+    };
   }
 
   // Modifiers

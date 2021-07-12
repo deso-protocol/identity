@@ -16,6 +16,16 @@ export interface PublicUserInfo {
   accessLevelHmac: string;
 }
 
+export interface DerivedUserInfo {
+  derivedSeedHex: string;
+  derivedPublicKey: string;
+  publicKey: string;
+  btcDepositAddress: string;
+  expirationBlock: number;
+  network: Network;
+  accessSignature: string;
+}
+
 export enum Network {
   mainnet = 'mainnet',
   testnet = 'testnet',

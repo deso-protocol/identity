@@ -8,6 +8,7 @@ import {LogInComponent} from './log-in/log-in.component';
 import {ApproveComponent} from './approve/approve.component';
 import {LogInSeedComponent} from './log-in-seed/log-in-seed.component';
 import {GoogleComponent} from './auth/google/google.component';
+import {DeriveComponent} from './derive/derive.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -17,6 +18,7 @@ export class RouteNames {
   public static LOAD_SEED = 'load-seed';
   public static APPROVE = 'approve';
   public static AUTH_GOOGLE = 'auth/google';
+  public static DERIVE = 'derive';
 }
 
 const routes: Routes = [
@@ -28,6 +30,7 @@ const routes: Routes = [
   { path: RouteNames.LOAD_SEED, component: LogInSeedComponent, pathMatch: 'full' },
   { path: RouteNames.APPROVE, component: ApproveComponent, pathMatch: 'full' },
   { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
+  { path: RouteNames.DERIVE, component: DeriveComponent, pathMatch: 'full' },
 ];
 
 @NgModule({

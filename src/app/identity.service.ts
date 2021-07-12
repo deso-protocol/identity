@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -61,6 +61,12 @@ export class IdentityService {
     signedTransactionHex?: string,
   }): void {
     this.cast('login', payload);
+  }
+
+  derive(payload: {
+    derivedUserInfo: DerivedUserInfo,
+  }): void {
+    this.cast('derive', payload);
   }
 
   import(): Observable<any> {
@@ -179,6 +185,7 @@ export class IdentityService {
       browserSupported: this.browserSupported,
     });
   }
+
 
   // Access levels
 
