@@ -24,7 +24,7 @@ export class SigningService {
 
   encryptMessage(seedHex: string, recipientPublicKey: string, message: string): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
 
     const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
     try {
@@ -40,7 +40,7 @@ export class SigningService {
   // @param encryptedHexes : string[]
   decryptMessagesLegacy(seedHex: string, encryptedHexes: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedHex of encryptedHexes) {
@@ -64,7 +64,7 @@ export class SigningService {
   // }[]
   decryptMessages(seedHex: string, encryptedMessages: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {
