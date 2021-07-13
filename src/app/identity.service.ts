@@ -13,6 +13,7 @@ import {
   TransactionMetadataCreatorCoin,
   TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
+  TransactionMetadataBlock,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
@@ -197,6 +198,7 @@ export class IdentityService {
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:
+      case TransactionMetadataBlock:
       case TransactionMetadataPrivateMessage:
       case TransactionMetadataSubmitPost:
       case TransactionMetadataUpdateProfile:
