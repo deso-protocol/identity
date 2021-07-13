@@ -92,7 +92,8 @@ export class AccountService {
     // Ask community for this number
     const expirationBlock = blockHeight + 2500;
 
-    const accessHash = sha256.x2(derivedPrivateKey + expirationBlock.toString());
+    const accessHash = sha256.x2(derivedPublicKey + expirationBlock.toString());
+    console.log(accessHash);
     const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];
 
     return {
