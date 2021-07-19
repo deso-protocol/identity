@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SignUpEntropyComponent } from './sign-up-entropy.component';
+import { LogInSeedComponent } from './log-in-seed.component';
 
-describe('SignUpEntropyComponent', () => {
-  let component: SignUpEntropyComponent;
-  let fixture: ComponentFixture<SignUpEntropyComponent>;
+describe('LogInSeedComponent', () => {
+  let component: LogInSeedComponent;
+  let fixture: ComponentFixture<LogInSeedComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SignUpEntropyComponent ]
+      declarations: [ LogInSeedComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SignUpEntropyComponent);
+    fixture = TestBed.createComponent(LogInSeedComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

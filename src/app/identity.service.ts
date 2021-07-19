@@ -10,7 +10,8 @@ import {
   Transaction,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
-  TransactionMetadataCreatorCoin, TransactionMetadataCreatorCoinTransfer,
+  TransactionMetadataCreatorCoin,
+  TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
@@ -97,14 +98,38 @@ export class IdentityService {
     });
   }
 
+  // Encrypt with shared secret
+  private handleEncrypt(data: any): void{
+    if (!this.approve(data, AccessLevel.ApproveAll)){
+      return;
+    }
+
+    const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPublicKey, message);
+    this.respond(id, {
+      encryptedMessage
+    });
+  }
+
   private handleDecrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, encryptedHexes } } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedHexes);
+    const seedHex = this.cryptoService.decryptSeedHex(data.payload.encryptedSeedHex, this.globalVars.hostname);
+    const id = data.id;
+
+    let decryptedHexes;
+    if (data.payload.encryptedHexes){
+      // Legacy public key decryption
+      const encryptedHexes = data.payload.encryptedHexes;
+      decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
+    } else {
+      // Shared secret decryption
+      const encryptedMessages = data.payload.encryptedMessages;
+      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
+    }
 
     this.respond(id, {
       decryptedHexes
@@ -148,7 +173,9 @@ export class IdentityService {
     this.browserSupported = hasCookieAccess || hasLocalStorageAccess;
 
     this.respond(event.data.id, {
+      hasCookieAccess,
       hasStorageAccess,
+      hasLocalStorageAccess,
       browserSupported: this.browserSupported,
     });
   }
@@ -224,6 +251,8 @@ export class IdentityService {
 
     if (method === 'burn') {
       this.handleBurn(data);
+    } else if (method === 'encrypt'){
+      this.handleEncrypt(data);
     } else if (method === 'decrypt') {
       this.handleDecrypt(data);
     } else if (method === 'sign') {
@@ -297,6 +326,9 @@ export class IdentityService {
       } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
         // Android Webview with registered "bitcloutIdentityAppInterface" handler
         this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+      } else if (this.currentWindow.ReactNativeWebView !== undefined) {
+        // React Native Webview with registered "ReactNativeWebView" handler
+        this.currentWindow.ReactNativeWebView.postMessage(JSON.stringify(message));
       }
     } else {
       this.currentWindow.postMessage(message, '*');

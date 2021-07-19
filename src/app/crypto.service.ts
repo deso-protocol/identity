@@ -7,14 +7,17 @@ import bs58check from 'bs58check';
 import {CookieService} from 'ngx-cookie';
 import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
 import {AccessLevel, Network} from '../types/identity';
+import { GlobalVarsService } from './global-vars.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CryptoService {
 
-  constructor(private cookieService: CookieService) {
-  }
+  constructor(
+    private cookieService: CookieService,
+    private globalVars: GlobalVarsService
+    ) {}
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -29,7 +32,20 @@ export class CryptoService {
 
   // Safari only lets us store things in cookies
   mustUseStorageAccess(): boolean {
-    return typeof document.hasStorageAccess === 'function';
+    // Webviews have full control over storage access
+    if (this.globalVars.webview) {
+      return false;
+    }
+
+    const supportsStorageAccess = typeof document.hasStorageAccess === 'function';
+    const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
+    const isSafari = !isChrome && navigator.userAgent.indexOf('Safari') > -1;
+
+    // Firefox and Edge support the storage access API but do not enforce it.
+    // For now, only use cookies if we support storage access and use Safari.
+    const mustUseStorageAccess = supportsStorageAccess && isSafari;
+
+    return mustUseStorageAccess;
   }
 
   // 32 bytes = 256 bits is plenty of entropy for encryption
@@ -131,6 +147,21 @@ export class CryptoService {
     const prefixAndKey = Uint8Array.from([...prefix, ...key]);
 
     return bs58check.encode(prefixAndKey);
+  }
+
+  // Decode public key base58check to Buffer of secp256k1 public key
+  publicKeyToECBuffer(publicKey: string): Buffer {
+    // Sanity check similar to Base58CheckDecodePrefix from core/lib/base58.go
+    if (publicKey.length < 5){
+      throw new Error('Failed to decode public key');
+    }
+    const decoded = bs58check.decode(publicKey);
+    const payload = Uint8Array.from(decoded).slice(3);
+
+    const ec = new EC('secp256k1');
+    const publicKeyEC = ec.keyFromPublic(payload, 'array');
+
+    return new Buffer(publicKeyEC.getPublic('array'));
   }
 
   keychainToBtcAddress(keychain: HDNode, network: Network): string {

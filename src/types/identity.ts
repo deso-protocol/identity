@@ -4,6 +4,7 @@ export interface PrivateUserInfo {
   extraText: string;
   btcDepositAddress: string;
   network: Network;
+  google?: boolean;
 }
 
 export interface PublicUserInfo {
@@ -35,4 +36,9 @@ export enum AccessLevel {
 
   // Node can sign all transactions without approval
   Full = 4,
+}
+
+export interface GoogleAuthState {
+  testnet: boolean;
+  webview: boolean;
 }
