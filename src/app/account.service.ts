@@ -93,7 +93,7 @@ export class AccountService {
     const expirationBlock = blockHeight + 2500;
 
     const accessHash = sha256.x2(derivedPublicKey + expirationBlock.toString());
-    const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];
+    const accessSignature = this.signingService.signBurn(derivedSeedHex, [accessHash])[0];
 
     return {
       btcDepositAddress: privateUser.btcDepositAddress,
