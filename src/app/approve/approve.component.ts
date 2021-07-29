@@ -8,14 +8,20 @@ import {
   Transaction,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
-  TransactionMetadataCreatorCoin, TransactionMetadataCreatorCoinTransfer,
+  TransactionMetadataCreatorCoin,
+  TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
-  TransactionMetadataUpdateBitcoinUSDExchangeRate, TransactionMetadataUpdateGlobalParams,
-  TransactionMetadataUpdateProfile
+  TransactionMetadataUpdateBitcoinUSDExchangeRate,
+  TransactionMetadataUpdateGlobalParams,
+  TransactionMetadataUpdateProfile,
+  TransactionMetadataCreateNFT,
+  TransactionMetadataUpdateNFT,
+  TransactionMetadataNFTBid,
+  TransactionMetadataAcceptNFTBid
 } from '../../lib/bitclout/transaction';
 import {SigningService} from '../signing.service';
 import bs58check from 'bs58check';
@@ -146,6 +152,21 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataCreatorCoinTransfer:
         description = 'transfer a creator coin';
         break;
+
+      case TransactionMetadataCreateNFT:
+        description = 'create an NFT';
+        break;
+
+      case TransactionMetadataUpdateNFT:
+        description = 'update an NFT';
+        break;
+
+      case TransactionMetadataNFTBid:
+        description = 'bid on an NFT';
+        break;
+
+      case TransactionMetadataAcceptNFTBid:
+        description = 'accept a bid on an NFT';
     }
 
     this.transactionDescription = description;
