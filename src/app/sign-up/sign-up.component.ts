@@ -19,11 +19,17 @@ export class SignUpComponent implements OnInit, OnDestroy {
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
+  publicKeyAdded = '';
 
   // Advanced tab
   advancedOpen = false;
   showMnemonicError = false;
   showEntropyHexError = false;
+
+  loginMessagePayload: any;
+  environment = environment;
+  
+  stepTotal = environment.jumioSupported ? 3 : 2;
 
   constructor(
     public entropyService: EntropyService,
@@ -73,7 +79,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
-    const publicKeyAdded = this.accountService.addUser({
+    this.publicKeyAdded = this.accountService.addUser({
       seedHex,
       mnemonic: this.mnemonicCheck,
       extraText: this.extraTextCheck,
@@ -81,17 +87,27 @@ export class SignUpComponent implements OnInit, OnDestroy {
       network,
     });
 
-    this.identityService.login({
+    this.loginMessagePayload = {
       users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded,
+      publicKeyAdded: this.publicKeyAdded,
       signedUp: true,
-    });
+    }
+    if (!environment.jumioSupported) {
+      this.login();
+    }
+    else {
+      this.stepNum = 3;
+    }
   }
 
   stepTwoBack(): void {
     this.extraTextCheck = '';
     this.mnemonicCheck = '';
     this.stepNum = 1;
+  }
+
+  login(): void {
+    this.identityService.login(this.loginMessagePayload);
   }
 
   clickTos(): void {
