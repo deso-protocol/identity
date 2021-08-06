@@ -7,6 +7,7 @@ import {EntropyService} from './entropy.service';
 import {SigningService} from './signing.service';
 import sha256 from 'sha256';
 import {ec as EC} from 'elliptic';
+import {uvarint64ToBuf} from "../lib/bindata/util";
 
 @Injectable({
   providedIn: 'root'
@@ -89,11 +90,14 @@ export class AccountService {
     const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
     const derivedPublicKey = this.cryptoService.privateKeyToBitcloutPublicKey(derivedPrivateKey, privateUser.network);
 
-    // Ask community for this number
+    // By default we authorize this derived key for 2500 blocks.
     const expirationBlock = blockHeight + 2500;
 
-    const accessHash = sha256.x2(derivedPublicKey + expirationBlock.toString());
-    const accessSignature = this.signingService.signBurn(derivedSeedHex, [accessHash])[0];
+    const expirationBlockBuffer = uvarint64ToBuf(expirationBlock);
+    const derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
+    const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
+    console.log([...derivedPublicKeyBuffer, ...expirationBlockBuffer], accessHash)
+    const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];
 
     return {
       btcDepositAddress: privateUser.btcDepositAddress,
