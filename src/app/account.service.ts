@@ -96,7 +96,6 @@ export class AccountService {
     const expirationBlockBuffer = uvarint64ToBuf(expirationBlock);
     const derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
     const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
-    console.log([...derivedPublicKeyBuffer, ...expirationBlockBuffer], accessHash)
     const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];
 
     return {
