@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
+import {RouteNames} from './app-routing.module';
+import {Network} from '../types/identity';
+import {GlobalVarsService} from './global-vars.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +14,10 @@ export class GoogleDriveService {
 
   private accessToken: string | undefined;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    public globalVars: GlobalVarsService
+  ) {}
 
   public setAccessToken(accessToken: string): void {
     this.accessToken = accessToken;
@@ -53,5 +59,28 @@ export class GoogleDriveService {
     return this.httpClient.get<any>(
       `https://www.googleapis.com/drive/v3/files/${fileId}?${httpParams.toString()}`,
       { headers: { Authorization: `Bearer ${this.accessToken}` }});
+  }
+
+  public launchGoogle(): void {
+    const redirectUri = new URL(`${window.location.origin}/${RouteNames.AUTH_GOOGLE}`);
+    if (this.globalVars.network === Network.testnet) {
+      redirectUri.searchParams.append('testnet', 'true');
+    }
+
+    const oauthUri = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    oauthUri.searchParams.append('redirect_uri', redirectUri.toString());
+    oauthUri.searchParams.append('client_id', GoogleDriveService.CLIENT_ID);
+    oauthUri.searchParams.append('scope', GoogleDriveService.DRIVE_SCOPE);
+    oauthUri.searchParams.append('response_type', 'token');
+    // TODO: Investigate using this parameter to defend against CSRF attacks
+    // pass on webview state to Google OAuth state
+    // https://stackoverflow.com/questions/7722062/google-oauth-2-0-redirect-uri-with-several-parameters
+    const stateString = btoa(JSON.stringify({
+      webview: this.globalVars.webview,
+      testnet: this.globalVars.network === Network.testnet
+    }));
+    oauthUri.searchParams.append('state', stateString);
+
+    window.location.href = oauthUri.toString();
   }
 }
