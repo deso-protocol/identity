@@ -1,13 +1,15 @@
 <div>
-  <div class="fs-24px font-weight-bold pt-15px">Get Free $CLOUT</div>
+  <div class="fs-24px font-weight-bold pt-15px">Get <b>{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 2)}}</b> in Free $CLOUT</div>
   <div class="d-flex align-items-center">
-    <div class="fs-15px mt-15px">
-      Click the button below to prove you're not a bot and receive free {{ globalVars.nanosToBitClout(globalVars.jumioBitCloutNanos, 2) }} $CLOUT (~{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos)}}).
+    <div>
+      <div class="fs-15px mt-15px">
+        Click the button below to prove you're not a bot and receive <b>{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 2)}}</b> in free $CLOUT!
+      </div>
     </div>
   </div>
   <div class="d-flex pt-15px justify-content-between">
     <button (click)="openJumio()" class="btn btn-primary font-weight-bold fs-15px sign-up-btn">
-      Get Free $CLOUT
+      Get  <b>{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 2)}}</b> in Free $CLOUT
     </button>
     <button
       (click)="skip()"
