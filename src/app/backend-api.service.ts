@@ -54,4 +54,10 @@ export class BackendAPIService {
       }
     )
   }
+
+  GetAppState(): Observable<any> {
+    return this.httpClient.post<any>(`${this.endpoint}/get-app-state`, {
+      PublicKeyBase58Check: "",
+    });
+  }
 }
