@@ -24,7 +24,7 @@ export class JumioComponent implements OnInit, OnDestroy {
 
   constructor(
     public backendApi: BackendAPIService,
-    private globalVars: GlobalVarsService,
+    public globalVars: GlobalVarsService,
   ) { }
 
   ngOnInit(): void {
