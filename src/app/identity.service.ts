@@ -60,6 +60,7 @@ export class IdentityService {
     signedUp?: boolean
     signedTransactionHex?: string,
     jumioSuccess?: boolean,
+    jumioInternalReference?: string,
   }): void {
     this.cast('login', payload);
   }

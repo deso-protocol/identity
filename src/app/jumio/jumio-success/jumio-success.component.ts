@@ -23,6 +23,7 @@ export class JumioSuccessComponent implements OnInit, OnDestroy {
         publicKeyAdded: publicKey,
         signedUp: true,
         jumioSuccess: true,
+        jumioInternalReference: params.customerInternalReference,
       });
     })
   }
