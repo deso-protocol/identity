@@ -40,7 +40,7 @@ export class GlobalVarsService {
   }
   
   showJumio(): boolean {
-    return environment.jumioSupported && this.webview;
+    return environment.jumioSupported && !this.webview;
   }
 
   nanosPerUSDExchangeRate: number = 0;
