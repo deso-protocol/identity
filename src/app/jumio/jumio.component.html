@@ -1,0 +1,28 @@
+<div class="google-wrapper" *ngIf="autoOpenJumio">
+  <div class="google-ball blue"></div>
+  <div class="google-ball red"></div>
+  <div class="google-ball yellow"></div>
+  <div class="google-ball green"></div>
+</div>
+<div *ngIf="!autoOpenJumio">
+  <div class="fs-24px font-weight-bold pt-15px">Get {{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 0)}} Free</div>
+  <div class="d-flex align-items-center">
+    <div>
+      <div class="fs-15px mt-15px">
+        Click the button below to prove you're not a robot and receive <b>{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 0)}} free</b>!
+      </div>
+    </div>
+  </div>
+  <div class="d-flex pt-15px justify-content-between">
+    <button (click)="openJumio()" class="btn btn-primary font-weight-bold fs-15px sign-up-btn">
+      Get  <b>{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 0)}} Free</b>
+    </button>
+    <button
+      (click)="skip()"
+      class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn"
+      *ngIf="showSkip"
+    >
+      Skip
+    </button>
+  </div>
+</div>

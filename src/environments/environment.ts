@@ -8,6 +8,7 @@ export const environment = {
   nodeHostname: 'bitclout.com',
   fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost'],
   noAccessHostnames: [''],
+  jumioSupported: true,
 };
 
 /*

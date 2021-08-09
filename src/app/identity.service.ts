@@ -59,6 +59,7 @@ export class IdentityService {
     publicKeyAdded?: string,
     signedUp?: boolean
     signedTransactionHex?: string,
+    jumioSuccess?: boolean,
   }): void {
     this.cast('login', payload);
   }

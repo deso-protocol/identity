@@ -19,11 +19,17 @@ export class SignUpComponent implements OnInit, OnDestroy {
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
+  publicKeyAdded = '';
 
   // Advanced tab
   advancedOpen = false;
   showMnemonicError = false;
   showEntropyHexError = false;
+
+  loginMessagePayload: any;
+  environment = environment;
+
+  stepTotal: number;
 
   constructor(
     public entropyService: EntropyService,
@@ -33,7 +39,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
     public globalVars: GlobalVarsService,
     private router: Router,
     private textService: TextService,
-  ) { }
+  ) {
+    this.stepTotal = globalVars.showJumio() ? 3 : 2;
+  }
 
   ngOnInit(): void {
   }
@@ -73,7 +81,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
-    const publicKeyAdded = this.accountService.addUser({
+    this.publicKeyAdded = this.accountService.addUser({
       seedHex,
       mnemonic: this.mnemonicCheck,
       extraText: this.extraTextCheck,
@@ -81,17 +89,25 @@ export class SignUpComponent implements OnInit, OnDestroy {
       network,
     });
 
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded,
-      signedUp: true,
-    });
+    if (!this.globalVars.showJumio()) {
+      this.login();
+    } else {
+      this.stepNum = 3;
+    }
   }
 
   stepTwoBack(): void {
     this.extraTextCheck = '';
     this.mnemonicCheck = '';
     this.stepNum = 1;
+  }
+
+  login(): void {
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded: this.publicKeyAdded,
+      signedUp: true,
+    });
   }
 
   clickTos(): void {
