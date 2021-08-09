@@ -38,6 +38,10 @@ export class GlobalVarsService {
   get environment() {
     return environment;
   }
+  
+  showJumio(): boolean {
+    return environment.jumioSupported && this.webview;
+  }
 
   nanosPerUSDExchangeRate: number = 0;
   nanosToBitCloutMemo = {};

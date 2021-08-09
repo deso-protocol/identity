@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   hostname: 'identity.bitclout.com',
-  nodeHostname: 'bitclout.blue',
+  nodeHostname: 'bitclout.com',
   fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost'],
   noAccessHostnames: [''],
   jumioSupported: true,

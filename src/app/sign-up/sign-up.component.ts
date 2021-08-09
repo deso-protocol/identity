@@ -28,8 +28,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   loginMessagePayload: any;
   environment = environment;
-  
-  stepTotal = environment.jumioSupported ? 3 : 2;
+
+  stepTotal: number;
 
   constructor(
     public entropyService: EntropyService,
@@ -39,7 +39,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
     public globalVars: GlobalVarsService,
     private router: Router,
     private textService: TextService,
-  ) { }
+  ) {
+    this.stepTotal = globalVars.showJumio() ? 3 : 2;
+  }
 
   ngOnInit(): void {
   }
@@ -87,15 +89,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
       network,
     });
 
-    this.loginMessagePayload = {
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: this.publicKeyAdded,
-      signedUp: true,
-    }
-    if (!environment.jumioSupported) {
+    if (!this.globalVars.showJumio()) {
       this.login();
-    }
-    else {
+    } else {
       this.stepNum = 3;
     }
   }
@@ -107,7 +103,11 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   login(): void {
-    this.identityService.login(this.loginMessagePayload);
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded: this.publicKeyAdded,
+      signedUp: true,
+    });
   }
 
   clickTos(): void {
