@@ -52,7 +52,7 @@ export class BackendAPIService {
         SuccessURL,
         ErrorURL,
       }
-    )
+    );
   }
 
   GetAppState(): Observable<any> {

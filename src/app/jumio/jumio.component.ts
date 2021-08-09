@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 import {TextService} from '../text.service';
 import {Network} from '../../types/identity';
 import {RouteNames} from '../app-routing.module';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-jumio',
@@ -25,10 +26,19 @@ export class JumioComponent implements OnInit, OnDestroy {
   constructor(
     public backendApi: BackendAPIService,
     public globalVars: GlobalVarsService,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    if (this.autoOpenJumio) {
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params.public_key) {
+        this.publicKey = params.public_key;
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
+    if (this.autoOpenJumio && this.publicKey) {
       this.openJumio();
     }
   }
