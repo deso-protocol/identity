@@ -60,4 +60,11 @@ export class BackendAPIService {
       PublicKeyBase58Check: "",
     });
   }
+
+  JumioFlowFinished(PublicKey: string, JumioInternalReference: string): Observable<any> {
+    return this.httpClient.post<any>(`${this.endpoint}/jumio-flow-finished`, {
+      PublicKey,
+      JumioInternalReference,
+    });
+  }
 }

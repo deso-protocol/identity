@@ -40,6 +40,6 @@
     </div>
   </div>
   <div class="container home-container" *ngIf="showJumio">
-    <app-jumio [publicKey]="publicKey" (skipJumio)="finishFlow(true)"></app-jumio>
+    <app-jumio [publicKey]="publicKey" (skipJumio)="finishFlow(true)" [autoOpenJumio]="false"></app-jumio>
   </div>
 </div>

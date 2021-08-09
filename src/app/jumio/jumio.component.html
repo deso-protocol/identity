@@ -1,4 +1,10 @@
-<div>
+<div class="google-wrapper" *ngIf="autoOpenJumio">
+  <div class="google-ball blue"></div>
+  <div class="google-ball red"></div>
+  <div class="google-ball yellow"></div>
+  <div class="google-ball green"></div>
+</div>
+<div *ngIf="!autoOpenJumio">
   <div class="fs-24px font-weight-bold pt-15px">Get {{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 0)}} Free</div>
   <div class="d-flex align-items-center">
     <div>

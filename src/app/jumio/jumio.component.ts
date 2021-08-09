@@ -19,7 +19,7 @@ export class JumioComponent implements OnInit, OnDestroy {
 
   @Input() publicKey: string = "";
   @Input() showSkip: boolean = true;
-
+  @Input() autoOpenJumio: boolean = true;
   @Output() skipJumio = new EventEmitter();
 
   constructor(
@@ -28,6 +28,9 @@ export class JumioComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    if (this.autoOpenJumio) {
+      this.openJumio();
+    }
   }
 
   ngOnDestroy(): void {
