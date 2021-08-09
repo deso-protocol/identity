@@ -24,7 +24,7 @@ export class GoogleComponent implements OnInit {
   seedCopied = false;
   publicKey = '';
   mnemonic = '';
-  showJumio = false;
+  showGetFreeCLOUT = false;
   environment = environment;
 
   constructor(
@@ -132,7 +132,7 @@ export class GoogleComponent implements OnInit {
 
   startJumio(): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-    this.showJumio = true;
+    this.showGetFreeCLOUT = true;
   }
 
   finishFlow(signedUp: boolean): void {
