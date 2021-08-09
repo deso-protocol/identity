@@ -62,9 +62,18 @@ export class BackendAPIService {
   }
 
   JumioFlowFinished(PublicKey: string, JumioInternalReference: string): Observable<any> {
+    const publicUserInfo = this.accountService.getEncryptedUsers()[PublicKey];
+    if (!publicUserInfo) {
+      return of(null);
+    }
+
+    const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
+    const jwt = this.signingService.signJWT(seedHex);
+
     return this.httpClient.post<any>(`${this.endpoint}/jumio-flow-finished`, {
       PublicKey,
       JumioInternalReference,
+      JWT: jwt,
     });
   }
 }
