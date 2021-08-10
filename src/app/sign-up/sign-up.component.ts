@@ -88,6 +88,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
       btcDepositAddress,
       network,
     });
+    this.accountService.setAccessLevel(
+      this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
     if (!this.globalVars.showJumio()) {
       this.login();
