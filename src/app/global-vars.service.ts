@@ -38,7 +38,7 @@ export class GlobalVarsService {
   get environment() {
     return environment;
   }
-  
+
   showJumio(): boolean {
     return environment.jumioSupported && !this.webview;
   }
@@ -89,7 +89,7 @@ export class GlobalVarsService {
     return Number(num).toLocaleString("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: decimal,
+      maximumFractionDigits: decimal,
     });
   }
 
