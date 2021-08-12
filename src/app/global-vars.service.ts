@@ -89,6 +89,7 @@ export class GlobalVarsService {
     return Number(num).toLocaleString("en-US", {
       style: "currency",
       currency: "USD",
+      minimumFractionDigits: decimal,
       maximumFractionDigits: decimal,
     });
   }
