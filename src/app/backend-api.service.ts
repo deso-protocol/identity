@@ -36,11 +36,11 @@ export class BackendAPIService {
   ): Observable<{[key: string]: UserProfile}> {
     return new Observable<{[key: string]: UserProfile}>(subscriber => {
       const userProfiles: {[key: string]: any} = {};
-      for (const publicKey of publicKeys) {
-        userProfiles[publicKey] = {};
-      }
 
       if (publicKeys.length > 0) {
+        for (const publicKey of publicKeys) {
+          userProfiles[publicKey] = {};
+        }
         this.GetUsersStateless(publicKeys).subscribe(res => {
           for (const user of res.UserList) {
             userProfiles[user.PublicKeyBase58Check] = {
@@ -50,6 +50,8 @@ export class BackendAPIService {
           }
           subscriber.next(userProfiles);
         });
+      } else {
+        subscriber.next(userProfiles);
       }
     });
   }

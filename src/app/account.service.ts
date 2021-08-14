@@ -81,17 +81,16 @@ export class AccountService {
   getDerivedUser(publicKey: string, blockHeight: number): DerivedUserInfo{
     const privateUser = this.getPrivateUsers()[publicKey];
 
-    if (!this.entropyService.temporaryEntropy.mnemonic) {
-      this.entropyService.setNewTemporaryEntropy();
-    }
+
+    this.entropyService.setNewTemporaryEntropy();
     const derivedMnemonic = this.entropyService.temporaryEntropy?.mnemonic;
     const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
     const derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
     const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
     const derivedPublicKey = this.cryptoService.privateKeyToBitcloutPublicKey(derivedPrivateKey, privateUser.network);
 
-    // By default we authorize this derived key for 2500 blocks.
-    const expirationBlock = blockHeight + 2500;
+    // By default we authorize this derived key for 10,000 blocks.
+    const expirationBlock = blockHeight + 10000;
 
     const expirationBlockBuffer = uvarint64ToBuf(expirationBlock);
     const derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
