@@ -42,8 +42,8 @@ export class DeriveComponent implements OnInit {
   }
 
   selectAccount(publicKey: string): void {
-    this.backendApi.GetBlockTipHeight().subscribe( res => {
-      const blockHeight = res.Header.Height;
+    this.backendApi.GetAppState().subscribe( res => {
+      const blockHeight = res.BlockHeight;
       this.identityService.derive({
         derivedUserInfo: this.accountService.getDerivedUser(publicKey, blockHeight),
       });
