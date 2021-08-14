@@ -10,6 +10,8 @@ import {GlobalVarsService} from '../../global-vars.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../../text.service';
 import {GoogleAuthState} from '../../../types/identity';
+import {environment} from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-google',
@@ -22,6 +24,8 @@ export class GoogleComponent implements OnInit {
   seedCopied = false;
   publicKey = '';
   mnemonic = '';
+  showGetFreeCLOUT = false;
+  environment = environment;
 
   constructor(
     private accountService: AccountService,
@@ -124,6 +128,11 @@ export class GoogleComponent implements OnInit {
       this.publicKey = this.accountService.addUser(userInfo);
       this.loading = false;
     });
+  }
+
+  startJumio(): void {
+    this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    this.showGetFreeCLOUT = true;
   }
 
   finishFlow(signedUp: boolean): void {

@@ -20,6 +20,9 @@ import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
 import { GoogleComponent } from './auth/google/google.component';
 import { AvatarDirective } from './avatar/avatar.directive';
 import { DeriveComponent } from './derive/derive.component';
+import { JumioComponent } from './jumio/jumio.component';
+import { JumioSuccessComponent } from './jumio/jumio-success/jumio-success.component';
+import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +38,9 @@ import { DeriveComponent } from './derive/derive.component';
     GoogleComponent,
     AvatarDirective,
     DeriveComponent,
+    JumioComponent,
+    JumioSuccessComponent,
+    JumioErrorComponent,
   ],
   imports: [
     BrowserModule,

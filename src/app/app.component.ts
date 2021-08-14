@@ -4,6 +4,7 @@ import {GlobalVarsService} from './global-vars.service';
 import {IdentityService} from './identity.service';
 import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
+import {BackendAPIService} from './backend-api.service';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ export class AppComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private globalVars: GlobalVarsService,
     private identityService: IdentityService,
+    private backendApiService: BackendAPIService,
   ) { }
 
   ngOnInit(): void {
@@ -66,5 +68,10 @@ export class AppComponent implements OnInit {
       // Identity currently doesn't have any management UIs that can be accessed directly
       window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
     }
+    
+    this.backendApiService.GetAppState().subscribe((res) => {
+      this.globalVars.jumioBitCloutNanos = res.JumioBitCloutNanos;
+      this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerBitCloutExchangeRate / 100);
+    });
   }
 }

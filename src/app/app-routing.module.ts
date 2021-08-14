@@ -9,6 +9,9 @@ import {ApproveComponent} from './approve/approve.component';
 import {LogInSeedComponent} from './log-in-seed/log-in-seed.component';
 import {GoogleComponent} from './auth/google/google.component';
 import {DeriveComponent} from './derive/derive.component';
+import {JumioSuccessComponent} from './jumio/jumio-success/jumio-success.component';
+import {JumioErrorComponent} from './jumio/jumio-error/jumio-error.component';
+import {JumioComponent} from './jumio/jumio.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -19,6 +22,9 @@ export class RouteNames {
   public static APPROVE = 'approve';
   public static AUTH_GOOGLE = 'auth/google';
   public static DERIVE = 'derive';
+  public static JUMIO_SUCCESS = 'jumio-success';
+  public static JUMIO_ERROR = 'jumio-error';
+  public static GET_FREE_CLOUT = 'get-free-clout';
 }
 
 const routes: Routes = [
@@ -31,6 +37,9 @@ const routes: Routes = [
   { path: RouteNames.APPROVE, component: ApproveComponent, pathMatch: 'full' },
   { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
   { path: RouteNames.DERIVE, component: DeriveComponent, pathMatch: 'full' },
+  { path: RouteNames.JUMIO_SUCCESS, component: JumioSuccessComponent, pathMatch: 'full'},
+  { path: RouteNames.JUMIO_ERROR, component: JumioErrorComponent, pathMatch: 'full' },
+  { path: RouteNames.GET_FREE_CLOUT, component: JumioComponent, pathMatch: 'full' },
 ];
 
 @NgModule({
