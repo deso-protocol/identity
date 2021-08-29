@@ -24,7 +24,7 @@ export class SigningService {
 
   encryptMessage(seedHex: string, recipientPublicKey: string, message: string): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
 
     const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
     try {
@@ -40,7 +40,7 @@ export class SigningService {
   // @param encryptedHexes : string[]
   decryptMessagesLegacy(seedHex: string, encryptedHexes: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedHex of encryptedHexes) {
@@ -60,11 +60,11 @@ export class SigningService {
   //     EncryptedHex: string,
   //     PublicKey: string,
   //     IsSender: bool,
-  //     V2: bool,
+  //     Legacy: bool,
   // }[]
   decryptMessages(seedHex: string, encryptedMessages: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer();
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {
@@ -72,13 +72,7 @@ export class SigningService {
       const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
       const encryptedBytes = new Buffer(encryptedMessage.EncryptedHex, 'hex');
       // Check if message was encrypted using shared secret or public key method
-      if (encryptedMessage.V2) {
-        try {
-          decryptedHexes[encryptedMessage.EncryptedHex] = ecies.decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes).toString();
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
+      if (encryptedMessage.Legacy) {
         // If message was encrypted using public key, check
         // the sender to determine if message is decryptable
         try {
@@ -88,6 +82,12 @@ export class SigningService {
           } else {
             decryptedHexes[encryptedMessage.EncryptedHex] = '';
           }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        try {
+          decryptedHexes[encryptedMessage.EncryptedHex] = ecies.decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes).toString();
         } catch (e) {
           console.error(e);
         }
