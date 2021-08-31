@@ -54,6 +54,17 @@ export class AppComponent implements OnInit {
       this.globalVars.hideGoogle = true;
     }
 
+    const referralCode = params.get('referralCode')
+    if (referralCode) {
+      this.globalVars.referralHashBase58 = referralCode;
+      this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
+        const referralInfoResponse = res.ReferralInfoResponse;
+        if (referralInfoResponse.IsActive && referralInfoResponse.Info.TotalReferrals < referralInfoResponse.Info.MaxReferrals) {
+          this.globalVars.referralUSDCents = referralInfoResponse.Info.RefereeAmountUSDCents;
+        }
+      });
+    }
+
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
@@ -68,7 +79,7 @@ export class AppComponent implements OnInit {
       // Identity currently doesn't have any management UIs that can be accessed directly
       window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
     }
-    
+
     this.backendApiService.GetAppState().subscribe((res) => {
       this.globalVars.jumioBitCloutNanos = res.JumioBitCloutNanos;
       this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerBitCloutExchangeRate / 100);
