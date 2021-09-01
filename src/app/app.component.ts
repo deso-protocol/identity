@@ -58,9 +58,12 @@ export class AppComponent implements OnInit {
     if (referralCode) {
       this.globalVars.referralHashBase58 = referralCode;
       this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
-        const referralInfoResponse = res.ReferralInfoResponse;
-        if (referralInfoResponse.IsActive && referralInfoResponse.Info.TotalReferrals < referralInfoResponse.Info.MaxReferrals) {
-          this.globalVars.referralUSDCents = referralInfoResponse.Info.RefereeAmountUSDCents;
+        const referralInfo = res.ReferralInfoResponse.Info;
+        if (
+          res.IsActive &&
+          (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
+        ) {
+          this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
         }
       });
     }
