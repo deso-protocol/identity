@@ -98,6 +98,6 @@ export class GlobalVarsService {
   }
 
   getFreeCloutMessage(): string {
-    return this.referralUSDCents ? this.formatUSD(this.referralUSDCents / 100, 0) : this.nanosToBitClout(this.jumioBitCloutNanos);
+    return this.referralUSDCents ? this.formatUSD(this.referralUSDCents / 100, 0) : this.nanosToUSD(this.jumioBitCloutNanos, 0);
   }
 }
