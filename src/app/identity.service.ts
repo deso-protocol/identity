@@ -195,12 +195,12 @@ export class IdentityService {
       case TransactionMetadataCreatorCoinTransfer:
       case TransactionMetadataSwapIdentity:
       case TransactionMetadataUpdateGlobalParams:
+      case TransactionMetadataUpdateProfile:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:
       case TransactionMetadataPrivateMessage:
       case TransactionMetadataSubmitPost:
-      case TransactionMetadataUpdateProfile:
       case TransactionMetadataLike:
         return AccessLevel.ApproveLarge;
     }
