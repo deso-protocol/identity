@@ -9,7 +9,7 @@ import {GoogleDriveService} from '../../google-drive.service';
 import {GlobalVarsService} from '../../global-vars.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../../text.service';
-import {GoogleAuthState} from '../../../types/identity';
+import {GoogleAuthState, PrivateUserInfo} from '../../../types/identity';
 import {environment} from '../../../environments/environment';
 
 
@@ -80,6 +80,7 @@ export class GoogleComponent implements OnInit {
     for (const file of files) {
       this.googleDrive.getFile(file.id).subscribe(fileContents => {
         try {
+          // TODO: Backfill eth address by changing addUser signature
           this.publicKey = this.accountService.addUser(fileContents);
         } catch (err) {
           console.error(err);
@@ -114,12 +115,14 @@ export class GoogleComponent implements OnInit {
     const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonic, extraText);
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
+    const ethDepositAddress = this.cryptoService.keychainToEthAddress(keychain, network);
 
-    const userInfo = {
+    const userInfo: PrivateUserInfo = {
       mnemonic,
       extraText,
       seedHex,
       btcDepositAddress,
+      ethDepositAddress,
       network,
       google: true,
     };

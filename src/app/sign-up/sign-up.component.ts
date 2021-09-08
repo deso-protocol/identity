@@ -80,12 +80,14 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonicCheck, this.extraTextCheck);
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
+    const ethDepositAddress = this.cryptoService.keychainToEthAddress(keychain, network);
 
     this.publicKeyAdded = this.accountService.addUser({
       seedHex,
       mnemonic: this.mnemonicCheck,
       extraText: this.extraTextCheck,
       btcDepositAddress,
+      ethDepositAddress,
       network,
     });
     this.accountService.setAccessLevel(

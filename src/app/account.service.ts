@@ -43,6 +43,7 @@ export class AccountService {
       publicUsers[publicKey] = {
         hasExtraText: privateUser.extraText?.length > 0,
         btcDepositAddress: privateUser.btcDepositAddress,
+        ethDepositAddress: privateUser.ethDepositAddress,
         encryptedSeedHex,
         network: privateUser.network,
         accessLevel,
@@ -73,6 +74,7 @@ export class AccountService {
 
   // Modifiers
 
+  // TODO: Make this method private and only allow adding users by mnemonic/seedHex and network
   addUser(userInfo: PrivateUserInfo): string {
     const privateUsers = this.getPrivateUsersRaw();
     const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);

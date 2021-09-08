@@ -88,12 +88,14 @@ export class LogInSeedComponent implements OnInit {
     const network = this.globalVars.network;
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
+    const ethDepositAddress = this.cryptoService.keychainToEthAddress(keychain, network);
 
     this.accountService.addUser({
       seedHex,
       mnemonic,
       extraText,
       btcDepositAddress,
+      ethDepositAddress,
       network,
     });
   }
