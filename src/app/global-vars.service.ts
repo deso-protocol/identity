@@ -16,6 +16,7 @@ export class GlobalVarsService {
   inTab = !!window.opener;
   webview = false;
   hideGoogle = false;
+  hideJumio = false;
 
   jumioBitCloutNanos: number = 0;
 
@@ -40,7 +41,7 @@ export class GlobalVarsService {
   }
 
   showJumio(): boolean {
-    return environment.jumioSupported && !this.webview;
+    return environment.jumioSupported && !this.webview && !this.hideJumio;
   }
 
   nanosPerUSDExchangeRate: number = 0;
