@@ -238,6 +238,36 @@ export class TransactionMetadataNFTBid extends BinaryRecord {
   bidAmountNanos: number = 0;
 }
 
+export class TransactionMetadataNFTTransfer extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  nftPostHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+
+  @Transcode(VarBuffer)
+  receiverPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  encryptedUnlockableText: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataAcceptNFTTransfer extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  nftPostHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+}
+
+export class TransactionMetadataBurnNFT extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  nftPostHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -256,6 +286,9 @@ export const TransactionTypeMetadataMap = {
 	16: TransactionMetadataUpdateNFT,
 	17: TransactionMetadataAcceptNFTBid,
 	18: TransactionMetadataNFTBid,
+	19: TransactionMetadataNFTTransfer,
+	20: TransactionMetadataAcceptNFTTransfer,
+	21: TransactionMetadataBurnNFT,
 };
 
 export class Transaction<T> extends BinaryRecord {
