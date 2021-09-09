@@ -48,8 +48,14 @@ export class JumioComponent implements OnInit, OnDestroy {
 
   getJumioURL(routeSuffix: string): string {
     // Jumio URLs cannot be localhost, so default to bitclout.com if localhost.
-    const origin = window.location.origin.startsWith("http://localhost") ? "https://bitclout.com" : window.location.origin;
+    let origin = window.location.origin;
 
+    const regExp = /(http(s?):\/\/localhost:\d{0,5})$/;
+    const match = origin.match(regExp);
+    if (match) {
+      origin = "https://bitclout.com";
+    }
+    
     const url = new URL(`${origin}/${routeSuffix}`)
     if (this.globalVars.network === Network.testnet) {
       url.searchParams.append('testnet', 'true');
