@@ -35,7 +35,7 @@ export class BackendAPIService {
     return `${this.endpoint}/get-single-profile-picture/${PublicKeyBase58Check}`;
   }
 
-  JumioBegin(PublicKey: string, SuccessURL: string, ErrorURL: string): Observable<any> {
+  JumioBegin(PublicKey: string, ReferralHashBase58: string, SuccessURL: string, ErrorURL: string): Observable<any> {
     const publicUserInfo = this.accountService.getEncryptedUsers()[PublicKey];
     if (!publicUserInfo) {
       return of(null);
@@ -49,6 +49,7 @@ export class BackendAPIService {
       {
         JWT: jwt,
         PublicKey,
+        ReferralHashBase58,
         SuccessURL,
         ErrorURL,
       }
@@ -74,6 +75,12 @@ export class BackendAPIService {
       PublicKey,
       JumioInternalReference,
       JWT: jwt,
+    });
+  }
+
+  GetReferralInfoForReferralHash(ReferralHash: string): Observable<any> {
+    return this.httpClient.post<any>(`${this.endpoint}/get-referral-info-for-referral-hash`, {
+      ReferralHash,
     });
   }
 }

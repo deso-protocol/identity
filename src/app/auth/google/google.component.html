@@ -34,7 +34,7 @@
         Continue to {{ globalVars.hostname }}
       </button>
       <button (click)="startJumio()" class="btn btn-primary font-weight-bold fs-15px sign-up-btn" *ngIf="globalVars.showJumio()">
-        Get  <b>{{ globalVars.nanosToUSD(globalVars.jumioBitCloutNanos, 0)}} Free</b>
+        Get  <b>{{ globalVars.getFreeCloutMessage() }} Free</b>
       </button>
     </div>
   </div>
