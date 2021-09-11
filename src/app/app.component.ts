@@ -53,7 +53,11 @@ export class AppComponent implements OnInit {
     if (params.get('hideGoogle')) {
       this.globalVars.hideGoogle = true;
     }
-
+    
+    if (params.get('hideJumio')) {
+      this.globalVars.hideJumio = true;
+    }
+    
     const referralCode = params.get('referralCode')
     if (referralCode) {
       this.globalVars.referralHashBase58 = referralCode;
@@ -67,7 +71,7 @@ export class AppComponent implements OnInit {
         }
       });
     }
-
+    
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
