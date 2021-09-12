@@ -7,7 +7,7 @@ import {EntropyService} from './entropy.service';
 import {SigningService} from './signing.service';
 import sha256 from 'sha256';
 import {ec as EC} from 'elliptic';
-import {uvarint64ToBuf} from "../lib/bindata/util";
+import {uint64ToBufBigEndian, uvarint64ToBuf} from '../lib/bindata/util';
 
 @Injectable({
   providedIn: 'root'
@@ -92,7 +92,7 @@ export class AccountService {
     // By default we authorize this derived key for 10,000 blocks.
     const expirationBlock = blockHeight + 10000;
 
-    const expirationBlockBuffer = uvarint64ToBuf(expirationBlock);
+    const expirationBlockBuffer = uint64ToBufBigEndian(expirationBlock);
     const derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
     const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
     const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];

@@ -28,3 +28,20 @@ export const uvarint64ToBuf = (uint: number): Buffer => {
 
   return new Buffer(result);
 };
+
+export const uint64ToBufBigEndian = (uint: number): Buffer => {
+  const result = [];
+
+  while (uint >= 0xFF) {
+    result.push(uint & 0xFF);
+    uint >>>= 8;
+  }
+
+  result.push(uint | 0);
+
+  while(result.length < 8){
+    result.push(0);
+  }
+
+  return new Buffer(result.reverse());
+}
