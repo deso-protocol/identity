@@ -15,6 +15,7 @@ export class DeriveComponent implements OnInit {
   allUsers: {[key: string]: any} = {};
   hasUsers = false;
   showAccessLevels = true;
+  withCallback = false;
 
   constructor(
     private accountService: AccountService,
@@ -35,6 +36,9 @@ export class DeriveComponent implements OnInit {
 
     // Set showAccessLevels
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
+
+    // Set withCallback
+    this.withCallback = this.globalVars.callback !== null;
   }
 
   launchGoogle(): void {

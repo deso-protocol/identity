@@ -17,6 +17,8 @@ export class GlobalVarsService {
   webview = false;
   hideGoogle = false;
 
+  callback: URL | null = null;
+
   jumioBitCloutNanos: number = 0;
 
   constructor() { }

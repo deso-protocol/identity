@@ -23,6 +23,7 @@ import { DeriveComponent } from './derive/derive.component';
 import { JumioComponent } from './jumio/jumio.component';
 import { JumioSuccessComponent } from './jumio/jumio-success/jumio-success.component';
 import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
+import { ErrorCallbackComponent } from './error-callback/error-callback.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
     JumioComponent,
     JumioSuccessComponent,
     JumioErrorComponent,
+    ErrorCallbackComponent,
   ],
   imports: [
     BrowserModule,

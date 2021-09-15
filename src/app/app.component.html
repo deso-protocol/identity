@@ -1,3 +1,8 @@
 <div *ngIf="!loading" class="full-screen">
-  <router-outlet></router-outlet>
+  <div *ngIf="isCallbackValid">
+    <router-outlet></router-outlet>
+  </div>
+  <div *ngIf="!isCallbackValid">
+    <app-error-callback></app-error-callback>
+  </div>
 </div>
