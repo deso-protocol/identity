@@ -58,9 +58,7 @@ export class AppComponent implements OnInit {
     // Callback should only be used in mobile applications, where payload is passed through URL parameters.
     if (params.get('callback')) {
       try {
-        // We suppress this because get() return type is string | null, and if we're here, it's not null.
-        // @ts-ignore
-        this.globalVars.callback = new URL(params.get('callback'));
+        this.globalVars.callback = new URL(params.get('callback') as string);
       } catch (err) {
         console.error(err);
         this.isCallbackValid = false;
