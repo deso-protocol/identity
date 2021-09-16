@@ -6,6 +6,12 @@ export interface PrivateUserInfo {
   ethDepositAddress: string;
   network: Network;
   google?: boolean;
+  version: PrivateUserVersion;
+}
+
+export enum PrivateUserVersion {
+  // Adds "version" and "ethDepositAddress" fields
+  V0 = 0,
 }
 
 export interface PublicUserInfo {

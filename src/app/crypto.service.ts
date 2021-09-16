@@ -184,7 +184,7 @@ export class CryptoService {
   // until LavaMoat is ready
   //
   // Reference implementation: https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L249
-  keychainToEthAddress(keychain: HDNode, network: Network): string {
+  keychainToEthAddress(keychain: HDNode): string {
     // Get the uncompressed key
     const ec = new EC('secp256k1');
     const publicKeyEC = ec.keyFromPublic(keychain.publicKey, 'array');
