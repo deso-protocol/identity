@@ -19,7 +19,10 @@ import {
   TransactionMetadataSwapIdentity,
   TransactionMetadataUpdateBitcoinUSDExchangeRate,
   TransactionMetadataUpdateGlobalParams,
-  TransactionMetadataUpdateProfile
+  TransactionMetadataUpdateProfile,
+  TransactionMetadataNFTTransfer,
+  TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataBurnNFT
 } from '../lib/bitclout/transaction';
 
 @Injectable({
@@ -196,6 +199,9 @@ export class IdentityService {
       case TransactionMetadataSwapIdentity:
       case TransactionMetadataUpdateGlobalParams:
       case TransactionMetadataUpdateProfile:
+      case TransactionMetadataNFTTransfer:
+      case TransactionMetadataAcceptNFTTransfer:
+      case TransactionMetadataBurnNFT:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

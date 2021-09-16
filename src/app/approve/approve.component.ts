@@ -21,7 +21,10 @@ import {
   TransactionMetadataCreateNFT,
   TransactionMetadataUpdateNFT,
   TransactionMetadataNFTBid,
-  TransactionMetadataAcceptNFTBid
+  TransactionMetadataAcceptNFTBid,
+  TransactionMetadataNFTTransfer,
+  TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataBurnNFT
 } from '../../lib/bitclout/transaction';
 import {SigningService} from '../signing.service';
 import bs58check from 'bs58check';
@@ -86,9 +89,9 @@ export class ApproveComponent implements OnInit {
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs = [];
-        
+
         let sendingToSelf = true; //for if sender and recipient are same account
-        
+
         for (const output of this.transaction.outputs) {
           // Skip the change output. 0 means the buffers are equal
           if (Buffer.compare(output.publicKey, this.transaction.publicKey) !== 0) {
@@ -98,14 +101,14 @@ export class ApproveComponent implements OnInit {
             outputs.push(`${sendAmount} CLOUT to ${sendKey}`);
           }
         }
-        
+
         //if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
           outputs.push(`$CLOUT to ${this.transaction.publicKey}`);
         }
-        
+
         description = `send ${outputs.join(', ')}`;
-         
+
         break;
 
       case TransactionMetadataBitcoinExchange:
@@ -178,6 +181,19 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataAcceptNFTBid:
         description = 'accept a bid on an NFT';
+        break;
+
+      case TransactionMetadataNFTTransfer:
+        description = 'transfer an NFT';
+        break;
+
+      case TransactionMetadataAcceptNFTTransfer:
+        description = 'accept an NFT transfer';
+        break;
+
+      case TransactionMetadataBurnNFT:
+        description = 'burn an NFT';
+        break;
     }
 
     this.transactionDescription = description;
