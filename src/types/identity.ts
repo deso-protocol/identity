@@ -24,6 +24,7 @@ export interface DerivedUserInfo {
   expirationBlock: number;
   network: Network;
   accessSignature: string;
+  jwt: string;
 }
 
 export enum Network {

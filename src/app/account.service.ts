@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, DerivedUserInfo, Network, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedUserInfo, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CookieService} from 'ngx-cookie';
 import {EntropyService} from './entropy.service';
 import {SigningService} from './signing.service';
 import sha256 from 'sha256';
-import {ec as EC} from 'elliptic';
-import {uint64ToBufBigEndian, uvarint64ToBuf} from '../lib/bindata/util';
+import {uint64ToBufBigEndian} from '../lib/bindata/util';
+import KeyEncoder from 'key-encoder';
+import * as jsonwebtoken from 'jsonwebtoken';
 
 @Injectable({
   providedIn: 'root'
@@ -97,6 +98,11 @@ export class AccountService {
     const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
     const accessSignature = this.signingService.signBurn(privateUser.seedHex, [accessHash])[0];
 
+    // We compute a JWT with a month-long expiration. This is needed for some backend endpoints.
+    const keyEncoder = new KeyEncoder('secp256k1');
+    const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
+    const jwt = jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+
     return {
       btcDepositAddress: privateUser.btcDepositAddress,
       derivedPublicKey,
@@ -104,7 +110,8 @@ export class AccountService {
       expirationBlock,
       accessSignature,
       network: privateUser.network,
-      publicKey
+      publicKey,
+      jwt
     };
   }
 
