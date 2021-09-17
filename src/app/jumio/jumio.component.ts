@@ -47,7 +47,16 @@ export class JumioComponent implements OnInit, OnDestroy {
   }
 
   getJumioURL(routeSuffix: string): string {
-    const url = new URL(`${window.location.origin}/${routeSuffix}`)
+    // Jumio URLs cannot be localhost, so default to bitclout.com if localhost.
+    let origin = window.location.origin;
+
+    const regExp = /(http(s?):\/\/localhost:\d{0,5})$/;
+    const match = origin.match(regExp);
+    if (match) {
+      origin = "https://bitclout.com";
+    }
+    
+    const url = new URL(`${origin}/${routeSuffix}`)
     if (this.globalVars.network === Network.testnet) {
       url.searchParams.append('testnet', 'true');
     }
@@ -61,7 +70,7 @@ export class JumioComponent implements OnInit, OnDestroy {
   }
 
   openJumio(): void {
-    this.backendApi.JumioBegin(this.publicKey, this.getJumioURL(RouteNames.JUMIO_SUCCESS), this.getJumioURL(RouteNames.JUMIO_ERROR)).subscribe((res) => {
+    this.backendApi.JumioBegin(this.publicKey, this.globalVars.referralHashBase58, this.getJumioURL(RouteNames.JUMIO_SUCCESS), this.getJumioURL(RouteNames.JUMIO_ERROR)).subscribe((res) => {
       window.location.href = res.URL;
     });
   }

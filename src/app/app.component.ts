@@ -65,6 +65,24 @@ export class AppComponent implements OnInit {
       }
     }
 
+    if (params.get('hideJumio')) {
+      this.globalVars.hideJumio = true;
+    }
+
+    const referralCode = params.get('referralCode')
+    if (referralCode) {
+      this.globalVars.referralHashBase58 = referralCode;
+      this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
+        const referralInfo = res.ReferralInfoResponse.Info;
+        if (
+          res.ReferralInfoResponse.IsActive &&
+          (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
+        ) {
+          this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
+        }
+      });
+    }
+
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
