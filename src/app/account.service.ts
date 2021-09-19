@@ -88,7 +88,7 @@ export class AccountService {
       ethDepositAddress,
       network,
       google,
-      version: PrivateUserVersion.V0,
+      version: PrivateUserVersion.V1,
     });
   }
 
