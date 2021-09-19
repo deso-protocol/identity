@@ -45,6 +45,7 @@ export class AccountService {
         hasExtraText: privateUser.extraText?.length > 0,
         btcDepositAddress: privateUser.btcDepositAddress,
         ethDepositAddress: privateUser.ethDepositAddress,
+        version: privateUser.version,
         encryptedSeedHex,
         network: privateUser.network,
         accessLevel,

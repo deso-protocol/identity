@@ -25,6 +25,7 @@ export interface PublicUserInfo {
   network: Network;
   accessLevel: AccessLevel;
   accessLevelHmac: string;
+  version: PrivateUserVersion;
 }
 
 export enum Network {
