@@ -10,8 +10,11 @@ export interface PrivateUserInfo {
 }
 
 export enum PrivateUserVersion {
-  // Adds "version" and "ethDepositAddress" fields
+  // Adds "version"
   V0 = 0,
+
+  // Adds "ethDepositAddress"
+  V1 = 1,
 }
 
 export interface PublicUserInfo {

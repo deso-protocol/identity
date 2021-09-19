@@ -78,7 +78,7 @@ export class AccountService {
   addUser(keychain: HDKey, mnemonic: string, extraText: string, network: Network, google?: boolean): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
-    const ethDepositAddress = this.cryptoService.keychainToEthAddress(keychain);
+    const ethDepositAddress = this.cryptoService.seedHexToEthAddress(seedHex);
 
     return this.addPrivateUser({
       seedHex,
@@ -117,17 +117,19 @@ export class AccountService {
     for (const publicKey of Object.keys(privateUsers)) {
       const privateUser = privateUsers[publicKey];
 
+      // Migrate from null to V0
       if (privateUser.version == null) {
-        // Begin migration to V0
-
         // Add version field
         privateUser.version = PrivateUserVersion.V0;
+      }
 
+      // Migrate from V0 -> V1
+      if (privateUser.version == PrivateUserVersion.V0) {
         // Add ethDepositAddress field
-        const keychain = HDKey.fromMasterSeed(Buffer.from(privateUser.seedHex, 'hex'));
-        privateUser.ethDepositAddress = this.cryptoService.keychainToEthAddress(keychain);
+        privateUser.ethDepositAddress = this.cryptoService.seedHexToEthAddress(privateUser.seedHex);
 
-        // End migration to V0
+        // Increment version
+        privateUser.version = PrivateUserVersion.V1;
       }
 
       privateUsers[publicKey] = privateUser;
