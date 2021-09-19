@@ -49,6 +49,7 @@ export class LogInSeedComponent implements OnInit {
     // they don't get saved in local storage reliably
     const mnemonic = this.mnemonic;
     const extraText = this.extraText;
+    const network = this.globalVars.network;
 
     if (!this.entropyService.isValidMnemonic(mnemonic)) {
       this.loginError = 'Invalid mnemonic';
@@ -58,7 +59,7 @@ export class LogInSeedComponent implements OnInit {
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
     const keychainNonStandard = this.cryptoService.mnemonicToKeychain(mnemonic, extraText, true);
 
-    this.addKeychain(keychain, mnemonic, extraText);
+    this.accountService.addUser(keychain, mnemonic, extraText, network);
 
     // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
     if (keychain.publicKey !== keychainNonStandard.publicKey) {
@@ -72,7 +73,7 @@ export class LogInSeedComponent implements OnInit {
         const user = res.UserList[0];
         if (user.ProfileEntryResponse || user.BalanceNanos > 0 || user.UsersYouHODL?.length) {
           // Add the non-standard key if the user has a profile, a balance, or holdings
-          this.addKeychain(keychainNonStandard, mnemonic, extraText);
+          this.accountService.addUser(keychainNonStandard, mnemonic, extraText, network);
         }
       });
     }
@@ -82,19 +83,5 @@ export class LogInSeedComponent implements OnInit {
     this.extraText = '';
 
     this.router.navigate(['/', RouteNames.LOG_IN]);
-  }
-
-  addKeychain(keychain: HDNode, mnemonic: string, extraText: string): void {
-    const network = this.globalVars.network;
-    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
-
-    this.accountService.addUser({
-      seedHex,
-      mnemonic,
-      extraText,
-      btcDepositAddress,
-      network,
-    });
   }
 }
