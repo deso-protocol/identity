@@ -16,9 +16,13 @@ export class GlobalVarsService {
   inTab = !!window.opener;
   webview = false;
   hideGoogle = false;
+  hideJumio = false;
 
   jumioBitCloutNanos: number = 0;
+  referralUSDCents: number = 0;
 
+  referralHashBase58: string = "";
+  
   constructor() { }
 
   isFullAccessHostname(): boolean {
@@ -40,7 +44,7 @@ export class GlobalVarsService {
   }
 
   showJumio(): boolean {
-    return environment.jumioSupported && !this.webview;
+    return environment.jumioSupported && !this.webview && !this.hideJumio;
   }
 
   nanosPerUSDExchangeRate: number = 0;
@@ -94,4 +98,7 @@ export class GlobalVarsService {
     });
   }
 
+  getFreeCloutMessage(): string {
+    return this.referralUSDCents ? this.formatUSD(this.referralUSDCents / 100, 0) : this.nanosToUSD(this.jumioBitCloutNanos, 0);
+  }
 }

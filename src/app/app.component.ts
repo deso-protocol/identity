@@ -51,7 +51,25 @@ export class AppComponent implements OnInit {
     if (params.get('hideGoogle')) {
       this.globalVars.hideGoogle = true;
     }
-
+    
+    if (params.get('hideJumio')) {
+      this.globalVars.hideJumio = true;
+    }
+    
+    const referralCode = params.get('referralCode')
+    if (referralCode) {
+      this.globalVars.referralHashBase58 = referralCode;
+      this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
+        const referralInfo = res.ReferralInfoResponse.Info;
+        if (
+          res.ReferralInfoResponse.IsActive &&
+          (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
+        ) {
+          this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
+        }
+      });
+    }
+    
     // Migrate all accounts
     this.accountService.migrate();
 
@@ -69,7 +87,7 @@ export class AppComponent implements OnInit {
       // Identity currently doesn't have any management UIs that can be accessed directly
       window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
     }
-    
+
     this.backendApiService.GetAppState().subscribe((res) => {
       this.globalVars.jumioBitCloutNanos = res.JumioBitCloutNanos;
       this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerBitCloutExchangeRate / 100);

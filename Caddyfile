@@ -52,6 +52,12 @@ header @html Content-Security-Policy "
     https://bitclout.com/api/v0/jumio-flow-finished
     https://bitclout.green/api/v0/jumio-flow-finished
     https://bitclout.blue/api/v0/jumio-flow-finished
+    http://localhost:17001/api/v0/get-referral-info-for-referral-hash
+    http://localhost:18001/api/v0/get-referral-info-for-referral-hash
+    https://bitpop.dev/api/v0/get-referral-info-for-referral-hash
+    https://bitclout.com/api/v0/get-referral-info-for-referral-hash
+    https://bitclout.green/api/v0/get-referral-info-for-referral-hash
+    https://bitclout.blue/api/v0/get-referral-info-for-referral-hash
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files;
