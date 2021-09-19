@@ -184,13 +184,11 @@ export class CryptoService {
   // until LavaMoat is ready
   //
   // Reference implementation: https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L249
-  keychainToEthAddress(keychain: HDNode): string {
-    // Get the uncompressed key
-    const ec = new EC('secp256k1');
-    const publicKeyEC = ec.keyFromPublic(keychain.publicKey, 'array');
+  seedHexToEthAddress(seedHex: string): string {
+    const privateKey = this.seedHexToPrivateKey(seedHex);
 
     // ETH uses the last 40 characters of the 64 byte SHA3 Keccak 256
-    const uncompressedKey = Buffer.from(publicKeyEC.getPublic(false, 'array').slice(1));
+    const uncompressedKey = Buffer.from(privateKey.getPublic(false, 'array').slice(1));
     const ethAddress = new Keccak(256).update(uncompressedKey).digest('hex').slice(24);
 
     // EIP-55 requires a checksum. Reference implementation: https://eips.ethereum.org/EIPS/eip-55
