@@ -98,13 +98,13 @@ export class ApproveComponent implements OnInit {
             sendingToSelf = false;
             const sendKey = this.base58KeyCheck(output.publicKey);
             const sendAmount = `${output.amountNanos / 1e9}`;
-            outputs.push(`${sendAmount} CLOUT to ${sendKey}`);
+            outputs.push(`${sendAmount} DESO to ${sendKey}`);
           }
         }
 
         //if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
-          outputs.push(`$CLOUT to ${this.transaction.publicKey}`);
+          outputs.push(`$DESO to ${this.transaction.publicKey}`);
         }
 
         description = `send ${outputs.join(', ')}`;
