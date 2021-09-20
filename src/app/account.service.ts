@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, DerivedUserInfo, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, Network, DerivedUserInfo, PrivateUserInfo, PrivateUserVersion, PublicUserInfo} from '../types/identity';
 import {CookieService} from 'ngx-cookie';
+import HDKey from 'hdkey';
 import {EntropyService} from './entropy.service';
 import {SigningService} from './signing.service';
 import sha256 from 'sha256';
@@ -27,7 +28,7 @@ export class AccountService {
     private signingService: SigningService
   ) { }
 
-  // Getters
+  // Public Getters
 
   getPublicKeys(): any {
     return Object.keys(this.getPrivateUsers());
@@ -51,6 +52,8 @@ export class AccountService {
       publicUsers[publicKey] = {
         hasExtraText: privateUser.extraText?.length > 0,
         btcDepositAddress: privateUser.btcDepositAddress,
+        ethDepositAddress: privateUser.ethDepositAddress,
+        version: privateUser.version,
         encryptedSeedHex,
         network: privateUser.network,
         accessLevel,
@@ -115,18 +118,23 @@ export class AccountService {
     };
   }
 
-  // Modifiers
+  // Public Modifiers
 
-  addUser(userInfo: PrivateUserInfo): string {
-    const privateUsers = this.getPrivateUsersRaw();
-    const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
-    const publicKey = this.cryptoService.privateKeyToBitcloutPublicKey(privateKey, userInfo.network);
+  addUser(keychain: HDKey, mnemonic: string, extraText: string, network: Network, google?: boolean): string {
+    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
+    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
+    const ethDepositAddress = this.cryptoService.seedHexToEthAddress(seedHex);
 
-    privateUsers[publicKey] = userInfo;
-
-    localStorage.setItem(AccountService.usersStorageKey, JSON.stringify(privateUsers));
-
-    return publicKey;
+    return this.addPrivateUser({
+      seedHex,
+      mnemonic,
+      extraText,
+      btcDepositAddress,
+      ethDepositAddress,
+      network,
+      google,
+      version: PrivateUserVersion.V1,
+    });
   }
 
   deleteUser(publicKey: string): void {
@@ -134,7 +142,7 @@ export class AccountService {
 
     delete privateUsers[publicKey];
 
-    localStorage.setItem(AccountService.usersStorageKey, JSON.stringify(privateUsers));
+    this.setPrivateUsersRaw(privateUsers);
   }
 
   setAccessLevel(publicKey: string, hostname: string, accessLevel: AccessLevel): void {
@@ -146,7 +154,48 @@ export class AccountService {
     localStorage.setItem(AccountService.levelsStorageKey, JSON.stringify(levels));
   }
 
-  // Private / Sensitive
+  // Migrations
+
+  migrate(): void {
+    const privateUsers = this.getPrivateUsersRaw();
+
+    for (const publicKey of Object.keys(privateUsers)) {
+      const privateUser = privateUsers[publicKey];
+
+      // Migrate from null to V0
+      if (privateUser.version == null) {
+        // Add version field
+        privateUser.version = PrivateUserVersion.V0;
+      }
+
+      // Migrate from V0 -> V1
+      if (privateUser.version == PrivateUserVersion.V0) {
+        // Add ethDepositAddress field
+        privateUser.ethDepositAddress = this.cryptoService.seedHexToEthAddress(privateUser.seedHex);
+
+        // Increment version
+        privateUser.version = PrivateUserVersion.V1;
+      }
+
+      privateUsers[publicKey] = privateUser;
+    }
+
+    this.setPrivateUsersRaw(privateUsers);
+  }
+
+  // Private Getters and Modifiers
+
+  private addPrivateUser(userInfo: PrivateUserInfo): string {
+    const privateUsers = this.getPrivateUsersRaw();
+    const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
+    const publicKey = this.cryptoService.privateKeyToBitcloutPublicKey(privateKey, userInfo.network);
+
+    privateUsers[publicKey] = userInfo;
+
+    this.setPrivateUsersRaw(privateUsers);
+
+    return publicKey;
+  }
 
   private getPrivateUsers(): {[key: string]: PrivateUserInfo} {
     const privateUsers = this.getPrivateUsersRaw();
@@ -174,5 +223,9 @@ export class AccountService {
 
   private getPrivateUsersRaw(): {[key: string]: PrivateUserInfo} {
     return JSON.parse(localStorage.getItem(AccountService.usersStorageKey) || '{}');
+  }
+
+  private setPrivateUsersRaw(privateUsers: {[key: string]: PrivateUserInfo}): void {
+    localStorage.setItem(AccountService.usersStorageKey, JSON.stringify(privateUsers));
   }
 }

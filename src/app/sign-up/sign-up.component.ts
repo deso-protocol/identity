@@ -8,6 +8,7 @@ import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import {TextService} from '../text.service';
 import * as bip39 from "bip39";
+import { PrivateUserVersion } from 'src/types/identity';
 
 @Component({
   selector: 'app-sign-up',
@@ -77,17 +78,12 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   stepTwoNext(): void {
     const network = this.globalVars.network;
-    const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonicCheck, this.extraTextCheck);
-    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
+    const mnemonic = this.mnemonicCheck;
+    const extraText = this.extraTextCheck;
+    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
 
-    this.publicKeyAdded = this.accountService.addUser({
-      seedHex,
-      mnemonic: this.mnemonicCheck,
-      extraText: this.extraTextCheck,
-      btcDepositAddress,
-      network,
-    });
+    this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
+
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
