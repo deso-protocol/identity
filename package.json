@@ -27,7 +27,7 @@
     "bip39": "^3.0.3",
     "crypto-browserify": "^3.12.0",
     "elliptic": "^6.5.4",
-    "hdkey": "github:bitclout/hdkey",
+    "hdkey": "github:deso-protocol/hdkey",
     "jsonwebtoken": "^8.5.1",
     "key-encoder": "^2.0.3",
     "ngx-bootstrap": "^6.2.0",

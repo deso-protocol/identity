@@ -76,7 +76,7 @@ export class AccountService {
   addUser(userInfo: PrivateUserInfo): string {
     const privateUsers = this.getPrivateUsersRaw();
     const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
-    const publicKey = this.cryptoService.privateKeyToBitcloutPublicKey(privateKey, userInfo.network);
+    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, userInfo.network);
 
     privateUsers[publicKey] = userInfo;
 
