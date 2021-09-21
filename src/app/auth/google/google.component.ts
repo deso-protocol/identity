@@ -24,7 +24,7 @@ export class GoogleComponent implements OnInit {
   seedCopied = false;
   publicKey = '';
   mnemonic = '';
-  showGetFreeCLOUT = false;
+  showGetFreeDESO = false;
   environment = environment;
 
   constructor(
@@ -46,7 +46,7 @@ export class GoogleComponent implements OnInit {
   }
 
   downloadSeed(): void {
-    this.textService.downloadText(this.mnemonic, 'bitclout-seed.txt');
+    this.textService.downloadText(this.mnemonic, 'deso-seed.txt');
   }
 
   printSeed(): void {
@@ -132,7 +132,7 @@ export class GoogleComponent implements OnInit {
 
   startJumio(): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-    this.showGetFreeCLOUT = true;
+    this.showGetFreeDESO = true;
   }
 
   finishFlow(signedUp: boolean): void {

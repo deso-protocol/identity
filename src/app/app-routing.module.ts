@@ -22,6 +22,8 @@ export class RouteNames {
   public static AUTH_GOOGLE = 'auth/google';
   public static JUMIO_SUCCESS = 'jumio-success';
   public static JUMIO_ERROR = 'jumio-error';
+  public static GET_FREE_DESO = 'get-free-deso';
+  // Deprecated route - redirects to get-free-deso 
   public static GET_FREE_CLOUT = 'get-free-clout';
 }
 
@@ -36,7 +38,10 @@ const routes: Routes = [
   { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
   { path: RouteNames.JUMIO_SUCCESS, component: JumioSuccessComponent, pathMatch: 'full'},
   { path: RouteNames.JUMIO_ERROR, component: JumioErrorComponent, pathMatch: 'full' },
-  { path: RouteNames.GET_FREE_CLOUT, component: JumioComponent, pathMatch: 'full' },
+  { path: RouteNames.GET_FREE_DESO, component: JumioComponent, pathMatch: 'full' },
+  // redirect to get-free-deso page
+  { path: RouteNames.GET_FREE_CLOUT, redirectTo: RouteNames.GET_FREE_DESO, pathMatch: 'full' },
+
 ];
 
 @NgModule({

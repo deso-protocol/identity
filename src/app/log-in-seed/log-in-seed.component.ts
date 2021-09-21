@@ -66,7 +66,7 @@ export class LogInSeedComponent implements OnInit {
       const network = this.globalVars.network;
       const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
       const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-      const publicKey = this.cryptoService.privateKeyToBitcloutPublicKey(privateKey, network);
+      const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, network);
 
       // We only want to add nonStandard derivations if the account is worth importing
       this.backendApi.GetUsersStateless([publicKey]).subscribe(res => {

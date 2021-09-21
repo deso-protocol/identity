@@ -137,16 +137,16 @@ export class TransactionMetadataCreatorCoin extends BinaryRecord {
   operationType: number = 0;
 
   @Transcode(Uvarint64)
-  bitcloutToSellNanos: number = 0;
+  desoToSellNanos: number = 0;
 
   @Transcode(Uvarint64)
   creatorCoinToSellNanos: number = 0;
 
   @Transcode(Uvarint64)
-  bitcloutToAddNanos: number = 0;
+  desoToAddNanos: number = 0;
 
   @Transcode(Uvarint64)
-  minBitcloutExpectedNanos: number = 0;
+  minDeSoExpectedNanos: number = 0;
 
   @Transcode(Uvarint64)
   minCreatorCoinExpectedNanos: number = 0;

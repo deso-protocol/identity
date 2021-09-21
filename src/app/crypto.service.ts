@@ -23,11 +23,11 @@ export class CryptoService {
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
       bitcoin: [0x00],
-      bitclout: [0xcd, 0x14, 0x0],
+      deso: [0xcd, 0x14, 0x0],
     },
     testnet: {
       bitcoin: [0x6f],
-      bitclout: [0x11, 0xc2, 0x0],
+      deso: [0x11, 0xc2, 0x0],
     }
   };
 
@@ -142,8 +142,8 @@ export class CryptoService {
     return ec.keyFromPrivate(seedHex);
   }
 
-  privateKeyToBitcloutPublicKey(privateKey: EC.KeyPair, network: Network): string {
-    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitclout;
+  privateKeyToDeSoPublicKey(privateKey: EC.KeyPair, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
     const key = privateKey.getPublic().encode('array', true);
     const prefixAndKey = Uint8Array.from([...prefix, ...key]);
 

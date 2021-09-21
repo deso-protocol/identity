@@ -89,8 +89,8 @@ export class AppComponent implements OnInit {
     }
 
     this.backendApiService.GetAppState().subscribe((res) => {
-      this.globalVars.jumioBitCloutNanos = res.JumioBitCloutNanos;
-      this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerBitCloutExchangeRate / 100);
+      this.globalVars.jumioDeSoNanos = res.JumioDeSoNanos;
+      this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
     });
   }
 }
