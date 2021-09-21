@@ -3,17 +3,29 @@ export interface PrivateUserInfo {
   mnemonic: string;
   extraText: string;
   btcDepositAddress: string;
+  ethDepositAddress: string;
   network: Network;
   google?: boolean;
+  version: PrivateUserVersion;
+}
+
+export enum PrivateUserVersion {
+  // Adds "version"
+  V0 = 0,
+
+  // Adds "ethDepositAddress"
+  V1 = 1,
 }
 
 export interface PublicUserInfo {
   hasExtraText: boolean;
   btcDepositAddress: string;
+  ethDepositAddress: string;
   encryptedSeedHex: string;
   network: Network;
   accessLevel: AccessLevel;
   accessLevelHmac: string;
+  version: PrivateUserVersion;
 }
 
 export enum Network {

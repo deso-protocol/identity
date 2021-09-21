@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 import {GlobalVarsService} from './global-vars.service';
 import {IdentityService} from './identity.service';
 import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
+import { AccountService } from './account.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   loading = true;
 
   constructor(
-    private activatedRoute: ActivatedRoute,
+    private accountService: AccountService,
     private globalVars: GlobalVarsService,
     private identityService: IdentityService,
     private backendApiService: BackendAPIService,
@@ -35,11 +35,9 @@ export class AppComponent implements OnInit {
     }
 
     const accessLevelRequest = params.get('accessLevelRequest');
-
     if (accessLevelRequest) {
       this.globalVars.accessLevelRequest = parseInt(accessLevelRequest, 10);
     }
-
 
     const stateParamsFromGoogle = getStateParamsFromGoogle(hashParams);
     if (params.get('webview') || stateParamsFromGoogle.webview) {
@@ -72,6 +70,9 @@ export class AppComponent implements OnInit {
       });
     }
     
+    // Migrate all accounts
+    this.accountService.migrate();
+
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
