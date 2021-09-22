@@ -62,7 +62,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   stepOneDownload(): void {
     const contents = `${this.entropyService.temporaryEntropy?.mnemonic}\n\n${this.entropyService.temporaryEntropy?.extraText}`;
-    this.textService.downloadText(contents, 'bitclout-seed.txt');
+    this.textService.downloadText(contents, 'deso-seed.txt');
   }
 
   stepOnePrint(): void {

@@ -19,12 +19,11 @@ export class GlobalVarsService {
   hideJumio = false;
 
   callback: URL | null = null;
-
-  jumioBitCloutNanos: number = 0;
+  jumioDeSoNanos: number = 0;
   referralUSDCents: number = 0;
 
-  referralHashBase58: string = "";
-  
+  referralHashBase58: string = '';
+
   constructor() { }
 
   isFullAccessHostname(): boolean {
@@ -50,9 +49,9 @@ export class GlobalVarsService {
   }
 
   nanosPerUSDExchangeRate: number = 0;
-  nanosToBitCloutMemo = {};
+  nanosToDeSoMemo = {};
 
-  nanosToBitClout(nanos: number, maximumFractionDigits: number = 2): string {
+  nanosToDeSo(nanos: number, maximumFractionDigits: number = 2): string {
     if (!maximumFractionDigits && nanos > 0) {
       // maximumFractionDigits defaults to 3.
       // Set it higher only if we have very small amounts.
@@ -100,7 +99,7 @@ export class GlobalVarsService {
     });
   }
 
-  getFreeCloutMessage(): string {
-    return this.referralUSDCents ? this.formatUSD(this.referralUSDCents / 100, 0) : this.nanosToUSD(this.jumioBitCloutNanos, 0);
+  getFreeDESOMessage(): string {
+    return this.referralUSDCents ? this.formatUSD(this.referralUSDCents / 100, 0) : this.nanosToUSD(this.jumioDeSoNanos, 0);
   }
 }

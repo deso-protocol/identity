@@ -7,7 +7,7 @@
 
 <div *ngIf="!loading">
   <app-banner></app-banner>
-  <div class="container home-container" *ngIf="!showGetFreeCLOUT">
+  <div class="container home-container" *ngIf="!showGetFreeDESO">
     <div class="fs-24px font-weight-bold pt-15px">Optional: Save your recovery code</div>
     <div class="fs-18px mt-15px">You can use this seed phrase to login if you lose access to your Google account.</div>
     <div class="fc-red fs-18px pt-15px">Do not share this with anyone.</div>
@@ -34,11 +34,11 @@
         Continue to {{ globalVars.hostname }}
       </button>
       <button (click)="startJumio()" class="btn btn-primary font-weight-bold fs-15px sign-up-btn" *ngIf="globalVars.showJumio()">
-        Get  <b>{{ globalVars.getFreeCloutMessage() }} Free</b>
+        Get  <b>{{ globalVars.getFreeDESOMessage() }} Free</b>
       </button>
     </div>
   </div>
-  <div class="container home-container" *ngIf="showGetFreeCLOUT">
+  <div class="container home-container" *ngIf="showGetFreeDESO">
     <app-jumio [publicKey]="publicKey" (skipJumio)="finishFlow(true)" [autoOpenJumio]="false"></app-jumio>
   </div>
 </div>
