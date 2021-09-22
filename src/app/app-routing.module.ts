@@ -12,6 +12,7 @@ import {DeriveComponent} from './derive/derive.component';
 import {JumioSuccessComponent} from './jumio/jumio-success/jumio-success.component';
 import {JumioErrorComponent} from './jumio/jumio-error/jumio-error.component';
 import {JumioComponent} from './jumio/jumio.component';
+import {SharedSecretComponent} from './shared-secret/shared-secret.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -43,6 +44,7 @@ const routes: Routes = [
   { path: RouteNames.JUMIO_SUCCESS, component: JumioSuccessComponent, pathMatch: 'full'},
   { path: RouteNames.JUMIO_ERROR, component: JumioErrorComponent, pathMatch: 'full' },
   { path: RouteNames.GET_FREE_DESO, component: JumioComponent, pathMatch: 'full' },
+  { path: RouteNames.GET_SHARED_SECRETS, component: SharedSecretComponent, pathMatch: 'full'},
   // redirect to get-free-deso page
   { path: RouteNames.GET_FREE_CLOUT, redirectTo: RouteNames.GET_FREE_DESO, pathMatch: 'full' },
 

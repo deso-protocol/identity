@@ -12,6 +12,13 @@ interface UserProfile {
   profilePic: any;
 }
 
+interface DerivedKey {
+  derivedPublicKeyBase58Check: string;
+  ownerPublicKeyBase58Check: string;
+  expirationBlock: number;
+  isValid: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -113,6 +120,32 @@ export class BackendAPIService {
   GetReferralInfoForReferralHash(ReferralHash: string): Observable<any> {
     return this.httpClient.post<any>(`${this.endpoint}/get-referral-info-for-referral-hash`, {
       ReferralHash,
+    });
+  }
+
+  GetUserDerivedKeys(
+    ownerPublicKey: string
+  ): Observable< { [key: string]: DerivedKey } > {
+    return new Observable<{ [key: string]: DerivedKey }>(subscriber => {
+      this.httpClient.post<any>(
+        `${this.endpoint}/get-user-derived-keys`,
+        {
+          PublicKeyBase58Check: ownerPublicKey,
+        },
+      ).subscribe(res => {
+        const derivedKeys: { [key: string]: DerivedKey } = {};
+        for (const derivedKey in res.DerivedKeys) {
+          if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
+            derivedKeys[res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check] = {
+              derivedPublicKeyBase58Check: res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
+              ownerPublicKeyBase58Check: res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
+              expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
+              isValid: res.DerivedKeys[derivedKey]?.IsValid,
+            };
+          }
+        }
+        subscriber.next(derivedKeys);
+      });
     });
   }
 }

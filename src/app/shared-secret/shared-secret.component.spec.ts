@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GetSharedSecretComponent } from './get-shared-secret.component';
+import { SharedSecretComponent } from './shared-secret.component';
 
-describe('GetSharedSecretComponent', () => {
-  let component: GetSharedSecretComponent;
-  let fixture: ComponentFixture<GetSharedSecretComponent>;
+describe('SharedSecretComponent', () => {
+  let component: SharedSecretComponent;
+  let fixture: ComponentFixture<SharedSecretComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GetSharedSecretComponent ]
+      declarations: [ SharedSecretComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GetSharedSecretComponent);
+    fixture = TestBed.createComponent(SharedSecretComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

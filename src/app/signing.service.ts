@@ -64,7 +64,7 @@ export class SigningService {
   // }[]
   decryptMessages(seedHex: string, encryptedMessages: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {

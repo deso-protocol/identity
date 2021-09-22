@@ -37,6 +37,7 @@ export interface DerivedUserInfo {
   network: Network;
   accessSignature: string;
   jwt: string;
+  derivedJwt: string;
 }
 
 export enum Network {
