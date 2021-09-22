@@ -268,6 +268,20 @@ export class TransactionMetadataBurnNFT extends BinaryRecord {
   serialNumber: number = 0;
 }
 
+export class TransactionMetadataAuthorizeDerivedKey extends BinaryRecord {
+  @Transcode(VarBuffer)
+  derivedPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  expirationBlock: number = 0;
+
+  @Transcode(Uint8)
+  operationType: number = 0;
+
+  @Transcode(VarBuffer)
+  accessSignature: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -282,13 +296,14 @@ export const TransactionTypeMetadataMap = {
   12: TransactionMetadataSwapIdentity,
   13: TransactionMetadataUpdateGlobalParams,
   14: TransactionMetadataCreatorCoinTransfer,
-	15: TransactionMetadataCreateNFT,
-	16: TransactionMetadataUpdateNFT,
-	17: TransactionMetadataAcceptNFTBid,
-	18: TransactionMetadataNFTBid,
-	19: TransactionMetadataNFTTransfer,
-	20: TransactionMetadataAcceptNFTTransfer,
-	21: TransactionMetadataBurnNFT,
+  15: TransactionMetadataCreateNFT,
+  16: TransactionMetadataUpdateNFT,
+  17: TransactionMetadataAcceptNFTBid,
+  18: TransactionMetadataNFTBid,
+  19: TransactionMetadataNFTTransfer,
+  20: TransactionMetadataAcceptNFTTransfer,
+  21: TransactionMetadataBurnNFT,
+  22: TransactionMetadataAuthorizeDerivedKey,
 };
 
 export class Transaction<T> extends BinaryRecord {
