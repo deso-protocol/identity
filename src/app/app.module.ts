@@ -24,6 +24,7 @@ import { JumioComponent } from './jumio/jumio.component';
 import { JumioSuccessComponent } from './jumio/jumio-success/jumio-success.component';
 import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
 import { ErrorCallbackComponent } from './error-callback/error-callback.component';
+import { GetSharedSecretComponent } from './get-shared-secret/get-shared-secret.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { ErrorCallbackComponent } from './error-callback/error-callback.componen
     JumioSuccessComponent,
     JumioErrorComponent,
     ErrorCallbackComponent,
+    GetSharedSecretComponent,
   ],
   imports: [
     BrowserModule,

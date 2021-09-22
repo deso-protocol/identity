@@ -25,7 +25,8 @@ export class RouteNames {
   public static JUMIO_SUCCESS = 'jumio-success';
   public static JUMIO_ERROR = 'jumio-error';
   public static GET_FREE_DESO = 'get-free-deso';
-  // Deprecated route - redirects to get-free-deso 
+  public static GET_SHARED_SECRETS = 'get-shared-secrets';
+  // Deprecated route - redirects to get-free-deso
   public static GET_FREE_CLOUT = 'get-free-clout';
 }
 
