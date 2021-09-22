@@ -91,7 +91,7 @@ export class AccountService {
     const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
     const derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
     const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
-    const derivedPublicKey = this.cryptoService.privateKeyToBitcloutPublicKey(derivedPrivateKey, privateUser.network);
+    const derivedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, privateUser.network);
 
     // By default we authorize this derived key for 10,000 blocks.
     const expirationBlock = blockHeight + 10000;
