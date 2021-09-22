@@ -22,7 +22,12 @@ import {
   TransactionMetadataUpdateProfile,
   TransactionMetadataNFTTransfer,
   TransactionMetadataAcceptNFTTransfer,
-  TransactionMetadataBurnNFT
+  TransactionMetadataBurnNFT,
+  TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataNFTBid,
+  TransactionMetadataAcceptNFTBid,
+  TransactionMetadataUpdateNFT,
+  TransactionMetadataCreateNFT
 } from '../lib/deso/transaction';
 
 @Injectable({
@@ -218,9 +223,14 @@ export class IdentityService {
       case TransactionMetadataSwapIdentity:
       case TransactionMetadataUpdateGlobalParams:
       case TransactionMetadataUpdateProfile:
+      case TransactionMetadataCreateNFT:
+      case TransactionMetadataUpdateNFT:
+      case TransactionMetadataAcceptNFTBid:
+      case TransactionMetadataNFTBid:
       case TransactionMetadataNFTTransfer:
       case TransactionMetadataAcceptNFTTransfer:
       case TransactionMetadataBurnNFT:
+      case TransactionMetadataAuthorizeDerivedKey:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

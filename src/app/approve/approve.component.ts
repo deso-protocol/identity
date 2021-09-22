@@ -24,7 +24,8 @@ import {
   TransactionMetadataAcceptNFTBid,
   TransactionMetadataNFTTransfer,
   TransactionMetadataAcceptNFTTransfer,
-  TransactionMetadataBurnNFT
+  TransactionMetadataBurnNFT,
+  TransactionMetadataAuthorizeDerivedKey
 } from '../../lib/deso/transaction';
 import {SigningService} from '../signing.service';
 import bs58check from 'bs58check';
@@ -193,6 +194,14 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataBurnNFT:
         description = 'burn an NFT';
+        break;
+
+      case TransactionMetadataAuthorizeDerivedKey:
+        if (this.transaction.metadata.operationType === 0){
+          description = 'de-authorize a derived key';
+        }  else if (this.transaction.metadata.operationType === 1){
+          description = 'authorize a derived key';
+        }
         break;
     }
 
