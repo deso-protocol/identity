@@ -16,6 +16,7 @@ export class RouteNames {
   public static EMBED = 'embed';
   public static LOGOUT = 'logout';
   public static SIGN_UP = 'sign-up';
+  public static CLEAR_ACCOUNT = 'clear-account';
   public static LOG_IN = 'log-in';
   public static LOAD_SEED = 'load-seed';
   public static APPROVE = 'approve';
@@ -33,7 +34,16 @@ const routes: Routes = [
   { path: RouteNames.LOGOUT, component: LogoutComponent, pathMatch: 'full' },
   { path: RouteNames.SIGN_UP, component: SignUpComponent, pathMatch: 'full' },
   { path: RouteNames.LOG_IN, component: LogInComponent, pathMatch: 'full' },
-  { path: RouteNames.LOAD_SEED, component: LogInSeedComponent, pathMatch: 'full' },
+  {
+    path: RouteNames.CLEAR_ACCOUNT,
+    component: ClearAccountComponent,
+    pathMatch: 'full',
+  },
+  {
+    path: RouteNames.LOAD_SEED,
+    component: LogInSeedComponent,
+    pathMatch: 'full',
+  },
   { path: RouteNames.APPROVE, component: ApproveComponent, pathMatch: 'full' },
   { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
   { path: RouteNames.JUMIO_SUCCESS, component: JumioSuccessComponent, pathMatch: 'full'},
@@ -46,6 +56,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

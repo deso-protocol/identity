@@ -1,0 +1,56 @@
+<app-banner></app-banner>
+
+<div
+  class="container home-container"
+  *ngIf="globalVars.inTab || globalVars.webview"
+>
+  <div class="font-weight-bold fs-30px mb-20px">Clear Login Data</div>
+  <div class="fs-15px">
+    Confirming this step will remove your login data from your browser. If you
+    use a seedphrase to login to your account, make sure you have recorded this
+    securely.
+  </div>
+  <div class="fc-red fs-18px pt-15px">
+    Enter "<b>I understand log me out</b>" to confirm you want to clear your
+    login data.
+  </div>
+  <div class="form-group pt-10px">
+    <textarea
+      [(ngModel)]="clearAccountCheck"
+      class="form-control fs-15px"
+      rows="4"
+    ></textarea>
+  </div>
+  <div class="d-flex align-items-center" style="margin-top: -15px">
+    <div class="fs-12px mt-15px text-grey6">
+      By proceeding, you agree that you will need to re-enter your seed phrase
+      on login to access your account.
+    </div>
+  </div>
+  <div class="d-flex pt-15px justify-content-between">
+    <button
+      class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn"
+      [routerLink]="['/log-in']"
+    >
+      Back
+    </button>
+    <div>
+      <button
+        *ngIf="clearAccountCheck == 'I understand log me out'"
+        (click)="clearAccounts()"
+        class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn"
+        [routerLink]="['/log-in']"
+      >
+        Confirm
+      </button>
+      <!-- Show blocked button if text entered does not equal required text-->
+      <button
+        *ngIf="clearAccountCheck !== 'I understand log me out'"
+        class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn"
+        disabled
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
