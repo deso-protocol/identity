@@ -89,6 +89,7 @@ export class AppComponent implements OnInit {
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // If callback is set, we won't be sending the initialize message.
       if (this.isCallbackValid) {
+        this.globalVars.hostname = 'localhost';
         this.loading = false;
       } else {
         // We must be running in a webview OR opened with window.open OR in an iframe to initialize
