@@ -8,6 +8,9 @@ import {LogInComponent} from './log-in/log-in.component';
 import {ApproveComponent} from './approve/approve.component';
 import {LogInSeedComponent} from './log-in-seed/log-in-seed.component';
 import {GoogleComponent} from './auth/google/google.component';
+import {JumioSuccessComponent} from './jumio/jumio-success/jumio-success.component';
+import {JumioErrorComponent} from './jumio/jumio-error/jumio-error.component';
+import {JumioComponent} from './jumio/jumio.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -17,6 +20,11 @@ export class RouteNames {
   public static LOAD_SEED = 'load-seed';
   public static APPROVE = 'approve';
   public static AUTH_GOOGLE = 'auth/google';
+  public static JUMIO_SUCCESS = 'jumio-success';
+  public static JUMIO_ERROR = 'jumio-error';
+  public static GET_FREE_DESO = 'get-free-deso';
+  // Deprecated route - redirects to get-free-deso 
+  public static GET_FREE_CLOUT = 'get-free-clout';
 }
 
 const routes: Routes = [
@@ -28,6 +36,12 @@ const routes: Routes = [
   { path: RouteNames.LOAD_SEED, component: LogInSeedComponent, pathMatch: 'full' },
   { path: RouteNames.APPROVE, component: ApproveComponent, pathMatch: 'full' },
   { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
+  { path: RouteNames.JUMIO_SUCCESS, component: JumioSuccessComponent, pathMatch: 'full'},
+  { path: RouteNames.JUMIO_ERROR, component: JumioErrorComponent, pathMatch: 'full' },
+  { path: RouteNames.GET_FREE_DESO, component: JumioComponent, pathMatch: 'full' },
+  // redirect to get-free-deso page
+  { path: RouteNames.GET_FREE_CLOUT, redirectTo: RouteNames.GET_FREE_DESO, pathMatch: 'full' },
+
 ];
 
 @NgModule({

@@ -9,7 +9,9 @@ import {GoogleDriveService} from '../../google-drive.service';
 import {GlobalVarsService} from '../../global-vars.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../../text.service';
-import {GoogleAuthState} from '../../../types/identity';
+import {GoogleAuthState, PrivateUserInfo} from '../../../types/identity';
+import {environment} from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-google',
@@ -22,6 +24,8 @@ export class GoogleComponent implements OnInit {
   seedCopied = false;
   publicKey = '';
   mnemonic = '';
+  showGetFreeDESO = false;
+  environment = environment;
 
   constructor(
     private accountService: AccountService,
@@ -42,7 +46,7 @@ export class GoogleComponent implements OnInit {
   }
 
   downloadSeed(): void {
-    this.textService.downloadText(this.mnemonic, 'bitclout-seed.txt');
+    this.textService.downloadText(this.mnemonic, 'deso-seed.txt');
   }
 
   printSeed(): void {
@@ -76,7 +80,12 @@ export class GoogleComponent implements OnInit {
     for (const file of files) {
       this.googleDrive.getFile(file.id).subscribe(fileContents => {
         try {
-          this.publicKey = this.accountService.addUser(fileContents);
+          const mnemonic = fileContents.mnemonic;
+          const extraText = fileContents.extraText;
+          const network = fileContents.network;
+          const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+
+          this.publicKey = this.accountService.addUser(keychain, mnemonic, extraText, network, true);
         } catch (err) {
           console.error(err);
         }
@@ -107,23 +116,23 @@ export class GoogleComponent implements OnInit {
     const mnemonic = this.mnemonic;
     const extraText = '';
     const network = this.globalVars.network;
-    const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonic, extraText);
-    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
 
     const userInfo = {
       mnemonic,
       extraText,
-      seedHex,
-      btcDepositAddress,
       network,
-      google: true,
     };
 
     this.googleDrive.uploadFile(this.fileName(), JSON.stringify(userInfo)).subscribe(() => {
-      this.publicKey = this.accountService.addUser(userInfo);
+      const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+      this.publicKey = this.accountService.addUser(keychain, mnemonic, extraText, network, true);
       this.loading = false;
     });
+  }
+
+  startJumio(): void {
+    this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    this.showGetFreeDESO = true;
   }
 
   finishFlow(signedUp: boolean): void {

@@ -19,8 +19,11 @@ import {
   TransactionMetadataSwapIdentity,
   TransactionMetadataUpdateBitcoinUSDExchangeRate,
   TransactionMetadataUpdateGlobalParams,
-  TransactionMetadataUpdateProfile
-} from '../lib/bitclout/transaction';
+  TransactionMetadataUpdateProfile,
+  TransactionMetadataNFTTransfer,
+  TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataBurnNFT
+} from '../lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +62,7 @@ export class IdentityService {
     publicKeyAdded?: string,
     signedUp?: boolean
     signedTransactionHex?: string,
+    jumioSuccess?: boolean,
   }): void {
     this.cast('login', payload);
   }
@@ -166,8 +170,8 @@ export class IdentityService {
     }
 
     // check for cookie access
-    this.cookieService.put('bitclout-test-access', 'true');
-    const hasCookieAccess = !!this.cookieService.get('bitclout-test-access');
+    this.cookieService.put('deso-test-access', 'true');
+    const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
     // store if browser is supported or not
     this.browserSupported = hasCookieAccess || hasLocalStorageAccess;
@@ -194,12 +198,15 @@ export class IdentityService {
       case TransactionMetadataCreatorCoinTransfer:
       case TransactionMetadataSwapIdentity:
       case TransactionMetadataUpdateGlobalParams:
+      case TransactionMetadataUpdateProfile:
+      case TransactionMetadataNFTTransfer:
+      case TransactionMetadataAcceptNFTTransfer:
+      case TransactionMetadataBurnNFT:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:
       case TransactionMetadataPrivateMessage:
       case TransactionMetadataSubmitPost:
-      case TransactionMetadataUpdateProfile:
       case TransactionMetadataLike:
         return AccessLevel.ApproveLarge;
     }
@@ -320,12 +327,12 @@ export class IdentityService {
   // Post message to correct client
   private postMessage(message: any): void {
     if (this.globalVars.webview) {
-      if (this.currentWindow.webkit?.messageHandlers?.bitcloutIdentityAppInterface !== undefined) {
-        // iOS Webview with registered "bitcloutIdentityAppInterface" handler
-        this.currentWindow.webkit.messageHandlers.bitcloutIdentityAppInterface.postMessage(message, '*');
-      } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
-        // Android Webview with registered "bitcloutIdentityAppInterface" handler
-        this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+      if (this.currentWindow.webkit?.messageHandlers?.desoIdentityAppInterface !== undefined) {
+        // iOS Webview with registered "desoIdentityAppInterface" handler
+        this.currentWindow.webkit.messageHandlers.desoIdentityAppInterface.postMessage(message, '*');
+      } else if (this.currentWindow.desoIdentityAppInterface !== undefined) {
+        // Android Webview with registered "desoIdentityAppInterface" handler
+        this.currentWindow.desoIdentityAppInterface.postMessage(JSON.stringify(message), '*');
       } else if (this.currentWindow.ReactNativeWebView !== undefined) {
         // React Native Webview with registered "ReactNativeWebView" handler
         this.currentWindow.ReactNativeWebView.postMessage(JSON.stringify(message));

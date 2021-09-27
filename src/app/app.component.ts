@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 import {GlobalVarsService} from './global-vars.service';
 import {IdentityService} from './identity.service';
 import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
+import {BackendAPIService} from './backend-api.service';
+import { AccountService } from './account.service';
 
 @Component({
   selector: 'app-root',
@@ -16,9 +17,10 @@ export class AppComponent implements OnInit {
   loading = true;
 
   constructor(
-    private activatedRoute: ActivatedRoute,
+    private accountService: AccountService,
     private globalVars: GlobalVarsService,
     private identityService: IdentityService,
+    private backendApiService: BackendAPIService,
   ) { }
 
   ngOnInit(): void {
@@ -33,11 +35,9 @@ export class AppComponent implements OnInit {
     }
 
     const accessLevelRequest = params.get('accessLevelRequest');
-
     if (accessLevelRequest) {
       this.globalVars.accessLevelRequest = parseInt(accessLevelRequest, 10);
     }
-
 
     const stateParamsFromGoogle = getStateParamsFromGoogle(hashParams);
     if (params.get('webview') || stateParamsFromGoogle.webview) {
@@ -51,6 +51,27 @@ export class AppComponent implements OnInit {
     if (params.get('hideGoogle')) {
       this.globalVars.hideGoogle = true;
     }
+    
+    if (params.get('hideJumio')) {
+      this.globalVars.hideJumio = true;
+    }
+    
+    const referralCode = params.get('referralCode')
+    if (referralCode) {
+      this.globalVars.referralHashBase58 = referralCode;
+      this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
+        const referralInfo = res.ReferralInfoResponse.Info;
+        if (
+          res.ReferralInfoResponse.IsActive &&
+          (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
+        ) {
+          this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
+        }
+      });
+    }
+    
+    // Migrate all accounts
+    this.accountService.migrate();
 
     if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
@@ -66,5 +87,10 @@ export class AppComponent implements OnInit {
       // Identity currently doesn't have any management UIs that can be accessed directly
       window.location.href = `https://${this.globalVars.environment.nodeHostname}`;
     }
+
+    this.backendApiService.GetAppState().subscribe((res) => {
+      this.globalVars.jumioDeSoNanos = res.JumioDeSoNanos;
+      this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
+    });
   }
 }

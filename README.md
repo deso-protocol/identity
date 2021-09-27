@@ -1,6 +1,6 @@
 # Identity
 
-BitClout Identity Service
+DeSo Identity Service
 
 ## Development server
 

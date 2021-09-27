@@ -19,6 +19,9 @@ import { ApproveComponent } from './approve/approve.component';
 import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
 import { GoogleComponent } from './auth/google/google.component';
 import { AvatarDirective } from './avatar/avatar.directive';
+import { JumioComponent } from './jumio/jumio.component';
+import { JumioSuccessComponent } from './jumio/jumio-success/jumio-success.component';
+import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +36,9 @@ import { AvatarDirective } from './avatar/avatar.directive';
     LogInSeedComponent,
     GoogleComponent,
     AvatarDirective,
+    JumioComponent,
+    JumioSuccessComponent,
+    JumioErrorComponent,
   ],
   imports: [
     BrowserModule,

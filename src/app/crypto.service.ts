@@ -8,6 +8,7 @@ import {CookieService} from 'ngx-cookie';
 import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
 import {AccessLevel, Network} from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
+import { Keccak } from 'sha3';
 
 @Injectable({
   providedIn: 'root'
@@ -22,11 +23,11 @@ export class CryptoService {
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
       bitcoin: [0x00],
-      bitclout: [0xcd, 0x14, 0x0],
+      deso: [0xcd, 0x14, 0x0],
     },
     testnet: {
       bitcoin: [0x6f],
-      bitclout: [0x11, 0xc2, 0x0],
+      deso: [0x11, 0xc2, 0x0],
     }
   };
 
@@ -141,8 +142,8 @@ export class CryptoService {
     return ec.keyFromPrivate(seedHex);
   }
 
-  privateKeyToBitcloutPublicKey(privateKey: EC.KeyPair, network: Network): string {
-    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitclout;
+  privateKeyToDeSoPublicKey(privateKey: EC.KeyPair, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
     const key = privateKey.getPublic().encode('array', true);
     const prefixAndKey = Uint8Array.from([...prefix, ...key]);
 
@@ -171,5 +172,37 @@ export class CryptoService {
     const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
 
     return bs58check.encode(prefixAndKey);
+  }
+
+  // NOTE: Our ETH address uses the bitcion/bitclout derivation path, not the ETH path.
+  // This is ugly but we only do it because they're just deposit addresses and we couldn't
+  // backfill this data for existing users because we store the derived private key.
+  // A user can still easily import their account to an ETH client to recover any ETH
+  // by coping the seedHex from local storage.
+  //
+  // We aren't using ethereumjs-util to minimize bundle size and protect from vulnerabilities
+  // until LavaMoat is ready
+  //
+  // Reference implementation: https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L249
+  seedHexToEthAddress(seedHex: string): string {
+    const privateKey = this.seedHexToPrivateKey(seedHex);
+
+    // ETH uses the last 40 characters of the 64 byte SHA3 Keccak 256
+    const uncompressedKey = Buffer.from(privateKey.getPublic(false, 'array').slice(1));
+    const ethAddress = new Keccak(256).update(uncompressedKey).digest('hex').slice(24);
+
+    // EIP-55 requires a checksum. Reference implementation: https://eips.ethereum.org/EIPS/eip-55
+    const checksumHash = new Keccak(256).update(ethAddress).digest('hex');
+    let ethAddressChecksum = '0x';
+
+    for (let i = 0; i < ethAddress.length; i++) {
+      if (parseInt(checksumHash[i], 16) >= 8) {
+        ethAddressChecksum += ethAddress[i].toUpperCase()
+      } else {
+        ethAddressChecksum += ethAddress[i]
+      }
+    }
+  
+    return ethAddressChecksum;
   }
 }

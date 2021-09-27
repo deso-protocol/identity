@@ -8,6 +8,7 @@ import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import {TextService} from '../text.service';
 import * as bip39 from "bip39";
+import { PrivateUserVersion } from 'src/types/identity';
 
 @Component({
   selector: 'app-sign-up',
@@ -19,11 +20,17 @@ export class SignUpComponent implements OnInit, OnDestroy {
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
+  publicKeyAdded = '';
 
   // Advanced tab
   advancedOpen = false;
   showMnemonicError = false;
   showEntropyHexError = false;
+
+  loginMessagePayload: any;
+  environment = environment;
+
+  stepTotal: number;
 
   constructor(
     public entropyService: EntropyService,
@@ -33,7 +40,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
     public globalVars: GlobalVarsService,
     private router: Router,
     private textService: TextService,
-  ) { }
+  ) {
+    this.stepTotal = globalVars.showJumio() ? 3 : 2;
+  }
 
   ngOnInit(): void {
   }
@@ -53,7 +62,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   stepOneDownload(): void {
     const contents = `${this.entropyService.temporaryEntropy?.mnemonic}\n\n${this.entropyService.temporaryEntropy?.extraText}`;
-    this.textService.downloadText(contents, 'bitclout-seed.txt');
+    this.textService.downloadText(contents, 'deso-seed.txt');
   }
 
   stepOnePrint(): void {
@@ -69,29 +78,34 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   stepTwoNext(): void {
     const network = this.globalVars.network;
-    const keychain = this.cryptoService.mnemonicToKeychain(this.mnemonicCheck, this.extraTextCheck);
-    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
+    const mnemonic = this.mnemonicCheck;
+    const extraText = this.extraTextCheck;
+    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
 
-    const publicKeyAdded = this.accountService.addUser({
-      seedHex,
-      mnemonic: this.mnemonicCheck,
-      extraText: this.extraTextCheck,
-      btcDepositAddress,
-      network,
-    });
+    this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
 
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded,
-      signedUp: true,
-    });
+    this.accountService.setAccessLevel(
+      this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+
+    if (!this.globalVars.showJumio()) {
+      this.login();
+    } else {
+      this.stepNum = 3;
+    }
   }
 
   stepTwoBack(): void {
     this.extraTextCheck = '';
     this.mnemonicCheck = '';
     this.stepNum = 1;
+  }
+
+  login(): void {
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded: this.publicKeyAdded,
+      signedUp: true,
+    });
   }
 
   clickTos(): void {
