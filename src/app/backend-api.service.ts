@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
+import { map } from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
@@ -48,26 +49,23 @@ export class BackendAPIService {
   GetUserProfiles(
     publicKeys: any[]
   ): Observable<{[key: string]: UserProfile}> {
-    return new Observable<{[key: string]: UserProfile}>(subscriber => {
       const userProfiles: {[key: string]: any} = {};
-
+      const req = this.GetUsersStateless(publicKeys);
       if (publicKeys.length > 0) {
-        for (const publicKey of publicKeys) {
-          userProfiles[publicKey] = {};
-        }
-        this.GetUsersStateless(publicKeys).subscribe(res => {
-          for (const user of res.UserList) {
-            userProfiles[user.PublicKeyBase58Check] = {
-              username: user.ProfileEntryResponse?.Username,
-              profilePic: user.ProfileEntryResponse?.ProfilePic,
-            };
-          }
-          subscriber.next(userProfiles);
-        });
+        return req.pipe(
+          map( (res): {[key: string]: UserProfile} => {
+            for (const user of res.UserList) {
+              userProfiles[user.PublicKeyBase58Check] = {
+                username: user.ProfileEntryResponse?.Username,
+                profilePic: user.ProfileEntryResponse?.ProfilePic,
+              };
+            }
+            return userProfiles;
+          })
+        );
       } else {
-        subscriber.next(userProfiles);
+        return of(userProfiles);
       }
-    });
   }
 
   GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {

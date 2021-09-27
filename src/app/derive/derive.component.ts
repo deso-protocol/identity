@@ -31,6 +31,7 @@ export class DeriveComponent implements OnInit {
     this.hasUsers = publicKeys.length > 0;
     this.backendApi.GetUserProfiles(publicKeys)
       .subscribe(profiles => {
+        console.log("GetUserProfiles | publicKeys:", publicKeys, "response:", profiles);
         this.allUsers = profiles;
       });
 

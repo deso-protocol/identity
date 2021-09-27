@@ -19,6 +19,7 @@ export class GlobalVarsService {
   hideJumio = false;
 
   callback: URL | null = null;
+  isCallbackValid = true;
   jumioDeSoNanos: number = 0;
   referralUSDCents: number = 0;
 

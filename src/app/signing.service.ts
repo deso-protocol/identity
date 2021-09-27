@@ -116,7 +116,7 @@ export class SigningService {
     return signedTransactionBytes.toString('hex');
   }
 
-  signBurn(seedHex: string, unsignedHashes: string[]): string[] {
+  signHashes(seedHex: string, unsignedHashes: string[]): string[] {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const signedHashes = [];
 

@@ -22,7 +22,7 @@ export class SharedSecretComponent implements OnInit {
     private accountService: AccountService,
     private backendApi: BackendAPIService,
     private cryptoService: CryptoService,
-    private globalVars: GlobalVarsService,
+    public globalVars: GlobalVarsService,
   ) { }
 
   ngOnInit(): void {

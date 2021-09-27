@@ -33,6 +33,7 @@ export interface DerivedUserInfo {
   derivedPublicKey: string;
   publicKey: string;
   btcDepositAddress: string;
+  ethDepositAddress: string;
   expirationBlock: number;
   network: Network;
   accessSignature: string;

@@ -15,7 +15,6 @@ export class AppComponent implements OnInit {
   title = 'identity';
 
   loading = true;
-  isCallbackValid = true;
 
   constructor(
     private accountService: AccountService,
@@ -59,7 +58,7 @@ export class AppComponent implements OnInit {
         this.globalVars.callback = new URL(params.get('callback') as string);
       } catch (err) {
         console.error(err);
-        this.isCallbackValid = false;
+        this.globalVars.isCallbackValid = false;
       }
     }
 
@@ -85,23 +84,20 @@ export class AppComponent implements OnInit {
     // Migrate all accounts
     this.accountService.migrate();
 
-
-    if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
+    if (this.globalVars.isCallbackValid) {
       // If callback is set, we won't be sending the initialize message.
-      if (this.isCallbackValid) {
-        this.globalVars.hostname = 'localhost';
-        this.loading = false;
-      } else {
-        // We must be running in a webview OR opened with window.open OR in an iframe to initialize
-        this.identityService.initialize().subscribe(res => {
-          this.globalVars.hostname = res.hostname;
-          if (this.globalVars.isFullAccessHostname()) {
-            this.globalVars.accessLevelRequest = AccessLevel.Full;
-          }
+      this.globalVars.hostname = 'localhost';
+      this.loading = false;
+    } else if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
+      // We must be running in a webview OR opened with window.open OR in an iframe to initialize
+      this.identityService.initialize().subscribe(res => {
+        this.globalVars.hostname = res.hostname;
+        if (this.globalVars.isFullAccessHostname()) {
+          this.globalVars.accessLevelRequest = AccessLevel.Full;
+        }
 
-          this.loading = false;
-        });
-      }
+        this.loading = false;
+      });
     } else {
       // Identity currently doesn't have any management UIs that can be accessed directly
       window.location.href = `https://${this.globalVars.environment.nodeHostname}`;

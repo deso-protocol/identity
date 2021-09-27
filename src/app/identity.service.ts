@@ -103,7 +103,7 @@ export class IdentityService {
 
     const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedHashes = this.signingService.signBurn(seedHex, unsignedHashes);
+    const signedHashes = this.signingService.signHashes(seedHex, unsignedHashes);
 
     this.respond(id, {
       signedHashes,
