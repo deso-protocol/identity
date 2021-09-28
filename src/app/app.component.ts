@@ -84,7 +84,7 @@ export class AppComponent implements OnInit {
     // Migrate all accounts
     this.accountService.migrate();
 
-    if (this.globalVars.isCallbackValid) {
+    if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
       // If callback is set, we won't be sending the initialize message.
       this.globalVars.hostname = 'localhost';
       this.loading = false;

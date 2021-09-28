@@ -124,14 +124,15 @@ export class BackendAPIService {
   GetUserDerivedKeys(
     ownerPublicKey: string
   ): Observable< { [key: string]: DerivedKey } > {
-    return new Observable<{ [key: string]: DerivedKey }>(subscriber => {
-      this.httpClient.post<any>(
-        `${this.endpoint}/get-user-derived-keys`,
-        {
-          PublicKeyBase58Check: ownerPublicKey,
-        },
-      ).subscribe(res => {
-        const derivedKeys: { [key: string]: DerivedKey } = {};
+    const derivedKeys: { [key: string]: DerivedKey } = {};
+    const req = this.httpClient.post<any>(
+      `${this.endpoint}/get-user-derived-keys`,
+      {
+        PublicKeyBase58Check: ownerPublicKey,
+      },
+    );
+    return req.pipe(
+      map( (res): { [key: string]: DerivedKey } => {
         for (const derivedKey in res.DerivedKeys) {
           if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
             derivedKeys[res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check] = {
@@ -142,8 +143,8 @@ export class BackendAPIService {
             };
           }
         }
-        subscriber.next(derivedKeys);
-      });
-    });
+        return derivedKeys;
+      })
+    );
   }
 }

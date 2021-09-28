@@ -29,6 +29,7 @@ import {
   TransactionMetadataUpdateNFT,
   TransactionMetadataCreateNFT
 } from '../lib/deso/transaction';
+import {HttpParams} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -77,14 +78,13 @@ export class IdentityService {
   }): void {
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
-      let paramString = '?';
+      let httpParams = new HttpParams();
       for (const key in payload.derivedUserInfo) {
         if (payload.derivedUserInfo.hasOwnProperty(key)) {
-          paramString += key + '=' + (payload.derivedUserInfo as any)[key].toString() + '&';
+          httpParams = httpParams.append(key, (payload.derivedUserInfo as any)[key].toString());
         }
       }
-      paramString = paramString.slice(0, -1);
-      window.location.href = this.globalVars.callback.href + paramString;
+      window.location.href = this.globalVars.callback.href + `?${httpParams.toString()}`;
     } else {
       this.cast('derive', payload);
     }

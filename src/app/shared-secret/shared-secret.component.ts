@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AccountService} from '../account.service';
 import {BackendAPIService} from '../backend-api.service';
 import {CryptoService} from '../crypto.service';
 import {GlobalVarsService} from '../global-vars.service';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
+import {HttpParams} from '@angular/common/http';
 
 @Component({
   selector: 'app-shared-secret',
@@ -103,9 +104,9 @@ export class SharedSecretComponent implements OnInit {
               sharedSecrets.push(sharedSecret);
             }
 
-            let paramString = '?sharedSecrets=';
-            paramString += sharedSecrets.toString();
-            window.location.href = (this.globalVars.callback as URL).href + paramString;
+            let httpParams = new HttpParams();
+            httpParams = httpParams.append('sharedSecrets', sharedSecrets.toString());
+            window.location.href = (this.globalVars.callback as URL).href + `?${httpParams.toString()}`;
           }
         });
       }
