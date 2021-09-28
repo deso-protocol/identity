@@ -53,7 +53,7 @@ export class BackendAPIService {
       const req = this.GetUsersStateless(publicKeys);
       if (publicKeys.length > 0) {
         return req.pipe(
-          map( (res): {[key: string]: UserProfile} => {
+          map( res => {
             for (const user of res.UserList) {
               userProfiles[user.PublicKeyBase58Check] = {
                 username: user.ProfileEntryResponse?.Username,
@@ -132,7 +132,7 @@ export class BackendAPIService {
       },
     );
     return req.pipe(
-      map( (res): { [key: string]: DerivedKey } => {
+      map( res => {
         for (const derivedKey in res.DerivedKeys) {
           if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
             derivedKeys[res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check] = {

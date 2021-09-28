@@ -27,7 +27,7 @@ export class SharedSecretComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (!this.globalVars.callback){
+    if (!this.globalVars.callback || !this.globalVars.isCallbackValid){
       this.errorMsg = 'Callback required';
       return;
     }
