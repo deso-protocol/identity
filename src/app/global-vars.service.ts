@@ -20,6 +20,7 @@ export class GlobalVarsService {
 
   callback: URL | null = null;
   isCallbackValid = true;
+  app = '';
   jumioDeSoNanos: number = 0;
   referralUSDCents: number = 0;
 
