@@ -84,7 +84,6 @@ export class AppComponent implements OnInit {
       });
     }
 
-
     // Migrate all accounts
     this.accountService.migrate();
 
