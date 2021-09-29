@@ -95,9 +95,10 @@ export class AccountService {
     const derivedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
 
     // Generate new btc and eth deposit addresses for the derived key.
-    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
-    const ethDepositAddress = this.cryptoService.seedHexToEthAddress(derivedSeedHex);
-
+    // const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
+    // const ethDepositAddress = this.cryptoService.seedHexToEthAddress(derivedSeedHex);
+    const btcDepositAddress = 'Not implemented yet';
+    const ethDepositAddress = 'Not implemented yet';
 
     // By default we authorize this derived key for 10,000 blocks.
     const expirationBlock = blockHeight + 10000;

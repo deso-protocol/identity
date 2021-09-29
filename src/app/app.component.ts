@@ -56,9 +56,9 @@ export class AppComponent implements OnInit {
     if (params.get('callback')) {
       try {
         this.globalVars.callback = new URL(params.get('callback') as string);
+        this.globalVars.isCallbackValid = true;
       } catch (err) {
         console.error(err);
-        this.globalVars.isCallbackValid = false;
       }
     }
 
