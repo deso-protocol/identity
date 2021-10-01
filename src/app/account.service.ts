@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, Network, DerivedUserInfo, PrivateUserInfo, PrivateUserVersion, PublicUserInfo} from '../types/identity';
+import {AccessLevel, Network, DerivedPrivateUserInfo, PrivateUserInfo, PrivateUserVersion, PublicUserInfo} from '../types/identity';
 import {CookieService} from 'ngx-cookie';
 import HDKey from 'hdkey';
 import {EntropyService} from './entropy.service';
@@ -83,7 +83,7 @@ export class AccountService {
     }
   }
 
-  getDerivedUser(publicKey: string, blockHeight: number): DerivedUserInfo{
+  getDerivedPrivateUser(publicKey: string, blockHeight: number): DerivedPrivateUserInfo{
     const privateUser = this.getPrivateUsers()[publicKey];
     const network = privateUser.network;
 
@@ -196,7 +196,7 @@ export class AccountService {
     this.setPrivateUsersRaw(privateUsers);
   }
 
-  getSharedSecret(ownerPublicKey: string, publicKey: string): string {
+  getPrivateSharedSecret(ownerPublicKey: string, publicKey: string): string {
     const privateUsers = this.getPrivateUsers();
     if ( !(ownerPublicKey in privateUsers) ) {
       return '';

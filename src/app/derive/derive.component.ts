@@ -45,11 +45,11 @@ export class DeriveComponent implements OnInit {
     this.googleDrive.launchGoogle();
   }
 
-  selectAccount(publicKey: string): void {
+  selectAccountAndDeriveKey(publicKey: string): void {
     this.backendApi.GetAppState().subscribe( res => {
       const blockHeight = res.BlockHeight;
       this.identityService.derive({
-        derivedUserInfo: this.accountService.getDerivedUser(publicKey, blockHeight),
+        derivedPrivateUserInfo: this.accountService.getDerivedPrivateUser(publicKey, blockHeight),
       });
     });
   }

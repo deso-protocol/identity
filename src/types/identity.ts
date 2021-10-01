@@ -28,7 +28,7 @@ export interface PublicUserInfo {
   version: PrivateUserVersion;
 }
 
-export interface DerivedUserInfo {
+export interface DerivedPrivateUserInfo {
   derivedSeedHex: string;
   derivedPublicKey: string;
   publicKey: string;

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, DerivedUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedPrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -74,14 +74,14 @@ export class IdentityService {
   }
 
   derive(payload: {
-    derivedUserInfo: DerivedUserInfo,
+    derivedPrivateUserInfo: DerivedPrivateUserInfo,
   }): void {
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       let httpParams = new HttpParams();
-      for (const key in payload.derivedUserInfo) {
-        if (payload.derivedUserInfo.hasOwnProperty(key)) {
-          httpParams = httpParams.append(key, (payload.derivedUserInfo as any)[key].toString());
+      for (const key in payload.derivedPrivateUserInfo) {
+        if (payload.derivedPrivateUserInfo.hasOwnProperty(key)) {
+          httpParams = httpParams.append(key, (payload.derivedPrivateUserInfo as any)[key].toString());
         }
       }
       window.location.href = this.globalVars.callback.href + `?${httpParams.toString()}`;

@@ -93,10 +93,14 @@ export class SharedSecretComponent implements OnInit {
         this.backendApi.GetAppState().subscribe( state => {
           const blockHeight = state.BlockHeight;
           const key = keys[this.derivedPublicKeyBase58Check];
+          if (!key) {
+            this.errorMsg = 'This should never happen but if it does, DH was right.';
+            return;
+          }
           if (blockHeight < key.expirationBlock && key.isValid) {
             const sharedSecrets: string[] = [];
             for (const messageKey of this.messagePublicKeys){
-              const sharedSecret = this.accountService.getSharedSecret(this.ownerPublicKeyBase58Check, messageKey);
+              const sharedSecret = this.accountService.getPrivateSharedSecret(this.ownerPublicKeyBase58Check, messageKey);
               if (sharedSecret === ''){
                 this.errorMsg = 'Failed to calculate shared secrets';
                 return;
