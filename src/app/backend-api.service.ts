@@ -7,18 +7,7 @@ import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-
-interface UserProfile {
-  username: string;
-  profilePic: any;
-}
-
-interface DerivedKey {
-  derivedPublicKeyBase58Check: string;
-  ownerPublicKeyBase58Check: string;
-  expirationBlock: number;
-  isValid: boolean;
-}
+import {DerivedKey, UserProfile} from '../types/identity';
 
 @Injectable({
   providedIn: 'root'

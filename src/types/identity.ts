@@ -41,6 +41,18 @@ export interface DerivedPrivateUserInfo {
   derivedJwt: string;
 }
 
+export interface UserProfile {
+  username: string;
+  profilePic: any;
+}
+
+export interface DerivedKey {
+  derivedPublicKeyBase58Check: string;
+  ownerPublicKeyBase58Check: string;
+  expirationBlock: number;
+  isValid: boolean;
+}
+
 export enum Network {
   mainnet = 'mainnet',
   testnet = 'testnet',

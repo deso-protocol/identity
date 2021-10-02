@@ -4,6 +4,7 @@ import {IdentityService} from '../identity.service';
 import {BackendAPIService} from '../backend-api.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {GoogleDriveService} from '../google-drive.service';
+import {UserProfile} from '../../types/identity';
 
 @Component({
   selector: 'app-derive',
@@ -12,7 +13,7 @@ import {GoogleDriveService} from '../google-drive.service';
 })
 export class DeriveComponent implements OnInit {
 
-  allUsers: {[key: string]: any} = {};
+  allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
   showAccessLevels = true;
   withCallback = false;

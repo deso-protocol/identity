@@ -3,7 +3,7 @@ import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {BackendAPIService} from '../backend-api.service';
-import {Network} from '../../types/identity';
+import {Network, UserProfile} from '../../types/identity';
 import {CryptoService} from '../crypto.service';
 import {EntropyService} from '../entropy.service';
 import {GoogleDriveService} from '../google-drive.service';
@@ -18,7 +18,7 @@ export class LogInComponent implements OnInit {
   loading = false;
   showAccessLevels = true;
 
-  allUsers: {[key: string]: any} = {};
+  allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
 
   constructor(
