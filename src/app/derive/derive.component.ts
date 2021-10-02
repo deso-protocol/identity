@@ -15,7 +15,6 @@ export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
-  showAccessLevels = true;
   withCallback = false;
 
   constructor(
@@ -34,9 +33,6 @@ export class DeriveComponent implements OnInit {
       .subscribe(profiles => {
         this.allUsers = profiles;
       });
-
-    // Set showAccessLevels
-    this.showAccessLevels = !this.globalVars.isFullAccessHostname();
 
     // Set withCallback
     this.withCallback = this.globalVars.callback !== null;

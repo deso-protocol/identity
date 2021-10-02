@@ -66,10 +66,6 @@ export class AppComponent implements OnInit {
       this.globalVars.hideJumio = true;
     }
 
-    if (params.get('app')) {
-      this.globalVars.app = params.get('app') as string;
-    }
-
     const referralCode = params.get('referralCode');
     if (referralCode) {
       this.globalVars.referralHashBase58 = referralCode;
