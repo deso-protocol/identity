@@ -5,6 +5,7 @@ import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
+import { EMPTY, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -80,13 +81,10 @@ export class AppComponent implements OnInit {
       });
     }
 
-    // Migrate all accounts
-    this.accountService.migrate();
-
     if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
       // If callback is set, we won't be sending the initialize message.
       this.globalVars.hostname = 'localhost';
-      this.loading = false;
+      this.finishInit();
     } else if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
@@ -95,7 +93,15 @@ export class AppComponent implements OnInit {
           this.globalVars.accessLevelRequest = AccessLevel.Full;
         }
 
-        this.loading = false;
+        const importedKey = 'imported';
+        if (this.globalVars.inTab && !localStorage.getItem(importedKey)) {
+          localStorage.setItem(importedKey, "true");
+          this.identityService.launchImportWindow().subscribe(() => {
+            this.finishInit();
+          });
+        } else {
+          this.finishInit();
+        }
       });
     } else {
       // Identity currently doesn't have any management UIs that can be accessed directly
@@ -106,5 +112,13 @@ export class AppComponent implements OnInit {
       this.globalVars.jumioDeSoNanos = res.JumioDeSoNanos;
       this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
     });
+  }
+
+  finishInit(): void {
+    // Migrate all accounts
+    this.accountService.migrate();
+
+    // Finish loading
+    this.loading = false;
   }
 }

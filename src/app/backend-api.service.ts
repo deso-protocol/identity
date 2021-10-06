@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
@@ -50,6 +50,13 @@ export class BackendAPIService {
               };
             }
             return userProfiles;
+          })
+        ).pipe(
+          catchError(() => {
+            for(const publicKey of publicKeys) {
+              userProfiles[publicKey] = {};
+            }
+            return of(userProfiles);
           })
         );
       } else {
