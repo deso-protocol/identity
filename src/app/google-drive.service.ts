@@ -61,10 +61,18 @@ export class GoogleDriveService {
       { headers: { Authorization: `Bearer ${this.accessToken}` }});
   }
 
-  public launchGoogle(): void {
+  public launchGoogle(origin?: string): void {
     const redirectUri = new URL(`${window.location.origin}/${RouteNames.AUTH_GOOGLE}`);
     if (this.globalVars.network === Network.testnet) {
       redirectUri.searchParams.append('testnet', 'true');
+    }
+    if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
+      redirectUri.searchParams.append('callback', this.globalVars.callback.href);
+    }
+    if (origin) {
+      if (origin === RouteNames.DERIVE) {
+        redirectUri.searchParams.append('origin', RouteNames.DERIVE);
+      }
     }
 
     const oauthUri = new URL('https://accounts.google.com/o/oauth2/v2/auth');

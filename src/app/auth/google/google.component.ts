@@ -38,6 +38,7 @@ export class GoogleComponent implements OnInit {
     private router: Router,
     private zone: NgZone,
     private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
   copySeed(): void {
@@ -137,11 +138,19 @@ export class GoogleComponent implements OnInit {
 
   finishFlow(signedUp: boolean): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: this.publicKey,
-      signedUp,
-    });
+
+    const urlParams = this.activatedRoute.snapshot.queryParamMap;
+    if (urlParams.has('origin')) {
+      if (urlParams.get('origin') === RouteNames.DERIVE) {
+        this.router.navigate(['/', RouteNames.DERIVE], { queryParamsHandling: 'merge' });
+      }
+    } else {
+      this.identityService.login({
+        users: this.accountService.getEncryptedUsers(),
+        publicKeyAdded: this.publicKey,
+        signedUp,
+      });
+    }
   }
 
   fileName(): string {

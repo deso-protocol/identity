@@ -87,6 +87,6 @@ export class LogInSeedComponent implements OnInit {
     if (origin !== RouteNames.DERIVE) {
       origin = RouteNames.LOG_IN;
     }
-    this.router.navigate(['/', origin]);
+    this.router.navigate(['/', origin], { queryParamsHandling: 'merge' });
   }
 }
