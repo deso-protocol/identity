@@ -28,6 +28,31 @@ export interface PublicUserInfo {
   version: PrivateUserVersion;
 }
 
+export interface DerivedPrivateUserInfo {
+  derivedSeedHex: string;
+  derivedPublicKey: string;
+  publicKey: string;
+  btcDepositAddress: string;
+  ethDepositAddress: string;
+  expirationBlock: number;
+  network: Network;
+  accessSignature: string;
+  jwt: string;
+  derivedJwt: string;
+}
+
+export interface UserProfile {
+  username: string;
+  profilePic: any;
+}
+
+export interface DerivedKey {
+  derivedPublicKeyBase58Check: string;
+  ownerPublicKeyBase58Check: string;
+  expirationBlock: number;
+  isValid: boolean;
+}
+
 export enum Network {
   mainnet = 'mainnet',
   testnet = 'testnet',

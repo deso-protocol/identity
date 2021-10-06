@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedPrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -22,8 +22,14 @@ import {
   TransactionMetadataUpdateProfile,
   TransactionMetadataNFTTransfer,
   TransactionMetadataAcceptNFTTransfer,
-  TransactionMetadataBurnNFT
+  TransactionMetadataBurnNFT,
+  TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataNFTBid,
+  TransactionMetadataAcceptNFTBid,
+  TransactionMetadataUpdateNFT,
+  TransactionMetadataCreateNFT
 } from '../lib/deso/transaction';
+import {HttpParams} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -67,6 +73,23 @@ export class IdentityService {
     this.cast('login', payload);
   }
 
+  derive(payload: {
+    derivedPrivateUserInfo: DerivedPrivateUserInfo,
+  }): void {
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      let httpParams = new HttpParams();
+      for (const key in payload.derivedPrivateUserInfo) {
+        if (payload.derivedPrivateUserInfo.hasOwnProperty(key)) {
+          httpParams = httpParams.append(key, (payload.derivedPrivateUserInfo as any)[key].toString());
+        }
+      }
+      window.location.href = this.globalVars.callback.href + `?${httpParams.toString()}`;
+    } else {
+      this.cast('derive', payload);
+    }
+  }
+
   import(): Observable<any> {
     return this.send('import', {});
   }
@@ -80,7 +103,7 @@ export class IdentityService {
 
     const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedHashes = this.signingService.signBurn(seedHex, unsignedHashes);
+    const signedHashes = this.signingService.signHashes(seedHex, unsignedHashes);
 
     this.respond(id, {
       signedHashes,
@@ -184,6 +207,7 @@ export class IdentityService {
     });
   }
 
+
   // Access levels
 
   private getRequiredAccessLevel(transactionHex: string): AccessLevel {
@@ -199,9 +223,14 @@ export class IdentityService {
       case TransactionMetadataSwapIdentity:
       case TransactionMetadataUpdateGlobalParams:
       case TransactionMetadataUpdateProfile:
+      case TransactionMetadataCreateNFT:
+      case TransactionMetadataUpdateNFT:
+      case TransactionMetadataAcceptNFTBid:
+      case TransactionMetadataNFTBid:
       case TransactionMetadataNFTTransfer:
       case TransactionMetadataAcceptNFTTransfer:
       case TransactionMetadataBurnNFT:
+      case TransactionMetadataAuthorizeDerivedKey:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

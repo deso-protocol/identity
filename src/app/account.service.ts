@@ -1,9 +1,16 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, Network, PrivateUserInfo, PrivateUserVersion, PublicUserInfo} from '../types/identity';
+import {AccessLevel, Network, DerivedPrivateUserInfo, PrivateUserInfo, PrivateUserVersion, PublicUserInfo} from '../types/identity';
 import {CookieService} from 'ngx-cookie';
 import HDKey from 'hdkey';
+import {EntropyService} from './entropy.service';
+import {SigningService} from './signing.service';
+import sha256 from 'sha256';
+import {uint64ToBufBigEndian} from '../lib/bindata/util';
+import KeyEncoder from 'key-encoder';
+import * as jsonwebtoken from 'jsonwebtoken';
+import * as ecies from '../lib/ecies';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +25,8 @@ export class AccountService {
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
     private cookieService: CookieService,
+    private entropyService: EntropyService,
+    private signingService: SigningService
   ) { }
 
   // Public Getters
@@ -72,6 +81,54 @@ export class AccountService {
     } else {
       return AccessLevel.None;
     }
+  }
+
+  getDerivedPrivateUser(publicKey: string, blockHeight: number): DerivedPrivateUserInfo{
+    const privateUser = this.getPrivateUsers()[publicKey];
+    const network = privateUser.network;
+
+    this.entropyService.setNewTemporaryEntropy();
+    const derivedMnemonic = this.entropyService.temporaryEntropy?.mnemonic;
+    const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
+    const derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
+    const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
+    const derivedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
+
+    // Generate new btc and eth deposit addresses for the derived key.
+    // const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
+    // const ethDepositAddress = this.cryptoService.seedHexToEthAddress(derivedSeedHex);
+    const btcDepositAddress = 'Not implemented yet';
+    const ethDepositAddress = 'Not implemented yet';
+
+    // By default we authorize this derived key for 10,000 blocks.
+    const expirationBlock = blockHeight + 10000;
+
+    const expirationBlockBuffer = uint64ToBufBigEndian(expirationBlock);
+    const derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
+    const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
+    const accessSignature = this.signingService.signHashes(privateUser.seedHex, [accessHash])[0];
+
+    // We compute an owner JWT with a month-long expiration. This is needed for some backend endpoints.
+    const keyEncoder = new KeyEncoder('secp256k1');
+    const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
+    const jwt = jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+
+    // We compute a derived key JWT with a month-long expiration. This is needed for shared secret endpoint.
+    const encodedDerivedPrivateKey = keyEncoder.encodePrivate(derivedSeedHex, 'raw', 'pem');
+    const derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+
+    return {
+      derivedSeedHex,
+      derivedPublicKey,
+      publicKey,
+      btcDepositAddress,
+      ethDepositAddress,
+      expirationBlock,
+      network,
+      accessSignature,
+      jwt,
+      derivedJwt
+    };
   }
 
   // Public Modifiers
@@ -137,6 +194,20 @@ export class AccountService {
     }
 
     this.setPrivateUsersRaw(privateUsers);
+  }
+
+  getPrivateSharedSecret(ownerPublicKey: string, publicKey: string): string {
+    const privateUsers = this.getPrivateUsers();
+    if ( !(ownerPublicKey in privateUsers) ) {
+      return '';
+    }
+    const seedHex = privateUsers[ownerPublicKey].seedHex;
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKeyBytes = privateKey.getPrivate().toBuffer(undefined, 32);
+    const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
+    const sharedPx = ecies.derive(privateKeyBytes, publicKeyBytes);
+    const sharedPrivateKey = ecies.kdf(sharedPx, 32);
+    return sharedPrivateKey.toString('hex');
   }
 
   // Private Getters and Modifiers

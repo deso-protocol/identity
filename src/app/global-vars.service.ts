@@ -18,11 +18,13 @@ export class GlobalVarsService {
   hideGoogle = false;
   hideJumio = false;
 
+  callback: URL | null = null;
+  isCallbackValid = false;
   jumioDeSoNanos: number = 0;
   referralUSDCents: number = 0;
 
-  referralHashBase58: string = "";
-  
+  referralHashBase58: string = '';
+
   constructor() { }
 
   isFullAccessHostname(): boolean {

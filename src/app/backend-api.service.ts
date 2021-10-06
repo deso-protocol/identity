@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
+import { map } from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
+import {DerivedKey, UserProfile} from '../types/identity';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class BackendAPIService {
   endpoint = `https://${environment.nodeHostname}/api/v0`;
 
@@ -31,6 +34,29 @@ export class BackendAPIService {
       },
     );
   }
+
+  GetUserProfiles(
+    publicKeys: any[]
+  ): Observable<{[key: string]: UserProfile}> {
+      const userProfiles: {[key: string]: any} = {};
+      const req = this.GetUsersStateless(publicKeys);
+      if (publicKeys.length > 0) {
+        return req.pipe(
+          map( res => {
+            for (const user of res.UserList) {
+              userProfiles[user.PublicKeyBase58Check] = {
+                username: user.ProfileEntryResponse?.Username,
+                profilePic: user.ProfileEntryResponse?.ProfilePic,
+              };
+            }
+            return userProfiles;
+          })
+        );
+      } else {
+        return of(userProfiles);
+      }
+  }
+
   GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {
     return `${this.endpoint}/get-single-profile-picture/${PublicKeyBase58Check}`;
   }
@@ -58,7 +84,7 @@ export class BackendAPIService {
 
   GetAppState(): Observable<any> {
     return this.httpClient.post<any>(`${this.endpoint}/get-app-state`, {
-      PublicKeyBase58Check: "",
+      PublicKeyBase58Check: '',
     });
   }
 
@@ -82,5 +108,32 @@ export class BackendAPIService {
     return this.httpClient.post<any>(`${this.endpoint}/get-referral-info-for-referral-hash`, {
       ReferralHash,
     });
+  }
+
+  GetUserDerivedKeys(
+    ownerPublicKey: string
+  ): Observable< { [key: string]: DerivedKey } > {
+    const derivedKeys: { [key: string]: DerivedKey } = {};
+    const req = this.httpClient.post<any>(
+      `${this.endpoint}/get-user-derived-keys`,
+      {
+        PublicKeyBase58Check: ownerPublicKey,
+      },
+    );
+    return req.pipe(
+      map( res => {
+        for (const derivedKey in res.DerivedKeys) {
+          if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
+            derivedKeys[res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check] = {
+              derivedPublicKeyBase58Check: res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
+              ownerPublicKeyBase58Check: res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
+              expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
+              isValid: res.DerivedKeys[derivedKey]?.IsValid,
+            };
+          }
+        }
+        return derivedKeys;
+      })
+    );
   }
 }

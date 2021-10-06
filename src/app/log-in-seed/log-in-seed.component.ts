@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import {AccountService} from "../account.service";
-import {IdentityService} from "../identity.service";
-import {CryptoService} from "../crypto.service";
-import {EntropyService} from "../entropy.service";
-import {GlobalVarsService} from "../global-vars.service";
-import {BackendAPIService} from "../backend-api.service";
-import {Router} from "@angular/router";
-import HDNode from "hdkey";
-import {RouteNames} from "../app-routing.module";
+import {AccountService} from '../account.service';
+import {IdentityService} from '../identity.service';
+import {CryptoService} from '../crypto.service';
+import {EntropyService} from '../entropy.service';
+import {GlobalVarsService} from '../global-vars.service';
+import {BackendAPIService} from '../backend-api.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import HDNode from 'hdkey';
+import {RouteNames} from '../app-routing.module';
 
 @Component({
   selector: 'app-log-in-seed',
@@ -39,6 +39,7 @@ export class LogInSeedComponent implements OnInit {
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
     private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +83,10 @@ export class LogInSeedComponent implements OnInit {
     this.mnemonic = '';
     this.extraText = '';
 
-    this.router.navigate(['/', RouteNames.LOG_IN]);
+    let origin = this.activatedRoute.snapshot.queryParamMap.get('origin') || RouteNames.LOG_IN;
+    if (origin !== RouteNames.DERIVE) {
+      origin = RouteNames.LOG_IN;
+    }
+    this.router.navigate(['/', origin]);
   }
 }

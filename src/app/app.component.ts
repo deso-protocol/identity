@@ -51,12 +51,22 @@ export class AppComponent implements OnInit {
     if (params.get('hideGoogle')) {
       this.globalVars.hideGoogle = true;
     }
-    
+
+    // Callback should only be used in mobile applications, where payload is passed through URL parameters.
+    if (params.get('callback')) {
+      try {
+        this.globalVars.callback = new URL(params.get('callback') as string);
+        this.globalVars.isCallbackValid = true;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     if (params.get('hideJumio')) {
       this.globalVars.hideJumio = true;
     }
-    
-    const referralCode = params.get('referralCode')
+
+    const referralCode = params.get('referralCode');
     if (referralCode) {
       this.globalVars.referralHashBase58 = referralCode;
       this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
@@ -69,11 +79,15 @@ export class AppComponent implements OnInit {
         }
       });
     }
-    
+
     // Migrate all accounts
     this.accountService.migrate();
 
-    if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
+    if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
+      // If callback is set, we won't be sending the initialize message.
+      this.globalVars.hostname = 'localhost';
+      this.loading = false;
+    } else if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
         this.globalVars.hostname = res.hostname;

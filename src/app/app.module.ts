@@ -19,9 +19,12 @@ import { ApproveComponent } from './approve/approve.component';
 import { LogInSeedComponent } from './log-in-seed/log-in-seed.component';
 import { GoogleComponent } from './auth/google/google.component';
 import { AvatarDirective } from './avatar/avatar.directive';
+import { DeriveComponent } from './derive/derive.component';
 import { JumioComponent } from './jumio/jumio.component';
 import { JumioSuccessComponent } from './jumio/jumio-success/jumio-success.component';
 import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
+import { ErrorCallbackComponent } from './error-callback/error-callback.component';
+import { SharedSecretComponent } from './shared-secret/shared-secret.component';
 
 @NgModule({
   declarations: [
@@ -36,9 +39,12 @@ import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
     LogInSeedComponent,
     GoogleComponent,
     AvatarDirective,
+    DeriveComponent,
     JumioComponent,
     JumioSuccessComponent,
     JumioErrorComponent,
+    ErrorCallbackComponent,
+    SharedSecretComponent,
   ],
   imports: [
     BrowserModule,

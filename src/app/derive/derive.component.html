@@ -1,0 +1,55 @@
+<app-banner></app-banner>
+
+<div *ngIf="globalVars.callback == null || (globalVars.callback !== null && globalVars.isCallbackValid)">
+  <div class="container home-container">
+    <div class="font-weight-bold fs-30px mb-20px" *ngIf="!withCallback">
+      Grant signing access to {{ globalVars.hostname }}
+    </div>
+    <div class="font-weight-bold fs-30px mb-20px" *ngIf="withCallback">
+      Grant signing access
+    </div>
+
+    <div class="row">
+      <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">
+        <ul class="list-group mt-7px mb-30px">
+          <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccountAndDeriveKey(item.key)">
+            <div class="w-100">
+              <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>
+              <div *ngIf="item.value.username" class="d-flex align-items-center">
+                <div class="avatar mr-15px" [appAvatar]="item.key"></div>
+                <div class="text-truncate">{{ item.value.username }}</div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="d-flex align-items-center flex-column" [class.col-sm-6]="hasUsers" [class.col-sm-12]="!hasUsers">
+        <button class="btn btn-default log-in-google mb-30px" (click)="launchGoogle()" *ngIf="!globalVars.hideGoogle"></button>
+        <button class="btn btn-default log-in-seed" [routerLink]="['/load-seed']" [queryParams]="{ origin: 'derive' }"></button>
+        <button class="btn btn-default sign-up-seed" [routerLink]="['/sign-up']"></button>
+      </div>
+    </div>
+
+    <div *ngIf="!withCallback">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with signing access:</b></span><br/>
+          This means <b>{{ globalVars.hostname }}</b> will be able to make transactions on your behalf as if it knew your seed.
+          This permission can be revoked anytime and it will automatically expire in about 30 days.
+      </div>
+    </div>
+    <div *ngIf="withCallback">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant signing access:</b></span><br/>
+        This means the mobile application will be able to sign transactions on your behalf as if it knew your seed.
+        This permission can be revoked anytime and it will automatically expire in about 30 days.
+        <br/><br/>
+        <span class="fs-underline"><b>DISCLAIMER:</b></span><br/>
+        <b>This session is only for mobile applications. If you are not using
+        a mobile application, you should exit this window.</b>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="globalVars.callback !== null && !globalVars.isCallbackValid">
+  <app-error-callback></app-error-callback>
+</div>
