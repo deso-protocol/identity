@@ -142,7 +142,9 @@ export class GoogleComponent implements OnInit {
     const urlParams = this.activatedRoute.snapshot.queryParamMap;
     if (urlParams.has('origin')) {
       if (urlParams.get('origin') === RouteNames.DERIVE) {
-        this.router.navigate(['/', RouteNames.DERIVE], { queryParamsHandling: 'merge' });
+        this.identityService.derive({
+          publicKey: this.publicKey,
+        });
       }
     } else {
       this.identityService.login({

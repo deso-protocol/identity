@@ -94,7 +94,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const urlParams = this.activatedRoute.snapshot.queryParamMap;
     if (urlParams.has('origin')) {
       if (urlParams.get('origin') === RouteNames.DERIVE) {
-        this.router.navigate(['/', RouteNames.DERIVE], { queryParamsHandling: 'merge' });
+        this.identityService.derive({
+          publicKey: this.publicKeyAdded,
+        });
       }
     } else {
       if (!this.globalVars.showJumio()) {
