@@ -4,6 +4,8 @@ import {CryptoService} from '../crypto.service';
 import {IdentityService} from '../identity.service';
 import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
+import {SigningService} from '../signing.service';
+import {BackendAPIService} from '../backend-api.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -27,7 +29,6 @@ import {
   TransactionMetadataBurnNFT,
   TransactionMetadataAuthorizeDerivedKey
 } from '../../lib/deso/transaction';
-import {SigningService} from '../signing.service';
 import bs58check from 'bs58check';
 
 @Component({
@@ -41,6 +42,7 @@ export class ApproveComponent implements OnInit {
   transactionHex: any;
   username: any;
   transactionDescription: any;
+  transactionDeSoSpent = '';
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -49,12 +51,25 @@ export class ApproveComponent implements OnInit {
     private accountService: AccountService,
     public globalVars: GlobalVarsService,
     private signingService: SigningService,
+    private backendApi: BackendAPIService,
   ) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
       this.transactionHex = params.tx;
-
+      this.backendApi.GetTransactionSpending(this.transactionHex).subscribe( res => {
+        if (res != BigInt(0)) {
+          const nano: BigInt = BigInt(1000000000);
+          // @ts-ignore
+          const fullDeSo: string = (res / nano).toString();
+          // @ts-ignore
+          let fractionalDeSo: string = (res - ((res / nano) * nano)).toString();
+          while (fractionalDeSo.length < 9) {
+            fractionalDeSo = '0' + fractionalDeSo;
+          }
+          this.transactionDeSoSpent = `${fullDeSo}.${fractionalDeSo}`;
+        }
+      });
       const txBytes = new Buffer(this.transactionHex, 'hex');
       this.transaction = Transaction.fromBytes(txBytes)[0];
       this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
@@ -91,7 +106,8 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataBasicTransfer:
         const outputs = [];
 
-        let sendingToSelf = true; //for if sender and recipient are same account
+        // for if sender and recipient are same account
+        let sendingToSelf = true;
 
         for (const output of this.transaction.outputs) {
           // Skip the change output. 0 means the buffers are equal
@@ -99,13 +115,13 @@ export class ApproveComponent implements OnInit {
             sendingToSelf = false;
             const sendKey = this.base58KeyCheck(output.publicKey);
             const sendAmount = `${output.amountNanos / 1e9}`;
-            outputs.push(`${sendAmount} DESO to ${sendKey}`);
+            outputs.push(`${sendAmount} $DeSo to ${sendKey}`);
           }
         }
 
-        //if all recipients are same as this.transaction.publicKey (outputs is empty)
+        // if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
-          outputs.push(`$DESO to ${this.transaction.publicKey}`);
+          outputs.push(`$DeSo to ${this.transaction.publicKey}`);
         }
 
         description = `send ${outputs.join(', ')}`;

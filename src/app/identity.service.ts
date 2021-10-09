@@ -116,10 +116,9 @@ export class IdentityService {
     if (!this.approve(data, requiredAccessLevel)) {
       return;
     }
-    if (this.approveSpending(data, transactionHex))
-    // You have to put code here that checks if accessLevel === AccessLevel.ApproveLarge
-    // where -- const { payload: { encryptedSeedHex, accessLevel, accessLevelHmac }} = data;
-    // and if so, parse transactionHex to metadata and compare the public keys of inputs and outputs
+    if (!this.approveSpending(data, transactionHex)) {
+      return;
+    }
 
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
     const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
@@ -258,18 +257,18 @@ export class IdentityService {
   }
 
   private approveSpending(data: any, transactionHex: string): boolean {
-    const { payload: { encryptedSeedHex, accessLevel, accessLevelHmac }} = data;
+    const { payload: { accessLevel }} = data;
     if (accessLevel === AccessLevel.ApproveLarge) {
       const txBytes = new Buffer(transactionHex, 'hex');
       const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
       for (const output of transaction.outputs) {
-        for (const input of transaction.inputs) {
-          if output.publicKey
+        if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
+          this.respond(data.id, {approvalRequired: true});
+          return false;
         }
       }
-    } else {
-      return true;
     }
+    return true;
   }
 
   private approve(data: any, accessLevel: AccessLevel): boolean {
