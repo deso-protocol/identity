@@ -93,7 +93,7 @@ export class IdentityService {
         }
         window.location.href = this.globalVars.callback.href + `?${httpParams.toString()}`;
       } else {
-        this.cast('derive', payload);
+        this.cast('derive', derivedPrivateUserInfo);
       }
     });
   }
