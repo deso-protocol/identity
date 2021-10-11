@@ -116,12 +116,10 @@ export class IdentityService {
   }
 
   private handleImport(event: MessageEvent) {
-    console.log(event.data.origin);
     // Only allow import events from BitClout Identity
-    if (event.data.origin !== 'https://identity.bitclout.com') {
+    if (event.origin !== 'https://identity.bitclout.com') {
       return;
     }
-    console.log(event.data.origin);
 
     // Import accounnts
     for (const privateUser of Object.values(event.data.payload.privateUsers)) {
