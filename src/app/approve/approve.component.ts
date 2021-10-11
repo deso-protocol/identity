@@ -105,7 +105,7 @@ export class ApproveComponent implements OnInit {
             sendingToSelf = false;
             const sendKey = this.base58KeyCheck(output.publicKey);
             const sendAmount = this.nanosToUnitString(output.amountNanos);
-            outputs.push(`${sendAmount} $DeSo to ${sendKey}`);
+            outputs.push(`${sendAmount} $DESO to ${sendKey}`);
           }
         }
 
