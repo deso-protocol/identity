@@ -129,7 +129,7 @@ export class IdentityService {
     // non-spending txns such as like, post, update profile, etc. In the
     // latter case we need a subsequent check to ensure that the txn is not
     // sending money to any public keys other than the sender himself.
-    if (!this.approveSpending(data, transactionHex)) {
+    if (!this.approveSpending(data)) {
       return;
     }
 
@@ -269,8 +269,11 @@ export class IdentityService {
     return this.cryptoService.validAccessLevelHmac(accessLevel, seedHex, accessLevelHmac);
   }
 
-  private approveSpending(data: any, transactionHex: string): boolean {
-    const { payload: { accessLevel }} = data;
+  // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
+  private approveSpending(data: any): boolean {
+    const { payload: { accessLevel, transactionHex }} = data;
+    // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
+    // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
     if (accessLevel === AccessLevel.ApproveLarge) {
       const txBytes = new Buffer(transactionHex, 'hex');
       const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
