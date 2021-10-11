@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { PrivateUserInfo } from 'src/types/identity';
-import { AccountService } from '../account.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { IdentityService } from '../identity.service';
 
@@ -13,12 +12,12 @@ export class ImportComponent implements OnInit {
 
   constructor(
     private globalVars: GlobalVarsService,
-    private accountService: AccountService,
     private identityService: IdentityService,
   ) { }
 
   ngOnInit(): void {
     // We will only import to identity.deso.org
+    console.log(this.globalVars.hostname);
     if (this.globalVars.hostname !== 'identity.deso.org') {
       return;
     }
