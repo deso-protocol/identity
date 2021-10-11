@@ -9,7 +9,7 @@
       <b>{{ globalVars.hostname }}</b> wants to <b>{{ transactionDescription }}</b>
     </p>
     <br/>
-    <div *ngIf="transactionDeSoSpent !== ''">
+    <div *ngIf="transactionDeSoSpent">
       <p class="pb-15px">
         Total Cost: {{ transactionDeSoSpent }} $DeSo
       </p>

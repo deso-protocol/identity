@@ -112,10 +112,23 @@ export class IdentityService {
 
   private handleSign(data: any): void {
     const { id, payload: { encryptedSeedHex, transactionHex } } = data;
+
+    // This will tell us whether we need full signing access or just ApproveLarge
+    // level of access.
     const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+
+    // In the case that approve() fails, it responds with a message indicating
+    // that approvalRequired = true, which the caller can then uses to trigger
+    // the /approve UI.
     if (!this.approve(data, requiredAccessLevel)) {
       return;
     }
+
+    // If we get to this point, no approval UI was required. This typically
+    // happens if the caller has full signing access or signing access for
+    // non-spending txns such as like, post, update profile, etc. In the
+    // latter case we need a subsequent check to ensure that the txn is not
+    // sending money to any public keys other than the sender himself.
     if (!this.approveSpending(data, transactionHex)) {
       return;
     }

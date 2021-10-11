@@ -139,7 +139,7 @@ export class BackendAPIService {
 
   GetTransactionSpending(
     transactionHex: string
-  ): Observable<BigInt> {
+  ): Observable<number> {
     const req = this.httpClient.post<any>(
       `${this.endpoint}/get-transaction-spending`,
       {
@@ -148,11 +148,11 @@ export class BackendAPIService {
     );
     return req.pipe(
       map( res => {
-        return BigInt(res.TotalSpendingNanos);
+        return res.TotalSpendingNanos as number;
       })
     ).pipe(
       catchError(() => {
-        return of(BigInt(0));
+        return of(0);
       })
     );
   }
