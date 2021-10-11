@@ -112,8 +112,24 @@ export class IdentityService {
 
   private handleSign(data: any): void {
     const { id, payload: { encryptedSeedHex, transactionHex } } = data;
+
+    // This will tell us whether we need full signing access or just ApproveLarge
+    // level of access.
     const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+
+    // In the case that approve() fails, it responds with a message indicating
+    // that approvalRequired = true, which the caller can then uses to trigger
+    // the /approve UI.
     if (!this.approve(data, requiredAccessLevel)) {
+      return;
+    }
+
+    // If we get to this point, no approval UI was required. This typically
+    // happens if the caller has full signing access or signing access for
+    // non-spending txns such as like, post, update profile, etc. In the
+    // latter case we need a subsequent check to ensure that the txn is not
+    // sending money to any public keys other than the sender himself.
+    if (!this.approveSpending(data)) {
       return;
     }
 
@@ -251,6 +267,25 @@ export class IdentityService {
 
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
     return this.cryptoService.validAccessLevelHmac(accessLevel, seedHex, accessLevelHmac);
+  }
+
+  // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
+  private approveSpending(data: any): boolean {
+    const { payload: { accessLevel, transactionHex }} = data;
+
+    // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
+    // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
+    if (accessLevel === AccessLevel.ApproveLarge) {
+      const txBytes = new Buffer(transactionHex, 'hex');
+      const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+      for (const output of transaction.outputs) {
+        if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
+          this.respond(data.id, {approvalRequired: true});
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private approve(data: any, accessLevel: AccessLevel): boolean {

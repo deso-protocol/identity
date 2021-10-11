@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
-import { map } from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
@@ -133,6 +133,26 @@ export class BackendAPIService {
           }
         }
         return derivedKeys;
+      })
+    );
+  }
+
+  GetTransactionSpending(
+    transactionHex: string
+  ): Observable<number> {
+    const req = this.httpClient.post<any>(
+      `${this.endpoint}/get-transaction-spending`,
+      {
+        TransactionHex: transactionHex,
+      },
+    );
+    return req.pipe(
+      map( res => {
+        return res.TotalSpendingNanos as number;
+      })
+    ).pipe(
+      catchError(() => {
+        return of(0);
       })
     );
   }
