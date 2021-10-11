@@ -5,7 +5,8 @@ import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
-import { EMPTY, Observable, of } from 'rxjs';
+
+const IMPORTED_KEY = 'imported';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ export class AppComponent implements OnInit {
   title = 'identity';
 
   loading = true;
+  importing = false;
 
   constructor(
     private accountService: AccountService,
@@ -93,12 +95,11 @@ export class AppComponent implements OnInit {
           this.globalVars.accessLevelRequest = AccessLevel.Full;
         }
 
-        const importedKey = 'imported';
-        if (this.globalVars.inTab && !localStorage.getItem(importedKey)) {
-          localStorage.setItem(importedKey, "true");
-          this.identityService.launchImportWindow().subscribe(() => {
-            this.finishInit();
-          });
+        // We only care about attempting to import when we're in a tab.
+        // The iframe doesn't have first party storage access and the webview
+        // cannot open a window.
+        if (this.globalVars.inTab && !localStorage.getItem(IMPORTED_KEY)) {
+          this.importing = true;
         } else {
           this.finishInit();
         }
@@ -120,5 +121,13 @@ export class AppComponent implements OnInit {
 
     // Finish loading
     this.loading = false;
+  }
+  
+  launchImport(): void {
+    this.identityService.launchImportWindow().subscribe(() => {
+      localStorage.setItem(IMPORTED_KEY, "true");
+      this.importing = false;
+      this.finishInit();
+    });
   }
 }
