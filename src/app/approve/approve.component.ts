@@ -157,7 +157,7 @@ export class ApproveComponent implements OnInit {
         const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
         const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
         if (this.transaction.metadata.operationType === 0) {
-          description = `spend ${desoToSell} $DeSo to buy creator coin of ${creatorKey}`;
+          description = `spend ${desoToSell} $DeSo to buy the creator coin of ${creatorKey}`;
         } else if (this.transaction.metadata.operationType === 1) {
           description = `sell ${creatorCoinToSell} creator coins of ${creatorKey} `;
         } else if (this.transaction.metadata.operationType === 2) {
