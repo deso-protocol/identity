@@ -374,6 +374,8 @@ export class IdentityService {
 
     if (method === 'burn') {
       this.handleBurn(data);
+    } else if (method == 'burn_eth') {
+      this.handleBurnETH(data);
     } else if (method === 'encrypt'){
       this.handleEncrypt(data);
     } else if (method === 'decrypt') {
