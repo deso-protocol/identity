@@ -6,6 +6,8 @@ import {CryptoService} from './crypto.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
 import {decryptShared} from '../lib/ecies';
+import { ec } from 'elliptic';
+import BN from "bn.js";
 
 @Injectable({
   providedIn: 'root'
@@ -124,6 +126,34 @@ export class SigningService {
       const signature = privateKey.sign(unsignedHash);
       const signatureBytes = new Buffer(signature.toDER());
       signedHashes.push(signatureBytes.toString('hex'));
+    }
+
+    return signedHashes;
+  }
+
+  signHashesETH(seedHex: string, unsignedHashes: string[]): {s: any, r: any, v: number | null}[] {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const signedHashes = [];
+
+    for (const unsignedHash of unsignedHashes) {
+      const signature = privateKey.sign(unsignedHash, { canonical: true });
+
+      // const derSig = new ec.Signature(signature.toDER());
+      // const x = new ec.Signature(derSig);
+      // let sVal = signature.s;
+      //
+      // debugger;
+      // const two = new BN(2);
+      // const one = new BN(1);
+      // if (sVal.cmp(privateKey.ec.curve.n.div(two)) === 1) {
+      //   sVal = privateKey.ec.curve.n.sub(sVal)
+      // }
+      debugger;
+      signedHashes.push({
+        s: "0x" + signature.s.toString("hex"),
+        r: "0x" + signature.r.toString("hex"),
+        v: signature.recoveryParam
+      });
     }
 
     return signedHashes;

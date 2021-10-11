@@ -103,10 +103,24 @@ export class IdentityService {
 
     const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedHashes = this.signingService.signHashes(seedHex, unsignedHashes);
+    const signedHashes = this.signingService.signHashesETH(seedHex, unsignedHashes);
 
     this.respond(id, {
       signedHashes,
+    });
+  }
+
+  private handleBurnETH(data: any): void {
+    if (!this.approve(data, AccessLevel.Full)) {
+      return;
+    }
+
+    const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const signatures = this.signingService.signHashesETH(seedHex, unsignedHashes);
+
+    this.respond(id, {
+      signatures,
     });
   }
 
@@ -297,6 +311,8 @@ export class IdentityService {
       this.handleJwt(data);
     } else if (method === 'info') {
       this.handleInfo(event);
+    } else if (method == 'burn_eth') {
+      this.handleBurnETH(data);
     } else {
       console.error('Unhandled identity request');
       console.error(event);
