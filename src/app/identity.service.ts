@@ -115,9 +115,14 @@ export class IdentityService {
     }, '*');
   }
 
-  private handleImport(data: any) {
+  private handleImport(event: MessageEvent) {
+    // Only allow import events from BitClout Identity
+    if (event.data.origin !== 'https://identity.bitclout.com') {
+      return;
+    }
+
     // Import accounnts
-    for (const privateUser of Object.values(data.payload.privateUsers)) {
+    for (const privateUser of Object.values(event.data.payload.privateUsers)) {
       this.accountService.addPrivateUser(privateUser as PrivateUserInfo);
     }
 
@@ -333,7 +338,7 @@ export class IdentityService {
     } else if (method === 'initialize') {
       this.handleInitialize(data);
     } else if (method === 'import') {
-      this.handleImport(data);
+      this.handleImport(event);
     } else {
       console.error('Unhandled identity request');
       console.error(event);
