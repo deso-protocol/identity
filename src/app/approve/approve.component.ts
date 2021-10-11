@@ -111,7 +111,7 @@ export class ApproveComponent implements OnInit {
 
         // if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
-          outputs.push(`$DeSo to ${this.transaction.publicKey}`);
+          outputs.push(`$DESO to ${this.transaction.publicKey}`);
         }
 
         description = `send ${outputs.join(', ')}`;
