@@ -272,6 +272,7 @@ export class IdentityService {
   // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
   private approveSpending(data: any): boolean {
     const { payload: { accessLevel, transactionHex }} = data;
+
     // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
     // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
     if (accessLevel === AccessLevel.ApproveLarge) {
