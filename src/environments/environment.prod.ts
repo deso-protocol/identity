@@ -4,5 +4,5 @@ export const environment = {
   nodeHostname: 'bitclout.com',
   fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost', 'buy.deso.org'],
   noAccessHostnames: [''],
-  jumioSupported: false,
+  jumioSupported: true,
 };
