@@ -138,17 +138,6 @@ export class SigningService {
     for (const unsignedHash of unsignedHashes) {
       const signature = privateKey.sign(unsignedHash, { canonical: true });
 
-      // const derSig = new ec.Signature(signature.toDER());
-      // const x = new ec.Signature(derSig);
-      // let sVal = signature.s;
-      //
-      // debugger;
-      // const two = new BN(2);
-      // const one = new BN(1);
-      // if (sVal.cmp(privateKey.ec.curve.n.div(two)) === 1) {
-      //   sVal = privateKey.ec.curve.n.sub(sVal)
-      // }
-      debugger;
       signedHashes.push({
         s: "0x" + signature.s.toString("hex"),
         r: "0x" + signature.r.toString("hex"),
