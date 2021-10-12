@@ -3,7 +3,7 @@ import { ArrayOf, Boolean, ChunkBuffer, Enum, FixedBuffer, Record, Uint8, Uvarin
 
 export class TransactionInput extends BinaryRecord {
   @Transcode(FixedBuffer(32))
-  id: Buffer = Buffer.alloc(0)
+  id: Buffer = Buffer.alloc(0);
 
   @Transcode(Uvarint64)
   index: number = 0;
