@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, DerivedPrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedPrivateUserInfo, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -30,6 +30,7 @@ import {
   TransactionMetadataCreateNFT
 } from '../lib/deso/transaction';
 import {HttpParams} from '@angular/common/http';
+import { AccountService } from './account.service';
 
 @Injectable({
   providedIn: 'root'
@@ -44,13 +45,25 @@ export class IdentityService {
   // Embed component checks for browser support
   browserSupported = true;
 
+  // TEMP: Import window
+  private importWindow: Window | null = null;
+  private importSubject = new Subject();
+
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
     private cookieService: CookieService,
     private signingService: SigningService,
+    private accountService: AccountService,
   ) {
     window.addEventListener('message', (event) => this.handleMessage(event));
+  }
+
+  // TEMP: Import from BitClout Identity
+  launchImportWindow(): Observable<any> {
+    // Open a BitClout Identity window
+    this.importWindow = window.open("https://identity.bitclout.com/import", undefined, `toolbar=no, width=10, height=10, top=0, left=0`);
+    return this.importSubject;
   }
 
   // Outgoing Messages
@@ -90,11 +103,36 @@ export class IdentityService {
     }
   }
 
-  import(): Observable<any> {
-    return this.send('import', {});
+  // Incoming Messages
+
+  // TEMP: The import window sends an initialize message we need to respond to
+  private handleInitialize(data: any) {
+    // acknowledge, provides hostname data
+    this.importWindow?.postMessage({
+      id: data.id,
+      service: "identity",
+      payload: {},
+    }, '*');
   }
 
-  // Incoming Messages
+  private handleImport(event: MessageEvent) {
+    // Only allow import events from BitClout Identity
+    if (event.origin !== 'https://identity.bitclout.com') {
+      return;
+    }
+
+    // Import accounnts
+    for (const privateUser of Object.values(event.data.payload.privateUsers)) {
+      this.accountService.addPrivateUser(privateUser as PrivateUserInfo);
+    }
+
+    // Close the window
+    this.importWindow?.close();
+
+    // Complete the observable
+    this.importSubject.next(null);
+    this.importSubject.complete();
+  }
 
   private handleBurn(data: any): void {
     if (!this.approve(data, AccessLevel.Full)) {
@@ -332,6 +370,10 @@ export class IdentityService {
       this.handleJwt(data);
     } else if (method === 'info') {
       this.handleInfo(event);
+    } else if (method === 'initialize') {
+      this.handleInitialize(data);
+    } else if (method === 'import') {
+      this.handleImport(event);
     } else {
       console.error('Unhandled identity request');
       console.error(event);
