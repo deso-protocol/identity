@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, DerivedPrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, DerivedPrivateUserInfo, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -90,8 +90,11 @@ export class IdentityService {
     }
   }
 
-  import(): Observable<any> {
-    return this.send('import', {});
+  // TEMP: Temporary to import users to identity.deso.org
+  import(payload: {
+    privateUsers: {[key: string]: PrivateUserInfo}
+  }) {
+    this.cast('import', payload);
   }
 
   // Incoming Messages

@@ -13,6 +13,7 @@ import {JumioSuccessComponent} from './jumio/jumio-success/jumio-success.compone
 import {JumioErrorComponent} from './jumio/jumio-error/jumio-error.component';
 import {JumioComponent} from './jumio/jumio.component';
 import {SharedSecretComponent} from './shared-secret/shared-secret.component';
+import { ImportComponent } from './import/import.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -29,6 +30,7 @@ export class RouteNames {
   public static GET_SHARED_SECRETS = 'get-shared-secrets';
   // Deprecated route - redirects to get-free-deso
   public static GET_FREE_CLOUT = 'get-free-clout';
+  public static IMPORT = 'import';
 }
 
 const routes: Routes = [
@@ -47,6 +49,7 @@ const routes: Routes = [
   { path: RouteNames.GET_SHARED_SECRETS, component: SharedSecretComponent, pathMatch: 'full'},
   // redirect to get-free-deso page
   { path: RouteNames.GET_FREE_CLOUT, redirectTo: RouteNames.GET_FREE_DESO, pathMatch: 'full' },
+  { path: RouteNames.IMPORT, component: ImportComponent, pathMatch: 'full' },
 
 ];
 
