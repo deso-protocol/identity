@@ -51,6 +51,13 @@ export class BackendAPIService {
             }
             return userProfiles;
           })
+        ).pipe(
+          catchError(() => {
+            for(const publicKey of publicKeys) {
+              userProfiles[publicKey] = {};
+            }
+            return of(userProfiles);
+          })
         );
       } else {
         return of(userProfiles);
