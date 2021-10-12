@@ -17,7 +17,6 @@ export class ImportComponent implements OnInit {
 
   ngOnInit(): void {
     // We will only import to identity.deso.org
-    console.log(this.globalVars.hostname);
     if (this.globalVars.hostname !== 'identity.deso.org') {
       return;
     }
