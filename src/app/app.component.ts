@@ -116,8 +116,12 @@ export class AppComponent implements OnInit {
   }
 
   finishInit(): void {
-    // Migrate all accounts
-    this.accountService.migrate();
+    // Attempt to migrate all accounts. This can fail if the browser is not supported
+    try {
+      this.accountService.migrate();
+    } catch (e) {
+      console.error(e)
+    }
 
     // Finish loading
     this.loading = false;
