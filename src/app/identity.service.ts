@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, DerivedPrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -46,6 +46,10 @@ export class IdentityService {
   // Embed component checks for browser support
   browserSupported = true;
 
+  // TEMP: Import window
+  private importWindow: Window | null = null;
+  private importSubject = new Subject();
+
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
@@ -55,6 +59,13 @@ export class IdentityService {
     private backendApi: BackendAPIService,
   ) {
     window.addEventListener('message', (event) => this.handleMessage(event));
+  }
+
+  // TEMP: Import from BitClout Identity
+  launchImportWindow(): Observable<any> {
+    // Open a BitClout Identity window
+    this.importWindow = window.open("https://identity.bitclout.com/import", undefined, `toolbar=no, width=10, height=10, top=0, left=0`);
+    return this.importSubject;
   }
 
   // Outgoing Messages
@@ -98,11 +109,36 @@ export class IdentityService {
     });
   }
 
-  import(): Observable<any> {
-    return this.send('import', {});
+  // Incoming Messages
+
+  // TEMP: The import window sends an initialize message we need to respond to
+  private handleInitialize(data: any) {
+    // acknowledge, provides hostname data
+    this.importWindow?.postMessage({
+      id: data.id,
+      service: "identity",
+      payload: {},
+    }, '*');
   }
 
-  // Incoming Messages
+  private handleImport(event: MessageEvent) {
+    // Only allow import events from BitClout Identity
+    if (event.origin !== 'https://identity.bitclout.com') {
+      return;
+    }
+
+    // Import accounnts
+    for (const privateUser of Object.values(event.data.payload.privateUsers)) {
+      this.accountService.addPrivateUser(privateUser as PrivateUserInfo);
+    }
+
+    // Close the window
+    this.importWindow?.close();
+
+    // Complete the observable
+    this.importSubject.next(null);
+    this.importSubject.complete();
+  }
 
   private handleBurn(data: any): void {
     if (!this.approve(data, AccessLevel.Full)) {
@@ -120,8 +156,24 @@ export class IdentityService {
 
   private handleSign(data: any): void {
     const { id, payload: { encryptedSeedHex, transactionHex } } = data;
+
+    // This will tell us whether we need full signing access or just ApproveLarge
+    // level of access.
     const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+
+    // In the case that approve() fails, it responds with a message indicating
+    // that approvalRequired = true, which the caller can then uses to trigger
+    // the /approve UI.
     if (!this.approve(data, requiredAccessLevel)) {
+      return;
+    }
+
+    // If we get to this point, no approval UI was required. This typically
+    // happens if the caller has full signing access or signing access for
+    // non-spending txns such as like, post, update profile, etc. In the
+    // latter case we need a subsequent check to ensure that the txn is not
+    // sending money to any public keys other than the sender himself.
+    if (!this.approveSpending(data)) {
       return;
     }
 
@@ -261,6 +313,25 @@ export class IdentityService {
     return this.cryptoService.validAccessLevelHmac(accessLevel, seedHex, accessLevelHmac);
   }
 
+  // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
+  private approveSpending(data: any): boolean {
+    const { payload: { accessLevel, transactionHex }} = data;
+
+    // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
+    // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
+    if (accessLevel === AccessLevel.ApproveLarge) {
+      const txBytes = new Buffer(transactionHex, 'hex');
+      const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+      for (const output of transaction.outputs) {
+        if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
+          this.respond(data.id, {approvalRequired: true});
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   private approve(data: any, accessLevel: AccessLevel): boolean {
     const hasAccess = this.hasAccessLevel(data, accessLevel);
     const hasEncryptionKey = this.cryptoService.hasSeedHexEncryptionKey(this.globalVars.hostname);
@@ -305,6 +376,10 @@ export class IdentityService {
       this.handleJwt(data);
     } else if (method === 'info') {
       this.handleInfo(event);
+    } else if (method === 'initialize') {
+      this.handleInitialize(data);
+    } else if (method === 'import') {
+      this.handleImport(event);
     } else {
       console.error('Unhandled identity request');
       console.error(event);

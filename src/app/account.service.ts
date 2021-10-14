@@ -212,7 +212,8 @@ export class AccountService {
 
   // Private Getters and Modifiers
 
-  private addPrivateUser(userInfo: PrivateUserInfo): string {
+  // TEMP: public for import flow
+  public addPrivateUser(userInfo: PrivateUserInfo): string {
     const privateUsers = this.getPrivateUsersRaw();
     const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
     const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, userInfo.network);

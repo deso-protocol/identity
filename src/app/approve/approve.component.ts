@@ -4,6 +4,8 @@ import {CryptoService} from '../crypto.service';
 import {IdentityService} from '../identity.service';
 import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
+import {SigningService} from '../signing.service';
+import {BackendAPIService} from '../backend-api.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -27,7 +29,6 @@ import {
   TransactionMetadataBurnNFT,
   TransactionMetadataAuthorizeDerivedKey
 } from '../../lib/deso/transaction';
-import {SigningService} from '../signing.service';
 import bs58check from 'bs58check';
 
 @Component({
@@ -41,6 +42,7 @@ export class ApproveComponent implements OnInit {
   transactionHex: any;
   username: any;
   transactionDescription: any;
+  transactionDeSoSpent: string | boolean = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -49,12 +51,15 @@ export class ApproveComponent implements OnInit {
     private accountService: AccountService,
     public globalVars: GlobalVarsService,
     private signingService: SigningService,
+    private backendApi: BackendAPIService,
   ) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
       this.transactionHex = params.tx;
-
+      this.backendApi.GetTransactionSpending(this.transactionHex).subscribe( res => {
+        this.transactionDeSoSpent = res ? this.nanosToUnitString(res) : false;
+      });
       const txBytes = new Buffer(this.transactionHex, 'hex');
       this.transaction = Transaction.fromBytes(txBytes)[0];
       this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
@@ -91,19 +96,20 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataBasicTransfer:
         const outputs = [];
 
-        let sendingToSelf = true; //for if sender and recipient are same account
+        // for if sender and recipient are same account
+        let sendingToSelf = true;
 
         for (const output of this.transaction.outputs) {
           // Skip the change output. 0 means the buffers are equal
           if (Buffer.compare(output.publicKey, this.transaction.publicKey) !== 0) {
             sendingToSelf = false;
             const sendKey = this.base58KeyCheck(output.publicKey);
-            const sendAmount = `${output.amountNanos / 1e9}`;
-            outputs.push(`${sendAmount} DESO to ${sendKey}`);
+            const sendAmount = this.nanosToUnitString(output.amountNanos);
+            outputs.push(`${sendAmount} $DESO to ${sendKey}`);
           }
         }
 
-        //if all recipients are same as this.transaction.publicKey (outputs is empty)
+        // if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
           outputs.push(`$DESO to ${this.transaction.publicKey}`);
         }
@@ -147,12 +153,15 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoin:
         const creatorKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
+        const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
+        const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
         if (this.transaction.metadata.operationType === 0) {
-          description = `buy ${creatorKey}`;
+          description = `spend ${desoToSell} $DESO to buy the creator coin of ${creatorKey}`;
         } else if (this.transaction.metadata.operationType === 1) {
-          description = `sell ${creatorKey}`;
-        } else if (this.transaction.metadata.operationType === 3) {
-          description = `transfer ${creatorKey}`;
+          description = `sell ${creatorCoinToSell} creator coins of ${creatorKey} `;
+        } else if (this.transaction.metadata.operationType === 2) {
+          description = `add ${creatorKey} creator coin for ${desoToAdd} $DESO`;
         }
         break;
 
@@ -165,7 +174,9 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataCreatorCoinTransfer:
-        description = 'transfer a creator coin';
+        const creatorPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
+        description = `transfer ${transferAmount} creator coin of ${creatorPublicKey}`;
         break;
 
       case TransactionMetadataCreateNFT:
@@ -215,5 +226,11 @@ export class ApproveComponent implements OnInit {
   base58KeyCheck(keyBytes: Uint8Array): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[this.globalVars.network].deso;
     return bs58check.encode(Buffer.from([...prefix, ...keyBytes]));
+  }
+
+  nanosToUnitString(nanos: number): string {
+    // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
+    // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
+    return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
   }
 }

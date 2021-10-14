@@ -6,6 +6,8 @@ import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
 
+const IMPORTED_KEY = 'imported';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,6 +17,7 @@ export class AppComponent implements OnInit {
   title = 'identity';
 
   loading = true;
+  importing = false;
 
   constructor(
     private accountService: AccountService,
@@ -80,13 +83,10 @@ export class AppComponent implements OnInit {
       });
     }
 
-    // Migrate all accounts
-    this.accountService.migrate();
-
     if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
       // If callback is set, we won't be sending the initialize message.
       this.globalVars.hostname = 'localhost';
-      this.loading = false;
+      this.finishInit();
     } else if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
       this.identityService.initialize().subscribe(res => {
@@ -95,7 +95,14 @@ export class AppComponent implements OnInit {
           this.globalVars.accessLevelRequest = AccessLevel.Full;
         }
 
-        this.loading = false;
+        // We only care about attempting to import when we're in a tab.
+        // The iframe doesn't have first party storage access and the webview
+        // cannot open a window.
+        if (this.globalVars.inTab && !localStorage.getItem(IMPORTED_KEY)) {
+          this.importing = true;
+        } else {
+          this.finishInit();
+        }
       });
     } else {
       // Identity currently doesn't have any management UIs that can be accessed directly
@@ -105,6 +112,22 @@ export class AppComponent implements OnInit {
     this.backendApiService.GetAppState().subscribe((res) => {
       this.globalVars.jumioDeSoNanos = res.JumioDeSoNanos;
       this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
+    });
+  }
+
+  finishInit(): void {
+    // Migrate all accounts
+    this.accountService.migrate();
+
+    // Finish loading
+    this.loading = false;
+  }
+  
+  launchImport(): void {
+    this.identityService.launchImportWindow().subscribe(() => {
+      localStorage.setItem(IMPORTED_KEY, "true");
+      this.importing = false;
+      this.finishInit();
     });
   }
 }
