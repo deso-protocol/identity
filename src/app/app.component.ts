@@ -69,8 +69,13 @@ export class AppComponent implements OnInit {
       this.globalVars.hideJumio = true;
     }
 
-    const referralCode = params.get('referralCode');
+    const referralCodeKey = 'referralCode'
+    let referralCode = params.get(referralCodeKey);
+    if (!referralCode) {
+      referralCode = localStorage.getItem(referralCodeKey);
+    }
     if (referralCode) {
+      localStorage.setItem(referralCodeKey, referralCode);
       this.globalVars.referralHashBase58 = referralCode;
       this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
         const referralInfo = res.ReferralInfoResponse.Info;
