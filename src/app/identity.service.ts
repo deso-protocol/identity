@@ -148,7 +148,7 @@ export class IdentityService {
     });
   }
 
-  private handleBurnETH(data: any): void {
+  private handleSignETH(data: any): void {
     if (!this.approve(data, AccessLevel.Full)) {
       return;
     }
@@ -374,14 +374,14 @@ export class IdentityService {
 
     if (method === 'burn') {
       this.handleBurn(data);
-    } else if (method == 'burn_eth') {
-      this.handleBurnETH(data);
     } else if (method === 'encrypt'){
       this.handleEncrypt(data);
     } else if (method === 'decrypt') {
       this.handleDecrypt(data);
     } else if (method === 'sign') {
       this.handleSign(data);
+    } else if (method == 'sign_eth') {
+      this.handleSignETH(data);
     } else if (method === 'jwt') {
       this.handleJwt(data);
     } else if (method === 'info') {
