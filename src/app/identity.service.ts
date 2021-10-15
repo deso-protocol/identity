@@ -386,8 +386,6 @@ export class IdentityService {
       this.handleJwt(data);
     } else if (method === 'info') {
       this.handleInfo(event);
-    } else if (method == 'burn_eth') {
-      this.handleBurnETH(data);
     } else if (method === 'initialize') {
       this.handleInitialize(data);
     } else if (method === 'import') {
