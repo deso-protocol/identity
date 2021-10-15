@@ -380,7 +380,7 @@ export class IdentityService {
       this.handleDecrypt(data);
     } else if (method === 'sign') {
       this.handleSign(data);
-    } else if (method == 'sign_eth') {
+    } else if (method == 'signETH') {
       this.handleSignETH(data);
     } else if (method === 'jwt') {
       this.handleJwt(data);
