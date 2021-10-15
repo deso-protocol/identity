@@ -6,8 +6,6 @@ import {CryptoService} from './crypto.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
 import {decryptShared} from '../lib/ecies';
-import { ec } from 'elliptic';
-import BN from "bn.js";
 
 @Injectable({
   providedIn: 'root'
