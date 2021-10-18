@@ -128,4 +128,21 @@ export class SigningService {
 
     return signedHashes;
   }
+
+  signHashesETH(seedHex: string, unsignedHashes: string[]): {s: any, r: any, v: number | null}[] {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const signedHashes = [];
+
+    for (const unsignedHash of unsignedHashes) {
+      const signature = privateKey.sign(unsignedHash, { canonical: true });
+
+      signedHashes.push({
+        s: "0x" + signature.s.toString("hex"),
+        r: "0x" + signature.r.toString("hex"),
+        v: signature.recoveryParam
+      });
+    }
+
+    return signedHashes;
+  }
 }

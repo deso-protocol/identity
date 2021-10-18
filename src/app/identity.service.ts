@@ -113,6 +113,20 @@ export class IdentityService {
     });
   }
 
+  private handleSignETH(data: any): void {
+    if (!this.approve(data, AccessLevel.Full)) {
+      return;
+    }
+
+    const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const signatures = this.signingService.signHashesETH(seedHex, unsignedHashes);
+
+    this.respond(id, {
+      signatures,
+    });
+  }
+
   private handleSign(data: any): void {
     const { id, payload: { encryptedSeedHex, transactionHex } } = data;
     const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
@@ -296,6 +310,8 @@ export class IdentityService {
       this.handleDecrypt(data);
     } else if (method === 'sign') {
       this.handleSign(data);
+    } else if (method == 'signETH') {
+      this.handleSignETH(data);
     } else if (method === 'jwt') {
       this.handleJwt(data);
     } else if (method === 'info') {
