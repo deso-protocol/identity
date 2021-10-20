@@ -99,7 +99,7 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
         const publicKeys = this.transaction.outputs.map((output: any) => output.publicKey);
-        this.getProfilesForPublicKeys(publicKeys).subscribe((userMap) => {
+        this.getDisplayNamesForPublicKeys(publicKeys).subscribe((displayNameMap) => {
           // for if sender and recipient are same account
           let sendingToSelf = true;
 
@@ -108,7 +108,7 @@ export class ApproveComponent implements OnInit {
             if (Buffer.compare(output.publicKey, this.transaction.publicKey) !== 0) {
               sendingToSelf = false;
               const sendKey = this.base58KeyCheck(output.publicKey);
-              const sendDisplayName = this.getNameOrPublicKey(userMap[sendKey]?.ProfileEntryResponse?.Username, sendKey);
+              const sendDisplayName = this.getNameOrPublicKey(displayNameMap[sendKey], sendKey);
               const sendAmount = this.nanosToUnitString(output.amountNanos);
               outputs.push(`${sendAmount} $DESO to ${sendDisplayName}`);
             }
@@ -117,7 +117,7 @@ export class ApproveComponent implements OnInit {
           // if all recipients are same as this.transaction.publicKey (outputs is empty)
           if (sendingToSelf && this.transaction.outputs.length > 0) {
             const publicKey = this.transaction.publicKey;
-            const displayName = this.getNameOrPublicKey(userMap[publicKey]?.ProfileEntryResponse?.Username, publicKey);
+            const displayName = this.getNameOrPublicKey(displayNameMap[publicKey], publicKey);
             outputs.push(`$DESO to ${displayName}`);
           }
 
@@ -151,8 +151,9 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataFollow:
         const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
-        this.getUsernameForPublicKey(followedKey).subscribe((username) => {
-          description = `follow ${this.getNameOrPublicKey(username, followedKey)}`;
+        const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
+        this.getDisplayNameForPublicKey(followedKey).subscribe((displayName) => {
+          description = `${followAction} ${displayName}`;
           this.transactionDescription = description;
           this.fetchingProfiles = false;
         });
@@ -171,8 +172,7 @@ export class ApproveComponent implements OnInit {
         const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
         const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
         const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-        this.getUsernameForPublicKey(creatorKey).subscribe((username) => {
-          const displayName = this.getNameOrPublicKey(username, creatorKey);
+        this.getDisplayNameForPublicKey(creatorKey).subscribe((displayName) => {
           if (this.transaction.metadata.operationType === 0) {
             description = `spend ${desoToSell} $DESO to buy the creator coin of ${displayName}`;
           } else if (this.transaction.metadata.operationType === 1) {
@@ -195,9 +195,9 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoinTransfer:
         const creatorPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        this.getUsernameForPublicKey(creatorPublicKey).subscribe((username) => {
+        this.getDisplayNameForPublicKey(creatorPublicKey).subscribe((displayName) => {
           const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-          description = `transfer ${transferAmount} creator coin of ${this.getNameOrPublicKey(username, creatorPublicKey)}`;
+          description = `transfer ${transferAmount} creator coin of ${displayName}`;
           this.transactionDescription = description;
           this.fetchingProfiles = false;
         });
@@ -259,7 +259,7 @@ export class ApproveComponent implements OnInit {
   }
 
   // Fetch a single ProfileEntryResponse
-  getUsernameForPublicKey(publicKey: string): Observable<string | null | undefined> {
+  getDisplayNameForPublicKey(publicKey: string): Observable<string> {
     this.fetchingProfiles = true;
     return this.backendApi.GetUsersStateless([publicKey], true).pipe(map(res => {
       const userList = res.UserList
@@ -267,23 +267,22 @@ export class ApproveComponent implements OnInit {
         return null;
       }
       const user = userList[0];
-      return user?.ProfileEntryResponse?.Username;
+      return user?.ProfileEntryResponse?.Username || publicKey;
     }));
   }
 
   // Fetch multiple User objects
-  getProfilesForPublicKeys(publicKeys: string[]): Observable<{ [k: string]: User}> {
+  getDisplayNamesForPublicKeys(publicKeys: string[]): Observable<{ [k: string]: string}> {
     this.fetchingProfiles = true;
     return this.backendApi.GetUsersStateless(publicKeys, true).pipe(map(res => {
       const userList = res.UserList
       if (userList.length === 0) {
         return {};
       }
-      return userList.reduce((userMap: { [k: string]: User}, user: User) => {
-        userMap[user.PublicKeyBase58Check] = user;
+      return userList.reduce((userMap: { [k: string]: string}, user: User) => {
+        userMap[user.PublicKeyBase58Check] = user?.ProfileEntryResponse?.Username || user.PublicKeyBase58Check;
         return userMap;
       }, {})
-      return userList.map((user: { ProfileEntryResponse: ProfileEntryResponse, PublicKeyBase58Check: string }) => user?.ProfileEntryResponse)
     }));
   }
 
