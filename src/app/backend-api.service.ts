@@ -63,7 +63,7 @@ export class BackendAPIService {
     publicKeys: any[]
   ): Observable<{[key: string]: UserProfile}> {
       const userProfiles: {[key: string]: any} = {};
-      const req = this.GetUsersStateless(publicKeys);
+      const req = this.GetUsersStateless(publicKeys, true);
       if (publicKeys.length > 0) {
         return req.pipe(
           map( res => {
