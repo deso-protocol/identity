@@ -258,7 +258,7 @@ export class ApproveComponent implements OnInit {
     return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
   }
 
-  // Fetch a single ProfileEntryResponse
+  // Fetch a single display name given a public key.  If a public key has a Profile, then this return a username. If not, it returns a public key. 
   getDisplayNameForPublicKey(publicKey: string): Observable<string> {
     this.fetchingProfiles = true;
     return this.backendApi.GetUsersStateless([publicKey], true).pipe(map(res => {
@@ -271,7 +271,7 @@ export class ApproveComponent implements OnInit {
     }));
   }
 
-  // Fetch multiple User objects
+  // Fetch a map of public key to display name. 
   getDisplayNamesForPublicKeys(publicKeys: string[]): Observable<{ [k: string]: string}> {
     this.fetchingProfiles = true;
     return this.backendApi.GetUsersStateless(publicKeys, true).pipe(map(res => {
