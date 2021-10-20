@@ -98,7 +98,7 @@ export class ApproveComponent implements OnInit {
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
-        const publicKeys = this.transaction.outputs.map((output: any) => output.publicKey);
+        const publicKeys = this.transaction.outputs.map((output: any) => this.base58KeyCheck(output.publicKey));
         this.getDisplayNamesForPublicKeys(publicKeys).subscribe((displayNameMap) => {
           // for if sender and recipient are same account
           let sendingToSelf = true;
