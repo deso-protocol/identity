@@ -9,10 +9,33 @@ import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {DerivedKey, UserProfile} from '../types/identity';
 
+export class ProfileEntryResponse {
+  Username: string | null = null;
+  Description: string | null = null;
+  ProfilePic?: string;
+  CoinEntry?: {
+    DeSoLockedNanos: number;
+    CoinWatermarkNanos: number;
+    CoinsInCirculationNanos: number;
+    CreatorBasisPoints: number;
+  };
+  CoinPriceDeSoNanos?: number;
+  StakeMultipleBasisPoints?: number;
+  PublicKeyBase58Check?: string;
+  UsersThatHODL?: any;
+  Posts?: any[];
+  IsReserved?: boolean;
+  IsVerified?: boolean;
+}
+
+export class User {
+  ProfileEntryResponse: ProfileEntryResponse | null = null;
+  PublicKeyBase58Check: string = "";
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class BackendAPIService {
   endpoint = `https://${environment.nodeHostname}/api/v0`;
 
@@ -25,12 +48,13 @@ export class BackendAPIService {
   ) { }
 
   GetUsersStateless(
-    publicKeys: any[]
+    publicKeys: any[], SkipForLeaderboard: boolean = false,
   ): Observable<any> {
     return this.httpClient.post<any>(
       `${this.endpoint}/get-users-stateless`,
       {
         PublicKeysBase58Check: publicKeys,
+        SkipForLeaderboard,
       },
     );
   }

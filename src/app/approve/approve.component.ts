@@ -5,7 +5,9 @@ import {IdentityService} from '../identity.service';
 import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {SigningService} from '../signing.service';
-import {BackendAPIService} from '../backend-api.service';
+import {BackendAPIService, ProfileEntryResponse, User} from '../backend-api.service';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -43,6 +45,7 @@ export class ApproveComponent implements OnInit {
   username: any;
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
+  fetchingProfiles: boolean = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -94,27 +97,35 @@ export class ApproveComponent implements OnInit {
 
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
-        const outputs = [];
+        const outputs: any[] = [];
+        const publicKeys = this.transaction.outputs.map((output: any) => output.publicKey);
+        this.getProfilesForPublicKeys(publicKeys).subscribe((userMap) => {
+          // for if sender and recipient are same account
+          let sendingToSelf = true;
 
-        // for if sender and recipient are same account
-        let sendingToSelf = true;
-
-        for (const output of this.transaction.outputs) {
-          // Skip the change output. 0 means the buffers are equal
-          if (Buffer.compare(output.publicKey, this.transaction.publicKey) !== 0) {
-            sendingToSelf = false;
-            const sendKey = this.base58KeyCheck(output.publicKey);
-            const sendAmount = this.nanosToUnitString(output.amountNanos);
-            outputs.push(`${sendAmount} $DESO to ${sendKey}`);
+          for (const output of this.transaction.outputs) {
+            // Skip the change output. 0 means the buffers are equal
+            if (Buffer.compare(output.publicKey, this.transaction.publicKey) !== 0) {
+              sendingToSelf = false;
+              const sendKey = this.base58KeyCheck(output.publicKey);
+              const sendDisplayName = this.getNameOrPublicKey(userMap[sendKey]?.ProfileEntryResponse?.Username, sendKey);
+              const sendAmount = this.nanosToUnitString(output.amountNanos);
+              outputs.push(`${sendAmount} $DESO to ${sendDisplayName}`);
+            }
           }
-        }
 
-        // if all recipients are same as this.transaction.publicKey (outputs is empty)
-        if (sendingToSelf && this.transaction.outputs.length > 0) {
-          outputs.push(`$DESO to ${this.transaction.publicKey}`);
-        }
+          // if all recipients are same as this.transaction.publicKey (outputs is empty)
+          if (sendingToSelf && this.transaction.outputs.length > 0) {
+            const publicKey = this.transaction.publicKey;
+            const displayName = this.getNameOrPublicKey(userMap[publicKey]?.ProfileEntryResponse?.Username, publicKey);
+            outputs.push(`$DESO to ${displayName}`);
+          }
 
-        description = `send ${outputs.join(', ')}`;
+          description = `send ${outputs.join(', ')}`;
+          this.transactionDescription = description;
+          this.fetchingProfiles = false;
+        });
+
 
         break;
 
@@ -140,7 +151,11 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataFollow:
         const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
-        description = `follow ${this.keyName(followedKey)}`;
+        this.getUsernameForPublicKey(followedKey).subscribe((username) => {
+          description = `follow ${this.getNameOrPublicKey(username, followedKey)}`;
+          this.transactionDescription = description;
+          this.fetchingProfiles = false;
+        });
         break;
 
       case TransactionMetadataLike:
@@ -156,13 +171,18 @@ export class ApproveComponent implements OnInit {
         const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
         const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
         const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-        if (this.transaction.metadata.operationType === 0) {
-          description = `spend ${desoToSell} $DESO to buy the creator coin of ${creatorKey}`;
-        } else if (this.transaction.metadata.operationType === 1) {
-          description = `sell ${creatorCoinToSell} creator coins of ${creatorKey} `;
-        } else if (this.transaction.metadata.operationType === 2) {
-          description = `add ${creatorKey} creator coin for ${desoToAdd} $DESO`;
-        }
+        this.getUsernameForPublicKey(creatorKey).subscribe((username) => {
+          const displayName = this.getNameOrPublicKey(username, creatorKey);
+          if (this.transaction.metadata.operationType === 0) {
+            description = `spend ${desoToSell} $DESO to buy the creator coin of ${displayName}`;
+          } else if (this.transaction.metadata.operationType === 1) {
+            description = `sell ${creatorCoinToSell} creator coins of ${displayName} `;
+          } else if (this.transaction.metadata.operationType === 2) {
+            description = `add ${displayName} creator coin for ${desoToAdd} $DESO`;
+          }
+          this.transactionDescription = description;
+          this.fetchingProfiles = false;
+        });
         break;
 
       case TransactionMetadataSwapIdentity:
@@ -175,8 +195,12 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoinTransfer:
         const creatorPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-        description = `transfer ${transferAmount} creator coin of ${creatorPublicKey}`;
+        this.getUsernameForPublicKey(creatorPublicKey).subscribe((username) => {
+          const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
+          description = `transfer ${transferAmount} creator coin of ${this.getNameOrPublicKey(username, creatorPublicKey)}`;
+          this.transactionDescription = description;
+          this.fetchingProfiles = false;
+        });
         break;
 
       case TransactionMetadataCreateNFT:
@@ -232,5 +256,39 @@ export class ApproveComponent implements OnInit {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
     return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
+  }
+
+  // Fetch a single ProfileEntryResponse
+  getUsernameForPublicKey(publicKey: string): Observable<string | null | undefined> {
+    this.fetchingProfiles = true;
+    return this.backendApi.GetUsersStateless([publicKey], true).pipe(map(res => {
+      const userList = res.UserList
+      if (userList.length === 0) {
+        return null;
+      }
+      const user = userList[0];
+      return user?.ProfileEntryResponse?.Username;
+    }));
+  }
+
+  // Fetch multiple User objects
+  getProfilesForPublicKeys(publicKeys: string[]): Observable<{ [k: string]: User}> {
+    this.fetchingProfiles = true;
+    return this.backendApi.GetUsersStateless(publicKeys, true).pipe(map(res => {
+      const userList = res.UserList
+      if (userList.length === 0) {
+        return {};
+      }
+      return userList.reduce((userMap: { [k: string]: User}, user: User) => {
+        userMap[user.PublicKeyBase58Check] = user;
+        return userMap;
+      }, {})
+      return userList.map((user: { ProfileEntryResponse: ProfileEntryResponse, PublicKeyBase58Check: string }) => user?.ProfileEntryResponse)
+    }));
+  }
+
+  // Returns username if truthy, otherwise public key
+  getNameOrPublicKey(username: string | null | undefined, publicKey: string): string {
+    return username || publicKey;
   }
 }
