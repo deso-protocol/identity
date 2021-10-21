@@ -94,7 +94,6 @@ export class ApproveComponent implements OnInit {
 
   generateTransactionDescription(): Observable<string> {
     const unknownTransaction = 'sign an unknown transaction';
-  console.log(this.transaction);
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
