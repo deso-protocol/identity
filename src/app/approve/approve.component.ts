@@ -230,13 +230,14 @@ export class ApproveComponent implements OnInit {
 
   // Fetch a single display name given a public key.  If a public key has a Profile, then this return a username. If not, it returns a public key.
   getDisplayNameForPublicKey(publicKey: Uint8Array): Observable<string> {
-    return this.backendApi.GetUsersStateless([this.base58KeyCheck(publicKey)], true).pipe(map(res => {
+    const publicKeyBase58Check = this.base58KeyCheck(publicKey);
+    return this.backendApi.GetUsersStateless([], true).pipe(map(res => {
       const userList = res.UserList
       if (userList.length === 0) {
         return null;
       }
       const user = userList[0];
-      return user?.ProfileEntryResponse?.Username || publicKey;
+      return user?.ProfileEntryResponse?.Username || publicKeyBase58Check;
     }));
   }
 
