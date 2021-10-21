@@ -5,7 +5,9 @@ import {IdentityService} from '../identity.service';
 import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {SigningService} from '../signing.service';
-import {BackendAPIService} from '../backend-api.service';
+import {BackendAPIService, ProfileEntryResponse, User} from '../backend-api.service';
+import {Observable, of} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -91,12 +93,10 @@ export class ApproveComponent implements OnInit {
 
   generateTransactionDescription(): void {
     let description = 'sign an unknown transaction';
-
+    let publicKeys: string[] = [];
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
-        const outputs = [];
-
-        // for if sender and recipient are same account
+        const outputs: any[] = [];
         let sendingToSelf = true;
 
         for (const output of this.transaction.outputs) {
@@ -106,16 +106,18 @@ export class ApproveComponent implements OnInit {
             const sendKey = this.base58KeyCheck(output.publicKey);
             const sendAmount = this.nanosToUnitString(output.amountNanos);
             outputs.push(`${sendAmount} $DESO to ${sendKey}`);
+            publicKeys.push(sendKey);
           }
         }
 
         // if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
-          outputs.push(`$DESO to ${this.transaction.publicKey}`);
+          const selfPublicKey = this.base58KeyCheck(this.transaction.publicKey);
+          publicKeys.push(selfPublicKey);
+          outputs.push(`$DESO to ${selfPublicKey}`);
         }
 
         description = `send ${outputs.join(', ')}`;
-
         break;
 
       case TransactionMetadataBitcoinExchange:
@@ -139,29 +141,29 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataFollow:
-        const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
-        description = `follow ${this.keyName(followedKey)}`;
+        const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
+        const followedPublicKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
+        publicKeys = [followedPublicKey];
+        description = `${followAction} ${followedPublicKey}`;
         break;
 
       case TransactionMetadataLike:
-        if (this.transaction.metadata.isUnlike) {
-          description = 'unlike a post';
-        } else {
-          description = 'like a post';
-        }
+        description = this.transaction.metadata.isUnlike ? 'unlike a post' : 'like a post';
         break;
 
       case TransactionMetadataCreatorCoin:
-        const creatorKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
-        const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
-        const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-        if (this.transaction.metadata.operationType === 0) {
-          description = `spend ${desoToSell} $DESO to buy the creator coin of ${creatorKey}`;
-        } else if (this.transaction.metadata.operationType === 1) {
-          description = `sell ${creatorCoinToSell} creator coins of ${creatorKey} `;
-        } else if (this.transaction.metadata.operationType === 2) {
-          description = `add ${creatorKey} creator coin for ${desoToAdd} $DESO`;
+        const operationType = this.transaction.metadata.operationType;
+        const creatorCoinPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        publicKeys = [creatorCoinPublicKey];
+        if (operationType === 0) {
+          const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
+          description = `spend ${desoToSell} $DESO to buy the creator coin of ${creatorCoinPublicKey}`;
+        } else if (operationType === 1) {
+          const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
+          description = `sell ${creatorCoinToSell} creator coins of ${creatorCoinPublicKey}`;
+        } else if (operationType === 2) {
+          const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
+          description = `add ${creatorCoinPublicKey} creator coin for ${desoToAdd} $DESO`;
         }
         break;
 
@@ -174,9 +176,10 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataCreatorCoinTransfer:
-        const creatorPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
         const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-        description = `transfer ${transferAmount} creator coin of ${creatorPublicKey}`;
+        const creatorCoinTransferPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        publicKeys = [creatorCoinTransferPublicKey];
+        description = `transfer ${transferAmount} creator coin of ${creatorCoinTransferPublicKey}`;
         break;
 
       case TransactionMetadataCreateNFT:
@@ -216,7 +219,10 @@ export class ApproveComponent implements OnInit {
         break;
     }
 
+    // Set the transaction description based on the description populated with public keys.
     this.transactionDescription = description;
+    // Fetch Usernames from the API and replace public keys with usernames in the description for a more useful message.
+    this.getDescriptionWithUsernames(publicKeys, description).subscribe((res) => this.transactionDescription = res);
   }
 
   keyName(publicKey: string): string {
@@ -232,5 +238,35 @@ export class ApproveComponent implements OnInit {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
     return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
+  }
+
+  // Fetch Usernames from API and replace public keys in description with Username
+  getDescriptionWithUsernames(publicKeys: string[], description: string): Observable<string> {
+    // If there are no public keys, we can just return the description as is.
+    if (publicKeys.length === 0) {
+      return of(description);
+    }
+    // Otherwise, we hit get-users-stateless to fetch profiles.
+    return this.backendApi.GetUsersStateless(publicKeys, true).pipe((map(res => {
+      const userList = res.UserList;
+      // If the response has no users, return the description as is.
+      if (userList.length === 0) {
+        return description;
+      }
+      // Convert the list of users to a map of PublicKeyBase58Check to Username that we can use to replace in the description.
+      const usernameMap: { [k: string]: string } = userList.reduce((userMap: { [k: string]: string }, user: User) => {
+        const username = user?.ProfileEntryResponse?.Username;
+        if (username) {
+          userMap[user.PublicKeyBase58Check] = username;
+        }
+        return userMap;
+      }, {});
+      let outputString = description;
+      // Iterate over key-value pairs and replace public key with username
+      for (const [publicKey, username] of Object.entries(usernameMap)) {
+        outputString = outputString.replace(publicKey, username);
+      };
+      return outputString;
+    })));
   }
 }

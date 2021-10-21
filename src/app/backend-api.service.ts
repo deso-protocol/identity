@@ -9,10 +9,33 @@ import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {DerivedKey, UserProfile} from '../types/identity';
 
+export class ProfileEntryResponse {
+  Username: string | null = null;
+  Description: string | null = null;
+  ProfilePic?: string;
+  CoinEntry?: {
+    DeSoLockedNanos: number;
+    CoinWatermarkNanos: number;
+    CoinsInCirculationNanos: number;
+    CreatorBasisPoints: number;
+  };
+  CoinPriceDeSoNanos?: number;
+  StakeMultipleBasisPoints?: number;
+  PublicKeyBase58Check?: string;
+  UsersThatHODL?: any;
+  Posts?: any[];
+  IsReserved?: boolean;
+  IsVerified?: boolean;
+}
+
+export class User {
+  ProfileEntryResponse: ProfileEntryResponse | null = null;
+  PublicKeyBase58Check: string = "";
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class BackendAPIService {
   endpoint = `https://${environment.nodeHostname}/api/v0`;
 
@@ -24,13 +47,18 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService,
   ) { }
 
+  // When SkipForLeaderboard is true, this endpoint only returns ProfileEntryResponse, IsGraylisted, IsBlacklisted,
+  //  IsAdmin, and IsSuperAdmin for each user.
+  // When SkipForLeaderboard is false, we also fetch the user's balance, profiles this user follows, hodlings,  and
+  //  UserMetadata. Oftentimes, this information is not needed and excluding it significantly improves performance.
   GetUsersStateless(
-    publicKeys: any[]
+    publicKeys: any[], SkipForLeaderboard: boolean = false,
   ): Observable<any> {
     return this.httpClient.post<any>(
       `${this.endpoint}/get-users-stateless`,
       {
         PublicKeysBase58Check: publicKeys,
+        SkipForLeaderboard,
       },
     );
   }
@@ -39,7 +67,7 @@ export class BackendAPIService {
     publicKeys: any[]
   ): Observable<{[key: string]: UserProfile}> {
       const userProfiles: {[key: string]: any} = {};
-      const req = this.GetUsersStateless(publicKeys);
+      const req = this.GetUsersStateless(publicKeys, true);
       if (publicKeys.length > 0) {
         return req.pipe(
           map( res => {
