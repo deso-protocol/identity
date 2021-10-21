@@ -1,11 +1,14 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, DerivedPrivateUserInfo, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
 import {SigningService} from './signing.service';
+import {HttpParams} from '@angular/common/http';
+import {BackendAPIService} from './backend-api.service';
+import {AccountService} from './account.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -29,8 +32,6 @@ import {
   TransactionMetadataUpdateNFT,
   TransactionMetadataCreateNFT
 } from '../lib/deso/transaction';
-import {HttpParams} from '@angular/common/http';
-import { AccountService } from './account.service';
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +56,7 @@ export class IdentityService {
     private cookieService: CookieService,
     private signingService: SigningService,
     private accountService: AccountService,
+    private backendApi: BackendAPIService,
   ) {
     window.addEventListener('message', (event) => this.handleMessage(event));
   }
@@ -87,20 +89,24 @@ export class IdentityService {
   }
 
   derive(payload: {
-    derivedPrivateUserInfo: DerivedPrivateUserInfo,
+    publicKey: string,
   }): void {
-    if (this.globalVars.callback) {
-      // If callback is passed, we redirect to it with payload as URL parameters.
-      let httpParams = new HttpParams();
-      for (const key in payload.derivedPrivateUserInfo) {
-        if (payload.derivedPrivateUserInfo.hasOwnProperty(key)) {
-          httpParams = httpParams.append(key, (payload.derivedPrivateUserInfo as any)[key].toString());
+    this.backendApi.GetAppState().subscribe( res => {
+      const blockHeight = res.BlockHeight;
+      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(payload.publicKey, blockHeight);
+      if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
+        // If callback is passed, we redirect to it with payload as URL parameters.
+        let httpParams = new HttpParams();
+        for (const key in derivedPrivateUserInfo) {
+          if (derivedPrivateUserInfo.hasOwnProperty(key)) {
+            httpParams = httpParams.append(key, (derivedPrivateUserInfo as any)[key].toString());
+          }
         }
+        window.location.href = this.globalVars.callback.href + `?${httpParams.toString()}`;
+      } else {
+        this.cast('derive', derivedPrivateUserInfo);
       }
-      window.location.href = this.globalVars.callback.href + `?${httpParams.toString()}`;
-    } else {
-      this.cast('derive', payload);
-    }
+    });
   }
 
   // Incoming Messages

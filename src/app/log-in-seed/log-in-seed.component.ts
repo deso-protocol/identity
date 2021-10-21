@@ -60,7 +60,7 @@ export class LogInSeedComponent implements OnInit {
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
     const keychainNonStandard = this.cryptoService.mnemonicToKeychain(mnemonic, extraText, true);
 
-    this.accountService.addUser(keychain, mnemonic, extraText, network);
+    let userPublicKey = this.accountService.addUser(keychain, mnemonic, extraText, network);
 
     // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
     if (keychain.publicKey !== keychainNonStandard.publicKey) {
@@ -74,7 +74,7 @@ export class LogInSeedComponent implements OnInit {
         const user = res.UserList[0];
         if (user.ProfileEntryResponse || user.BalanceNanos > 0 || user.UsersYouHODL?.length) {
           // Add the non-standard key if the user has a profile, a balance, or holdings
-          this.accountService.addUser(keychainNonStandard, mnemonic, extraText, network);
+          userPublicKey = this.accountService.addUser(keychainNonStandard, mnemonic, extraText, network);
         }
       });
     }
@@ -83,10 +83,15 @@ export class LogInSeedComponent implements OnInit {
     this.mnemonic = '';
     this.extraText = '';
 
-    let origin = this.activatedRoute.snapshot.queryParamMap.get('origin') || RouteNames.LOG_IN;
-    if (origin !== RouteNames.DERIVE) {
-      origin = RouteNames.LOG_IN;
+    const urlParams = this.activatedRoute.snapshot.queryParamMap;
+    if (urlParams.has('origin')) {
+      if (urlParams.get('origin') === RouteNames.DERIVE) {
+        this.identityService.derive({
+          publicKey: userPublicKey,
+        });
+      }
+    } else {
+      this.router.navigate(['/', RouteNames.LOG_IN], {queryParamsHandling: 'merge'});
     }
-    this.router.navigate(['/', origin]);
   }
 }

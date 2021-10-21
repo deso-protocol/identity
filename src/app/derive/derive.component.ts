@@ -5,6 +5,8 @@ import {BackendAPIService} from '../backend-api.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {GoogleDriveService} from '../google-drive.service';
 import {UserProfile} from '../../types/identity';
+import {Router} from '@angular/router';
+import {RouteNames} from '../app-routing.module';
 
 @Component({
   selector: 'app-derive',
@@ -23,6 +25,7 @@ export class DeriveComponent implements OnInit {
     public globalVars: GlobalVarsService,
     private googleDrive: GoogleDriveService,
     private backendApi: BackendAPIService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -38,16 +41,21 @@ export class DeriveComponent implements OnInit {
     this.withCallback = this.globalVars.callback !== null;
   }
 
+  redirectLoadSeed(): void {
+    this.router.navigate(['/', RouteNames.LOAD_SEED], { queryParams: { origin: RouteNames.DERIVE }, queryParamsHandling: 'merge' });
+  }
+
+  redirectSignUp(): void {
+    this.router.navigate(['/', RouteNames.SIGN_UP], { queryParams: { origin: RouteNames.DERIVE }, queryParamsHandling: 'merge' });
+  }
+
   launchGoogle(): void {
-    this.googleDrive.launchGoogle();
+    this.googleDrive.launchGoogle(RouteNames.DERIVE);
   }
 
   selectAccountAndDeriveKey(publicKey: string): void {
-    this.backendApi.GetAppState().subscribe( res => {
-      const blockHeight = res.BlockHeight;
-      this.identityService.derive({
-        derivedPrivateUserInfo: this.accountService.getDerivedPrivateUser(publicKey, blockHeight),
-      });
+    this.identityService.derive({
+      publicKey
     });
   }
 }

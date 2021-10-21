@@ -5,10 +5,10 @@ import {AccountService} from '../account.service';
 import {IdentityService} from '../identity.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {environment} from '../../environments/environment';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../text.service';
-import * as bip39 from "bip39";
-import { PrivateUserVersion } from 'src/types/identity';
+import * as bip39 from 'bip39';
+import {RouteNames} from '../app-routing.module';
 
 @Component({
   selector: 'app-sign-up',
@@ -39,9 +39,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private identityService: IdentityService,
     public globalVars: GlobalVarsService,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private textService: TextService,
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
+    if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
+      this.stepTotal = 2;
+    }
   }
 
   ngOnInit(): void {
@@ -87,10 +91,19 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    if (!this.globalVars.showJumio()) {
-      this.login();
+    const urlParams = this.activatedRoute.snapshot.queryParamMap;
+    if (urlParams.has('origin')) {
+      if (urlParams.get('origin') === RouteNames.DERIVE) {
+        this.identityService.derive({
+          publicKey: this.publicKeyAdded,
+        });
+      }
     } else {
-      this.stepNum = 3;
+      if (!this.globalVars.showJumio()) {
+        this.login();
+      } else {
+        this.stepNum = 3;
+      }
     }
   }
 
