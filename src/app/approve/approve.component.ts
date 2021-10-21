@@ -221,7 +221,7 @@ export class ApproveComponent implements OnInit {
     }
 
     this.transactionDescription = description;
-    this.getDescriptionWithusernames(publicKeys, description).subscribe((res) => this.transactionDescription = res);
+    this.getDescriptionWithUsernames(publicKeys, description).subscribe((res) => this.transactionDescription = res);
   }
 
   keyName(publicKey: string): string {
@@ -240,7 +240,7 @@ export class ApproveComponent implements OnInit {
   }
 
   // Fetch Usernames from API and replace public keys in description with Username
-  getDescriptionWithusernames(publicKeys: string[], description: string): Observable<string> {
+  getDescriptionWithUsernames(publicKeys: string[], description: string): Observable<string> {
     // If there are no public keys, we can just return the description as is.
     if (publicKeys.length === 0) {
       return of(description);
