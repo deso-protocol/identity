@@ -6,7 +6,7 @@ import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {SigningService} from '../signing.service';
 import {BackendAPIService, ProfileEntryResponse, User} from '../backend-api.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {
   Transaction,
@@ -45,7 +45,7 @@ export class ApproveComponent implements OnInit {
   username: any;
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
-  fetchingProfiles: boolean = false;
+  loading: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -67,7 +67,9 @@ export class ApproveComponent implements OnInit {
       this.transaction = Transaction.fromBytes(txBytes)[0];
       this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
 
-      this.generateTransactionDescription();
+      this.generateTransactionDescription()
+        .subscribe((description) => this.transactionDescription = description)
+        .add(() => this.loading = false);
     });
   }
 
@@ -92,14 +94,14 @@ export class ApproveComponent implements OnInit {
     return this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
   }
 
-  generateTransactionDescription(): void {
-    let description = 'sign an unknown transaction';
+  generateTransactionDescription(): Observable<string> {
+    const unknownTransaction = 'sign an unknown transaction';
 
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
         const publicKeys = this.transaction.outputs.map((output: any) => this.base58KeyCheck(output.publicKey));
-        this.getDisplayNamesForPublicKeys(publicKeys).subscribe((displayNameMap) => {
+        return this.getDisplayNamesForPublicKeys(publicKeys).pipe(map((displayNameMap) => {
           // for if sender and recipient are same account
           let sendingToSelf = true;
 
@@ -121,126 +123,95 @@ export class ApproveComponent implements OnInit {
             outputs.push(`$DESO to ${displayName}`);
           }
 
-          description = `send ${outputs.join(', ')}`;
-          this.transactionDescription = description;
-          this.fetchingProfiles = false;
-        });
-
-
-        break;
+          return `send ${outputs.join(', ')}`;
+        }));
 
       case TransactionMetadataBitcoinExchange:
-        description = 'exchange bitcoin';
-        break;
+        return of('exchange bitcoin');
 
       case TransactionMetadataPrivateMessage:
-        description = 'send a private message';
-        break;
+        return of('send a private message');
 
       case TransactionMetadataSubmitPost:
-        description = 'submit a post';
-        break;
+        return of('submit a post');
 
       case TransactionMetadataUpdateProfile:
-        description = 'update your profile';
-        break;
+        return of('update your profile');
 
       case TransactionMetadataUpdateBitcoinUSDExchangeRate:
-        description = 'update bitcoin exchange rate';
-        break;
+        return of('update bitcoin exchange rate');
 
       case TransactionMetadataFollow:
         const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
         const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
-        this.getDisplayNameForPublicKey(followedKey).subscribe((displayName) => {
-          description = `${followAction} ${displayName}`;
-          this.transactionDescription = description;
-          this.fetchingProfiles = false;
-        });
-        break;
+        return this.getDisplayNameForPublicKey(followedKey).pipe(map((displayName) =>
+          `${followAction} ${displayName}`
+        ));
 
       case TransactionMetadataLike:
-        if (this.transaction.metadata.isUnlike) {
-          description = 'unlike a post';
-        } else {
-          description = 'like a post';
-        }
-        break;
+        return of(this.transaction.metadata.isUnlike ? 'unlike a post' : 'like a post');
 
       case TransactionMetadataCreatorCoin:
         const creatorKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
         const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
         const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
         const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-        this.getDisplayNameForPublicKey(creatorKey).subscribe((displayName) => {
+        return this.getDisplayNameForPublicKey(creatorKey).pipe(map((displayName) => {
           if (this.transaction.metadata.operationType === 0) {
-            description = `spend ${desoToSell} $DESO to buy the creator coin of ${displayName}`;
+            return `spend ${desoToSell} $DESO to buy the creator coin of ${displayName}`;
           } else if (this.transaction.metadata.operationType === 1) {
-            description = `sell ${creatorCoinToSell} creator coins of ${displayName} `;
+            return `sell ${creatorCoinToSell} creator coins of ${displayName} `;
           } else if (this.transaction.metadata.operationType === 2) {
-            description = `add ${displayName} creator coin for ${desoToAdd} $DESO`;
+            return `add ${displayName} creator coin for ${desoToAdd} $DESO`;
           }
-          this.transactionDescription = description;
-          this.fetchingProfiles = false;
-        });
-        break;
+          return unknownTransaction;
+        }));
 
       case TransactionMetadataSwapIdentity:
-        description = 'swap identities';
-        break;
+        return of('swap identities');
 
       case TransactionMetadataUpdateGlobalParams:
-        description = 'update global params';
-        break;
+        return of('update global params');
 
       case TransactionMetadataCreatorCoinTransfer:
+        const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
         const creatorPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        this.getDisplayNameForPublicKey(creatorPublicKey).subscribe((displayName) => {
-          const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-          description = `transfer ${transferAmount} creator coin of ${displayName}`;
-          this.transactionDescription = description;
-          this.fetchingProfiles = false;
-        });
-        break;
+        return this.getDisplayNameForPublicKey(creatorPublicKey).pipe(map((displayName) =>
+          `transfer ${transferAmount} creator coin of ${displayName}`
+        ));
 
       case TransactionMetadataCreateNFT:
-        description = 'create an NFT';
-        break;
+        return of('create an NFT');
 
       case TransactionMetadataUpdateNFT:
-        description = 'update an NFT';
-        break;
+        return of('update an NFT');
 
       case TransactionMetadataNFTBid:
-        description = 'bid on an NFT';
-        break;
+        return of('bid on an NFT');
 
       case TransactionMetadataAcceptNFTBid:
-        description = 'accept a bid on an NFT';
-        break;
+        return of('accept a bid on an NFT');
 
       case TransactionMetadataNFTTransfer:
-        description = 'transfer an NFT';
-        break;
+        return of('transfer an NFT');
 
       case TransactionMetadataAcceptNFTTransfer:
-        description = 'accept an NFT transfer';
-        break;
+        return of('accept an NFT transfer');
 
       case TransactionMetadataBurnNFT:
-        description = 'burn an NFT';
-        break;
+        return of('burn an NFT');
 
       case TransactionMetadataAuthorizeDerivedKey:
         if (this.transaction.metadata.operationType === 0){
-          description = 'de-authorize a derived key';
+          return of('de-authorize a derived key');
         }  else if (this.transaction.metadata.operationType === 1){
-          description = 'authorize a derived key';
+          return of('authorize a derived key');
         }
-        break;
+        return of(unknownTransaction)
+      default:
+        return of(unknownTransaction)
     }
 
-    this.transactionDescription = description;
   }
 
   keyName(publicKey: string): string {
@@ -258,9 +229,8 @@ export class ApproveComponent implements OnInit {
     return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
   }
 
-  // Fetch a single display name given a public key.  If a public key has a Profile, then this return a username. If not, it returns a public key. 
+  // Fetch a single display name given a public key.  If a public key has a Profile, then this return a username. If not, it returns a public key.
   getDisplayNameForPublicKey(publicKey: string): Observable<string> {
-    this.fetchingProfiles = true;
     return this.backendApi.GetUsersStateless([publicKey], true).pipe(map(res => {
       const userList = res.UserList
       if (userList.length === 0) {
@@ -271,9 +241,8 @@ export class ApproveComponent implements OnInit {
     }));
   }
 
-  // Fetch a map of public key to display name. 
+  // Fetch a map of public key to display name.
   getDisplayNamesForPublicKeys(publicKeys: string[]): Observable<{ [k: string]: string}> {
-    this.fetchingProfiles = true;
     return this.backendApi.GetUsersStateless(publicKeys, true).pipe(map(res => {
       const userList = res.UserList
       if (userList.length === 0) {

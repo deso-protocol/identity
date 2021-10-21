@@ -5,10 +5,10 @@
     Approve a transaction
   </div>
   <div class="p-15px">
-    <p class="pb-15px" *ngIf="!fetchingProfiles">
+    <p class="pb-15px" *ngIf="!loading">
       <b>{{ globalVars.hostname }}</b> wants to <b>{{ transactionDescription }}</b>
     </p>
-    <p class="pb-15px" *ngIf="fetchingProfiles">
+    <p class="pb-15px" *ngIf="loading">
       Parsing transaction...
     </p>
     <br/>
