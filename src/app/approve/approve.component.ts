@@ -100,7 +100,7 @@ export class ApproveComponent implements OnInit {
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
-        const publicKeys = this.transaction.outputs.map((output: any) => this.base58KeyCheck(output.publicKey));
+        const publicKeys = this.transaction.outputs.map((output: { publicKey: Uint8Array }) => output.publicKey);
         return this.getDisplayNamesForPublicKeys(publicKeys).pipe(map((displayNameMap) => {
           // for if sender and recipient are same account
           let sendingToSelf = true;
@@ -142,26 +142,25 @@ export class ApproveComponent implements OnInit {
         return of('update bitcoin exchange rate');
 
       case TransactionMetadataFollow:
-        const followedKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
         const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
-        return this.getDisplayNameForPublicKey(followedKey).pipe(map((displayName) =>
-          `${followAction} ${displayName}`
+        return this.getDisplayNameForPublicKey(this.transaction.metadata.followedPublicKey)
+          .pipe(
+            map((displayName) => `${followAction} ${displayName}`
         ));
 
       case TransactionMetadataLike:
         return of(this.transaction.metadata.isUnlike ? 'unlike a post' : 'like a post');
 
       case TransactionMetadataCreatorCoin:
-        const creatorKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
-        const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
-        const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-        return this.getDisplayNameForPublicKey(creatorKey).pipe(map((displayName) => {
+        return this.getDisplayNameForPublicKey(this.transaction.metadata.profilePublicKey).pipe(map((displayName) => {
           if (this.transaction.metadata.operationType === 0) {
+            const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
             return `spend ${desoToSell} $DESO to buy the creator coin of ${displayName}`;
           } else if (this.transaction.metadata.operationType === 1) {
+            const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
             return `sell ${creatorCoinToSell} creator coins of ${displayName} `;
           } else if (this.transaction.metadata.operationType === 2) {
+            const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
             return `add ${displayName} creator coin for ${desoToAdd} $DESO`;
           }
           return unknownTransaction;
@@ -175,9 +174,9 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoinTransfer:
         const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-        const creatorPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        return this.getDisplayNameForPublicKey(creatorPublicKey).pipe(map((displayName) =>
-          `transfer ${transferAmount} creator coin of ${displayName}`
+        return this.getDisplayNameForPublicKey(this.transaction.metadata.profilePublicKey)
+          .pipe(
+            map((displayName) => `transfer ${transferAmount} creator coin of ${displayName}`
         ));
 
       case TransactionMetadataCreateNFT:
@@ -230,8 +229,8 @@ export class ApproveComponent implements OnInit {
   }
 
   // Fetch a single display name given a public key.  If a public key has a Profile, then this return a username. If not, it returns a public key.
-  getDisplayNameForPublicKey(publicKey: string): Observable<string> {
-    return this.backendApi.GetUsersStateless([publicKey], true).pipe(map(res => {
+  getDisplayNameForPublicKey(publicKey: Uint8Array): Observable<string> {
+    return this.backendApi.GetUsersStateless([this.base58KeyCheck(publicKey)], true).pipe(map(res => {
       const userList = res.UserList
       if (userList.length === 0) {
         return null;
@@ -242,17 +241,18 @@ export class ApproveComponent implements OnInit {
   }
 
   // Fetch a map of public key to display name.
-  getDisplayNamesForPublicKeys(publicKeys: string[]): Observable<{ [k: string]: string}> {
-    return this.backendApi.GetUsersStateless(publicKeys, true).pipe(map(res => {
-      const userList = res.UserList
-      if (userList.length === 0) {
-        return {};
-      }
-      return userList.reduce((userMap: { [k: string]: string}, user: User) => {
-        userMap[user.PublicKeyBase58Check] = user?.ProfileEntryResponse?.Username || user.PublicKeyBase58Check;
-        return userMap;
-      }, {})
-    }));
+  getDisplayNamesForPublicKeys(publicKeys: Uint8Array[]): Observable<{ [k: string]: string}> {
+    return this.backendApi.GetUsersStateless(publicKeys.map((publicKey) => this.base58KeyCheck(publicKey)), true)
+      .pipe(map(res => {
+        const userList = res.UserList;
+        if (userList.length === 0) {
+          return {};
+        }
+        return userList.reduce((userMap: { [k: string]: string}, user: User) => {
+          userMap[user.PublicKeyBase58Check] = user?.ProfileEntryResponse?.Username || user.PublicKeyBase58Check;
+          return userMap;
+        }, {});
+      }));
   }
 
   // Returns username if truthy, otherwise public key
