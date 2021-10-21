@@ -46,8 +46,6 @@ export class ApproveComponent implements OnInit {
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
 
-  static usernamePlaceholder = '{username}'
-
   constructor(
     private activatedRoute: ActivatedRoute,
     private cryptoService: CryptoService,
@@ -96,7 +94,7 @@ export class ApproveComponent implements OnInit {
 
   generateTransactionDescription(): Observable<string> {
     const unknownTransaction = 'sign an unknown transaction';
-
+  console.log(this.transaction);
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
@@ -115,7 +113,8 @@ export class ApproveComponent implements OnInit {
 
         // if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
-          const publicKey = this.transaction.publicKey;
+          const publicKey = this.base58KeyCheck(this.transaction.publicKey);
+          publicKeys.push(this.transaction.publicKey);
           outputs.push(`$DESO to ${publicKey}`);
         }
 
@@ -139,7 +138,8 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataFollow:
         const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
-        return this.getDescriptionForPublicKey(this.transaction.metadata.followedPublicKey, `${followAction} ${ApproveComponent.usernamePlaceholder}`);
+        const followedPublicKey = this.transaction.metadata.followedPublicKey;
+        return this.getDescriptionForPublicKey(followedPublicKey, `${followAction} ${this.base58KeyCheck(followedPublicKey)}`);
 
       case TransactionMetadataLike:
         return of(this.transaction.metadata.isUnlike ? 'unlike a post' : 'like a post');
@@ -149,16 +149,15 @@ export class ApproveComponent implements OnInit {
           const publicKey = this.transaction.metadata.profilePublicKey;
           if (operationType === 0) {
           const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
-          return this.getDescriptionForPublicKey(publicKey, `spend ${desoToSell} $DESO to buy the creator coin of ${ApproveComponent.usernamePlaceholder}`);
+          return this.getDescriptionForPublicKey(publicKey, `spend ${desoToSell} $DESO to buy the creator coin of ${this.base58KeyCheck(publicKey)}`);
         } else if (operationType === 1) {
           const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
-          return this.getDescriptionForPublicKey(publicKey, `sell ${creatorCoinToSell} creator coins of ${ApproveComponent.usernamePlaceholder} `);
+          return this.getDescriptionForPublicKey(publicKey, `sell ${creatorCoinToSell} creator coins of ${this.base58KeyCheck(publicKey)} `);
         } else if (this.transaction.metadata.operationType === 2) {
           const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-          return this.getDescriptionForPublicKey(publicKey, `add ${ApproveComponent.usernamePlaceholder} creator coin for ${desoToAdd} $DESO`);
-        } else {
-          return of(unknownTransaction);
+          return this.getDescriptionForPublicKey(publicKey, `add ${this.base58KeyCheck(publicKey)} creator coin for ${desoToAdd} $DESO`);
         }
+        return of(unknownTransaction);
 
       case TransactionMetadataSwapIdentity:
         return of('swap identities');
@@ -168,10 +167,8 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoinTransfer:
         const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-        return this.getDescriptionForPublicKey(
-          this.transaction.metadata.profilePublicKey,
-          `transfer ${transferAmount} creator coin of ${ApproveComponent.usernamePlaceholder}`
-        );
+        const profilePublicKey = this.transaction.metadata.profilePublicKey;
+        return this.getDescriptionForPublicKey(profilePublicKey, `transfer ${transferAmount} creator coin of ${this.base58KeyCheck(profilePublicKey)}`);
 
       case TransactionMetadataCreateNFT:
         return of('create an NFT');
@@ -222,24 +219,9 @@ export class ApproveComponent implements OnInit {
     return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
   }
 
-  // Fetch a single display name given a public key.  If a public key has a Profile, then this return a username. If not, it returns a public key.
+  // Fetch username and replace in description string if available.
   getDescriptionForPublicKey(publicKey: Uint8Array, descriptionString: string): Observable<string> {
-    const publicKeyBase58Check = this.base58KeyCheck(publicKey);
-    // Set transactionDescription to descriptionString with public key replacing the placeholder so user immediately
-    // sees transaction they are approving while we wait for network call to resolve.
-    this.transactionDescription = descriptionString.replace(ApproveComponent.usernamePlaceholder, publicKeyBase58Check);
-    return this.backendApi.GetUsersStateless([publicKeyBase58Check], true).pipe(map(res => {
-      const userList = res.UserList
-      if (userList.length === 0) {
-        return this.transactionDescription;
-      }
-      const user = userList[0];
-      // Replace the placeholder with the username or public key.
-      return descriptionString.replace(
-        ApproveComponent.usernamePlaceholder,
-        user?.ProfileEntryResponse?.Username || publicKeyBase58Check
-      );
-    }));
+    return this.getDescriptionForPublicKeys([publicKey], descriptionString);
   }
 
   // Get profile entries for all public keys and then replace public keys in description string with username.
