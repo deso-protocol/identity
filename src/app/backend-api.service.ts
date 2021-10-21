@@ -47,6 +47,10 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService,
   ) { }
 
+  // When SkipForLeaderboard is true, this endpoint only returns ProfileEntryResponse, IsGraylisted, IsBlacklisted,
+  //  IsAdmin, and IsSuperAdmin for each user.
+  // When SkipForLeaderboard is false, we also fetch the user's balance, profiles this user follows, hodlings,  and
+  //  UserMetadata. Oftentimes, this information is not needed and excluding it significantly improves performance.
   GetUsersStateless(
     publicKeys: any[], SkipForLeaderboard: boolean = false,
   ): Observable<any> {

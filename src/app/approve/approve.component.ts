@@ -93,7 +93,7 @@ export class ApproveComponent implements OnInit {
 
   generateTransactionDescription(): void {
     let description = 'sign an unknown transaction';
-    let publicKeys: string[] = [];
+    let outputPublicKeys: string[] = [];
     switch (this.transaction.metadata.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
@@ -107,15 +107,15 @@ export class ApproveComponent implements OnInit {
             const sendKey = this.base58KeyCheck(output.publicKey);
             const sendAmount = this.nanosToUnitString(output.amountNanos);
             outputs.push(`${sendAmount} $DESO to ${sendKey}`);
-            publicKeys.push(sendKey);
+            outputPublicKeys.push(sendKey);
           }
         }
 
         // if all recipients are same as this.transaction.publicKey (outputs is empty)
         if (sendingToSelf && this.transaction.outputs.length > 0) {
-          const publicKey = this.base58KeyCheck(this.transaction.publicKey);
-          publicKeys.push(publicKey);
-          outputs.push(`$DESO to ${publicKey}`);
+          const selfPublicKey = this.base58KeyCheck(this.transaction.publicKey);
+          outputPublicKeys.push(selfPublicKey);
+          outputs.push(`$DESO to ${selfPublicKey}`);
         }
 
         description = `send ${outputs.join(', ')}`;
@@ -144,7 +144,7 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataFollow:
         const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
         const followedPublicKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
-        publicKeys = [followedPublicKey];
+        outputPublicKeys = [followedPublicKey];
         description = `${followAction} ${followedPublicKey}`;
         break;
 
@@ -154,17 +154,17 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoin:
         const operationType = this.transaction.metadata.operationType;
-        const publicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        publicKeys = [publicKey];
+        const creatorCoinPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        outputPublicKeys = [creatorCoinPublicKey];
         if (operationType === 0) {
           const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
-          description = `spend ${desoToSell} $DESO to buy the creator coin of ${publicKey}`;
+          description = `spend ${desoToSell} $DESO to buy the creator coin of ${creatorCoinPublicKey}`;
         } else if (operationType === 1) {
           const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
-          description = `sell ${creatorCoinToSell} creator coins of ${publicKey}`;
+          description = `sell ${creatorCoinToSell} creator coins of ${creatorCoinPublicKey}`;
         } else if (operationType === 2) {
           const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
-          description = `add ${publicKey} creator coin for ${desoToAdd} $DESO`;
+          description = `add ${creatorCoinPublicKey} creator coin for ${desoToAdd} $DESO`;
         }
         break;
 
@@ -178,9 +178,9 @@ export class ApproveComponent implements OnInit {
 
       case TransactionMetadataCreatorCoinTransfer:
         const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-        const profilePublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        publicKeys = [profilePublicKey];
-        description = `transfer ${transferAmount} creator coin of ${profilePublicKey}`;
+        const creatorCoinTransferPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        outputPublicKeys = [creatorCoinTransferPublicKey];
+        description = `transfer ${transferAmount} creator coin of ${creatorCoinTransferPublicKey}`;
         break;
 
       case TransactionMetadataCreateNFT:
@@ -220,8 +220,10 @@ export class ApproveComponent implements OnInit {
         break;
     }
 
+    // Set the transaction description based on the description populated with public keys.
     this.transactionDescription = description;
-    this.getDescriptionWithUsernames(publicKeys, description).subscribe((res) => this.transactionDescription = res);
+    // Fetch Usernames from the API and replace public keys with usernames in the description for a more useful message.
+    this.getDescriptionWithUsernames(outputPublicKeys, description).subscribe((res) => this.transactionDescription = res);
   }
 
   keyName(publicKey: string): string {
