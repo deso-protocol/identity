@@ -5,11 +5,8 @@
     Approve a transaction
   </div>
   <div class="p-15px">
-    <p class="pb-15px" *ngIf="!loading">
+    <p class="pb-15px">
       <b>{{ globalVars.hostname }}</b> wants to <b>{{ transactionDescription }}</b>
-    </p>
-    <p class="pb-15px" *ngIf="loading">
-      Parsing transaction...
     </p>
     <br/>
     <div *ngIf="transactionDeSoSpent">
