@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    if (params.get('hideJumio') || stateParamsFromGoogle.hideJumio) {
+    if (params.get('hideJumio') || stateParamsFromGoogle?.hideJumio) {
       this.globalVars.hideJumio = true;
     }
 
