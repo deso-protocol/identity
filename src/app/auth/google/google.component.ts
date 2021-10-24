@@ -139,13 +139,10 @@ export class GoogleComponent implements OnInit {
   finishFlow(signedUp: boolean): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    const urlParams = this.activatedRoute.snapshot.queryParamMap;
-    if (urlParams.has('origin')) {
-      if (urlParams.get('origin') === RouteNames.DERIVE) {
-        this.identityService.derive({
-          publicKey: this.publicKey,
-        });
-      }
+    if (this.globalVars.derive) {
+      this.identityService.derive({
+        publicKey: this.publicKey,
+      });
     } else {
       this.identityService.login({
         users: this.accountService.getEncryptedUsers(),

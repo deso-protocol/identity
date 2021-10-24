@@ -91,13 +91,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    const urlParams = this.activatedRoute.snapshot.queryParamMap;
-    if (urlParams.has('origin')) {
-      if (urlParams.get('origin') === RouteNames.DERIVE) {
-        this.identityService.derive({
-          publicKey: this.publicKeyAdded,
-        });
-      }
+    if (this.globalVars.derive) {
+      this.identityService.derive({
+        publicKey: this.publicKeyAdded,
+      });
     } else {
       if (!this.globalVars.showJumio()) {
         this.login();

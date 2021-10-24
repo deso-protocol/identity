@@ -17,7 +17,6 @@ export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
-  withCallback = false;
 
   constructor(
     private accountService: AccountService,
@@ -37,19 +36,16 @@ export class DeriveComponent implements OnInit {
         this.allUsers = profiles;
       });
 
-    // Set withCallback
-    this.withCallback = this.globalVars.callback !== null;
-
     // Set derive to true
     this.globalVars.derive = true;
   }
 
   redirectLoadSeed(): void {
-    this.router.navigate(['/', RouteNames.LOAD_SEED]);
+    this.router.navigate(['/', RouteNames.LOAD_SEED], { queryParams: { derive: true }, queryParamsHandling: 'merge' });
   }
 
   redirectSignUp(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP]);
+    this.router.navigate(['/', RouteNames.SIGN_UP], { queryParams: { derive: true }, queryParamsHandling: 'merge' });
   }
 
   launchGoogle(): void {
