@@ -83,13 +83,10 @@ export class LogInSeedComponent implements OnInit {
     this.mnemonic = '';
     this.extraText = '';
 
-    const urlParams = this.activatedRoute.snapshot.queryParamMap;
-    if (urlParams.has('origin')) {
-      if (urlParams.get('origin') === RouteNames.DERIVE) {
-        this.identityService.derive({
-          publicKey: userPublicKey,
-        });
-      }
+    if (this.globalVars.derive) {
+      this.identityService.derive({
+        publicKey: userPublicKey,
+      });
     } else {
       this.router.navigate(['/', RouteNames.LOG_IN], {queryParamsHandling: 'merge'});
     }

@@ -17,7 +17,6 @@ export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
-  withCallback = false;
 
   constructor(
     private accountService: AccountService,
@@ -36,9 +35,6 @@ export class DeriveComponent implements OnInit {
       .subscribe(profiles => {
         this.allUsers = profiles;
       });
-
-    // Set withCallback
-    this.withCallback = this.globalVars.callback !== null;
 
     // Set derive to true
     this.globalVars.derive = true;
