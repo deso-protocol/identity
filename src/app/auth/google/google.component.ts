@@ -139,13 +139,10 @@ export class GoogleComponent implements OnInit {
   finishFlow(signedUp: boolean): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    const urlParams = this.activatedRoute.snapshot.queryParamMap;
-    if (urlParams.has('origin')) {
-      if (urlParams.get('origin') === RouteNames.DERIVE) {
-        this.identityService.derive({
-          publicKey: this.publicKey,
-        });
-      }
+    if (this.globalVars.derive) {
+      this.identityService.derive({
+        publicKey: this.publicKey,
+      });
     } else {
       this.identityService.login({
         users: this.accountService.getEncryptedUsers(),
@@ -161,7 +158,14 @@ export class GoogleComponent implements OnInit {
 }
 
 export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAuthState => {
-  const defaultStateParams = { webview: false, testnet: false, hideJumio: false };
+  const defaultStateParams: GoogleAuthState = {
+    webview: false,
+    testnet: false,
+    jumio: false,
+    callback: "",
+    derive: false,
+  };
+
   try {
     const stateParamsString = hashParams?.get('state');
     const stateParams: GoogleAuthState = stateParamsString ? JSON.parse(atob(stateParamsString)) : null;
@@ -171,5 +175,6 @@ export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAu
   } catch (e) {
     console.error('Failed to parse state passed from Google');
   }
+
   return defaultStateParams;
 };

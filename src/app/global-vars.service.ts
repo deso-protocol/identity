@@ -16,10 +16,15 @@ export class GlobalVarsService {
   inTab = !!window.opener;
   webview = false;
   hideGoogle = false;
-  hideJumio = false;
+  jumio = false;
 
-  callback: URL | null = null;
-  isCallbackValid = false;
+  // Set 'derive' url param to true to return a derived key when logging in or signing up
+  derive = false;
+
+  // Derived key callback URL href / debug info
+  callback = "";
+  callbackInvalid = false;
+
   jumioDeSoNanos: number = 0;
   referralUSDCents: number = 0;
 
@@ -46,7 +51,7 @@ export class GlobalVarsService {
   }
 
   showJumio(): boolean {
-    return environment.jumioSupported && !this.webview && !this.hideJumio;
+    return environment.jumioSupported && !this.webview && this.jumio;
   }
 
   nanosPerUSDExchangeRate: number = 0;

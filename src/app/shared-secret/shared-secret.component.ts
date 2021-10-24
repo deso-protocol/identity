@@ -27,7 +27,7 @@ export class SharedSecretComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (!this.globalVars.callback || !this.globalVars.isCallbackValid){
+    if (!this.globalVars.callback){
       this.errorMsg = 'Callback required';
       return;
     }
@@ -110,7 +110,7 @@ export class SharedSecretComponent implements OnInit {
 
             let httpParams = new HttpParams();
             httpParams = httpParams.append('sharedSecrets', sharedSecrets.toString());
-            window.location.href = (this.globalVars.callback as URL).href + `?${httpParams.toString()}`;
+            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
           }
         });
       }

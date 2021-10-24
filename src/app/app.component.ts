@@ -5,6 +5,7 @@ import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
+import { RouteNames } from './app-routing.module';
 
 const IMPORTED_KEY = 'imported';
 
@@ -56,17 +57,23 @@ export class AppComponent implements OnInit {
     }
 
     // Callback should only be used in mobile applications, where payload is passed through URL parameters.
-    if (params.get('callback')) {
+    const callback = params.get('callback') || stateParamsFromGoogle.callback;
+    if (callback) {
       try {
-        this.globalVars.callback = new URL(params.get('callback') as string);
-        this.globalVars.isCallbackValid = true;
+        const callbackURL = new URL(callback as string);
+        this.globalVars.callback = callbackURL.href;
       } catch (err) {
+        this.globalVars.callbackInvalid = true;
         console.error(err);
       }
     }
 
-    if (params.get('hideJumio') || stateParamsFromGoogle?.hideJumio) {
-      this.globalVars.hideJumio = true;
+    if (stateParamsFromGoogle.derive) {
+      this.globalVars.derive = true;
+    }
+
+    if (params.get('jumio') || stateParamsFromGoogle.jumio) {
+      this.globalVars.jumio = true;
     }
 
     const referralCodeKey = 'referralCode'
@@ -88,7 +95,7 @@ export class AppComponent implements OnInit {
       });
     }
 
-    if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
+    if (this.globalVars.callback) {
       // If callback is set, we won't be sending the initialize message.
       this.globalVars.hostname = 'localhost';
       this.finishInit();

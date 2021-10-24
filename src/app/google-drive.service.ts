@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {RouteNames} from './app-routing.module';
-import {Network} from '../types/identity';
+import {GoogleAuthState, Network} from '../types/identity';
 import {GlobalVarsService} from './global-vars.service';
 
 @Injectable({
@@ -61,35 +61,27 @@ export class GoogleDriveService {
       { headers: { Authorization: `Bearer ${this.accessToken}` }});
   }
 
-  public launchGoogle(origin?: string): void {
+  public launchGoogle(): void {
     const redirectUri = new URL(`${window.location.origin}/${RouteNames.AUTH_GOOGLE}`);
-    if (this.globalVars.network === Network.testnet) {
-      redirectUri.searchParams.append('testnet', 'true');
-    }
-    if (this.globalVars.hideJumio) {
-      redirectUri.searchParams.append('hideJumio', 'true');
-    }
-    if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
-      redirectUri.searchParams.append('callback', this.globalVars.callback.href);
-    }
-    if (origin) {
-      if (origin === RouteNames.DERIVE) {
-        redirectUri.searchParams.append('origin', RouteNames.DERIVE);
-      }
-    }
 
     const oauthUri = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     oauthUri.searchParams.append('redirect_uri', redirectUri.toString());
     oauthUri.searchParams.append('client_id', GoogleDriveService.CLIENT_ID);
     oauthUri.searchParams.append('scope', GoogleDriveService.DRIVE_SCOPE);
     oauthUri.searchParams.append('response_type', 'token');
+
     // TODO: Investigate using this parameter to defend against CSRF attacks
     // pass on webview state to Google OAuth state
     // https://stackoverflow.com/questions/7722062/google-oauth-2-0-redirect-uri-with-several-parameters
-    const stateString = btoa(JSON.stringify({
+    const stateParams: GoogleAuthState = {
       webview: this.globalVars.webview,
-      testnet: this.globalVars.network === Network.testnet
-    }));
+      testnet: this.globalVars.network === Network.testnet,
+      jumio: this.globalVars.jumio,
+      derive: this.globalVars.derive,
+      callback: this.globalVars.callback,
+    };
+
+    const stateString = btoa(JSON.stringify(stateParams));
     oauthUri.searchParams.append('state', stateString);
 
     window.location.href = oauthUri.toString();
