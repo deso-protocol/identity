@@ -68,7 +68,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    if (params.get('derive') || stateParamsFromGoogle.derive) {
+    if (stateParamsFromGoogle.derive) {
       this.globalVars.derive = true;
     }
 
