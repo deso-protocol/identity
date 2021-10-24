@@ -21,7 +21,10 @@ export class GlobalVarsService {
   // Set 'derive' url param to true to return a derived key when logging in or signing up
   derive = false;
 
+  // Derived key callback URL href / debug info
   callback = "";
+  callbackInvalid = false;
+
   jumioDeSoNanos: number = 0;
   referralUSDCents: number = 0;
 

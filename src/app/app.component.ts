@@ -63,6 +63,7 @@ export class AppComponent implements OnInit {
         const callbackURL = new URL(callback as string);
         this.globalVars.callback = callbackURL.href;
       } catch (err) {
+        this.globalVars.callbackInvalid = true;
         console.error(err);
       }
     }
