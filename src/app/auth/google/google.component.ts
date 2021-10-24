@@ -161,7 +161,7 @@ export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAu
   const defaultStateParams: GoogleAuthState = {
     webview: false,
     testnet: false,
-    hideJumio: false,
+    jumio: false,
     callback: "",
     derive: false,
   };

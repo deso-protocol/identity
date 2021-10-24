@@ -76,7 +76,7 @@ export class GoogleDriveService {
     const stateParams: GoogleAuthState = {
       webview: this.globalVars.webview,
       testnet: this.globalVars.network === Network.testnet,
-      hideJumio: this.globalVars.hideJumio,
+      jumio: this.globalVars.jumio,
       derive: this.globalVars.derive,
       callback: this.globalVars.callback,
     };

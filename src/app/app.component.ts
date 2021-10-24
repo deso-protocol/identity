@@ -72,8 +72,8 @@ export class AppComponent implements OnInit {
       this.globalVars.derive = true;
     }
 
-    if (params.get('hideJumio') || stateParamsFromGoogle.hideJumio) {
-      this.globalVars.hideJumio = true;
+    if (params.get('jumio') || stateParamsFromGoogle.jumio) {
+      this.globalVars.jumio = true;
     }
 
     const referralCodeKey = 'referralCode'
