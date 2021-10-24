@@ -41,11 +41,11 @@ export class DeriveComponent implements OnInit {
   }
 
   redirectLoadSeed(): void {
-    this.router.navigate(['/', RouteNames.LOAD_SEED], { queryParams: { derive: true }, queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.LOAD_SEED]);
   }
 
   redirectSignUp(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP], { queryParams: { derive: true }, queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.SIGN_UP]);
   }
 
   launchGoogle(): void {
