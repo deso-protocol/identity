@@ -66,6 +66,9 @@ export class GoogleDriveService {
     if (this.globalVars.network === Network.testnet) {
       redirectUri.searchParams.append('testnet', 'true');
     }
+    if (this.globalVars.hideJumio) {
+      redirectUri.searchParams.append('hideJumio', 'true');
+    }
     if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
       redirectUri.searchParams.append('callback', this.globalVars.callback.href);
     }

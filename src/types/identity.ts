@@ -78,4 +78,5 @@ export enum AccessLevel {
 export interface GoogleAuthState {
   testnet: boolean;
   webview: boolean;
+  hideJumio: boolean;
 }

@@ -161,7 +161,7 @@ export class GoogleComponent implements OnInit {
 }
 
 export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAuthState => {
-  const defaultStateParams = { webview: false, testnet: false };
+  const defaultStateParams = { webview: false, testnet: false, hideJumio: false };
   try {
     const stateParamsString = hashParams?.get('state');
     const stateParams: GoogleAuthState = stateParamsString ? JSON.parse(atob(stateParamsString)) : null;

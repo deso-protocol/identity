@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    if (params.get('hideJumio')) {
+    if (params.get('hideJumio') || stateParamsFromGoogle?.hideJumio) {
       this.globalVars.hideJumio = true;
     }
 
@@ -131,7 +131,7 @@ export class AppComponent implements OnInit {
     // Finish loading
     this.loading = false;
   }
-  
+
   launchImport(): void {
     this.identityService.launchImportWindow().subscribe(() => {
       localStorage.setItem(IMPORTED_KEY, "true");
