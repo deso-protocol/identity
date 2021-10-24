@@ -60,8 +60,8 @@ export class AppComponent implements OnInit {
     const callback = params.get('callback') || stateParamsFromGoogle.callback;
     if (callback) {
       try {
-        this.globalVars.callback = new URL(callback as string);
-        this.globalVars.isCallbackValid = true;
+        const callbackURL = new URL(callback as string);
+        this.globalVars.callback = callbackURL.href;
       } catch (err) {
         console.error(err);
       }
@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
       });
     }
 
-    if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
+    if (this.globalVars.callback) {
       // If callback is set, we won't be sending the initialize message.
       this.globalVars.hostname = 'localhost';
       this.finishInit();

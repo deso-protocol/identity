@@ -1,6 +1,6 @@
 <app-banner></app-banner>
 
-<div *ngIf="globalVars.callback == null || (globalVars.callback !== null && globalVars.isCallbackValid)">
+<div>
   <div class="container home-container">
     <div class="font-weight-bold fs-30px mb-20px" *ngIf="!withCallback">
       Grant signing access to {{ globalVars.hostname }}
@@ -50,6 +50,6 @@
     </div>
   </div>
 </div>
-<div *ngIf="globalVars.callback !== null && !globalVars.isCallbackValid">
+<div *ngIf="false">
   <app-error-callback></app-error-callback>
 </div>

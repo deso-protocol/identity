@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {RouteNames} from './app-routing.module';
-import {Network} from '../types/identity';
+import {GoogleAuthState, Network} from '../types/identity';
 import {GlobalVarsService} from './global-vars.service';
 
 @Injectable({
@@ -73,13 +73,15 @@ export class GoogleDriveService {
     // TODO: Investigate using this parameter to defend against CSRF attacks
     // pass on webview state to Google OAuth state
     // https://stackoverflow.com/questions/7722062/google-oauth-2-0-redirect-uri-with-several-parameters
-    const stateString = btoa(JSON.stringify({
+    const stateParams: GoogleAuthState = {
       webview: this.globalVars.webview,
       testnet: this.globalVars.network === Network.testnet,
       hideJumio: this.globalVars.hideJumio,
       derive: this.globalVars.derive,
-      callback: this.globalVars.isCallbackValid ? this.globalVars.callback?.href : null,
-    }));
+      callback: this.globalVars.callback,
+    };
+
+    const stateString = btoa(JSON.stringify(stateParams));
     oauthUri.searchParams.append('state', stateString);
 
     window.location.href = oauthUri.toString();

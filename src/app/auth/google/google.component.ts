@@ -161,7 +161,14 @@ export class GoogleComponent implements OnInit {
 }
 
 export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAuthState => {
-  const defaultStateParams = { webview: false, testnet: false, hideJumio: false };
+  const defaultStateParams: GoogleAuthState = {
+    webview: false,
+    testnet: false,
+    hideJumio: false,
+    callback: "",
+    derive: false,
+  };
+
   try {
     const stateParamsString = hashParams?.get('state');
     const stateParams: GoogleAuthState = stateParamsString ? JSON.parse(atob(stateParamsString)) : null;
@@ -171,5 +178,6 @@ export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAu
   } catch (e) {
     console.error('Failed to parse state passed from Google');
   }
+
   return defaultStateParams;
 };
