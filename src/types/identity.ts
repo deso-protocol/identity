@@ -79,4 +79,6 @@ export interface GoogleAuthState {
   testnet: boolean;
   webview: boolean;
   hideJumio: boolean;
+  callback: string;
+  derive: boolean;
 }

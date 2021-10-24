@@ -18,6 +18,9 @@ export class GlobalVarsService {
   hideGoogle = false;
   hideJumio = false;
 
+  // Set 'derive' url param to true to return a derived key when logging in or signing up
+  derive = false;
+
   callback: URL | null = null;
   isCallbackValid = false;
   jumioDeSoNanos: number = 0;

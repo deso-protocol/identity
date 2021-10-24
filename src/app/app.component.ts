@@ -5,6 +5,7 @@ import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
+import { RouteNames } from './app-routing.module';
 
 const IMPORTED_KEY = 'imported';
 
@@ -56,16 +57,21 @@ export class AppComponent implements OnInit {
     }
 
     // Callback should only be used in mobile applications, where payload is passed through URL parameters.
-    if (params.get('callback')) {
+    const callback = params.get('callback') || stateParamsFromGoogle.callback;
+    if (callback) {
       try {
-        this.globalVars.callback = new URL(params.get('callback') as string);
+        this.globalVars.callback = new URL(callback as string);
         this.globalVars.isCallbackValid = true;
       } catch (err) {
         console.error(err);
       }
     }
 
-    if (params.get('hideJumio') || stateParamsFromGoogle?.hideJumio) {
+    if (params.get('derive') || stateParamsFromGoogle.derive) {
+      this.globalVars.derive = true;
+    }
+
+    if (params.get('hideJumio') || stateParamsFromGoogle.hideJumio) {
       this.globalVars.hideJumio = true;
     }
 
