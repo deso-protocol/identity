@@ -1,6 +1,6 @@
 <app-banner></app-banner>
 
-<div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview">
+<div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
     <div class="fs-15px fc-muted">STEP 1 of {{ stepTotal }}</div>
