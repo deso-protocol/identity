@@ -69,23 +69,28 @@ export class AppComponent implements OnInit {
       this.globalVars.hideJumio = true;
     }
 
-    const referralCodeKey = 'referralCode'
+    const referralCodeKey = 'referralCode';
     let referralCode = params.get(referralCodeKey);
-    if (!referralCode) {
-      referralCode = localStorage.getItem(referralCodeKey);
-    }
-    if (referralCode) {
-      localStorage.setItem(referralCodeKey, referralCode);
-      this.globalVars.referralHashBase58 = referralCode;
-      this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
-        const referralInfo = res.ReferralInfoResponse.Info;
-        if (
-          res.ReferralInfoResponse.IsActive &&
-          (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
-        ) {
-          this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
-        }
-      });
+    // Request may fail if browser doesn't support local storage e.g. incognito, third party cookies blocked, etc
+    try {
+      if (!referralCode) {
+        referralCode = localStorage.getItem(referralCodeKey);
+      }
+      if (referralCode) {
+        localStorage.setItem(referralCodeKey, referralCode);
+        this.globalVars.referralHashBase58 = referralCode;
+        this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
+          const referralInfo = res.ReferralInfoResponse.Info;
+          if (
+            res.ReferralInfoResponse.IsActive &&
+            (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
+          ) {
+            this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
+          }
+        });
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     if (this.globalVars.callback !== null && this.globalVars.isCallbackValid) {
@@ -131,7 +136,7 @@ export class AppComponent implements OnInit {
     // Finish loading
     this.loading = false;
   }
-  
+
   launchImport(): void {
     this.identityService.launchImportWindow().subscribe(() => {
       localStorage.setItem(IMPORTED_KEY, "true");
