@@ -7,33 +7,35 @@
 
 <div *ngIf="!loading">
   <app-banner></app-banner>
-  <div class="container home-container" *ngIf="!showGetFreeDESO">
-    <div class="fs-24px font-weight-bold pt-15px">Optional: Save your recovery code</div>
-    <div class="fs-18px mt-15px">You can use this seed phrase to login if you lose access to your Google account.</div>
-    <div class="fc-red fs-18px pt-15px">Do not share this with anyone.</div>
-    <div class="w-100 mt-30px fs-15px border border-color-grey"
-         style="border-radius: 3px">
-      <div class="p-15px border-bottom border-color-grey">{{ mnemonic }}</div>
-      <div class="d-flex align-items-center justify-content-between flex-wrap mb-15px ml-15px mr-15px">
-        <div class="d-flex align-items-center mt-15px">
-          <button (click)="copySeed()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
-            Copy
+  <div class="page-container" *ngIf="!showGetFreeDESO">
+    <div class="title-text">Optional: Save your recovery code</div>
+    <div class="subtitle-text">You can use this seed phrase to login if you lose access to your Google account.</div>
+    <div class="warning-text">Do not share this with anyone.</div>
+    <div class="seed-phrase-container">
+      <div class="px-25px pt-10px pb-30px border-bottom">{{ mnemonic }}</div>
+      <div class="d-flex align-items-center justify-content-between py-20px px-25px">
+        <div class="d-flex align-items-center">
+          <button (click)="copySeed()" class="seed-phrase-button d-flex align-items-center">
+            <img *ngIf="seedCopied" src="assets/check-square.svg" width="16px" height="16px" class="mr-5px"/>
+            <img *ngIf="!seedCopied" src="assets/copy.svg" class="mr-5px"/>
+            <span>Copy</span>
           </button>
-          <button (click)="downloadSeed()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
-            Download
+          <button (click)="downloadSeed()" class="seed-phrase-button d-flex align-items-center ml-10px">
+            <img src="assets/download.svg" class="mr-5px"/>
+            <span>Download</span>
           </button>
-          <button (click)="printSeed()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
-            Print
+          <button (click)="printSeed()" class="seed-phrase-button d-flex align-items-center ml-10px">
+            <img src="assets/print.svg" class="mr-5px"/>
+            <span>Print</span>
           </button>
-          <span *ngIf="seedCopied" class="ml-10px">✅</span>
         </div>
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-end">
-      <button (click)="finishFlow(true)" class="btn btn-primary font-weight-bold fs-15px sign-up-btn" *ngIf="!globalVars.showJumio()">
+      <button (click)="finishFlow(true)" class="button button-primary button-large" *ngIf="!globalVars.showJumio()">
         Continue to {{ globalVars.hostname }}
       </button>
-      <button (click)="startJumio()" class="btn btn-primary font-weight-bold fs-15px sign-up-btn" *ngIf="globalVars.showJumio()">
+      <button (click)="startJumio()" class="button button-primary button-large" *ngIf="globalVars.showJumio()">
         Get  <b>{{ globalVars.getFreeDESOMessage() }} Free</b>
       </button>
     </div>
