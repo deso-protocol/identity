@@ -583,7 +583,7 @@ h2,h3,h4,h5,h6,p {
 .saved-seeds-scroll {
   max-height: 300px;
   overflow-y: scroll;
-  border-radius: 17px;
+  border-radius: 0px 0px 17px 17px;
   border-bottom: 1px solid $border-grey;
 }
 
