@@ -1,13 +1,12 @@
-<div class="identity-banner mb-30px" *ngIf="!globalVars.webview">
-  <div class="container d-flex justify-content-center align-items-center">
-    <div class="mr-20px font-emoji">&#9757;</div>
-    <div>Always verify you are on {{ globalVars.environment.hostname }}</div>
-    <div class="ml-20px font-emoji">&#9757;</div>
-  </div>
-</div>
-
-<div class="container home-container d-flex justify-content-between align-items-center">
-  <div>
+<div class="identity-banner w-100" *ngIf="!globalVars.webview">
+  <div class="d-flex justify-content-between h-100 align-items-center banner-margin">
     <img src="/assets/camelcase_logo.svg" class="home-logo"/>
+    <div class="fs-18px font-weight-semibold d-flex align-items-center verify-site-banner">
+      <span class="fc-title">Always verify you are on: </span>
+      <div>
+        <img class="ml-15px position-relative" src="/assets/lock.svg" style="top: -2px"/>
+        <span class="fc-blue ml-5px">{{ globalVars.environment.hostname }}</span>
+      </div>
+    </div>
   </div>
 </div>

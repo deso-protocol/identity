@@ -5,33 +5,54 @@ $success: #32ED4B;
 $info: #689eff;
 
 $feed-border-radius: 12px;
-$border-grey: #E5E5E5;
+$border-grey: #DBDDED;
 $staking-grey: #F0F0F0;
 $light-grey-for-divider: #F8F8F8;
 $light-grey-for-divider-2: #FAFAFA;
-$buy-button-blue: #0058F7;
+$blue: #007BFF;
+$light-blue: #E5F2FF;
+$input-background: #F7F7FC;
 
 // Font colors.
-$light-font-color: #777777;
-$normal-font-color: #222222;
-$red-font-color: #fe3537;
+$light-font-color: #A0A3BD;
+$normal-font-color: #626480;
+$title-font-color: #0E0E23;
+$banner-font-color: #292941;
+$red-font-color: #FF3434;
 $green-font-color: #19B028;
 
+@font-face {
+  font-family: 'Eina01';
+  src: url('./assets/fonts/Eina01-Bold.ttf')  format('truetype');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Eina01';
+  src: url('./assets/fonts/Eina01-SemiBold.ttf')  format('truetype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Eina01';
+  src: url('./assets/fonts/Eina01-Regular.ttf')  format('truetype');
+  font-weight: normal;
+}
+
+
 html, body {
-  font-family: 'Roboto Mono';
+  font-family: Eina01, Arial, SansSerif;
   height: 100%;
   width: 100%;
 }
 
 h1 {
   margin: 0;
-  color: #333333;
 }
 
 h2,h3,h4,h5,h6,p {
   margin: 0;
-  color: #333333;
-  font-family: 'Roboto Mono';
+  font-family: Eina01, Arial, SansSerif;
   font-weight: normal;
 }
 
@@ -50,9 +71,9 @@ h2,h3,h4,h5,h6,p {
 @font-face {
   font-family: "color-emoji";
   src: local("Apple Color Emoji"),
-       local("Segoe UI Emoji"),
-       local("Segoe UI Symbol"),
-       local("Noto Color Emoji");
+  local("Segoe UI Emoji"),
+  local("Segoe UI Symbol"),
+  local("Noto Color Emoji");
 }
 
 .font-emoji {
@@ -60,9 +81,10 @@ h2,h3,h4,h5,h6,p {
 }
 
 // Custom font classes.
+.fc-title { color: $title-font-color }
 .fc-default { color: $normal-font-color; }
 .fc-muted { color: $light-font-color; }
-.fc-blue { color: $buy-button-blue; }
+.fc-blue { color: $blue; }
 .fc-red { color: $red-font-color; }
 .fc-green { color: $green-font-color; }
 
@@ -73,6 +95,7 @@ h2,h3,h4,h5,h6,p {
 .fs-underline { text-decoration: underline }
 
 .fs-30px { font-size: 30px; }
+.fs-26px { font-size: 26px; }
 .fs-25px { font-size: 25px; }
 .fs-24px { font-size: 24px; }
 .fs-20px { font-size: 20px; }
@@ -93,12 +116,15 @@ h2,h3,h4,h5,h6,p {
 .lh-12px { line-height: 12px; }
 .roboto-regular { font-family: 'Roboto' }
 .roboto-mono { font-family: 'Roboto Mono' }
+.font-weight-semibold {
+  font-weight: 500;
+}
 
 
 // Custom border classes.
 .border-color-grey { border-color: $border-grey; }
-.border-color-blue { border-color: $buy-button-blue; }
-.tab-underline-active { border-bottom: solid $buy-button-blue 3px; }
+.border-color-blue { border-color: $blue; }
+.tab-underline-active { border-bottom: solid $blue 3px; }
 .tab-underline-inactive { border-bottom: solid rgba(0,0,0,0) 3px; }
 
 .background-color-grey { background-color: #F5F5F5; } // mocks call this G4
@@ -203,6 +229,12 @@ h2,h3,h4,h5,h6,p {
 .mb-10px { margin-bottom: 10px; }
 .ml-10px { margin-left: 10px; }
 
+.m-12px { margin: 12px; }
+.mt-12px { margin-top: 12px; }
+.mr-12px { margin-right: 12px; }
+.mb-12px { margin-bottom: 12px; }
+.ml-12px { margin-left: 12px; }
+
 .m-15px { margin: 15px; }
 .mt-15px { margin-top: 15px; }
 .mr-15px { margin-right: 15px; }
@@ -233,6 +265,14 @@ h2,h3,h4,h5,h6,p {
 .mx-30px { margin-left: 30px; margin-right: 30px; }
 .my-30px { margin-top: 30px; margin-bottom: 30px; }
 
+.m-40px { margin: 40px; }
+.mt-40px { margin-top: 40px; }
+.mr-40px { margin-right: 40px; }
+.mb-40px { margin-bottom: 40px; }
+.ml-40px { margin-left: 40px; }
+.mx-40px { margin-left: 40px; margin-right: 40px; }
+.my-40px { margin-top: 40px; margin-bottom: 40px; }
+
 .br-3px { border-radius: 3px; }
 .br-12px { border-radius: $feed-border-radius; }
 
@@ -242,19 +282,29 @@ h2,h3,h4,h5,h6,p {
 .background-color-white { background-color: white; }
 
 .home-container {
-  max-width: 720px;
+  max-width: 515px;
   padding-bottom: 50px;
 }
 
+.page-container {
+  max-width: 610px;
+  padding-bottom: 50px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .home-logo {
-  width: 170px;
+  height: 35px;
 }
 
 .identity-banner {
-  background-color: $primary;
+  background-color: white;
   padding: 20px;
+  height: 92px;
   text-align: center;
   color: #FFF;
+  border-bottom: 1px solid $border-grey;
+  margin-bottom: 80px;
 }
 
 .full-screen {
@@ -336,8 +386,219 @@ h2,h3,h4,h5,h6,p {
   animation-delay: .75s;
 }
 
+.title-text {
+  font-weight: bold;
+  font-size: 26px;
+  line-height: 36px;
+  color: $title-font-color;
+}
+
+.title-text-small {
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 25px;
+  color: $title-font-color;
+}
+
+.main-text {
+  font-size: 20px;
+  font-weight: normal;
+  line-height: 30px;
+  margin-top: 13px;
+  color: $normal-font-color;
+}
+
+.subtitle-text {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  margin-top: 13px;
+  color: $normal-font-color;
+}
+
+.warning-text {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  margin-top: 13px;
+  color: $red-font-color;
+}
+
+.button {
+  border-radius: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+
+.button-primary {
+  background: $blue;
+  color: white;
+  border: none;
+}
+
+.button-primary-disabled {
+  background: $light-blue;
+  color: white;
+  border: none;
+}
+
+.button-secondary {
+  background: white;
+  color: $blue;
+  border: 1px solid $blue;
+}
+
+.button-large {
+  height: 78px;
+  width: 100%
+}
+
+.button-small {
+  height: 62px;
+  width: 140px;
+}
+
+.link {
+  color: $blue;
+  font-size: 20px;
+  line-height: 22px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.banner-margin {
+  margin: 0px 20px;
+  @media (max-width: 600px) {
+    margin: 0px;
+  }
+}
+
+.verify-site-banner {
+  @media (max-width: 600px) {
+    flex-flow: column;
+    font-size: 15px;
+  }
+}
+
+.seed-phrase-container {
+  background: $input-background;
+  color: $normal-font-color;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 30px;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid $border-grey;
+  margin-bottom: 24px;
+  margin-top: 40px;
+}
+
+.seed-phrase-button {
+  border: none;
+  padding: 9px 15px;
+  opacity: 0.7;
+  border-radius: 40px;
+  height: 40px;
+  font-size: 16px;
+  line-height: 25px;
+  color: $banner-font-color;
+  font-weight: 500;
+}
+
+.text-input-container {
+  background: $input-background;
+  color: $normal-font-color;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 30px;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid $border-grey;
+  padding: 0px 8px;
+  margin-bottom: 24px;
+}
+
+.text-input {
+  padding: 10px;
+  width: 100%;
+  height: 170px;
+  border: none;
+  background: none;
+  outline: none;
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.text-input-container-light {
+  width: 100%;
+  background: white;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 25px;
+  color: $normal-font-color;
+  border: 1px solid $border-grey;
+  border-radius: 16px;
+  box-shadow: 0px 2px 10px rgba(20, 20, 43, 0.05);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  resize: none;
+}
+
+.step-title {
+  color: $light-font-color;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.saved-seeds-header {
+  height: 60px;
+  min-height: 60px;
+  padding-left: 28px;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 20px;
+  border-bottom: 1px solid $border-grey;
+  color: $title-font-color;
+}
+
+.saved-seeds-list {
+  border: 1px solid $border-grey;
+  border-bottom: none;
+  border-radius: 17px;
+  li:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.saved-seeds-scroll {
+  max-height: 300px;
+  overflow-y: scroll;
+  border-radius: 17px;
+  border-bottom: 1px solid $border-grey;
+}
+
+.saved-seed {
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  height: 66px;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+}
+
 @keyframes bounce {
-    50% {
-        transform: translateY(25px);
-    }
+  50% {
+    transform: translateY(25px);
+  }
 }

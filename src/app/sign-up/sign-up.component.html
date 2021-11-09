@@ -1,37 +1,42 @@
 <app-banner></app-banner>
 
-<div class="container home-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
+<div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
-    <div class="fs-15px fc-muted">STEP 1 of {{ stepTotal }}</div>
-    <div class="fs-24px font-weight-bold pt-15px">Store your seed phrase</div>
-    <div class="fs-18px mt-15px">Write, download, print, or copy it somewhere safe.</div>
-    <div class="fc-red fs-18px pt-15px">If you lose your seed phrase your account will be lost forever.</div>
-    <div class="w-100 mt-30px fs-15px border border-color-grey" style="border-radius: 3px">
-      <div *ngIf="!entropyService.advancedOpen" class="p-15px border-bottom border-color-grey">{{ entropyService.temporaryEntropy.mnemonic }}</div>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="title-text">Store your seed phrase</div>
+      <div class="step-title">Step 1 of {{ stepTotal }}</div>
+    </div>
+    <div class="subtitle-text">Write, download, print, or copy it somewhere safe.</div>
+    <div class="warning-text">If you lose your seed phrase your account will be lost forever.</div>
+    <div class="seed-phrase-container">
+      <div *ngIf="!entropyService.advancedOpen" class="px-25px pt-10px pb-30px border-bottom">{{ entropyService.temporaryEntropy.mnemonic }}</div>
       <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && hasEntropyError()">
         Please fix errors in your advanced entropy configuration.</div>
       <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && !hasEntropyError() && entropyService.temporaryEntropy.extraText.length > 0">
         Note that you have added a passphrase in the advanced menu.</div>
-      <div class="d-flex align-items-center justify-content-between p-15px">
+      <div class="d-flex align-items-center justify-content-between py-20px px-25px">
         <div class="d-flex align-items-center">
-          <button (click)="stepOneCopy()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
-            Copy
+          <button (click)="stepOneCopy()" class="seed-phrase-button d-flex align-items-center">
+            <img *ngIf="seedCopied" src="assets/check-square.svg" width="16px" height="16px" class="mr-5px"/>
+            <img *ngIf="!seedCopied" src="assets/copy.svg" class="mr-5px"/>
+            <span>Copy</span>
           </button>
-          <button (click)="stepOneDownload()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
-            Download
+          <button (click)="stepOneDownload()" class="seed-phrase-button d-flex align-items-center ml-10px">
+            <img src="assets/download.svg" class="mr-5px"/>
+            <span>Download</span>
           </button>
-          <button (click)="stepOnePrint()" class="btn btn-outline-primary font-weight-bold fs-15px ml-10px sign-up-btn">
-            Print
+          <button (click)="stepOnePrint()" class="seed-phrase-button d-flex align-items-center ml-10px">
+            <img src="assets/print.svg" class="mr-5px"/>
+            <span>Print</span>
           </button>
-          <span *ngIf="seedCopied" class="ml-10px">✅</span>
         </div>
-        <div class="fc-blue fs-13px cursor-pointer" *ngIf="!entropyService.advancedOpen" (click)="entropyService.advancedOpen = true">Advanced</div>
-        <div class="fc-blue fs-13px cursor-pointer" *ngIf="entropyService.advancedOpen" (click)="entropyService.advancedOpen = false">Simple</div>
+        <div class="fc-blue fs-16px cursor-pointer" *ngIf="!entropyService.advancedOpen" (click)="entropyService.advancedOpen = true">Advanced</div>
+        <div class="fc-blue fs-16px cursor-pointer" *ngIf="entropyService.advancedOpen" (click)="entropyService.advancedOpen = false">Simple</div>
       </div>
       <div class="border-top border-color-grey" *ngIf="entropyService.advancedOpen">
-        <div class="w-100 p-15px">
-          <div class="fs-15px">
+        <div class="w-100 py-25px px-30px">
+          <div class="fs-15px fc-default">
             <p>
               The following displays the entropy (random numbers) used to generate the "seed phrase" above.
               The entropy below was generated using a random number generator, but you can edit the
@@ -55,37 +60,46 @@
             </p>
           </div>
 
-          <div class="form-group pt-15px">
-            <p>Custom seed phrase (must be
+          <div style="margin-top: 55px">
+            <p class="title-text-small">Custom seed phrase (must be
               <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
               mnemonic):</p>
-            <p class="fc-red py-10px" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</p>
-            <textarea [(ngModel)]="entropyService.temporaryEntropy.mnemonic"
-                      (ngModelChange)="checkMnemonic()"
-                      class="form-control fs-15px"
-                      rows="2"></textarea>
+            <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</p>
+            <div class="text-input-container-light mt-10px">
+              <textarea [(ngModel)]="entropyService.temporaryEntropy.mnemonic"
+                        (ngModelChange)="checkMnemonic()"
+                        class="text-input"
+                        style="resize: none; height: 70px"
+                        rows="2"></textarea>
+            </div>
           </div>
 
-          <div class="form-group">
-            <p>Passphrase:</p>
-            <textarea [(ngModel)]="entropyService.temporaryEntropy.extraText"
-                      (ngModelChange)="normalizeExtraText()"
-                      class="form-control fs-15px"
-                      rows="2"></textarea>
+          <div class="mt-25px">
+            <p class="title-text-small">Passphrase:</p>
+            <div class="text-input-container-light mt-10px">
+              <textarea [(ngModel)]="entropyService.temporaryEntropy.extraText"
+                        (ngModelChange)="normalizeExtraText()"
+                        class="text-input"
+                        style="resize: none; height: 70px"
+                        rows="2"></textarea>
+            </div>
           </div>
 
-          <div class="form-group">
-            <p>Custom Entropy (hex = base16 = [0-9a-f]):</p>
-            <p class="fc-red  py-10px" *ngIf="showEntropyHexError">
+          <div class="mt-25px">
+            <p class="title-text-small">Custom Entropy (hex = base16 = [0-9a-f]):</p>
+            <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showEntropyHexError">
               Entropy value must be a hexadecimal value with a total number of characters
               that is a multiple of 8, less than 128, and greater than 32.</p>
-            <textarea [(ngModel)]="entropyService.temporaryEntropy.customEntropyHex"
-                      (ngModelChange)="checkEntropyHex()"
-                      class="form-control fs-15px"
-                      rows="2"></textarea>
+            <div class="text-input-container-light mt-10px">
+              <textarea [(ngModel)]="entropyService.temporaryEntropy.customEntropyHex"
+                        (ngModelChange)="checkEntropyHex()"
+                        class="text-input"
+                        style="resize: none; height: 70px"
+                        rows="2"></textarea>
+            </div>
           </div>
 
-          <button (click)="getNewEntropy()" class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
+          <button (click)="getNewEntropy()" class="button button-small button-secondary mt-20px" style="height: 54px">
             Regenerate
           </button>
         </div>
@@ -94,12 +108,12 @@
     <div class="d-flex pt-15px justify-content-end">
       <button *ngIf="!hasEntropyError()"
               (click)="stepOneNext()"
-              class="btn btn-primary font-weight-bold fs-15px sign-up-btn">
+              class="button button-primary button-small">
         Next
       </button>
       <button *ngIf="hasEntropyError()"
               (click)="stepOneNext()"
-              class="btn btn-primary font-weight-bold fs-15px sign-up-btn" disabled>
+              class="button button-primary-disabled button-small" disabled>
         Next
       </button>
     </div>
@@ -114,44 +128,48 @@
 
   <!-- Step 2 -->
   <div *ngIf="stepNum == 2">
-    <div class="fs-15px fc-muted">STEP 2 of {{ stepTotal }}</div>
-    <div class="fs-24px font-weight-bold pt-15px">Verify your seed phrase</div>
-    <div class="fc-red fs-18px mt-15px">Never share your seed phrase with anyone.</div>
-    <div class="fc-red fs-18px pt-15px"><b>If you lose your seed phrase your account will be lost forever.</b></div>
-    <div class="form-group pt-10px">
-      <textarea [(ngModel)]="mnemonicCheck"
-                class="form-control fs-15px"
-                rows="4"></textarea>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="title-text">Verify your seed phrase</div>
+      <div class="step-title">Step 2 of {{ stepTotal }}</div>
     </div>
-    <div class="fs-15px pt-15px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
+    <div class="subtitle-text">Never share your seed phrase with anyone.</div>
+    <div class="warning-text"><b>If you lose your seed phrase your account will be lost forever.</b></div>
+    <div class="text-input-container mt-25px">
+      <textarea [(ngModel)]="mnemonicCheck"
+                class="text-input"
+                rows="4"
+                placeholder="Enter your seed phrase"></textarea>
+    </div>
+    <div class="title-text-small pt-15px mb-20px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
       Enter your passphrase:
     </div>
-    <div class="form-group pt-10px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
+    <div class="text-input-container pt-10px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
       <textarea [(ngModel)]="extraTextCheck"
-                class="form-control fs-15px"
-                rows="4"></textarea>
+                class="text-input"
+                rows="4"
+                placeholder="Enter your passphrase"></textarea>
     </div>
     <div class="d-flex align-items-center" style="margin-top: -15px">
-      <div class="fs-12px mt-15px text-grey6">
+      <div class="fs-18px mt-15px fc-default font-weight-normal">
         By proceeding, you agree to the
         <a (click)="clickTos()" class="font-weight-bold cursor-pointer">Terms of Service</a>.
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-between">
       <button (click)="stepTwoBack()"
-              class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn">
+              class="button button-small button-secondary">
         Back
       </button>
       <div>
         <button *ngIf="entropyService.temporaryEntropy.mnemonic == mnemonicCheck
                        && entropyService.temporaryEntropy.extraText == extraTextCheck"
                 (click)="stepTwoNext()"
-                class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn">
+                class="button button-small button-primary">
           Next
         </button>
         <button *ngIf="entropyService.temporaryEntropy.mnemonic != mnemonicCheck
                        || entropyService.temporaryEntropy.extraText != extraTextCheck"
-                class="btn btn-primary font-weight-bold fs-15px ml-10px sign-up-btn" disabled>
+                class="button button-small button-primary-disabled" disabled>
           Next
         </button>
       </div>
