@@ -1,19 +1,19 @@
 <app-banner></app-banner>
 
-<div class="container home-container">
-  <div class="fs-24px font-weight-bold ml-15px">
+<div class="page-container">
+  <div class="title-text text-center">
     Log out of {{ globalVars.hostname }}
   </div>
-  <div class="p-15px">
+  <div class="main-text text-center">
     <p class="pb-15px">
       Logging out revokes any permissions you've granted on {{ globalVars.hostname }}.
     </p>
     <p class="pb-15px">
       Your account will stay logged in on {{ globalVars.environment.hostname }}.
     </p>
-    <div class="d-flex align-items-end justify-content-end">
-      <button type="button" class="btn btn-secondary mr-10px" (click)="onCancel()">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="onSubmit()">Logout</button>
+    <div class="d-flex align-items-center justify-content-center mt-40px">
+      <button type="button" class="button button-primary button-small" (click)="onSubmit()">Logout</button>
+      <a class="fs-18px font-weight-bold fc-default ml-40px cursor-pointer" (click)="onCancel()">Cancel</a>
     </div>
   </div>
 </div>
