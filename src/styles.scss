@@ -288,9 +288,9 @@ h2,h3,h4,h5,h6,p {
 
 .page-container {
   max-width: 610px;
-  padding-bottom: 50px;
   margin-left: auto;
   margin-right: auto;
+  padding: 0px 10px 50px 10px;
 }
 
 .home-logo {
@@ -305,6 +305,9 @@ h2,h3,h4,h5,h6,p {
   color: #FFF;
   border-bottom: 1px solid $border-grey;
   margin-bottom: 80px;
+  @media (max-width: 445px) {
+    margin-bottom: 40px;
+  }
 }
 
 .full-screen {
@@ -482,6 +485,20 @@ h2,h3,h4,h5,h6,p {
   }
 }
 
+.seed-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  @media (max-width: 445px) {
+    flex-flow: column;
+    align-items: center;
+    justify-content: flex-start;
+    .toggle-advanced {
+      margin-top: 12px;
+    }
+  }
+}
+
 .seed-phrase-container {
   background: $input-background;
   color: $normal-font-color;
@@ -549,6 +566,21 @@ h2,h3,h4,h5,h6,p {
   -moz-box-shadow: none;
   box-shadow: none;
   resize: none;
+}
+
+.step-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  @media (max-width: 445px) {
+    flex-flow: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    .step-title {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+  }
 }
 
 .step-title {
