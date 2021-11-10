@@ -1,12 +1,12 @@
 <app-banner></app-banner>
 
-<div class="container home-container">
-  <div class="fs-24px font-weight-bold ml-15px">
+<div class="page-container">
+  <div class="title-text">
     Approve a transaction
   </div>
-  <div class="p-15px">
+  <div class="main-text">
     <p class="pb-15px">
-      <b>{{ globalVars.hostname }}</b> wants to <b>{{ transactionDescription }}</b>
+      {{ globalVars.hostname }} wants to {{ transactionDescription }}
     </p>
     <br/>
     <div *ngIf="transactionDeSoSpent">
@@ -15,8 +15,8 @@
       </p>
     </div>
     <div class="d-flex align-items-end justify-content-between">
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">Deny</button>
-      <button type="button" class="btn btn-primary" (click)="onSubmit()">Allow</button>
+      <button type="button" class="button button-small button-secondary" (click)="onCancel()">Deny</button>
+      <button type="button" class="button button-small button-primary" (click)="onSubmit()">Allow</button>
     </div>
   </div>
 </div>
