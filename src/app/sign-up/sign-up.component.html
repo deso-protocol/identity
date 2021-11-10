@@ -3,7 +3,7 @@
 <div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="step-row">
       <div class="title-text">Store your seed phrase</div>
       <div class="step-title">Step 1 of {{ stepTotal }}</div>
     </div>
@@ -15,7 +15,7 @@
         Please fix errors in your advanced entropy configuration.</div>
       <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && !hasEntropyError() && entropyService.temporaryEntropy.extraText.length > 0">
         Note that you have added a passphrase in the advanced menu.</div>
-      <div class="d-flex align-items-center justify-content-between py-20px px-25px">
+      <div class=" py-20px px-25px seed-actions-row">
         <div class="d-flex align-items-center">
           <button (click)="stepOneCopy()" class="seed-phrase-button d-flex align-items-center">
             <img *ngIf="seedCopied" src="assets/check-square.svg" width="16px" height="16px" class="mr-5px"/>
@@ -31,8 +31,8 @@
             <span>Print</span>
           </button>
         </div>
-        <div class="fc-blue fs-16px cursor-pointer" *ngIf="!entropyService.advancedOpen" (click)="entropyService.advancedOpen = true">Advanced</div>
-        <div class="fc-blue fs-16px cursor-pointer" *ngIf="entropyService.advancedOpen" (click)="entropyService.advancedOpen = false">Simple</div>
+        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="!entropyService.advancedOpen" (click)="entropyService.advancedOpen = true">Advanced</div>
+        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="entropyService.advancedOpen" (click)="entropyService.advancedOpen = false">Simple</div>
       </div>
       <div class="border-top border-color-grey" *ngIf="entropyService.advancedOpen">
         <div class="w-100 py-25px px-30px">
@@ -128,7 +128,7 @@
 
   <!-- Step 2 -->
   <div *ngIf="stepNum == 2">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="step-row">
       <div class="title-text">Verify your seed phrase</div>
       <div class="step-title">Step 2 of {{ stepTotal }}</div>
     </div>
