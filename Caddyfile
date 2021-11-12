@@ -70,6 +70,18 @@ header @html Content-Security-Policy "
     https://bitclout.com/api/v0/get-transaction-spending
     https://bitclout.green/api/v0/get-transaction-spending
     https://bitclout.blue/api/v0/get-transaction-spending
+    http://localhost:17001/api/v0/send-phone-number-verification-text
+    http://localhost:18001/api/v0/send-phone-number-verification-text
+    https://bitpop.dev/api/v0/send-phone-number-verification-text
+    https://bitclout.com/api/v0/send-phone-number-verification-text
+    https://bitclout.green/api/v0/send-phone-number-verification-text
+    https://bitclout.blue/api/v0/send-phone-number-verification-text
+    http://localhost:17001/api/v0/submit-phone-number-verification-code
+    http://localhost:18001/api/v0/submit-phone-number-verification-code
+    https://bitpop.dev/api/v0/submit-phone-number-verification-code
+    https://bitclout.com/api/v0/submit-phone-number-verification-code
+    https://bitclout.green/api/v0/submit-phone-number-verification-code
+    https://bitclout.blue/api/v0/submit-phone-number-verification-code
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files;

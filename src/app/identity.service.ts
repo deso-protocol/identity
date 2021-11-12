@@ -84,6 +84,7 @@ export class IdentityService {
     signedUp?: boolean
     signedTransactionHex?: string,
     jumioSuccess?: boolean,
+    phoneNumberSuccess?: boolean,
   }): void {
     this.cast('login', payload);
   }

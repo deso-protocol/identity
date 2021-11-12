@@ -13,6 +13,7 @@ import {JumioSuccessComponent} from './jumio/jumio-success/jumio-success.compone
 import {JumioErrorComponent} from './jumio/jumio-error/jumio-error.component';
 import {JumioComponent} from './jumio/jumio.component';
 import {SharedSecretComponent} from './shared-secret/shared-secret.component';
+import {SignUpGetStarterDESOComponent} from './sign-up-get-starter-deso/sign-up-get-starter-deso.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -26,6 +27,7 @@ export class RouteNames {
   public static JUMIO_SUCCESS = 'jumio-success';
   public static JUMIO_ERROR = 'jumio-error';
   public static GET_FREE_DESO = 'get-free-deso';
+  public static VERIFY_PHONE_NUMBER = 'verify-phone-number';
   public static GET_SHARED_SECRETS = 'get-shared-secrets';
   // Deprecated route - redirects to get-free-deso
   public static GET_FREE_CLOUT = 'get-free-clout';
@@ -45,6 +47,7 @@ const routes: Routes = [
   { path: RouteNames.JUMIO_ERROR, component: JumioErrorComponent, pathMatch: 'full' },
   { path: RouteNames.GET_FREE_DESO, component: JumioComponent, pathMatch: 'full' },
   { path: RouteNames.GET_SHARED_SECRETS, component: SharedSecretComponent, pathMatch: 'full'},
+  { path: RouteNames.VERIFY_PHONE_NUMBER, component: SignUpGetStarterDESOComponent, pathMatch: 'full'},
   // redirect to get-free-deso page
   { path: RouteNames.GET_FREE_CLOUT, redirectTo: RouteNames.GET_FREE_DESO, pathMatch: 'full' },
 
