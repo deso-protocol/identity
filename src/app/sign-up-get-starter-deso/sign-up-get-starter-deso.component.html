@@ -3,7 +3,7 @@
   <div class="d-flex pt-15px justify-content-between">
     <button
       (click)="finishFlow()"
-      class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn"
+      class="button button-secondary button-large font-weight-bold fs-15px sign-up-btn"
     >
       Continue to {{ globalVars.hostname }}
     </button>
@@ -95,14 +95,14 @@
         <a
           *ngIf="displayForSignupFlow"
           (click)="onSkipButtonClicked()"
-          class="btn btn-outline-primary font-weight-bold fs-15px"
+          class="button button-secondary button-small font-weight-bold fs-15px"
         >
           Skip
         </a>
         <a
           (click)="sendVerificationText()"
           [ngClass]="{ disabled: !phoneForm.valid, 'btn-loading': sendingPhoneNumberVerificationText }"
-          class="btn btn-primary font-weight-bold fs-15px ml-10px"
+          class="button button-primary button-small font-weight-bold fs-15px ml-10px"
         >
           Next
         </a>
@@ -149,7 +149,7 @@
         <a
           *ngIf="displayForSignupFlow"
           (click)="backButtonClickedOnSubmitVerificationScreen()"
-          class="btn btn-outline-primary font-weight-bold fs-15px"
+          class="button button-secondary button-small font-weight-bold fs-15px"
         >
           Back
         </a>
@@ -158,14 +158,14 @@
         <a
           *ngIf="displayForSignupFlow"
           (click)="onSkipButtonClicked()"
-          class="btn btn-outline-primary font-weight-bold fs-15px"
+          class="button button-secondary button-small font-weight-bold fs-15px"
         >
           Skip
         </a>
         <a
           (click)="submitVerificationCode()"
           [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
-          class="btn btn-primary font-weight-bold fs-15px ml-10px"
+          class="button button-primary button-small font-weight-bold fs-15px ml-10px"
         >
           Verify
         </a>

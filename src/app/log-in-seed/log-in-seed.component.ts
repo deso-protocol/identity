@@ -71,6 +71,9 @@ export class LogInSeedComponent implements OnInit {
 
       // We only want to add nonStandard derivations if the account is worth importing
       this.backendApi.GetUsersStateless([publicKey]).subscribe(res => {
+        if (!res.UserList.length) {
+          return;
+        }
         const user = res.UserList[0];
         if (user.ProfileEntryResponse || user.BalanceNanos > 0 || user.UsersYouHODL?.length) {
           // Add the non-standard key if the user has a profile, a balance, or holdings

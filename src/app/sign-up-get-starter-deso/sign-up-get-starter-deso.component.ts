@@ -53,13 +53,17 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this._setScreenToShow();
     this.activatedRoute.queryParams.subscribe(params => {
       if (params.public_key) {
         this.publicKey = params.public_key;
         this.backendApi.GetUsersStateless([this.publicKey]).subscribe((res) => {
           if (res.UserList?.length) {
             this.user = res.UserList[0];
+            if (this.user?.HasPhoneNumber) {
+              this.screenToShow = SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
+            } else {
+              this.screenToShow = SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
+            }
           }
         }, (err) => {
           console.error(err);
@@ -69,24 +73,6 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       }
     });
 
-  }
-
-  _setScreenToShow() {
-    // TODO: refactor silly setInterval
-    let interval = setInterval(() => {
-      if (this.user?.HasPhoneNumber == null) {
-        // Wait until we've loaded the HasPhoneNumber boolean from the server
-        return;
-      }
-
-      if (this.user?.HasPhoneNumber) {
-        this.screenToShow = SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
-      } else {
-        this.screenToShow = SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
-      }
-
-      clearInterval(interval);
-    }, 50);
   }
 
   backToPreviousSignupStepOnClick() {
