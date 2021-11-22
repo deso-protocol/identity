@@ -31,6 +31,9 @@ export class ProfileEntryResponse {
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
   PublicKeyBase58Check: string = "";
+  HasPhoneNumber: boolean | null = null;
+  BalanceNanos: number = 0;
+  UsersYouHODL: any[] = [];
 }
 
 @Injectable({
@@ -47,13 +50,34 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService,
   ) { }
 
+  post(path: string, body: any): Observable<any> {
+    return this.httpClient.post<any>(`${this.endpoint}/${path}`, body);
+  }
+
+  jwtPost(path: string, publicKey: string, body: any): Observable<any> {
+    const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
+    if (!publicUserInfo) {
+      return of(null);
+    }
+
+    const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
+    const jwt = this.signingService.signJWT(seedHex);
+    return this.post(path, {...body, ...{JWT: jwt}});
+  }
+
+  // Error parsing
+  stringifyError(err: any): string {
+    return err?.error?.error || JSON.stringify(err);
+  }
+
+
   // When SkipForLeaderboard is true, this endpoint only returns ProfileEntryResponse, IsGraylisted, IsBlacklisted,
   //  IsAdmin, and IsSuperAdmin for each user.
   // When SkipForLeaderboard is false, we also fetch the user's balance, profiles this user follows, hodlings,  and
   //  UserMetadata. Oftentimes, this information is not needed and excluding it significantly improves performance.
   GetUsersStateless(
-    publicKeys: any[], SkipForLeaderboard: boolean = false,
-  ): Observable<any> {
+    publicKeys: string[], SkipForLeaderboard: boolean = false,
+  ): Observable<{ UserList: User[]}> {
     return this.httpClient.post<any>(
       `${this.endpoint}/get-users-stateless`,
       {
@@ -64,7 +88,7 @@ export class BackendAPIService {
   }
 
   GetUserProfiles(
-    publicKeys: any[]
+    publicKeys: string[]
   ): Observable<{[key: string]: UserProfile}> {
       const userProfiles: {[key: string]: any} = {};
       const req = this.GetUsersStateless(publicKeys, true);
@@ -190,5 +214,31 @@ export class BackendAPIService {
         return of(0);
       })
     );
+  }
+
+  SendPhoneNumberVerificationText(
+    PublicKeyBase58Check: string,
+    PhoneNumber: string,
+    PhoneNumberCountryCode: string
+  ): Observable<any> {
+    return this.jwtPost("send-phone-number-verification-text", PublicKeyBase58Check, {
+      PublicKeyBase58Check,
+      PhoneNumber,
+      PhoneNumberCountryCode,
+    });
+  }
+
+  SubmitPhoneNumberVerificationCode(
+    PublicKeyBase58Check: string,
+    PhoneNumber: string,
+    PhoneNumberCountryCode: string,
+    VerificationCode: string
+  ): Observable<any> {
+    return this.jwtPost("submit-phone-number-verification-code", PublicKeyBase58Check, {
+      PublicKeyBase58Check,
+      PhoneNumber,
+      PhoneNumberCountryCode,
+      VerificationCode,
+    });
   }
 }

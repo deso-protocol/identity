@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EmbedComponent } from './embed/embed.component';
 import { HomeComponent } from './home/home.component';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {IdentityService} from './identity.service';
 import {CookieModule} from 'ngx-cookie';
 import { LogoutComponent } from './logout/logout.component';
@@ -25,6 +27,8 @@ import { JumioSuccessComponent } from './jumio/jumio-success/jumio-success.compo
 import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
 import { ErrorCallbackComponent } from './error-callback/error-callback.component';
 import { SharedSecretComponent } from './shared-secret/shared-secret.component';
+import { SignUpGetStarterDESOComponent } from './sign-up-get-starter-deso/sign-up-get-starter-deso.component';
+import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 
 @NgModule({
   declarations: [
@@ -45,12 +49,17 @@ import { SharedSecretComponent } from './shared-secret/shared-secret.component';
     JumioErrorComponent,
     ErrorCallbackComponent,
     SharedSecretComponent,
+    SignUpGetStarterDESOComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
     FormsModule,
+    ReactiveFormsModule,
+    NgxIntlTelInputModule,
+    MatFormFieldModule,
     CookieModule.forRoot()
   ],
   providers: [
