@@ -39,6 +39,7 @@ export class LogoutComponent implements OnInit {
 
   onSubmit(): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, AccessLevel.None);
+    this.cryptoService.seedHexEncryptionKey(this.globalVars.hostname, true);
     this.finishFlow();
   }
 

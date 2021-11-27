@@ -68,13 +68,13 @@ export class CryptoService {
     }
   }
 
-  seedHexEncryptionKey(hostname: string): string {
+  seedHexEncryptionKey(hostname: string, reset: boolean): string {
     const storageKey = this.seedHexEncryptionStorageKey(hostname);
     let encryptionKey;
 
     if (this.mustUseStorageAccess()) {
       encryptionKey = this.cookieService.get(storageKey);
-      if (!encryptionKey) {
+      if (!encryptionKey || reset) {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.put(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
@@ -82,7 +82,7 @@ export class CryptoService {
       }
     } else {
       encryptionKey = localStorage.getItem(storageKey) || '';
-      if (!encryptionKey) {
+      if (!encryptionKey || reset) {
         encryptionKey = this.newEncryptionKey();
         localStorage.setItem(storageKey, encryptionKey);
       }
@@ -98,13 +98,13 @@ export class CryptoService {
   }
 
   encryptSeedHex(seedHex: string, hostname: string): string {
-    const encryptionKey = this.seedHexEncryptionKey(hostname);
+    const encryptionKey = this.seedHexEncryptionKey(hostname, false);
     const cipher = createCipher('aes-256-gcm', encryptionKey);
     return cipher.update(seedHex).toString('hex');
   }
 
   decryptSeedHex(encryptedSeedHex: string, hostname: string): string {
-    const encryptionKey = this.seedHexEncryptionKey(hostname);
+    const encryptionKey = this.seedHexEncryptionKey(hostname, false);
     const decipher = createDecipher('aes-256-gcm', encryptionKey);
     return decipher.update(Buffer.from(encryptedSeedHex, 'hex')).toString();
   }
@@ -202,7 +202,7 @@ export class CryptoService {
         ethAddressChecksum += ethAddress[i]
       }
     }
-  
+
     return ethAddressChecksum;
   }
 }
