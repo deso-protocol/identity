@@ -128,7 +128,7 @@ export class IdentityService {
       return;
     }
 
-    // Import accounnts
+    // Import accounts
     for (const privateUser of Object.values(event.data.payload.privateUsers)) {
       this.accountService.addPrivateUser(privateUser as PrivateUserInfo);
     }
@@ -387,7 +387,7 @@ export class IdentityService {
       this.handleDecrypt(data);
     } else if (method === 'sign') {
       this.handleSign(data);
-    } else if (method == 'signETH') {
+    } else if (method === 'signETH') {
       this.handleSignETH(data);
     } else if (method === 'jwt') {
       this.handleJwt(data);

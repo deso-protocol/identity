@@ -265,7 +265,7 @@ export class ApproveComponent implements OnInit {
       // Iterate over key-value pairs and replace public key with username
       for (const [publicKey, username] of Object.entries(usernameMap)) {
         outputString = outputString.replace(publicKey, username);
-      };
+      }
       return outputString;
     })));
   }

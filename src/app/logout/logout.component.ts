@@ -38,7 +38,12 @@ export class LogoutComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // We set the accessLevel for the logged out user to None.
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, AccessLevel.None);
+    // We reset the seed encryption key so that all existing accounts, except
+    // the logged out user, will regenerate their encryptedSeedHex. Without this,
+    // someone could have reused the encryptedSeedHex of an already logged out user.
+    this.cryptoService.seedHexEncryptionKey(this.globalVars.hostname, true);
     this.finishFlow();
   }
 
