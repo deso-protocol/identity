@@ -53,6 +53,7 @@ export class LogInComponent implements OnInit {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: publicKey,
+      signedUp: false
     });
   }
 }
