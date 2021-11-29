@@ -68,7 +68,9 @@ export class CryptoService {
     }
   }
 
-  seedHexEncryptionKey(hostname: string, reset: boolean): string {
+  // Place a seed encryption key in storage. If reset is set to true, the
+  // previous key is overwritten, which is useful in logging out users.
+  seedHexEncryptionKey(hostname: string, reset: boolean = false): string {
     const storageKey = this.seedHexEncryptionStorageKey(hostname);
     let encryptionKey;
 
