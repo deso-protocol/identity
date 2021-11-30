@@ -5,7 +5,7 @@ import {AccessLevel, PrivateUserInfo, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
-import {SigningService} from './signing.service';
+import {ETHSignature, SigningService} from './signing.service';
 import {HttpParams} from '@angular/common/http';
 import {BackendAPIService} from './backend-api.service';
 import {AccountService} from './account.service';
@@ -85,6 +85,8 @@ export class IdentityService {
     signedTransactionHex?: string,
     jumioSuccess?: boolean,
     phoneNumberSuccess?: boolean,
+    signatures?: ETHSignature[],
+    signedHashes?: string[],
   }): void {
     this.cast('login', payload);
   }

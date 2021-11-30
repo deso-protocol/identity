@@ -4,7 +4,7 @@ import {CryptoService} from '../crypto.service';
 import {IdentityService} from '../identity.service';
 import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
-import {SigningService} from '../signing.service';
+import {ETHSignature, SigningService} from '../signing.service';
 import {BackendAPIService, ProfileEntryResponse, User} from '../backend-api.service';
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -46,6 +46,9 @@ export class ApproveComponent implements OnInit {
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
 
+  ethTx: string | undefined;
+  btcTx: string | undefined;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private cryptoService: CryptoService,
@@ -58,6 +61,19 @@ export class ApproveComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
+      if (params.ethTx) {
+        this.transactionDescription = 'an ethereum transaction to purchase DeSo';
+        this.publicKey = params.publicKey;
+        this.ethTx = params.ethTx;
+        return;
+      }
+      if (params.btcTx) {
+        this.transactionDescription = 'a btc transaction to purchase DeSo';
+        this.publicKey = params.publicKey;
+        this.btcTx = params.btcTx;
+        return;
+      }
+
       this.transactionHex = params.tx;
       this.backendApi.GetTransactionSpending(this.transactionHex).subscribe( res => {
         this.transactionDeSoSpent = res ? this.nanosToUnitString(res) : false;
@@ -75,14 +91,21 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex);
-    this.finishFlow(signedTransactionHex);
+    let payload: { signedTransactionHex?: string; signatures?: ETHSignature[]; signedHashes?: string[]} = {};
+    if (this.ethTx) {
+      payload = {signatures: this.signingService.signHashesETH(this.seedHex(), [this.ethTx])};
+    } else if (this.btcTx) {
+      payload = {signedHashes: this.signingService.signHashes(this.seedHex(), [this.btcTx])};
+    } else if (this.transactionHex) {
+      payload = {signedTransactionHex: this.signingService.signTransaction(this.seedHex(), this.transactionHex)};
+    }
+    this.finishFlow(payload);
   }
 
-  finishFlow(signedTransactionHex?: string): void {
+  finishFlow(payload?: { signedTransactionHex?: string; signatures?: ETHSignature[]; signedHashes?: string[]; }): void {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
-      signedTransactionHex,
+      ...payload,
     });
   }
 
@@ -141,7 +164,7 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataFollow:
-        const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
+        const followAction = this.transaction.metadata.isUnfollow ? 'unfollow' : 'follow';
         const followedPublicKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
         publicKeys = [followedPublicKey];
         description = `${followAction} ${followedPublicKey}`;
@@ -237,7 +260,7 @@ export class ApproveComponent implements OnInit {
   nanosToUnitString(nanos: number): string {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
-    return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
+    return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/, '$1');
   }
 
   // Fetch Usernames from API and replace public keys in description with Username
