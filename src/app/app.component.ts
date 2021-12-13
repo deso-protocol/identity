@@ -5,9 +5,6 @@ import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
-import { RouteNames } from './app-routing.module';
-
-const IMPORTED_KEY = 'imported';
 
 @Component({
   selector: 'app-root',
