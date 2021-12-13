@@ -18,7 +18,6 @@ export class AppComponent implements OnInit {
   title = 'identity';
 
   loading = true;
-  importing = false;
 
   constructor(
     private accountService: AccountService,
@@ -112,14 +111,7 @@ export class AppComponent implements OnInit {
           this.globalVars.accessLevelRequest = AccessLevel.Full;
         }
 
-        // We only care about attempting to import when we're in a tab.
-        // The iframe doesn't have first party storage access and the webview
-        // cannot open a window.
-        if (this.globalVars.inTab && !localStorage.getItem(IMPORTED_KEY)) {
-          this.importing = true;
-        } else {
-          this.finishInit();
-        }
+        this.finishInit();
       });
     } else {
       // Identity currently doesn't have any management UIs that can be accessed directly
@@ -142,13 +134,5 @@ export class AppComponent implements OnInit {
 
     // Finish loading
     this.loading = false;
-  }
-
-  launchImport(): void {
-    this.identityService.launchImportWindow().subscribe(() => {
-      localStorage.setItem(IMPORTED_KEY, "true");
-      this.importing = false;
-      this.finishInit();
-    });
   }
 }
