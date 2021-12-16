@@ -25,7 +25,7 @@ export class GlobalVarsService {
   callback = "";
   callbackInvalid = false;
 
-  jumioDeSoNanos: number = 0;
+  jumioUSDCents: number = 0;
   referralUSDCents: number = 0;
 
   referralHashBase58: string = '';
@@ -106,6 +106,6 @@ export class GlobalVarsService {
   }
 
   getFreeDESOMessage(): string {
-    return this.referralUSDCents ? this.formatUSD(this.referralUSDCents / 100, 0) : this.nanosToUSD(this.jumioDeSoNanos, 0);
+    return this.formatUSD((this.referralUSDCents ? this.referralUSDCents : this.jumioUSDCents) / 100, 0);
   }
 }
