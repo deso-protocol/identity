@@ -84,11 +84,16 @@ export class AppComponent implements OnInit {
         this.globalVars.referralHashBase58 = referralCode;
         this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
           const referralInfo = res.ReferralInfoResponse.Info;
-          if (
+          const countrySignUpBonus = res.CountrySignUpBonus;
+          if (!countrySignUpBonus.AllowCustomReferralAmount) {
+            this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
+          } else if (
             res.ReferralInfoResponse.IsActive &&
             (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
           ) {
             this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
+          } else {
+            this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
           }
         });
       }
