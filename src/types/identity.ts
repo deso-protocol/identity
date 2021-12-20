@@ -39,6 +39,10 @@ export interface DerivedPrivateUserInfo {
   accessSignature: string;
   jwt: string;
   derivedJwt: string;
+  messagingPublicKey: string;
+  messagingPrivateKey: string;
+  messagingKeyName: string;
+  messagingKeySignature: string;
 }
 
 export interface UserProfile {

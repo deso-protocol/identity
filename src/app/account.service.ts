@@ -11,6 +11,7 @@ import {uint64ToBufBigEndian} from '../lib/bindata/util';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
+import {ec as EC} from 'elliptic';
 
 @Injectable({
   providedIn: 'root'
@@ -117,6 +118,23 @@ export class AccountService {
     const encodedDerivedPrivateKey = keyEncoder.encodePrivate(derivedSeedHex, 'raw', 'pem');
     const derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
 
+    // Set the default messaging key name
+    const messagingKeyName = this.globalVars.defaultMessageKeyName;
+    // Compute messaging private key as kdf ( sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) ) )
+    const messagingPrivateBytes = new Buffer(sha256.x2( [... new Buffer(privateUser.seedHex, 'hex'),
+      ... new Buffer(messagingKeyName, 'utf8')]), 'hex');
+    const messagingPrivateKeyBuff = ecies.kdf(messagingPrivateBytes, 32);
+    const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
+    const ec = new EC('secp256k1');
+
+    // We do this to compress the messaging public key from 65 bytes to 33 bytes.
+    const messagingPublicKey = ec.keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array').getPublic(true, 'hex');
+
+    // Messaging key signature is needed so if derived key submits the messaging public key,
+    // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )
+    const messagingKeyHash = sha256.x2([...new Buffer(messagingPublicKey, 'hex'), ...new Buffer(messagingKeyName, 'utf8')]);
+    const messagingKeySignature = this.signingService.signHashes(privateUser.seedHex, [messagingKeyHash])[0];
+
     return {
       derivedSeedHex,
       derivedPublicKey,
@@ -127,7 +145,11 @@ export class AccountService {
       network,
       accessSignature,
       jwt,
-      derivedJwt
+      derivedJwt,
+      messagingPublicKey,
+      messagingPrivateKey,
+      messagingKeyName,
+      messagingKeySignature
     };
   }
 

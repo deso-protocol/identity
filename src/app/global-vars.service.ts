@@ -22,13 +22,15 @@ export class GlobalVarsService {
   derive = false;
 
   // Derived key callback URL href / debug info
-  callback = "";
+  callback = '';
   callbackInvalid = false;
 
   jumioUSDCents: number = 0;
   referralUSDCents: number = 0;
 
   referralHashBase58: string = '';
+
+  defaultMessageKeyName: string = 'default-key';
 
   constructor() { }
 
