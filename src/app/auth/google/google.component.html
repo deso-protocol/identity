@@ -36,8 +36,11 @@
         Continue to {{ globalVars.hostname }}
       </button>
       <button (click)="startJumio()" class="button button-primary button-large" *ngIf="globalVars.showJumio()">
-        Get <app-free-deso-message></app-free-deso-message> <b>Free</b>
+        Earn <app-free-deso-message></app-free-deso-message> <b>Free</b>
       </button>
+    </div>
+    <div class="pt-5px">
+      <app-free-deso-disclaimer></app-free-deso-disclaimer>
     </div>
   </div>
   <div class="container home-container" *ngIf="showGetFreeDESO">
