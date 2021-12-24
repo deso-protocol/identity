@@ -32,6 +32,8 @@ import {
   TransactionMetadataUpdateNFT,
   TransactionMetadataCreateNFT
 } from '../lib/deso/transaction';
+import {ec as EC} from "elliptic";
+import {map} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -166,12 +168,24 @@ export class IdentityService {
       return;
     }
 
+    const ec = new EC('secp256k1');
     const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPublicKey, message);
-    this.respond(id, {
-      encryptedMessage
-    });
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const recipientPublicKeyEC = ec.keyFromPublic(this.cryptoService.publicKeyToECBuffer(recipientPublicKey), 'array')
+    const request = this.backendApi.GetPartyMessagingKeys(
+      this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network),
+      this.globalVars.defaultMessageKeyName,
+      this.cryptoService.publicKeyToDeSoPublicKey(recipientPublicKeyEC, this.globalVars.network),
+      this.globalVars.defaultMessageKeyName
+    ).pipe(
+      map( messagingParty => {
+        return this.signingService.encryptMessage(seedHex, recipientPublicKey, messagingParty, message);
+      })
+    );
+    request.subscribe( messageAndParty => {
+      this.respond(id, messageAndParty);
+    })
   }
 
   private handleDecrypt(data: any): void {
@@ -188,7 +202,7 @@ export class IdentityService {
       const encryptedHexes = data.payload.encryptedHexes;
       decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
     } else {
-      // Shared secret decryption
+      // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
       decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
     }

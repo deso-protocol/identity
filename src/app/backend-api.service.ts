@@ -7,7 +7,7 @@ import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {DerivedKey, UserProfile} from '../types/identity';
+import {DerivedKey, PartyMessagingKeys, UserProfile} from '../types/identity';
 
 export class ProfileEntryResponse {
   Username: string | null = null;
@@ -249,5 +249,38 @@ export class BackendAPIService {
       PhoneNumberCountryCode,
       VerificationCode,
     });
+  }
+
+  GetPartyMessagingKeys(
+    SenderPublicKeyBase58Check: string,
+    SenderMessagingKeyName: string,
+    RecipientPublicKeyBase58Check: string,
+    RecipientMessagingKeyName: string
+  ): Observable< PartyMessagingKeys > {
+    const req = this.httpClient.post<any>(
+      `${this.endpoint}/check-party-messaging-keys`,
+      {
+        SenderPublicKeyBase58Check,
+        SenderMessagingKeyName,
+        RecipientPublicKeyBase58Check,
+        RecipientMessagingKeyName
+      }
+    );
+    return req.pipe(
+      map( res => {
+        return {
+          senderMessagingPublicKey: res.SenderMessagingPublicKey,
+          isSenderMessagingKey: res.IsSenderMessagingKey,
+          senderMessagingKeyName: res.SenderMessagingKeyName,
+          recipientMessagingPublicKey: res.RecipientMessagingPublicKey,
+          isRecipientMessagingKey: res.IsRecipientMessagingKey,
+          recipientMessagingKeyName: res.RecipientMessagingKeyName
+        } as PartyMessagingKeys;
+      })
+    ).pipe(
+      catchError( () => {
+        return of({} as PartyMessagingKeys);
+      })
+    );
   }
 }

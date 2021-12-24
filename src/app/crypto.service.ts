@@ -152,6 +152,12 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
+  publicKeyToDeSoPublicKey(publicKey: EC.KeyPair, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
+    const key = publicKey.getPublic().encode('array', true);
+    return bs58check.encode(Buffer.from([...prefix, ...key]));
+  }
+
   // Decode public key base58check to Buffer of secp256k1 public key
   publicKeyToECBuffer(publicKey: string): Buffer {
     // Sanity check similar to Base58CheckDecodePrefix from core/lib/base58.go

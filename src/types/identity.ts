@@ -57,6 +57,27 @@ export interface DerivedKey {
   isValid: boolean;
 }
 
+export interface PartyMessagingKeys {
+  senderMessagingPublicKey: string;
+  isSenderMessagingKey: boolean;
+  senderMessagingKeyName: string;
+  recipientMessagingPublicKey: string;
+  isRecipientMessagingKey: boolean;
+  recipientMessagingKeyName: string;
+}
+
+export interface EncryptedMessage {
+  EncryptedHex: string,
+  PublicKey: string,
+  IsSender: boolean,
+  Legacy: boolean,
+  Version?: number,
+  SenderMessagingPublicKey?: string,
+  SenderMessagingKeyName?: string,
+  RecipientMessagingPublicKey?: string,
+  RecipientMessagingKeyName?: string
+}
+
 export enum Network {
   mainnet = 'mainnet',
   testnet = 'testnet',
