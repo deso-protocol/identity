@@ -32,6 +32,7 @@ export class SigningService {
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
     const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
 
+    // If we've failed fetching partyKeys for whatever reason, we return.
     if(JSON.stringify(partyKeys) === JSON.stringify({})){
       console.error("Failed fetching party entry.")
       return {
@@ -41,18 +42,18 @@ export class SigningService {
     }
 
     try {
+      // If sender (the user) have authorized the default messaging key, then we would compute it and use for encryption.
       let privateEncryptionKey = privateKeyBuffer;
       if(partyKeys.isSenderMessagingKey){
-        const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]));
-        const keyNameHash = new Buffer(sha256.x2([... new Buffer(this.globalVars.defaultMessageKeyName, 'utf8')]), 'hex');
-        const messagingPrivateBytes = new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
-        privateEncryptionKey = ecies.kdf(messagingPrivateBytes, 32);
+        privateEncryptionKey = this.cryptoService.deriveMessagingKey(seedHex, this.globalVars.defaultMessageKeyName);
       }
+      // If recipient has authorized a default messaging key, then we would use it for the encryption.
       let publicEncryptionKey = publicKeyBuffer;
       if(partyKeys.isRecipientMessagingKey){
         publicEncryptionKey = new Buffer(ec.keyFromPublic(partyKeys.recipientMessagingPublicKey, 'hex').getPublic('array'));
       }
 
+      // Encrypt the message using keys we determined above.
       const encryptedMessage = ecies.encryptShared(privateEncryptionKey, publicEncryptionKey, message);
       return {
         encryptedMessage: encryptedMessage.toString('hex'),
@@ -99,8 +100,7 @@ export class SigningService {
       const encryptedBytes = new Buffer(encryptedMessage.EncryptedHex, 'hex');
       // Check if message was encrypted using shared secret or public key method
       if (encryptedMessage.Legacy) {
-        // If message was encrypted using public key, check
-        // the sender to determine if message is decryptable
+        // If message was encrypted using public key, check the sender to determine if message is decryptable.
         try {
           if (!encryptedMessage.IsSender) {
             const opts = {legacy: true};
@@ -144,10 +144,7 @@ export class SigningService {
             // Currently, Identity only computes trapdoor public key with name "default-key".
             // Compute messaging private key as kdf( sha256x2( sha256x2(secret key) || sha256x2(key name) ) )
             if (defaultKey) {
-              const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]));
-              const keyNameHash = new Buffer(sha256.x2([... new Buffer(this.globalVars.defaultMessageKeyName, 'utf8')]), 'hex');
-              const messagingPrivateBytes = new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
-              privateEncryptionKey = ecies.kdf(messagingPrivateBytes, 32);
+              privateEncryptionKey = this.cryptoService.deriveMessagingKey(seedHex, this.globalVars.defaultMessageKeyName);
             }
 
             // Now decrypt the message based on computed keys.

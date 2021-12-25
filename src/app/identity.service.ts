@@ -172,7 +172,11 @@ export class IdentityService {
     const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const recipientPublicKeyEC = ec.keyFromPublic(this.cryptoService.publicKeyToECBuffer(recipientPublicKey), 'array')
+    const recipientPublicKeyEC = ec.keyFromPublic(this.cryptoService.publicKeyToECBuffer(recipientPublicKey), 'array');
+
+    // In the DeSo V3 Messages, users can register messaging keys on the blockchain. We send a backend
+    // request to check if sender or recipient have authorized default messaging keys. Based on this
+    // information we will decide how to encrypt the message.
     const request = this.backendApi.GetPartyMessagingKeys(
       this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network),
       this.globalVars.defaultMessageKeyName,
@@ -180,6 +184,7 @@ export class IdentityService {
       this.globalVars.defaultMessageKeyName
     ).pipe(
       map( messagingParty => {
+        // Messaging party object indicates if either user has authorized the default messaging key.
         return this.signingService.encryptMessage(seedHex, recipientPublicKey, messagingParty, message);
       })
     );
