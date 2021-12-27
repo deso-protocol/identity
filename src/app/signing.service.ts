@@ -130,15 +130,13 @@ export class SigningService {
             // private key of a messaging public key, we just need the trapdoor = user's seedHex and the key name.
             // Setting IsSender tells Identity if it should invert sender or recipient public key.
             if(encryptedMessage.IsSender) {
-              if(encryptedMessage.SenderMessagingKeyName === this.globalVars.defaultMessageKeyName){
+              if(encryptedMessage.SenderMessagingKeyName === this.globalVars.defaultMessageKeyName)
                 defaultKey = true;
-                publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.RecipientMessagingPublicKey as string, 'hex').getPublic('array'));
-              }
+              publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.RecipientMessagingPublicKey as string, 'hex').getPublic('array'));
             } else {
-              if(encryptedMessage.RecipientMessagingKeyName === this.globalVars.defaultMessageKeyName){
+              if(encryptedMessage.RecipientMessagingKeyName === this.globalVars.defaultMessageKeyName)
                 defaultKey = true;
-                publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.SenderMessagingPublicKey as string, 'hex').getPublic('array'));
-              }
+              publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.SenderMessagingPublicKey as string, 'hex').getPublic('array'));
             }
 
             // Currently, Identity only computes trapdoor public key with name "default-key".
