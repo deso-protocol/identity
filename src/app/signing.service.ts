@@ -24,7 +24,7 @@ export class SigningService {
 
   encryptMessage(seedHex: string, recipientPublicKey: string, message: string): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
     const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
     try {
@@ -40,7 +40,7 @@ export class SigningService {
   // @param encryptedHexes : string[]
   decryptMessagesLegacy(seedHex: string, encryptedHexes: any): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedHex of encryptedHexes) {
@@ -129,7 +129,7 @@ export class SigningService {
     return signedHashes;
   }
 
-  signHashesETH(seedHex: string, unsignedHashes: string[]): {s: any, r: any, v: number | null}[] {
+  signHashesETH(seedHex: string, unsignedHashes: string[]): ETHSignature[] {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const signedHashes = [];
 
@@ -137,8 +137,8 @@ export class SigningService {
       const signature = privateKey.sign(unsignedHash, { canonical: true });
 
       signedHashes.push({
-        s: "0x" + signature.s.toString("hex"),
-        r: "0x" + signature.r.toString("hex"),
+        s: '0x' + signature.s.toString('hex'),
+        r: '0x' + signature.r.toString('hex'),
         v: signature.recoveryParam
       });
     }
@@ -146,3 +146,9 @@ export class SigningService {
     return signedHashes;
   }
 }
+
+export type ETHSignature = {
+  s: any;
+  r: any;
+  v: number | null;
+};
