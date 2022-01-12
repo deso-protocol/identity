@@ -283,30 +283,30 @@ export class TransactionMetadataAuthorizeDerivedKey extends BinaryRecord {
 }
 
 export class TransactionMetadataDAOCoin extends BinaryRecord {
-  @Transcode(FixedBuffer(33))
+  @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
   @Transcode(Uint8)
   operationType: number = 0;
 
   @Transcode(VarBuffer)
-  coinsToMintNanos: number = 0;
+  coinsToMintNanos: Buffer = Buffer.alloc(0);
 
   @Transcode(VarBuffer)
-  coinsToBurnNanos: number = 0;
+  coinsToBurnNanos: Buffer = Buffer.alloc(0);
 
   @Transcode(Uint8)
   transferRestrictionStatus: Buffer = Buffer.alloc(0);
 }
 
 export class TransactionMetadataTransferDAOCoin extends BinaryRecord {
-  @Transcode(FixedBuffer(33))
+  @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
   @Transcode(VarBuffer)
-  daoCoinToTransferNanos = 0;
+  daoCoinToTransferNanos: Buffer = Buffer.alloc(0);
 
-  @Transcode(FixedBuffer(33))
+  @Transcode(VarBuffer)
   receiverPublicKey: Buffer = Buffer.alloc(0);
 }
 
