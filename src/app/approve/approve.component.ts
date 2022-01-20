@@ -29,7 +29,9 @@ import {
   TransactionMetadataNFTTransfer,
   TransactionMetadataAcceptNFTTransfer,
   TransactionMetadataBurnNFT,
-  TransactionMetadataAuthorizeDerivedKey
+  TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataDAOCoin,
+  TransactionMetadataTransferDAOCoin
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 
@@ -178,8 +180,9 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataCreatorCoinTransfer:
         const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
         const creatorCoinTransferPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        publicKeys = [creatorCoinTransferPublicKey];
-        description = `transfer ${transferAmount} creator coin of ${creatorCoinTransferPublicKey}`;
+        const receiverPublicKey = this.base58KeyCheck(this.transaction.metadata.receiverPublicKey);
+        publicKeys = [creatorCoinTransferPublicKey, receiverPublicKey];
+        description = `transfer ${transferAmount} creator coin of ${creatorCoinTransferPublicKey} to ${receiverPublicKey}`;
         break;
 
       case TransactionMetadataCreateNFT:
@@ -217,6 +220,29 @@ export class ApproveComponent implements OnInit {
           description = 'authorize a derived key';
         }
         break;
+      case TransactionMetadataDAOCoin:
+        const daoCoinPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        publicKeys = [daoCoinPublicKey]
+        if (this.transaction.metadata.operationType === 0) {
+          const mintAmount = this.hexNanosToUnitString(this.transaction.metadata.coinsToMintNanos);
+          description = `mint ${mintAmount} ${daoCoinPublicKey} DAO coins`;
+        } else if (this.transaction.metadata.operationType === 1) {
+          const burnAmount = this.hexNanosToUnitString(this.transaction.metadata.coinsToBurnNanos);
+          description = `burn ${burnAmount} ${daoCoinPublicKey} DAO coins`;
+        } else if (this.transaction.metadata.operationType === 2) {
+          description = `disabling minting of ${daoCoinPublicKey} DAO coins`;
+        } else if (this.transaction.metadata.operationType === 3) {
+          description = `update transfer restriction status for ${daoCoinPublicKey} DAO coins`;
+        }
+        break;
+      case TransactionMetadataTransferDAOCoin:
+        const daoCoinTransferAmount = this.hexNanosToUnitString(this.transaction.metadata.daoCoinToTransferNanos);
+        const daoCoinTransferPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        const daoCoinReceiverPublicKey = this.base58KeyCheck(this.transaction.metadata.receiverPublicKey);
+        publicKeys = [daoCoinTransferPublicKey, daoCoinReceiverPublicKey];
+        description = `transfer ${daoCoinTransferAmount} ${daoCoinTransferPublicKey} DAO coins to ${daoCoinReceiverPublicKey}`;
+        break;
+
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -232,6 +258,10 @@ export class ApproveComponent implements OnInit {
   base58KeyCheck(keyBytes: Uint8Array): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[this.globalVars.network].deso;
     return bs58check.encode(Buffer.from([...prefix, ...keyBytes]));
+  }
+
+  hexNanosToUnitString(nanos: Buffer): string {
+    return this.nanosToUnitString(parseInt(nanos.toString('hex'), 16));
   }
 
   nanosToUnitString(nanos: number): string {

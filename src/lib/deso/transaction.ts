@@ -282,6 +282,34 @@ export class TransactionMetadataAuthorizeDerivedKey extends BinaryRecord {
   accessSignature: Buffer = Buffer.alloc(0);
 }
 
+export class TransactionMetadataDAOCoin extends BinaryRecord {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  operationType: number = 0;
+
+  @Transcode(VarBuffer)
+  coinsToMintNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  coinsToBurnNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  transferRestrictionStatus: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataTransferDAOCoin extends BinaryRecord {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  daoCoinToTransferNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  receiverPublicKey: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -304,6 +332,8 @@ export const TransactionTypeMetadataMap = {
   20: TransactionMetadataAcceptNFTTransfer,
   21: TransactionMetadataBurnNFT,
   22: TransactionMetadataAuthorizeDerivedKey,
+  25: TransactionMetadataDAOCoin,
+  26: TransactionMetadataTransferDAOCoin,
 };
 
 export class Transaction<T> extends BinaryRecord {
