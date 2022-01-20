@@ -332,8 +332,8 @@ export const TransactionTypeMetadataMap = {
   20: TransactionMetadataAcceptNFTTransfer,
   21: TransactionMetadataBurnNFT,
   22: TransactionMetadataAuthorizeDerivedKey,
-  25: TransactionMetadataDAOCoin,
-  26: TransactionMetadataTransferDAOCoin,
+  24: TransactionMetadataDAOCoin,
+  25: TransactionMetadataTransferDAOCoin,
 };
 
 export class Transaction<T> extends BinaryRecord {
