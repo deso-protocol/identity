@@ -29,7 +29,8 @@ import {
   TransactionMetadataNFTTransfer,
   TransactionMetadataAcceptNFTTransfer,
   TransactionMetadataBurnNFT,
-  TransactionMetadataAuthorizeDerivedKey
+  TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataMessagingGroup
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 
@@ -217,6 +218,10 @@ export class ApproveComponent implements OnInit {
           description = 'authorize a derived key';
         }
         break;
+
+      case TransactionMetadataMessagingGroup:
+        const groupKeyName = this.transaction.metadata.messagingGroupKeyName
+        description = `register group key with name "${groupKeyName}"`
     }
 
     // Set the transaction description based on the description populated with public keys.

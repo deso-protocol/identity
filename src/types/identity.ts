@@ -30,8 +30,8 @@ export interface PublicUserInfo {
 
 export interface DerivedPrivateUserInfo {
   derivedSeedHex: string;
-  derivedPublicKey: string;
-  publicKey: string;
+  derivedPublicKeyBase58Check: string;
+  publicKeyBase58Check: string;
   btcDepositAddress: string;
   ethDepositAddress: string;
   expirationBlock: number;
@@ -39,7 +39,7 @@ export interface DerivedPrivateUserInfo {
   accessSignature: string;
   jwt: string;
   derivedJwt: string;
-  messagingPublicKey: string;
+  messagingPublicKeyBase58Check: string;
   messagingPrivateKey: string;
   messagingKeyName: string;
   messagingKeySignature: string;

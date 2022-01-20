@@ -26,44 +26,27 @@ export class SigningService {
     return jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: 60 * 10 });
   }
 
-  encryptMessage(seedHex: string, recipientPublicKey: string, partyKeys: PartyMessagingKeys, message: string): any {
+  encryptMessage(seedHex: string, senderGroupKeyName: string, recipientPublicKey: string, message: string): any {
     const ec = new EC('secp256k1');
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
     const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
 
-    // If we've failed fetching partyKeys for whatever reason, we return.
-    if(JSON.stringify(partyKeys) === JSON.stringify({})){
-      console.error("Failed fetching party entry.")
-      return {
-        encryptedMessage: "",
-        messagingParty: {}
-      };
-    }
-
     try {
-      // If sender (the user) have authorized the default messaging key, then we would compute it and use for encryption.
       let privateEncryptionKey = privateKeyBuffer;
-      if(partyKeys.isSenderMessagingKey){
-        privateEncryptionKey = this.cryptoService.deriveMessagingKey(seedHex, this.globalVars.defaultMessageKeyName);
-      }
-      // If recipient has authorized a default messaging key, then we would use it for the encryption.
-      let publicEncryptionKey = publicKeyBuffer;
-      if(partyKeys.isRecipientMessagingKey){
-        publicEncryptionKey = new Buffer(ec.keyFromPublic(partyKeys.recipientMessagingPublicKey, 'hex').getPublic('array'));
+      if(senderGroupKeyName) {
+        privateEncryptionKey = this.cryptoService.deriveMessagingKey(seedHex, senderGroupKeyName);
       }
 
       // Encrypt the message using keys we determined above.
-      const encryptedMessage = ecies.encryptShared(privateEncryptionKey, publicEncryptionKey, message);
+      const encryptedMessage = ecies.encryptShared(privateEncryptionKey, publicKeyBuffer, message);
       return {
         encryptedMessage: encryptedMessage.toString('hex'),
-        messagingParty: partyKeys
       };
     } catch (e) {
       console.error(e);
       return {
         encryptedMessage: "",
-        messagingParty: {}
       };
     }
   }
@@ -132,11 +115,13 @@ export class SigningService {
             if(encryptedMessage.IsSender) {
               if(encryptedMessage.SenderMessagingKeyName === this.globalVars.defaultMessageKeyName)
                 defaultKey = true;
-              publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.RecipientMessagingPublicKey as string, 'hex').getPublic('array'));
+              publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(encryptedMessage.RecipientMessagingPublicKey as string);
+              // publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.RecipientMessagingPublicKey as string, 'hex').getPublic('array'));
             } else {
               if(encryptedMessage.RecipientMessagingKeyName === this.globalVars.defaultMessageKeyName)
                 defaultKey = true;
-              publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.SenderMessagingPublicKey as string, 'hex').getPublic('array'));
+              publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(encryptedMessage.SenderMessagingPublicKey as string);
+              // publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.SenderMessagingPublicKey as string, 'hex').getPublic('array'));
             }
 
             // Currently, Identity only computes trapdoor public key with name "default-key".
