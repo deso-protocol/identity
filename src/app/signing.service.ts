@@ -111,7 +111,7 @@ export class SigningService {
         } catch (e) {
           console.error(e);
         }
-      } else if(!encryptedMessage.Version) {
+      } else if(!encryptedMessage.Version || encryptedMessage.Version == 2) {
         try {
           decryptedHexes[encryptedMessage.EncryptedHex] = ecies.decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes).toString();
         } catch (e) {
