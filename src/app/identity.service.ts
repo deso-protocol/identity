@@ -30,7 +30,9 @@ import {
   TransactionMetadataNFTBid,
   TransactionMetadataAcceptNFTBid,
   TransactionMetadataUpdateNFT,
-  TransactionMetadataCreateNFT
+  TransactionMetadataCreateNFT,
+  TransactionMetadataDAOCoin,
+  TransactionMetadataTransferDAOCoin
 } from '../lib/deso/transaction';
 import {ec as EC} from "elliptic";
 import {map} from "rxjs/operators";
@@ -293,6 +295,8 @@ export class IdentityService {
       case TransactionMetadataAcceptNFTTransfer:
       case TransactionMetadataBurnNFT:
       case TransactionMetadataAuthorizeDerivedKey:
+      case TransactionMetadataDAOCoin:
+      case TransactionMetadataTransferDAOCoin:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

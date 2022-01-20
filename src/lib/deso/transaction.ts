@@ -307,6 +307,34 @@ export class TransactionMetadataMessagingGroup extends BinaryRecord {
   messagingGroupMembers: MessagingGroupMember[] = [];
 }
 
+export class TransactionMetadataDAOCoin extends BinaryRecord {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  operationType: number = 0;
+
+  @Transcode(VarBuffer)
+  coinsToMintNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  coinsToBurnNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  transferRestrictionStatus: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataTransferDAOCoin extends BinaryRecord {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  daoCoinToTransferNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  receiverPublicKey: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -330,6 +358,8 @@ export const TransactionTypeMetadataMap = {
   21: TransactionMetadataBurnNFT,
   22: TransactionMetadataAuthorizeDerivedKey,
   23: TransactionMetadataMessagingGroup,
+  24: TransactionMetadataDAOCoin,
+  25: TransactionMetadataTransferDAOCoin,
 };
 
 export class Transaction<T> extends BinaryRecord {
