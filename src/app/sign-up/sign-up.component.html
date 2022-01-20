@@ -4,11 +4,11 @@
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
     <div class="step-row">
-      <div class="title-text">Store your seed phrase</div>
+      <div class="title-text">Store your DeSo seed phrase</div>
       <div class="step-title">Step 1 of {{ stepTotal }}</div>
     </div>
     <div class="subtitle-text">Write, download, print, or copy it somewhere safe.</div>
-    <div class="warning-text">If you lose your seed phrase your account will be lost forever.</div>
+    <div class="warning-text">If you lose your DeSo seed phrase your account will be lost forever.</div>
     <div class="seed-phrase-container">
       <div *ngIf="!entropyService.advancedOpen" class="px-25px pt-10px pb-30px border-bottom">{{ entropyService.temporaryEntropy.mnemonic }}</div>
       <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && hasEntropyError()">
@@ -38,10 +38,10 @@
         <div class="w-100 py-25px px-30px">
           <div class="fs-15px fc-default">
             <p>
-              The following displays the entropy (random numbers) used to generate the "seed phrase" above.
+              The following displays the entropy (random numbers) used to generate the "DeSo seed phrase" above.
               The entropy below was generated using a random number generator, but you can edit the
-              fields below to use your own randomness to generate the seed phrase (you can't go wrong
-              with a set of dice). You can also enter your own seed phrase directly if you prefer.
+              fields below to use your own randomness to generate the DeSo seed phrase (you can't go wrong
+              with a set of dice). You can also enter your own DeSo seed phrase directly if you prefer.
             </p>
 
             <p class="pt-15px">
@@ -61,7 +61,7 @@
           </div>
 
           <div style="margin-top: 55px">
-            <p class="title-text-small">Custom seed phrase (must be
+            <p class="title-text-small">Custom DeSo seed phrase (must be
               <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
               mnemonic):</p>
             <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</p>
@@ -129,16 +129,16 @@
   <!-- Step 2 -->
   <div *ngIf="stepNum == 2">
     <div class="step-row">
-      <div class="title-text">Verify your seed phrase</div>
+      <div class="title-text">Verify your DeSo seed phrase</div>
       <div class="step-title">Step 2 of {{ stepTotal }}</div>
     </div>
-    <div class="subtitle-text">Never share your seed phrase with anyone.</div>
-    <div class="warning-text"><b>If you lose your seed phrase your account will be lost forever.</b></div>
+    <div class="subtitle-text">Never share your DeSo seed phrase with anyone.</div>
+    <div class="warning-text"><b>If you lose your DeSo seed phrase your account will be lost forever.</b></div>
     <div class="text-input-container mt-25px">
       <textarea [(ngModel)]="mnemonicCheck"
                 class="text-input"
                 rows="4"
-                placeholder="Enter your seed phrase"></textarea>
+                placeholder="Enter your DeSo seed phrase"></textarea>
     </div>
     <div class="title-text-small pt-15px mb-20px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
       Enter your passphrase:
