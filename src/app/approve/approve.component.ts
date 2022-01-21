@@ -42,12 +42,13 @@ import bs58check from 'bs58check';
   styleUrls: ['./approve.component.scss']
 })
 export class ApproveComponent implements OnInit {
-  transaction: any;
+  transaction?: any;
   publicKey: any;
-  transactionHex: any;
+  transactionHex?: any;
   username: any;
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
+  messageHex?: string;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -61,15 +62,28 @@ export class ApproveComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
-      this.transactionHex = params.tx;
-      this.backendApi.GetTransactionSpending(this.transactionHex).subscribe( res => {
-        this.transactionDeSoSpent = res ? this.nanosToUnitString(res) : false;
-      });
-      const txBytes = new Buffer(this.transactionHex, 'hex');
-      this.transaction = Transaction.fromBytes(txBytes)[0];
-      this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
+      if (params.messageHex) {
+        this.messageHex = params.messageHex;
+        this.publicKey = params.publicKey;
 
-      this.generateTransactionDescription();
+        // Ensure the public key passed is one we know
+        const encryptedUser = this.accountService.getPublicKeys().includes(this.publicKey)
+        if (!encryptedUser) {
+          this.finishFlow();
+        }
+
+        this.transactionDescription = 'sign a message:';
+      } else {
+        this.transactionHex = params.tx;
+        this.backendApi.GetTransactionSpending(this.transactionHex).subscribe(res => {
+          this.transactionDeSoSpent = res ? this.nanosToUnitString(res) : false;
+        });
+        const txBytes = new Buffer(this.transactionHex, 'hex');
+        this.transaction = Transaction.fromBytes(txBytes)[0];
+        this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
+
+        this.generateTransactionDescription();
+      }
     });
   }
 
@@ -78,14 +92,22 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex);
-    this.finishFlow(signedTransactionHex);
+    if (this.messageHex) {
+      const signedMessageHex = this.signingService.sign(this.seedHex(), this.messageHex);
+      this.finishFlow({signedMessageHex});
+    } else {
+      const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex);
+      this.finishFlow({signedTransactionHex});
+    }
   }
 
-  finishFlow(signedTransactionHex?: string): void {
+  finishFlow(payload: {
+    signedTransactionHex?: string,
+    signedMessageHex?: string
+  } = {}): void {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
-      signedTransactionHex,
+      ...payload
     });
   }
 
@@ -302,5 +324,17 @@ export class ApproveComponent implements OnInit {
       }
       return outputString;
     })));
+  }
+
+  getMessageAsText() {
+    if (!this.messageHex) {
+      return null;
+    }
+    try {
+      const buff = Buffer.from(this.messageHex, 'hex');
+      return buff.length === 32 ? this.messageHex : buff.toString('utf8');
+    } catch (e) {
+      return this.messageHex;
+    }
   }
 }

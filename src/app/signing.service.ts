@@ -160,6 +160,38 @@ export class SigningService {
     return signedTransactionBytes.toString('hex');
   }
 
+  sign(seedHex: string, messageHex: string): string {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+
+    const contentBytes = new Buffer(messageHex, 'hex');
+    const contentLength = uvarint64ToBuf(contentBytes.length);
+
+    // We add a prefix to prevent the caller from signing a transaction
+    const prefix = 'DeSo Signed Message:\n';
+    const prefixBytes = new Buffer(prefix, 'hex');
+
+    const messageBytes = Buffer.concat([
+      prefixBytes,
+      contentLength,
+      contentBytes,
+    ]);
+    const messageBytesLength = uvarint64ToBuf(messageBytes.length);
+    const messageHash = new Buffer(sha256.x2(messageBytes), 'hex');
+
+    const signature = privateKey.sign(messageHash);
+    const signatureBytes = new Buffer(signature.toDER());
+    const signatureLength = uvarint64ToBuf(signatureBytes.length);
+
+    const signedMessageBytes = Buffer.concat([
+      messageBytesLength,
+      messageBytes,
+      signatureLength,
+      signatureBytes
+    ])
+
+    return signedMessageBytes.toString('hex');
+  }
+
   signHashes(seedHex: string, unsignedHashes: string[]): string[] {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const signedHashes = [];

@@ -76,6 +76,7 @@ export class IdentityService {
     signedTransactionHex?: string,
     jumioSuccess?: boolean,
     phoneNumberSuccess?: boolean,
+    signedMessageHex?: string,
   }): void {
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
@@ -143,34 +144,49 @@ export class IdentityService {
   }
 
   private handleSign(data: any): void {
-    const { id, payload: { encryptedSeedHex, transactionHex } } = data;
-
-    // This will tell us whether we need full signing access or just ApproveLarge
-    // level of access.
-    const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
-
-    // In the case that approve() fails, it responds with a message indicating
-    // that approvalRequired = true, which the caller can then uses to trigger
-    // the /approve UI.
-    if (!this.approve(data, requiredAccessLevel)) {
-      return;
-    }
-
-    // If we get to this point, no approval UI was required. This typically
-    // happens if the caller has full signing access or signing access for
-    // non-spending txns such as like, post, update profile, etc. In the
-    // latter case we need a subsequent check to ensure that the txn is not
-    // sending money to any public keys other than the sender himself.
-    if (!this.approveSpending(data)) {
-      return;
-    }
+    const { id, payload: { encryptedSeedHex, transactionHex, messageHex } } = data;
 
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
 
-    this.respond(id, {
-      signedTransactionHex,
-    });
+    if (transactionHex) {
+      // This will tell us whether we need full signing access or just ApproveLarge
+      // level of access.
+      const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+
+      // In the case that approve() fails, it responds with a message indicating
+      // that approvalRequired = true, which the caller can then uses to trigger
+      // the /approve UI.
+      if (!this.approve(data, requiredAccessLevel)) {
+        return;
+      }
+
+      // If we get to this point, no approval UI was required. This typically
+      // happens if the caller has full signing access or signing access for
+      // non-spending txns such as like, post, update profile, etc. In the
+      // latter case we need a subsequent check to ensure that the txn is not
+      // sending money to any public keys other than the sender himself.
+      if (!this.approveSpending(data)) {
+        return;
+      }
+
+      const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
+
+      this.respond(id, {
+        signedTransactionHex,
+      });
+    } else if (messageHex) {
+      // No transaction or spending here, so we just check if approval is required.
+      if (!this.hasAccessLevel(data, AccessLevel.ApproveLarge)) {
+        this.respond(data.id, {approvalRequired: true});
+        return;
+      }
+
+      const signedMessageHex = this.signingService.sign(seedHex, messageHex);
+
+      this.respond(id, {
+        signedMessageHex,
+      });
+    }
   }
 
   // Encrypt with shared secret
