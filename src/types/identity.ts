@@ -73,9 +73,9 @@ export interface EncryptedMessage {
   Legacy: boolean,
   Version?: number,
   SenderMessagingPublicKey?: string,
-  SenderMessagingKeyName?: string,
+  SenderMessagingGroupKeyName?: string,
   RecipientMessagingPublicKey?: string,
-  RecipientMessagingKeyName?: string
+  RecipientMessagingGroupKeyName?: string
 }
 
 export enum Network {

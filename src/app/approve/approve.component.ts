@@ -30,9 +30,9 @@ import {
   TransactionMetadataAcceptNFTTransfer,
   TransactionMetadataBurnNFT,
   TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataMessagingGroup,
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin,
-  TransactionMetadataMessagingGroup
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 
