@@ -32,7 +32,7 @@ import {
   TransactionMetadataAuthorizeDerivedKey,
   TransactionMetadataMessagingGroup,
   TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin,
+  TransactionMetadataTransferDAOCoin
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 

@@ -27,12 +27,13 @@ export class SigningService {
   }
 
   encryptMessage(seedHex: string, senderGroupKeyName: string, recipientPublicKey: string, message: string): any {
-    const ec = new EC('secp256k1');
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined,32);
-    const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
 
+    const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
     try {
+      // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
+      // encrypting the message.
       let privateEncryptionKey = privateKeyBuffer;
       if(senderGroupKeyName) {
         privateEncryptionKey = this.cryptoService.deriveMessagingKey(seedHex, senderGroupKeyName);
@@ -74,7 +75,6 @@ export class SigningService {
   decryptMessages(seedHex: string, encryptedMessages: EncryptedMessage[]): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
-    const ec = new EC('secp256k1');
 
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {

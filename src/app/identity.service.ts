@@ -34,8 +34,6 @@ import {
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin
 } from '../lib/deso/transaction';
-import {ec as EC} from "elliptic";
-import {map} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -170,36 +168,15 @@ export class IdentityService {
       return;
     }
 
-    // const ec = new EC('secp256k1');
     const { id, payload: { encryptedSeedHex, senderGroupKeyName, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    // const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    // const recipientPublicKeyEC = ec.keyFromPublic(this.cryptoService.publicKeyToECBuffer(recipientPublicKey), 'array');
 
-    // In the DeSo V3 Messages, users can register messaging keys on the blockchain. We send a backend
-    // request to check if sender or recipient have authorized default messaging keys. Based on this
-    // information we will decide how to encrypt the message.
+    // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
+    // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
+    // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
+    // senderGroupKeyName parameter.
     const encryptedMessage = this.signingService.encryptMessage(seedHex, senderGroupKeyName, recipientPublicKey, message);
     this.respond(id, encryptedMessage);
-
-    // const request = this.backendApi.GetPartyMessagingKeys(
-    //   this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network),
-    //   this.globalVars.defaultMessageKeyName,
-    //   this.cryptoService.publicKeyToDeSoPublicKey(recipientPublicKeyEC, this.globalVars.network),
-    //   this.globalVars.defaultMessageKeyName
-    // ).pipe(
-    //   map( messagingParty => {
-    //     console.log("messagingParty", messagingParty);
-    //     console.log("seed hex", seedHex);
-    //     console.log("recipient public key", recipientPublicKey);
-    //     console.log("message", message);
-    //     // Messaging party object indicates if either user has authorized the default messaging key.
-    //
-    //   })
-    // );
-    // request.subscribe( messageAndParty => {
-    //
-    // })
   }
 
   private handleDecrypt(data: any): void {
@@ -218,7 +195,6 @@ export class IdentityService {
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      console.log("encrypted messages", encryptedMessages);
       decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
     }
 

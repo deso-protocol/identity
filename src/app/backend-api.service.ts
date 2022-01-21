@@ -47,7 +47,7 @@ type CountryLevelSignUpBonus = {
   providedIn: 'root'
 })
 export class BackendAPIService {
-  endpoint = `http://${environment.nodeHostname}:18001/api/v0`;
+  endpoint = `https://${environment.nodeHostname}/api/v0`;
 
   constructor(
     private httpClient: HttpClient,
@@ -249,38 +249,5 @@ export class BackendAPIService {
       PhoneNumberCountryCode,
       VerificationCode,
     });
-  }
-
-  GetPartyMessagingKeys(
-    SenderPublicKeyBase58Check: string,
-    SenderMessagingKeyName: string,
-    RecipientPublicKeyBase58Check: string,
-    RecipientMessagingKeyName: string
-  ): Observable< PartyMessagingKeys > {
-    const req = this.httpClient.post<any>(
-      `${this.endpoint}/check-party-messaging-keys`,
-      {
-        SenderPublicKeyBase58Check,
-        SenderMessagingKeyName,
-        RecipientPublicKeyBase58Check,
-        RecipientMessagingKeyName
-      }
-    );
-    return req.pipe(
-      map( res => {
-        return {
-          senderMessagingPublicKey: res.SenderMessagingPublicKey,
-          isSenderMessagingKey: res.IsSenderMessagingKey,
-          senderMessagingKeyName: res.SenderMessagingKeyName,
-          recipientMessagingPublicKey: res.RecipientMessagingPublicKey,
-          isRecipientMessagingKey: res.IsRecipientMessagingKey,
-          recipientMessagingKeyName: res.RecipientMessagingKeyName
-        } as PartyMessagingKeys;
-      })
-    ).pipe(
-      catchError( () => {
-        return of({} as PartyMessagingKeys);
-      })
-    );
   }
 }

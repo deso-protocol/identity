@@ -37,7 +37,6 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending
     {$DOMAIN:https://node.deso.org}/api/v0/send-phone-number-verification-text
     {$DOMAIN:https://node.deso.org}/api/v0/submit-phone-number-verification-code
-    {$DOMAIN:https://node.deso.org}/api/v0/check-party-messaging-keys
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files;
