@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import HDNode from 'hdkey';
 import * as bip39 from 'bip39';
-import * as ecies from '../lib/ecies';
 import HDKey from 'hdkey';
 import {ec as EC} from 'elliptic';
 import bs58check from 'bs58check';
@@ -184,12 +183,11 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
-  // Compute messaging private key as kdf( sha256x2( sha256x2(seed hex) || sha256x2(key name) ) )
+  // Compute messaging private key as sha256x2( sha256x2(seed hex) || sha256x2(key name) )
   deriveMessagingKey(seedHex: string, keyName: string): Buffer {
     const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]), 'hex');
     const keyNameHash = new Buffer(sha256.x2([... new Buffer(keyName, 'utf8')]), 'hex');
-    const messagingPrivateBytes = new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
-    return ecies.kdf(messagingPrivateBytes, 32);
+    return new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
   }
 
   // NOTE: Our ETH address uses the bitcion/bitclout derivation path, not the ETH path.

@@ -131,7 +131,7 @@ export class AppComponent implements OnInit {
     try {
       this.accountService.migrate();
     } catch (e) {
-      console.error(e);
+      console.error(e)
     }
 
     // Finish loading

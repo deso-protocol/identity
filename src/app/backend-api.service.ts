@@ -7,7 +7,7 @@ import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {DerivedKey, PartyMessagingKeys, UserProfile} from '../types/identity';
+import {DerivedKey, UserProfile} from '../types/identity';
 
 export class ProfileEntryResponse {
   Username: string | null = null;

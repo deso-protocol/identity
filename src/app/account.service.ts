@@ -120,7 +120,7 @@ export class AccountService {
 
     // Set the default messaging key name
     const messagingKeyName = this.globalVars.defaultMessageKeyName;
-    // Compute messaging private key as kdf( sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) ) )
+    // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
     const messagingPrivateKeyBuff = this.cryptoService.deriveMessagingKey(privateUser.seedHex, messagingKeyName);
     const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
     const ec = new EC('secp256k1');

@@ -57,15 +57,6 @@ export interface DerivedKey {
   isValid: boolean;
 }
 
-export interface PartyMessagingKeys {
-  senderMessagingPublicKey: string;
-  isSenderMessagingKey: boolean;
-  senderMessagingKeyName: string;
-  recipientMessagingPublicKey: string;
-  isRecipientMessagingKey: boolean;
-  recipientMessagingKeyName: string;
-}
-
 export interface EncryptedMessage {
   EncryptedHex: string,
   PublicKey: string,

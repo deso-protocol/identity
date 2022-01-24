@@ -7,8 +7,7 @@ import {GlobalVarsService} from "./global-vars.service";
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
 import {decryptShared} from '../lib/ecies';
-import {ec as EC} from "elliptic";
-import {EncryptedMessage, PartyMessagingKeys} from "../types/identity";
+import {EncryptedMessage} from "../types/identity";
 
 @Injectable({
   providedIn: 'root'
@@ -113,19 +112,19 @@ export class SigningService {
             // private key of a messaging public key, we just need the trapdoor = user's seedHex and the key name.
             // Setting IsSender tells Identity if it should invert sender or recipient public key.
             if(encryptedMessage.IsSender) {
-              if(encryptedMessage.SenderMessagingGroupKeyName === this.globalVars.defaultMessageKeyName)
+              if(encryptedMessage.SenderMessagingGroupKeyName === this.globalVars.defaultMessageKeyName) {
                 defaultKey = true;
+              }
               publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(encryptedMessage.RecipientMessagingPublicKey as string);
-              // publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.RecipientMessagingPublicKey as string, 'hex').getPublic('array'));
             } else {
-              if(encryptedMessage.RecipientMessagingGroupKeyName === this.globalVars.defaultMessageKeyName)
+              if(encryptedMessage.RecipientMessagingGroupKeyName === this.globalVars.defaultMessageKeyName) {
                 defaultKey = true;
+              }
               publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(encryptedMessage.SenderMessagingPublicKey as string);
-              // publicEncryptionKey = new Buffer(ec.keyFromPublic(encryptedMessage.SenderMessagingPublicKey as string, 'hex').getPublic('array'));
             }
 
             // Currently, Identity only computes trapdoor public key with name "default-key".
-            // Compute messaging private key as kdf( sha256x2( sha256x2(secret key) || sha256x2(key name) ) )
+            // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(key name) )
             if (defaultKey) {
               privateEncryptionKey = this.cryptoService.deriveMessagingKey(seedHex, this.globalVars.defaultMessageKeyName);
             }
