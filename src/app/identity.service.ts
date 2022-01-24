@@ -168,12 +168,15 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
+    const { id, payload: { encryptedSeedHex, senderGroupKeyName, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPublicKey, message);
-    this.respond(id, {
-      encryptedMessage
-    });
+
+    // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
+    // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
+    // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
+    // senderGroupKeyName parameter.
+    const encryptedMessage = this.signingService.encryptMessage(seedHex, senderGroupKeyName, recipientPublicKey, message);
+    this.respond(id, encryptedMessage);
   }
 
   private handleDecrypt(data: any): void {
@@ -190,7 +193,7 @@ export class IdentityService {
       const encryptedHexes = data.payload.encryptedHexes;
       decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
     } else {
-      // Shared secret decryption
+      // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
       decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
     }

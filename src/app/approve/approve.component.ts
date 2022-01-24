@@ -30,6 +30,7 @@ import {
   TransactionMetadataAcceptNFTTransfer,
   TransactionMetadataBurnNFT,
   TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataMessagingGroup,
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin
 } from '../../lib/deso/transaction';
@@ -242,7 +243,10 @@ export class ApproveComponent implements OnInit {
         publicKeys = [daoCoinTransferPublicKey, daoCoinReceiverPublicKey];
         description = `transfer ${daoCoinTransferAmount} ${daoCoinTransferPublicKey} DAO coins to ${daoCoinReceiverPublicKey}`;
         break;
-
+      case TransactionMetadataMessagingGroup:
+        const groupKeyName = this.transaction.metadata.messagingGroupKeyName
+        description = `register group key with name "${groupKeyName}"`
+        break
     }
 
     // Set the transaction description based on the description populated with public keys.

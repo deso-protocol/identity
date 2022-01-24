@@ -9,6 +9,7 @@ import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
 import {AccessLevel, Network} from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
+import * as sha256 from "sha256";
 
 @Injectable({
   providedIn: 'root'
@@ -152,6 +153,12 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
+  publicKeyToDeSoPublicKey(publicKey: EC.KeyPair, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
+    const key = publicKey.getPublic().encode('array', true);
+    return bs58check.encode(Buffer.from([...prefix, ...key]));
+  }
+
   // Decode public key base58check to Buffer of secp256k1 public key
   publicKeyToECBuffer(publicKey: string): Buffer {
     // Sanity check similar to Base58CheckDecodePrefix from core/lib/base58.go
@@ -174,6 +181,13 @@ export class CryptoService {
     const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
 
     return bs58check.encode(prefixAndKey);
+  }
+
+  // Compute messaging private key as sha256x2( sha256x2(seed hex) || sha256x2(key name) )
+  deriveMessagingKey(seedHex: string, keyName: string): Buffer {
+    const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]), 'hex');
+    const keyNameHash = new Buffer(sha256.x2([... new Buffer(keyName, 'utf8')]), 'hex');
+    return new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
   }
 
   // NOTE: Our ETH address uses the bitcion/bitclout derivation path, not the ETH path.

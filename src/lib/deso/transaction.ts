@@ -282,6 +282,31 @@ export class TransactionMetadataAuthorizeDerivedKey extends BinaryRecord {
   accessSignature: Buffer = Buffer.alloc(0);
 }
 
+export class MessagingGroupMember extends BinaryRecord {
+  @Transcode(VarBuffer)
+  groupMemberPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  groupMemberKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  encryptedKey: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataMessagingGroup extends BinaryRecord {
+  @Transcode(VarBuffer)
+  messagingPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  messagingGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  groupOwnerSignature: Buffer = Buffer.alloc(0);
+
+  @Transcode(ArrayOf(MessagingGroupMember))
+  messagingGroupMembers: MessagingGroupMember[] = [];
+}
+
 export class TransactionMetadataDAOCoin extends BinaryRecord {
   @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
@@ -332,6 +357,7 @@ export const TransactionTypeMetadataMap = {
   20: TransactionMetadataAcceptNFTTransfer,
   21: TransactionMetadataBurnNFT,
   22: TransactionMetadataAuthorizeDerivedKey,
+  23: TransactionMetadataMessagingGroup,
   24: TransactionMetadataDAOCoin,
   25: TransactionMetadataTransferDAOCoin,
 };

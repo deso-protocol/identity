@@ -11,6 +11,7 @@ import {uint64ToBufBigEndian} from '../lib/bindata/util';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
+import {ec as EC} from 'elliptic';
 
 @Injectable({
   providedIn: 'root'
@@ -83,8 +84,8 @@ export class AccountService {
     }
   }
 
-  getDerivedPrivateUser(publicKey: string, blockHeight: number): DerivedPrivateUserInfo{
-    const privateUser = this.getPrivateUsers()[publicKey];
+  getDerivedPrivateUser(publicKeyBase58Check: string, blockHeight: number): DerivedPrivateUserInfo{
+    const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
 
     this.entropyService.setNewTemporaryEntropy();
@@ -92,7 +93,7 @@ export class AccountService {
     const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
     const derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
     const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
-    const derivedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
+    const derivedPublicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
 
     // Generate new btc and eth deposit addresses for the derived key.
     // const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
@@ -117,17 +118,37 @@ export class AccountService {
     const encodedDerivedPrivateKey = keyEncoder.encodePrivate(derivedSeedHex, 'raw', 'pem');
     const derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
 
+    // Set the default messaging key name
+    const messagingKeyName = this.globalVars.defaultMessageKeyName;
+    // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
+    const messagingPrivateKeyBuff = this.cryptoService.deriveMessagingKey(privateUser.seedHex, messagingKeyName);
+    const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
+    const ec = new EC('secp256k1');
+
+    // We do this to compress the messaging public key from 65 bytes to 33 bytes.
+    const messagingPublicKey = ec.keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array').getPublic(true, 'hex');
+    const messagingPublicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(ec.keyFromPrivate(messagingPrivateKeyBuff), this.globalVars.network)
+
+    // Messaging key signature is needed so if derived key submits the messaging public key,
+    // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )
+    const messagingKeyHash = sha256.x2([...new Buffer(messagingPublicKey, 'hex'), ...new Buffer(messagingKeyName, 'utf8')]);
+    const messagingKeySignature = this.signingService.signHashes(privateUser.seedHex, [messagingKeyHash])[0];
+
     return {
       derivedSeedHex,
-      derivedPublicKey,
-      publicKey,
+      derivedPublicKeyBase58Check,
+      publicKeyBase58Check,
       btcDepositAddress,
       ethDepositAddress,
       expirationBlock,
       network,
       accessSignature,
       jwt,
-      derivedJwt
+      derivedJwt,
+      messagingPublicKeyBase58Check,
+      messagingPrivateKey,
+      messagingKeyName,
+      messagingKeySignature
     };
   }
 
