@@ -77,7 +77,18 @@ export class IdentityService {
     jumioSuccess?: boolean,
     phoneNumberSuccess?: boolean,
   }): void {
-    this.cast('login', payload);
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      let httpParams = new HttpParams();
+      for (const key in payload) {
+        if (payload.hasOwnProperty(key)) {
+          httpParams = httpParams.append(key, (payload as any)[key].toString());
+        }
+      }
+      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+    } else {
+      this.cast('login', payload);
+    }
   }
 
   derive(payload: {
