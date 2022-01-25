@@ -5,7 +5,8 @@
       (click)="finishFlow()"
       class="button button-secondary button-large font-weight-bold fs-15px sign-up-btn"
     >
-      Continue to {{ globalVars.hostname }}
+      <div *ngIf="globalVars.callback; else elseBlock">Continue</div>
+      <ng-template #elseBlock>Continue to {{ globalVars.hostname }}</ng-template>
     </button>
   </div>
 </ng-template>
