@@ -62,6 +62,10 @@ export class ApproveComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
+      if (params.tx && params.messageHex) {
+        console.error('Found transactionHex and messageHex in query parameters. Only messageHex will be used.');
+      }
+
       if (params.messageHex) {
         this.messageHex = params.messageHex;
         this.publicKey = params.publicKey;

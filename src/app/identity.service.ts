@@ -148,7 +148,23 @@ export class IdentityService {
 
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
 
-    if (transactionHex) {
+    if (transactionHex && messageHex) {
+      console.error('Found transactionHex and messageHex in payload. Only messageHex will be used.');
+    }
+
+    if (messageHex) {
+      // No transaction or spending here, so we just check if approval is required.
+      if (!this.hasAccessLevel(data, AccessLevel.ApproveLarge)) {
+        this.respond(data.id, {approvalRequired: true});
+        return;
+      }
+
+      const signedMessageHex = this.signingService.sign(seedHex, messageHex);
+
+      this.respond(id, {
+        signedMessageHex,
+      });
+    } else if (transactionHex) {
       // This will tell us whether we need full signing access or just ApproveLarge
       // level of access.
       const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
@@ -173,18 +189,6 @@ export class IdentityService {
 
       this.respond(id, {
         signedTransactionHex,
-      });
-    } else if (messageHex) {
-      // No transaction or spending here, so we just check if approval is required.
-      if (!this.hasAccessLevel(data, AccessLevel.ApproveLarge)) {
-        this.respond(data.id, {approvalRequired: true});
-        return;
-      }
-
-      const signedMessageHex = this.signingService.sign(seedHex, messageHex);
-
-      this.respond(id, {
-        signedMessageHex,
       });
     }
   }
