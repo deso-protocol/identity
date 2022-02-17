@@ -11,7 +11,6 @@ import {uint64ToBufBigEndian} from '../lib/bindata/util';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
-import {ec as EC} from "elliptic";
 
 @Injectable({
   providedIn: 'root'
@@ -99,7 +98,7 @@ export class AccountService {
     let derivedJwt = '';
 
     if (derivedPublicKeyBase58Check === undefined) {
-      // If the user hasn't passed in a derived public key, create it
+      // If the user hasn't passed in a derived public key, create it.
       derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
       const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
       derivedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
@@ -115,8 +114,8 @@ export class AccountService {
       derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
     } else {
       // If the user has passed in a derived public key, use that instead.
-      // Don't define the derived seed hex (a private key presumably already exists)
-      // Don't define the JWT either
+      // Don't define the derived seed hex (a private key presumably already exists).
+      // Don't define the JWT, since we have no private key to sign it with.
       derivedPublicKey = derivedPublicKeyBase58Check;
       derivedPublicKeyBuffer = this.cryptoService.publicKeyToBuffer(derivedPublicKeyBase58Check);
     }

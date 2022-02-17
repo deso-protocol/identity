@@ -62,8 +62,6 @@ export class DeriveComponent implements OnInit {
   }
 
   selectAccountAndDeriveKey(publicKey: string): void {
-    console.log("SELECTING DERIVED KEY");
-    console.log(this.derivedPublicKeyBase58Check);
     this.identityService.derive({
       publicKey,
       derivedPublicKeyBase58Check: this.derivedPublicKeyBase58Check,
