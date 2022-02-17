@@ -5,9 +5,6 @@ import {AccessLevel, Network} from '../types/identity';
 import {getStateParamsFromGoogle} from './auth/google/google.component';
 import {BackendAPIService} from './backend-api.service';
 import { AccountService } from './account.service';
-import { RouteNames } from './app-routing.module';
-
-const IMPORTED_KEY = 'imported';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +15,6 @@ export class AppComponent implements OnInit {
   title = 'identity';
 
   loading = true;
-  importing = false;
 
   constructor(
     private accountService: AccountService,
@@ -88,11 +84,16 @@ export class AppComponent implements OnInit {
         this.globalVars.referralHashBase58 = referralCode;
         this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
           const referralInfo = res.ReferralInfoResponse.Info;
-          if (
+          const countrySignUpBonus = res.CountrySignUpBonus;
+          if (!countrySignUpBonus.AllowCustomReferralAmount) {
+            this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
+          } else if (
             res.ReferralInfoResponse.IsActive &&
             (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
           ) {
             this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
+          } else {
+            this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
           }
         });
       }
@@ -112,14 +113,7 @@ export class AppComponent implements OnInit {
           this.globalVars.accessLevelRequest = AccessLevel.Full;
         }
 
-        // We only care about attempting to import when we're in a tab.
-        // The iframe doesn't have first party storage access and the webview
-        // cannot open a window.
-        if (this.globalVars.inTab && !localStorage.getItem(IMPORTED_KEY)) {
-          this.importing = true;
-        } else {
-          this.finishInit();
-        }
+        this.finishInit();
       });
     } else {
       // Identity currently doesn't have any management UIs that can be accessed directly
@@ -127,7 +121,7 @@ export class AppComponent implements OnInit {
     }
 
     this.backendApiService.GetAppState().subscribe((res) => {
-      this.globalVars.jumioDeSoNanos = res.JumioDeSoNanos;
+      this.globalVars.jumioUSDCents = res.JumioUSDCents;
       this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
     });
   }
@@ -142,13 +136,5 @@ export class AppComponent implements OnInit {
 
     // Finish loading
     this.loading = false;
-  }
-
-  launchImport(): void {
-    this.identityService.launchImportWindow().subscribe(() => {
-      localStorage.setItem(IMPORTED_KEY, "true");
-      this.importing = false;
-      this.finishInit();
-    });
   }
 }

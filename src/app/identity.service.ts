@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
-import {AccessLevel, PrivateUserInfo, PublicUserInfo} from '../types/identity';
+import {AccessLevel, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
@@ -30,7 +30,9 @@ import {
   TransactionMetadataNFTBid,
   TransactionMetadataAcceptNFTBid,
   TransactionMetadataUpdateNFT,
-  TransactionMetadataCreateNFT
+  TransactionMetadataCreateNFT,
+  TransactionMetadataDAOCoin,
+  TransactionMetadataTransferDAOCoin
 } from '../lib/deso/transaction';
 
 @Injectable({
@@ -46,10 +48,6 @@ export class IdentityService {
   // Embed component checks for browser support
   browserSupported = true;
 
-  // TEMP: Import window
-  private importWindow: Window | null = null;
-  private importSubject = new Subject();
-
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
@@ -59,13 +57,6 @@ export class IdentityService {
     private backendApi: BackendAPIService,
   ) {
     window.addEventListener('message', (event) => this.handleMessage(event));
-  }
-
-  // TEMP: Import from BitClout Identity
-  launchImportWindow(): Observable<any> {
-    // Open a BitClout Identity window
-    this.importWindow = window.open("https://identity.bitclout.com/import", undefined, `toolbar=no, width=10, height=10, top=0, left=0`);
-    return this.importSubject;
   }
 
   // Outgoing Messages
@@ -86,7 +77,18 @@ export class IdentityService {
     jumioSuccess?: boolean,
     phoneNumberSuccess?: boolean,
   }): void {
-    this.cast('login', payload);
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      let httpParams = new HttpParams();
+      for (const key in payload) {
+        if (payload.hasOwnProperty(key)) {
+          httpParams = httpParams.append(key, (payload as any)[key].toString());
+        }
+      }
+      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+    } else {
+      this.cast('login', payload);
+    }
   }
 
   derive(payload: {
@@ -113,35 +115,6 @@ export class IdentityService {
   }
 
   // Incoming Messages
-
-  // TEMP: The import window sends an initialize message we need to respond to
-  private handleInitialize(data: any) {
-    // acknowledge, provides hostname data
-    this.importWindow?.postMessage({
-      id: data.id,
-      service: "identity",
-      payload: {},
-    }, '*');
-  }
-
-  private handleImport(event: MessageEvent) {
-    // Only allow import events from BitClout Identity
-    if (event.origin !== 'https://identity.bitclout.com') {
-      return;
-    }
-
-    // Import accounts
-    for (const privateUser of Object.values(event.data.payload.privateUsers)) {
-      this.accountService.addPrivateUser(privateUser as PrivateUserInfo);
-    }
-
-    // Close the window
-    this.importWindow?.close();
-
-    // Complete the observable
-    this.importSubject.next(null);
-    this.importSubject.complete();
-  }
 
   private handleBurn(data: any): void {
     if (!this.approve(data, AccessLevel.Full)) {
@@ -208,12 +181,15 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
+    const { id, payload: { encryptedSeedHex, senderGroupKeyName, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPublicKey, message);
-    this.respond(id, {
-      encryptedMessage
-    });
+
+    // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
+    // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
+    // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
+    // senderGroupKeyName parameter.
+    const encryptedMessage = this.signingService.encryptMessage(seedHex, senderGroupKeyName, recipientPublicKey, message);
+    this.respond(id, encryptedMessage);
   }
 
   private handleDecrypt(data: any): void {
@@ -230,7 +206,7 @@ export class IdentityService {
       const encryptedHexes = data.payload.encryptedHexes;
       decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
     } else {
-      // Shared secret decryption
+      // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
       decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
     }
@@ -308,6 +284,8 @@ export class IdentityService {
       case TransactionMetadataAcceptNFTTransfer:
       case TransactionMetadataBurnNFT:
       case TransactionMetadataAuthorizeDerivedKey:
+      case TransactionMetadataDAOCoin:
+      case TransactionMetadataTransferDAOCoin:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:
@@ -395,10 +373,6 @@ export class IdentityService {
       this.handleJwt(data);
     } else if (method === 'info') {
       this.handleInfo(event);
-    } else if (method === 'initialize') {
-      this.handleInitialize(data);
-    } else if (method === 'import') {
-      this.handleImport(event);
     } else {
       console.error('Unhandled identity request');
       console.error(event);

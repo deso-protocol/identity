@@ -36,6 +36,13 @@ export class User {
   UsersYouHODL: any[] = [];
 }
 
+type CountryLevelSignUpBonus = {
+  AllowCustomReferralAmount: boolean;
+  ReferralAmountOverrideUSDCents: number;
+  AllowCustomKickbackAmount: boolean;
+  KickbackAmountOverrideUSDCents: number;
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -163,7 +170,9 @@ export class BackendAPIService {
     });
   }
 
-  GetReferralInfoForReferralHash(ReferralHash: string): Observable<any> {
+  GetReferralInfoForReferralHash(
+    ReferralHash: string
+  ): Observable<{ ReferralInfoResponse: any; CountrySignUpBonus: CountryLevelSignUpBonus }> {
     return this.httpClient.post<any>(`${this.endpoint}/get-referral-info-for-referral-hash`, {
       ReferralHash,
     });

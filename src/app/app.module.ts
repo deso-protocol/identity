@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -29,6 +29,9 @@ import { ErrorCallbackComponent } from './error-callback/error-callback.componen
 import { SharedSecretComponent } from './shared-secret/shared-secret.component';
 import { SignUpGetStarterDESOComponent } from './sign-up-get-starter-deso/sign-up-get-starter-deso.component';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
+import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component'
 
 @NgModule({
   declarations: [
@@ -50,6 +53,8 @@ import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
     ErrorCallbackComponent,
     SharedSecretComponent,
     SignUpGetStarterDESOComponent,
+    FreeDesoMessageComponent,
+    FreeDeSoDisclaimerComponent,
   ],
   imports: [
     BrowserModule,
@@ -60,6 +65,7 @@ import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
     ReactiveFormsModule,
     NgxIntlTelInputModule,
     MatFormFieldModule,
+    MatTooltipModule,
     CookieModule.forRoot()
   ],
   providers: [
