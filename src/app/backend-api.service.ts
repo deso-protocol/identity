@@ -47,7 +47,7 @@ type CountryLevelSignUpBonus = {
   providedIn: 'root'
 })
 export class BackendAPIService {
-  endpoint = `http://${environment.nodeHostname}/api/v0`;
+  endpoint = `https://${environment.nodeHostname}/api/v0`;
 
   constructor(
     private httpClient: HttpClient,
