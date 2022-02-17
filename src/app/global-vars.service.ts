@@ -32,6 +32,8 @@ export class GlobalVarsService {
 
   defaultMessageKeyName: string = 'default-key';
 
+  signPrefix: string = 'DeSo Signed Message:\n';
+
   constructor() { }
 
   isFullAccessHostname(): boolean {

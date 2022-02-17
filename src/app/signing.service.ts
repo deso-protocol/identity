@@ -167,8 +167,7 @@ export class SigningService {
     const contentLength = uvarint64ToBuf(contentBytes.length);
 
     // We add a prefix to prevent the caller from signing a transaction
-    const prefix = 'DeSo Signed Message:\n';
-    const prefixBytes = new Buffer(prefix, 'hex');
+    const prefixBytes = new Buffer(this.globalVars.signPrefix, 'utf-8');
 
     const messageBytes = Buffer.concat([
       prefixBytes,
