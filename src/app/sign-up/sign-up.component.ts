@@ -94,6 +94,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     if (this.globalVars.derive) {
       this.identityService.derive({
         publicKey: this.publicKeyAdded,
+        derivedPublicKeyBase58Check: this.globalVars.derivedPublicKeyBase58Check,
       });
     } else {
       if (!this.globalVars.showJumio()) {

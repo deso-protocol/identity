@@ -5,7 +5,7 @@ import {BackendAPIService} from '../backend-api.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {GoogleDriveService} from '../google-drive.service';
 import {UserProfile} from '../../types/identity';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {RouteNames} from '../app-routing.module';
 
 @Component({
@@ -17,6 +17,7 @@ export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
+  derivedPublicKeyBase58Check: string | undefined = undefined;
 
   constructor(
     private accountService: AccountService,
@@ -25,6 +26,7 @@ export class DeriveComponent implements OnInit {
     private googleDrive: GoogleDriveService,
     private backendApi: BackendAPIService,
     private router: Router,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -38,6 +40,13 @@ export class DeriveComponent implements OnInit {
 
     // Set derive to true
     this.globalVars.derive = true;
+
+    this.route.queryParams.subscribe((params) => {
+      if (params.derivedPublicKeyBase58Check) {
+        this.derivedPublicKeyBase58Check = params.derivedPublicKeyBase58Check;
+        this.globalVars.derivedPublicKeyBase58Check = this.derivedPublicKeyBase58Check;
+      }
+    });
   }
 
   redirectLoadSeed(): void {
@@ -53,8 +62,11 @@ export class DeriveComponent implements OnInit {
   }
 
   selectAccountAndDeriveKey(publicKey: string): void {
+    console.log("SELECTING DERIVED KEY");
+    console.log(this.derivedPublicKeyBase58Check);
     this.identityService.derive({
-      publicKey
+      publicKey,
+      derivedPublicKeyBase58Check: this.derivedPublicKeyBase58Check,
     });
   }
 }

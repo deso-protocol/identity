@@ -91,10 +91,12 @@ export class IdentityService {
 
   derive(payload: {
     publicKey: string,
+    derivedPublicKeyBase58Check: string | undefined,
   }): void {
     this.backendApi.GetAppState().subscribe( res => {
       const blockHeight = res.BlockHeight;
-      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(payload.publicKey, blockHeight);
+      const derivedPrivateUserInfo =
+        this.accountService.getDerivedPrivateUser(payload.publicKey, blockHeight, payload.derivedPublicKeyBase58Check);
       if (this.globalVars.callback) {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();

@@ -142,6 +142,7 @@ export class GoogleComponent implements OnInit {
     if (this.globalVars.derive) {
       this.identityService.derive({
         publicKey: this.publicKey,
+        derivedPublicKeyBase58Check: this.globalVars.derivedPublicKeyBase58Check,
       });
     } else {
       this.identityService.login({

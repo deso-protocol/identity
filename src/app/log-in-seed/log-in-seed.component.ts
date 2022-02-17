@@ -89,6 +89,7 @@ export class LogInSeedComponent implements OnInit {
     if (this.globalVars.derive) {
       this.identityService.derive({
         publicKey: userPublicKey,
+        derivedPublicKeyBase58Check: this.globalVars.derivedPublicKeyBase58Check,
       });
     } else {
       this.router.navigate(['/', RouteNames.LOG_IN], {queryParamsHandling: 'merge'});

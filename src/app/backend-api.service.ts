@@ -40,7 +40,7 @@ export class User {
   providedIn: 'root'
 })
 export class BackendAPIService {
-  endpoint = `https://${environment.nodeHostname}/api/v0`;
+  endpoint = `http://${environment.nodeHostname}/api/v0`;
 
   constructor(
     private httpClient: HttpClient,
