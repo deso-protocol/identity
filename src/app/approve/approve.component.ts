@@ -43,7 +43,7 @@ import bs58check from 'bs58check';
   styleUrls: ['./approve.component.scss']
 })
 export class ApproveComponent implements OnInit {
-  transaction: Transaction<any> = new Transaction;
+  transaction: Transaction = new Transaction;
   publicKey: any;
   transactionHex: any;
   username: any;
