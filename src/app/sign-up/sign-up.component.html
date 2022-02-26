@@ -4,11 +4,11 @@
   <!-- Step 1 -->
   <div *ngIf="stepNum == 1">
     <div class="step-row">
-      <div class="title-text">Store your DeSo Key</div>
+      <div class="title-text">Store your Private Key</div>
       <div class="step-title">Step 1 of {{ stepTotal }}</div>
     </div>
     <div class="subtitle-text">Write, download, print, or copy it somewhere safe.</div>
-    <div class="warning-text">If you lose your DeSo Key your account will be lost forever.</div>
+    <div class="warning-text">If you lose your Private Key your account will be lost forever.</div>
     <div class="seed-phrase-container">
       <div *ngIf="!entropyService.advancedOpen" class="px-25px pt-10px pb-30px border-bottom">{{ entropyService.temporaryEntropy.mnemonic }}</div>
       <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && hasEntropyError()">
@@ -38,22 +38,22 @@
         <div class="w-100 py-25px px-30px">
           <div class="fs-15px fc-default">
             <p>
-              The following displays the entropy (random numbers) used to generate the "DeSo Key" above.
+              The following displays the entropy (random numbers) used to generate the "Private Key" above.
               The entropy below was generated using a random number generator, but you can edit the
-              fields below to use your own randomness to generate the DeSo Key (you can't go wrong
-              with a set of dice). You can also enter your own DeSo Key directly if you prefer.
+              fields below to use your own randomness to generate the Private Key (you can't go wrong
+              with a set of dice). You can also enter your own Private Key directly if you prefer.
             </p>
 
             <p class="pt-15px">
               Because there is a standard for generating seed phrases for Bitcoin (called
               <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>),
-              and because we use this same standard to generate DeSo Key,
-              DeSo Keys can also be used with any Bitcoin wallet that implements
+              and because we use this same standard to generate Private Key,
+              Private Keys can also be used with any Bitcoin wallet that implements
               this standard under the m/44'/0'/0'/0/0 derivation path (e.g.
               <a target="_blank" href="https://wallet.mycelium.com/">Mycelium</a>,
               <a target="_blank" href="https://electrum.org">Electrum</a>).
               Similarly, any standard
-              Bitcoin seed phrase you have can also be used as a DeSo Key. Of course, all
+              Bitcoin seed phrase you have can also be used as a Private Key. Of course, all
               of this can be verified using a tool like the
               <a target="_blank" href="https://iancoleman.io/bip39/">Ian Coleman mnemonic generator</a>
               (must click "show entropy details") so you know this generator is doing what it says it is.
@@ -61,7 +61,7 @@
           </div>
 
           <div style="margin-top: 55px">
-            <p class="title-text-small">Custom DeSo Key (must be
+            <p class="title-text-small">Custom Private Key (must be
               <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
               mnemonic):</p>
             <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</p>
@@ -129,16 +129,16 @@
   <!-- Step 2 -->
   <div *ngIf="stepNum == 2">
     <div class="step-row">
-      <div class="title-text">Verify your DeSo Key</div>
+      <div class="title-text">Verify your Private Key</div>
       <div class="step-title">Step 2 of {{ stepTotal }}</div>
     </div>
-    <div class="subtitle-text">Never share your DeSo Key with anyone.</div>
-    <div class="warning-text"><b>If you lose your DeSo Key your account will be lost forever.</b></div>
+    <div class="subtitle-text">Never share your Private Key with anyone.</div>
+    <div class="warning-text"><b>If you lose your Private Key your account will be lost forever.</b></div>
     <div class="text-input-container mt-25px">
       <textarea [(ngModel)]="mnemonicCheck"
                 class="text-input"
                 rows="4"
-                placeholder="Enter your DeSo Key"></textarea>
+                placeholder="Enter your Private Key"></textarea>
     </div>
     <div class="title-text-small pt-15px mb-20px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
       Enter your passphrase:
