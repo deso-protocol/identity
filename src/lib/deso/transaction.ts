@@ -27,17 +27,18 @@ export class TransactionExtraDataKV extends BinaryRecord {
 
 export class TransactionExtraData extends BinaryRecord {
   @Transcode(ArrayOf(TransactionExtraDataKV))
-  kvs: TransactionInput[] = [];
+  kvs: TransactionExtraDataKV[] = [];
 }
+export abstract class TransactionMetadata extends BinaryRecord {}
 
-export class TransactionMetadataBlockReward extends BinaryRecord {
+export class TransactionMetadataBlockReward extends TransactionMetadata {
   @Transcode(VarBuffer)
   extraData: Buffer = Buffer.alloc(0);
 }
 
-export class TransactionMetadataBasicTransfer extends BinaryRecord {}
+export class TransactionMetadataBasicTransfer extends TransactionMetadata {}
 
-export class TransactionMetadataBitcoinExchange extends BinaryRecord {
+export class TransactionMetadataBitcoinExchange extends TransactionMetadata {
   @Transcode(VarBuffer)
   transaction: Buffer = Buffer.alloc(0);
 
@@ -51,7 +52,7 @@ export class TransactionMetadataBitcoinExchange extends BinaryRecord {
   merkleProof: Buffer[] = [];
 }
 
-export class TransactionMetadataPrivateMessage extends BinaryRecord {
+export class TransactionMetadataPrivateMessage extends TransactionMetadata {
   @Transcode(FixedBuffer(33))
   recipientPublicKey: Buffer = Buffer.alloc(0);
 
@@ -62,7 +63,7 @@ export class TransactionMetadataPrivateMessage extends BinaryRecord {
   timestampNanos: number = 0;
 }
 
-export class TransactionMetadataSubmitPost extends BinaryRecord {
+export class TransactionMetadataSubmitPost extends TransactionMetadata {
   @Transcode(VarBuffer)
   postHashToModify: Buffer = Buffer.alloc(0);
 
@@ -85,7 +86,7 @@ export class TransactionMetadataSubmitPost extends BinaryRecord {
   isHidden: boolean = false;
 }
 
-export class TransactionMetadataUpdateProfile extends BinaryRecord {
+export class TransactionMetadataUpdateProfile extends TransactionMetadata {
   @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
@@ -108,12 +109,12 @@ export class TransactionMetadataUpdateProfile extends BinaryRecord {
   isHidden: boolean = false;
 }
 
-export class TransactionMetadataUpdateBitcoinUSDExchangeRate extends BinaryRecord {
+export class TransactionMetadataUpdateBitcoinUSDExchangeRate extends TransactionMetadata {
   @Transcode(Uvarint64)
   usdCentsPerBitcoin: number = 0;
 }
 
-export class TransactionMetadataFollow extends BinaryRecord {
+export class TransactionMetadataFollow extends TransactionMetadata {
   @Transcode(FixedBuffer(33))
   followedPublicKey: Buffer = Buffer.alloc(0);
 
@@ -121,7 +122,7 @@ export class TransactionMetadataFollow extends BinaryRecord {
   isUnfollow: boolean = false;
 }
 
-export class TransactionMetadataLike extends BinaryRecord {
+export class TransactionMetadataLike extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   likedPostHash: Buffer = Buffer.alloc(0);
 
@@ -129,7 +130,7 @@ export class TransactionMetadataLike extends BinaryRecord {
   isUnlike: boolean = false;
 }
 
-export class TransactionMetadataCreatorCoin extends BinaryRecord {
+export class TransactionMetadataCreatorCoin extends TransactionMetadata {
   @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
@@ -152,7 +153,7 @@ export class TransactionMetadataCreatorCoin extends BinaryRecord {
   minCreatorCoinExpectedNanos: number = 0;
 }
 
-export class TransactionMetadataSwapIdentity extends BinaryRecord {
+export class TransactionMetadataSwapIdentity extends TransactionMetadata {
   @Transcode(VarBuffer)
   fromPublicKey: Buffer = Buffer.alloc(0);
 
@@ -160,9 +161,9 @@ export class TransactionMetadataSwapIdentity extends BinaryRecord {
   toPublicKey: Buffer = Buffer.alloc(0);
 }
 
-export class TransactionMetadataUpdateGlobalParams extends BinaryRecord {}
+export class TransactionMetadataUpdateGlobalParams extends TransactionMetadata {}
 
-export class TransactionMetadataCreatorCoinTransfer extends BinaryRecord {
+export class TransactionMetadataCreatorCoinTransfer extends TransactionMetadata {
   @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
@@ -173,7 +174,7 @@ export class TransactionMetadataCreatorCoinTransfer extends BinaryRecord {
   receiverPublicKey: Buffer = Buffer.alloc(0);
 }
 
-export class TransactionMetadataCreateNFT extends BinaryRecord {
+export class TransactionMetadataCreateNFT extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -193,7 +194,7 @@ export class TransactionMetadataCreateNFT extends BinaryRecord {
   nftRoyaltyToCoinBasisPoints = 0;
 }
 
-export class TransactionMetadataUpdateNFT extends BinaryRecord {
+export class TransactionMetadataUpdateNFT extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -207,7 +208,7 @@ export class TransactionMetadataUpdateNFT extends BinaryRecord {
   minBidAmountNanos: number = 0;
 }
 
-export class TransactionMetadataAcceptNFTBid extends BinaryRecord {
+export class TransactionMetadataAcceptNFTBid extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -227,7 +228,7 @@ export class TransactionMetadataAcceptNFTBid extends BinaryRecord {
   bidderInputs: TransactionInput[] = [];
 }
 
-export class TransactionMetadataNFTBid extends BinaryRecord {
+export class TransactionMetadataNFTBid extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -238,7 +239,7 @@ export class TransactionMetadataNFTBid extends BinaryRecord {
   bidAmountNanos: number = 0;
 }
 
-export class TransactionMetadataNFTTransfer extends BinaryRecord {
+export class TransactionMetadataNFTTransfer extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -252,7 +253,7 @@ export class TransactionMetadataNFTTransfer extends BinaryRecord {
   encryptedUnlockableText: Buffer = Buffer.alloc(0);
 }
 
-export class TransactionMetadataAcceptNFTTransfer extends BinaryRecord {
+export class TransactionMetadataAcceptNFTTransfer extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -260,7 +261,7 @@ export class TransactionMetadataAcceptNFTTransfer extends BinaryRecord {
   serialNumber: number = 0;
 }
 
-export class TransactionMetadataBurnNFT extends BinaryRecord {
+export class TransactionMetadataBurnNFT extends TransactionMetadata {
   @Transcode(FixedBuffer(32))
   nftPostHash: Buffer = Buffer.alloc(0);
 
@@ -268,7 +269,7 @@ export class TransactionMetadataBurnNFT extends BinaryRecord {
   serialNumber: number = 0;
 }
 
-export class TransactionMetadataAuthorizeDerivedKey extends BinaryRecord {
+export class TransactionMetadataAuthorizeDerivedKey extends TransactionMetadata {
   @Transcode(VarBuffer)
   derivedPublicKey: Buffer = Buffer.alloc(0);
 
@@ -307,7 +308,7 @@ export class TransactionMetadataMessagingGroup extends BinaryRecord {
   messagingGroupMembers: MessagingGroupMember[] = [];
 }
 
-export class TransactionMetadataDAOCoin extends BinaryRecord {
+export class TransactionMetadataDAOCoin extends TransactionMetadata {
   @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
@@ -324,7 +325,7 @@ export class TransactionMetadataDAOCoin extends BinaryRecord {
   transferRestrictionStatus: Buffer = Buffer.alloc(0);
 }
 
-export class TransactionMetadataTransferDAOCoin extends BinaryRecord {
+export class TransactionMetadataTransferDAOCoin extends TransactionMetadata {
   @Transcode(VarBuffer)
   profilePublicKey: Buffer = Buffer.alloc(0);
 
@@ -333,6 +334,72 @@ export class TransactionMetadataTransferDAOCoin extends BinaryRecord {
 
   @Transcode(VarBuffer)
   receiverPublicKey: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionCountLimitMapItem extends BinaryRecord {
+  @Transcode(Uint8)
+  txnType: number = 0;
+
+  @Transcode(Uvarint64)
+  value: number = 0;
+}
+
+export class TransactionCountLimitMap extends BinaryRecord {
+  @Transcode(ArrayOf(TransactionCountLimitMapItem))
+  txnCountLimitMap: TransactionCountLimitMapItem[] = [];
+}
+
+export class TransactionCoinOperationLimitMapItem extends BinaryRecord {
+  @Transcode(VarBuffer)
+  creatorPKID: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  operation: number = 0;
+
+  @Transcode(Uvarint64)
+  value: number = 0;
+}
+
+export class TransactionCoinOperationLimitMap extends BinaryRecord {
+  @Transcode(ArrayOf(TransactionCoinOperationLimitMapItem))
+  coinOperationLimitMap: TransactionCoinOperationLimitMap[] = [];
+}
+
+export class TransactionNFTOperationLimitMapItem extends BinaryRecord {
+  @Transcode(VarBuffer)
+  postHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  serialNumber: number = 0;
+
+  @Transcode(Uvarint64)
+  operation: number = 0;
+
+  @Transcode(Uvarint64)
+  value: number = 0;
+}
+
+export class TransactionNFTOperationLimitMap extends BinaryRecord {
+  @Transcode(ArrayOf(TransactionNFTOperationLimitMapItem))
+  coinOperationLimitMap: TransactionNFTOperationLimitMap[] = [];
+}
+
+
+export class TransactionSpendingLimit extends BinaryRecord {
+  @Transcode(Uvarint64)
+  globalDESOLimit: number = 0;
+
+  @Transcode(ArrayOf(TransactionCountLimitMapItem))
+  txnCountLimitMap: TransactionCountLimitMapItem[] = [];
+
+  @Transcode(ArrayOf(TransactionCoinOperationLimitMapItem))
+  creatorCoinOperationLimitMap: TransactionCoinOperationLimitMapItem[] = [];
+
+  @Transcode(ArrayOf(TransactionCoinOperationLimitMapItem))
+  daoCoinOperationLimitMap: TransactionCoinOperationLimitMapItem[] = [];
+
+  @Transcode(ArrayOf(TransactionNFTOperationLimitMapItem))
+  nftOperationLimitMap: TransactionNFTOperationLimitMapItem[] = [];
 }
 
 export const TransactionTypeMetadataMap = {
@@ -362,7 +429,7 @@ export const TransactionTypeMetadataMap = {
   25: TransactionMetadataTransferDAOCoin,
 };
 
-export class Transaction<T> extends BinaryRecord {
+export class Transaction extends BinaryRecord {
   @Transcode(ArrayOf(TransactionInput))
   inputs: TransactionInput[] = [];
 
@@ -370,7 +437,7 @@ export class Transaction<T> extends BinaryRecord {
   outputs: TransactionOutput[] = [];
 
   @Transcode(Enum(TransactionTypeMetadataMap))
-  metadata: T | null = null;
+  metadata: TransactionMetadata | null = null;
 
   @Transcode(VarBuffer)
   publicKey: Buffer = Buffer.alloc(0);

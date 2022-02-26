@@ -1,3 +1,5 @@
+import { TransactionSpendingLimit } from "src/lib/deso/transaction";
+
 export interface PrivateUserInfo {
   seedHex: string;
   mnemonic: string;
@@ -55,6 +57,7 @@ export interface DerivedKey {
   ownerPublicKeyBase58Check: string;
   expirationBlock: number;
   isValid: boolean;
+  transactionSpendingLimit?: TransactionSpendingLimit | null;
 }
 
 export interface EncryptedMessage {

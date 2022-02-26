@@ -31,7 +31,8 @@ import { SignUpGetStarterDESOComponent } from './sign-up-get-starter-deso/sign-u
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
-import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component'
+import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component';
+import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-discl
     SignUpGetStarterDESOComponent,
     FreeDesoMessageComponent,
     FreeDeSoDisclaimerComponent,
+    TransactionSpendingLimitComponent,
   ],
   imports: [
     BrowserModule,

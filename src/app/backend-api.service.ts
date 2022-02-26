@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
@@ -8,6 +8,7 @@ import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
 import {DerivedKey, UserProfile} from '../types/identity';
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export class ProfileEntryResponse {
   Username: string | null = null;
@@ -43,6 +44,61 @@ type CountryLevelSignUpBonus = {
   KickbackAmountOverrideUSDCents: number;
 };
 
+export enum CreatorCoinLimitOperationString {
+  ANY = "any",
+  BUY = "buy",
+  SELL = "sell",
+  TRANSFER = "transfer",
+}
+
+export enum DAOCoinLimitOperationString {
+  ANY = "any",
+  MINT = "mint",
+  BURN = "burn",
+  DISABLE_MINTING = "disable_minting",
+  UPDATE_TRANSFER_RESTRICTION_STATUS = "update_transfer_restriction_status",
+  TRANSFER = "transfer",
+}
+
+export type CoinLimitOperationString = DAOCoinLimitOperationString | CreatorCoinLimitOperationString;
+
+export type CoinOperationLimitMap<T extends CoinLimitOperationString> = {
+  [public_key: string]: OperationToCountMap<T>;
+};
+
+export type OperationToCountMap<T extends LimitOperationString> = {
+  [operation in T]?: number;
+};
+
+export type LimitOperationString = DAOCoinLimitOperationString | CreatorCoinLimitOperationString | NFTLimitOperationString;
+export type CreatorCoinOperationLimitMap = CoinOperationLimitMap<CreatorCoinLimitOperationString>;
+export type DAOCoinOperationLimitMap = CoinOperationLimitMap<DAOCoinLimitOperationString>;
+
+export enum NFTLimitOperationString {
+  ANY = "any",
+  CREATE = "create",
+  UPDATE = "update",
+  BID = "nft_bid",
+  ACCEPT_BID = "accept_nft_bid",
+  TRANSFER = "transfer",
+  BURN = "burn",
+  ACCEPT_TRANSFER = "accept_nft_transfer",
+}
+export type NFTOperationLimitMap = {
+  [post_hash_hex: string]: {
+    [serial_number: number]: OperationToCountMap<NFTLimitOperationString>;
+  };
+};
+
+export type TransactionSpendingLimitResponse = {
+  GlobalDESOLimit: number;
+  // TODO: make enum for transaction type string
+  TransactionCountLimitMap?: { [k: string]: number };
+  CreatorCoinOperationLimitMap?: CreatorCoinOperationLimitMap;
+  DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
+  NFTOperationLimitMap?: NFTOperationLimitMap;
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -57,6 +113,10 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService,
   ) { }
 
+  get(path: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.endpoint}/${path}`);
+  }
+  
   post(path: string, body: any): Observable<any> {
     return this.httpClient.post<any>(`${this.endpoint}/${path}`, body);
   }
@@ -197,6 +257,7 @@ export class BackendAPIService {
               ownerPublicKeyBase58Check: res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
               expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
               isValid: res.DerivedKeys[derivedKey]?.IsValid,
+              transactionSpendingLimit: res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
             };
           }
         }
@@ -249,5 +310,27 @@ export class BackendAPIService {
       PhoneNumberCountryCode,
       VerificationCode,
     });
+  }
+
+  GetTransactionSpendingLimitHexString(
+    TransactionSpendingLimitResponse: TransactionSpendingLimitResponse
+  ): Observable<TransactionSpendingLimit> {
+    return this.post("get-transaction-spending-limit-hex-string", {
+      TransactionSpendingLimit: TransactionSpendingLimitResponse,
+    }).pipe(
+      map(
+        res => {
+          return TransactionSpendingLimit.fromBytes(Buffer.from(res.HexString, 'hex'))[0] as TransactionSpendingLimit
+    }),
+      catchError((err) => {
+        console.error(err);
+        return throwError(err)
+      }));
+  }
+  
+  GetTransactionSpendingLimitResponseFromHex(
+    hex: string
+  ): Observable<TransactionSpendingLimitResponse> {
+    return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`)
   }
 }

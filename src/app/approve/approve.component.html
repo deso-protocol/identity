@@ -8,6 +8,15 @@
     <p class="pb-15px">
       {{ globalVars.hostname }} wants to {{ transactionDescription }}
     </p>
+    <div
+      *ngIf="derivedKeyMemo">
+      Memo: {{ derivedKeyMemo }}
+    </div>
+    <div *ngIf="transactionSpendingLimitResponse">
+      <app-transaction-spending-limit
+        [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
+      ></app-transaction-spending-limit>
+    </div>
     <br/>
     <div *ngIf="transactionDeSoSpent">
       <p class="pb-15px">
