@@ -1,13 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {AccountService} from '../account.service';
-import {DerivePayload, IdentityService} from '../identity.service';
 import {BackendAPIService, CoinLimitOperationString, CoinOperationLimitMap, TransactionSpendingLimitResponse, User} from '../backend-api.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {UserProfile} from '../../types/identity';
-import {ActivatedRoute, Router} from '@angular/router';
-import {RouteNames} from '../app-routing.module';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
+import { GlobalVarsService } from '../global-vars.service';
 
 @Component({
   selector: 'app-transaction-spending-limit',
@@ -20,16 +13,22 @@ export class TransactionSpendingLimitComponent implements OnInit {
     GlobalDESOLimit: 0,
   };
   hasUsers = false;
-  derivePayload: DerivePayload | null = null;
   userMap: { [k: string]: User } = {};
-
+  showTransactions: boolean = false;
+  
+  static TransactionLimitsSection = "Transaction Limits";
+  static CreatorCoinLimitsSection = "Creator Coins";
+  static DAOCoinLimitsSection = "DAOs";
+  static NFTLimitsSection = "NFTs";
+  
+  TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
   constructor(
-    public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
+    public globalVars: GlobalVarsService,
   ) { }
 
   ngOnInit(): void {
-    const publicKeysToFetch = [...new Set(this.getPublicKeysFromCoinOperationLimitMap(
+    const publicKeysToFetch = [...new Set<string>(this.getPublicKeysFromCoinOperationLimitMap(
       this.transactionSpendingLimitResponse?.CreatorCoinOperationLimitMap
     ).concat(this.getPublicKeysFromCoinOperationLimitMap(
       this.transactionSpendingLimitResponse?.DAOCoinOperationLimitMap
@@ -42,26 +41,8 @@ export class TransactionSpendingLimitComponent implements OnInit {
     })
   }
 
-  getPublicKeysFromCoinOperationLimitMap(coinOpLimitMap: CoinOperationLimitMap<CoinLimitOperationString> | undefined): string[] {
+  getPublicKeysFromCoinOperationLimitMap(
+    coinOpLimitMap: CoinOperationLimitMap<CoinLimitOperationString> | undefined): string[] {
     return coinOpLimitMap ? Object.keys(coinOpLimitMap) : [];
-  }
-
-  ObjectKeyLength(obj: { [k: string]: any} | undefined): number {
-    if (!obj) {
-      return 0;
-    }
-    return Object.keys(obj).length;
-  }
-
-  getUsernameFromUserMap(publicKey: string): string {
-    if (publicKey === "") {
-      return "ANY CREATOR";
-    }
-    return this.userMap[publicKey]?.ProfileEntryResponse?.Username || publicKey;
-  }
-
-  cleanOperationName(opName: string): string {
-    return opName.split("_").map((token) =>
-      token.toLocaleLowerCase() === "nft" ? "NFT" : token.charAt(0).toUpperCase() + token.slice(1)).join(" ");
   }
 }

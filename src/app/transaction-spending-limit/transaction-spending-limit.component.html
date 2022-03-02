@@ -1,69 +1,29 @@
 <div *ngIf="transactionSpendingLimitResponse">
-  <div>Global DESO Limit: {{ globalVars.nanosToDeSo(transactionSpendingLimitResponse.GlobalDESOLimit || 0, 4) }} DESO </div>
-  <div *ngIf="ObjectKeyLength(transactionSpendingLimitResponse.TransactionCountLimitMap)"> Transaction Limits:
-    <ul>
-      <li
-        *ngFor="let txnLimitItem of transactionSpendingLimitResponse.TransactionCountLimitMap | keyvalue"
-      >{{ txnLimitItem.key }}: {{ txnLimitItem.value }}
-      </li>
-    </ul>
+  <div class="d-flex justify-content-between py-15px">
+    <div class="fs-18px">Cumulative Spending DESO Limit</div>
+    <div>{{ globalVars.nanosToDeSo(transactionSpendingLimitResponse.GlobalDESOLimit || 0, 4) }} DESO </div>
   </div>
-  <div
-    *ngIf="ObjectKeyLength(transactionSpendingLimitResponse.CreatorCoinOperationLimitMap)"
-  >Creator Coin Limits:
-    <div
-      *ngFor="let ccLimitItem of transactionSpendingLimitResponse.CreatorCoinOperationLimitMap | keyvalue"
-    >
-      <div class="d-flex justify-content-start align-items-center">
-        <div class="avatar mr-15px" [appAvatar]="ccLimitItem.key" *ngIf="ccLimitItem.key"></div>
-        <div>{{ getUsernameFromUserMap(ccLimitItem.key) }}:</div>
-      </div>
-      <ul>
-        <li
-          *ngFor="let ccOperationToCount of ccLimitItem.value | keyvalue"
-        >
-          {{ cleanOperationName(ccOperationToCount.key) }}: {{ ccOperationToCount.value }}
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div
-    *ngIf="ObjectKeyLength(transactionSpendingLimitResponse.DAOCoinOperationLimitMap)"
-  >DAO Coin Limits:
-    <div
-      *ngFor="let daoLimitItem of transactionSpendingLimitResponse.DAOCoinOperationLimitMap | keyvalue"
-    >
-      <div class="d-flex justify-content-start align-items-center">
-        <div class="avatar mr-15px" [appAvatar]="daoLimitItem.key" *ngIf="daoLimitItem.key"></div>
-        <div>{{ getUsernameFromUserMap(daoLimitItem.key) }}:</div>
-      </div>
-      <ul>
-        <li
-          *ngFor="let daoOperationToCount of daoLimitItem.value | keyvalue"
-        >
-          {{ cleanOperationName(daoOperationToCount.key) }}: {{ daoOperationToCount.value }}
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div *ngIf="ObjectKeyLength(transactionSpendingLimitResponse.NFTOperationLimitMap)"
-  >NFT Limits:
-    <ul>
-      <li *ngFor="let nftLimitItem of transactionSpendingLimitResponse.NFTOperationLimitMap | keyvalue"
-      >
-        {{ nftLimitItem.key }}
-
-        <div *ngFor="let serialNumLimitItem of nftLimitItem.value | keyvalue">
-          {{ serialNumLimitItem.key === "0" ? "Any Serial Number" : "#" + serialNumLimitItem.key.toString() }}:
-          <ul>
-            <li
-              *ngFor="let nftOperationToCount of serialNumLimitItem.value | keyvalue"
-            >
-              {{ cleanOperationName(nftOperationToCount.key) }}: {{ nftOperationToCount.value }}
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
-  </div>
+  <app-transaction-spending-limit-section
+    [sectionMap]="transactionSpendingLimitResponse.TransactionCountLimitMap"
+    [sectionTitle]="TransactionSpendingLimitComponent.TransactionLimitsSection"
+    *ngIf="transactionSpendingLimitResponse.TransactionCountLimitMap"
+  ></app-transaction-spending-limit-section>
+  <app-transaction-spending-limit-section
+    [sectionMap]="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
+    [sectionTitle]="TransactionSpendingLimitComponent.CreatorCoinLimitsSection"
+    [userMap]="userMap"
+    *ngIf="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
+  ></app-transaction-spending-limit-section>
+  <app-transaction-spending-limit-section
+    [sectionMap]="transactionSpendingLimitResponse.DAOCoinOperationLimitMap"
+    [sectionTitle]="TransactionSpendingLimitComponent.DAOCoinLimitsSection"
+    [userMap]="userMap"
+    *ngIf="transactionSpendingLimitResponse.DAOCoinOperationLimitMap"
+  ></app-transaction-spending-limit-section>
+  <app-transaction-spending-limit-section
+    [sectionMap]="transactionSpendingLimitResponse.NFTOperationLimitMap"
+    [sectionTitle]="TransactionSpendingLimitComponent.NFTLimitsSection"
+    *ngIf="transactionSpendingLimitResponse.NFTOperationLimitMap"
+  >
+  </app-transaction-spending-limit-section>
 </div>

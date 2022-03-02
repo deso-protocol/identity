@@ -29,6 +29,65 @@ export class ProfileEntryResponse {
   IsVerified?: boolean;
 }
 
+export class PostEntryReaderState {
+  // This is true if the reader has liked the associated post.
+  LikedByReader?: boolean;
+
+  // This is true if the reader has reposted the associated post.
+  RepostedByReader?: boolean;
+
+  // This is the post hash hex of the repost
+  RepostPostHashHex?: string;
+
+  // Level of diamond the user gave this post.
+  DiamondLevelBestowed?: number;
+}
+
+export type PostEntryResponse = {
+  PostHashHex: string;
+  PosterPublicKeyBase58Check: string;
+  ParentStakeID: string;
+  Body: string;
+  RepostedPostHashHex: string;
+  ImageURLs: string[];
+  VideoURLs: string[];
+  RepostPost: PostEntryResponse;
+  CreatorBasisPoints: number;
+  StakeMultipleBasisPoints: number;
+  TimestampNanos: number;
+  IsHidden: boolean;
+  ConfirmationBlockHeight: number;
+  // PostEntryResponse of the post that this post reposts.
+  RepostedPostEntryResponse: PostEntryResponse;
+  // The profile associated with this post.
+  ProfileEntryResponse: ProfileEntryResponse;
+  // The comments associated with this post.
+  Comments: PostEntryResponse[];
+  LikeCount: number;
+  RepostCount: number;
+  QuoteRepostCount: number;
+  DiamondCount: number;
+  // Information about the reader's state w/regard to this post (e.g. if they liked it).
+  PostEntryReaderState?: PostEntryReaderState;
+  // True if this post hash hex is in the global feed.
+  InGlobalFeed: boolean;
+  CommentCount: number;
+  // A list of parent posts for this post (ordered: root -> closest parent post).
+  ParentPosts: PostEntryResponse[];
+  InMempool: boolean;
+  IsPinned: boolean;
+  DiamondsFromSender?: number;
+  NumNFTCopies: number;
+  NumNFTCopiesForSale: number;
+  HasUnlockable: boolean;
+  IsNFT: boolean;
+  NFTRoyaltyToCoinBasisPoints: number;
+  NFTRoyaltyToCreatorBasisPoints: number;
+  AdditionalDESORoyaltiesMap: { [k: string]: number };
+  AdditionalCoinRoyaltiesMap: { [k: string]: number };
+}
+
+
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
   PublicKeyBase58Check: string = "";
@@ -327,10 +386,31 @@ export class BackendAPIService {
         return throwError(err)
       }));
   }
-  
+
   GetTransactionSpendingLimitResponseFromHex(
     hex: string
   ): Observable<TransactionSpendingLimitResponse> {
     return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`)
+  }
+
+  GetSinglePost(PostHashHex: string,
+                ReaderPublicKeyBase58Check: string = "",
+                FetchParents: boolean = false,
+                CommentOffset: number = 0,
+                CommentLimit: number = 0,
+                AddGlobalFeedBool: boolean = false
+  ): Observable<PostEntryResponse | undefined> {
+    return this.post("get-single-post", {
+      PostHashHex,
+      ReaderPublicKeyBase58Check,
+      FetchParents,
+      CommentOffset,
+      CommentLimit,
+      AddGlobalFeedBool,
+    }).pipe(
+      map(
+        res => res.PostFound
+      )
+    );
   }
 }
