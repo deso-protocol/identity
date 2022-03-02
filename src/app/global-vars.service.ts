@@ -117,6 +117,7 @@ export class GlobalVarsService {
 
   cleanSpendingLimitOperationName(opName: string): string {
     return opName.split("_").map((token) =>
-      token.toLocaleLowerCase() === "nft" ? "NFT" : token.charAt(0).toUpperCase() + token.slice(1)).join(" ");
+      token.toLocaleLowerCase() === "nft" ? "NFT" : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
+    ).join(" ");
   }
 }
