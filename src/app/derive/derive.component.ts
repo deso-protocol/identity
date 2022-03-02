@@ -57,7 +57,6 @@ export class DeriveComponent implements OnInit {
         this.backendApi.GetTransactionSpendingLimitHexString(
           this.transactionSpendingLimitResponse as TransactionSpendingLimitResponse
         ).subscribe((res) => {
-          console.log(res.toBytes());
           this.transactionSpendingLimit = res;
         })
       }
