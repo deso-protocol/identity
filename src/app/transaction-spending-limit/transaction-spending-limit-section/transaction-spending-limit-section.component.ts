@@ -27,9 +27,9 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   showAll: boolean = false;
   defaultNumShown: number = 5;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
-  anyCreatorItem: 
-    OperationToCountMap<CreatorCoinLimitOperationString> | 
-    OperationToCountMap<DAOCoinLimitOperationString> | 
+  anyCreatorItem:
+    OperationToCountMap<CreatorCoinLimitOperationString> |
+    OperationToCountMap<DAOCoinLimitOperationString> |
     undefined;
   anyNFTItem: OperationToCountMap<NFTLimitOperationString> | undefined;
 
@@ -49,8 +49,8 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     if (this.sectionTitle === TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
       this.sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitsSection) {
       this.anyCreatorItem = this.sectionMap[""] as (
-        OperationToCountMap<CreatorCoinLimitOperationString> | 
-        OperationToCountMap<DAOCoinLimitOperationString> | 
+        OperationToCountMap<CreatorCoinLimitOperationString> |
+        OperationToCountMap<DAOCoinLimitOperationString> |
         undefined);
       delete this.sectionMap[""];
       this.coinLimitMap = this.sectionMap as (CreatorCoinOperationLimitMap | DAOCoinOperationLimitMap)
@@ -60,6 +60,7 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
       delete this.sectionMap[""];
       this.nftLimitMap = this.sectionMap as NFTOperationLimitMap;
     }
+    this.showAll = this.globalVars.ObjectKeyLength(this.sectionMap) <= this.defaultNumShown;
   }
 
   sectionItemType(): string {
@@ -89,14 +90,14 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     }
     return false;
   }
-  
+
   sectionSummary(): string {
     const operationsStr = this.sectionTitle !== TransactionSpendingLimitComponent.TransactionLimitsSection ?
       "operations on specific " : "";
     const keyLen = this.globalVars.ObjectKeyLength(this.sectionMap)
     const sectionItemType = this.sectionItemType();
     return `This app can perform the following ${operationsStr}${
-      keyLen 
+      keyLen
     } ${
       sectionItemType
     }${

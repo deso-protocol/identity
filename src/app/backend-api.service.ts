@@ -135,7 +135,6 @@ export type DAOCoinOperationLimitMap = CoinOperationLimitMap<DAOCoinLimitOperati
 
 export enum NFTLimitOperationString {
   ANY = "any",
-  CREATE = "create",
   UPDATE = "update",
   BID = "nft_bid",
   ACCEPT_BID = "accept_nft_bid",
@@ -175,7 +174,7 @@ export class BackendAPIService {
   get(path: string): Observable<any> {
     return this.httpClient.get<any>(`${this.endpoint}/${path}`);
   }
-  
+
   post(path: string, body: any): Observable<any> {
     return this.httpClient.post<any>(`${this.endpoint}/${path}`, body);
   }

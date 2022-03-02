@@ -111,10 +111,10 @@
   </div>
 
   <div
-    *ngIf="showDetails && globalVars.ObjectKeyLength(sectionMap) > defaultNumShown"
+    *ngIf="showDetails"
     class="d-flex justify-content-center mr-15px ml-15px"
     style="background: lightgray; border: 1px solid darkgray; border-radius: 2px"
-    (click)="showAll = !showAll; showDetails = showAll"
+    (click)="showDetails = !showAll; showAll = !showAll || globalVars.ObjectKeyLength(sectionMap) <= defaultNumShown;"
   >
     {{ showAll ? "Hide" : "Show all" }} {{ globalVars.ObjectKeyLength(sectionMap) }} {{ sectionItemType() }}s
   </div>
