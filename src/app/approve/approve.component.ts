@@ -231,7 +231,7 @@ export class ApproveComponent implements OnInit {
         }  else if (authorizeDKMetadata.operationType === 1){
           description = 'authorize a derived key';
         }
-       
+
         // Parse the transaction spending limit and memo from the extra data
         for (const kv of this.transaction.extraData?.kvs || []) {
           if (kv.key.toString() === "TransactionSpendingLimit") {
@@ -241,7 +241,7 @@ export class ApproveComponent implements OnInit {
             })
           }
           if (kv.key.toString() === "DerivedKeyMemo") {
-            this.derivedKeyMemo = kv.value.toString("hex");
+            this.derivedKeyMemo = new Buffer(kv.value.toString(), 'hex').toString();
           }
         }
         break;
