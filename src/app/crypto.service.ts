@@ -9,6 +9,7 @@ import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
 import {AccessLevel, Network} from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
+import * as sha256 from "sha256";
 
 @Injectable({
   providedIn: 'root'
@@ -152,8 +153,13 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
-  // Decode public key base58check to Buffer of secp256k1 public key
-  publicKeyToECBuffer(publicKey: string): Buffer {
+  publicKeyToDeSoPublicKey(publicKey: EC.KeyPair, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
+    const key = publicKey.getPublic().encode('array', true);
+    return bs58check.encode(Buffer.from([...prefix, ...key]));
+  }
+
+  publicKeyToECKeyPair(publicKey: string): EC.KeyPair {
     // Sanity check similar to Base58CheckDecodePrefix from core/lib/base58.go
     if (publicKey.length < 5){
       throw new Error('Failed to decode public key');
@@ -162,9 +168,21 @@ export class CryptoService {
     const payload = Uint8Array.from(decoded).slice(3);
 
     const ec = new EC('secp256k1');
-    const publicKeyEC = ec.keyFromPublic(payload, 'array');
+    return ec.keyFromPublic(payload, 'array');
+  }
+  
+  // Decode public key base58check to Buffer of secp256k1 public key
+  publicKeyToECBuffer(publicKey: string): Buffer {
+    const publicKeyEC = this.publicKeyToECKeyPair(publicKey);
 
     return new Buffer(publicKeyEC.getPublic('array'));
+  }
+
+  // Decode public key base58check to Buffer of secp256k1 public key
+  publicKeyToBuffer(publicKey: string): number[] {
+    const publicKeyEC = this.publicKeyToECKeyPair(publicKey);
+
+    return publicKeyEC.getPublic().encode('array', true);
   }
 
   keychainToBtcAddress(keychain: HDNode, network: Network): string {
@@ -174,6 +192,13 @@ export class CryptoService {
     const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
 
     return bs58check.encode(prefixAndKey);
+  }
+
+  // Compute messaging private key as sha256x2( sha256x2(seed hex) || sha256x2(key name) )
+  deriveMessagingKey(seedHex: string, keyName: string): Buffer {
+    const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]), 'hex');
+    const keyNameHash = new Buffer(sha256.x2([... new Buffer(keyName, 'utf8')]), 'hex');
+    return new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
   }
 
   // NOTE: Our ETH address uses the bitcion/bitclout derivation path, not the ETH path.

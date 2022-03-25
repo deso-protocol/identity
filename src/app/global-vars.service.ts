@@ -22,13 +22,15 @@ export class GlobalVarsService {
   derive = false;
 
   // Derived key callback URL href / debug info
-  callback = "";
+  callback = '';
   callbackInvalid = false;
 
   jumioUSDCents: number = 0;
   referralUSDCents: number = 0;
 
   referralHashBase58: string = '';
+
+  defaultMessageKeyName: string = 'default-key';
 
   constructor() { }
 
@@ -107,5 +109,15 @@ export class GlobalVarsService {
 
   getFreeDESOMessage(): string {
     return this.formatUSD((this.referralUSDCents ? this.referralUSDCents : this.jumioUSDCents) / 100, 0);
+  }
+
+  ObjectKeyLength(obj: { [k: string]: any} | undefined): number {
+    return obj ? Object.keys(obj).length : 0;
+  }
+
+  cleanSpendingLimitOperationName(opName: string): string {
+    return opName.split("_").map((token) =>
+      token.toLocaleLowerCase() === "nft" ? "NFT" : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
+    ).join(" ");
   }
 }

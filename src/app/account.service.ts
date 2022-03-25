@@ -11,6 +11,8 @@ import {uint64ToBufBigEndian} from '../lib/bindata/util';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
+import {ec as EC} from 'elliptic';
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -83,16 +85,43 @@ export class AccountService {
     }
   }
 
-  getDerivedPrivateUser(publicKey: string, blockHeight: number): DerivedPrivateUserInfo{
-    const privateUser = this.getPrivateUsers()[publicKey];
+  getDerivedPrivateUser(publicKeyBase58Check: string, blockHeight: number,
+                        transactionSpendingLimit: TransactionSpendingLimit | undefined = undefined,
+                        derivedPublicKeyBase58CheckInput: string | undefined = undefined): DerivedPrivateUserInfo{
+    const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
+
+    let derivedSeedHex = '';
+    let derivedPublicKeyBuffer: number[];
+    let derivedPublicKeyBase58Check: string;
+    let jwt = '';
+    let derivedJwt = '';
 
     this.entropyService.setNewTemporaryEntropy();
     const derivedMnemonic = this.entropyService.temporaryEntropy?.mnemonic;
     const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
-    const derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
-    const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
-    const derivedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
+    if (!derivedPublicKeyBase58CheckInput) {
+      // If the user hasn't passed in a derived public key, create it.
+      derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeychain);
+      const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(derivedSeedHex);
+      derivedPublicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(derivedPrivateKey, network);
+      derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
+
+      // We compute an owner JWT with a month-long expiration. This is needed for some backend endpoints.
+      const keyEncoder = new KeyEncoder('secp256k1');
+      const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
+      jwt = jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+
+      // We compute a derived key JWT with a month-long expiration. This is needed for shared secret endpoint.
+      const encodedDerivedPrivateKey = keyEncoder.encodePrivate(derivedSeedHex, 'raw', 'pem');
+      derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+    } else {
+      // If the user has passed in a derived public key, use that instead.
+      // Don't define the derived seed hex (a private key presumably already exists).
+      // Don't define the JWT, since we have no private key to sign it with.
+      derivedPublicKeyBase58Check = derivedPublicKeyBase58CheckInput;
+      derivedPublicKeyBuffer = this.cryptoService.publicKeyToBuffer(derivedPublicKeyBase58CheckInput);
+    }
 
     // Generate new btc and eth deposit addresses for the derived key.
     // const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
@@ -104,30 +133,42 @@ export class AccountService {
     const expirationBlock = blockHeight + 10000;
 
     const expirationBlockBuffer = uint64ToBufBigEndian(expirationBlock);
-    const derivedPublicKeyBuffer = derivedPrivateKey.getPublic().encode('array', true);
-    const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
+    const transactionSpendingLimitBytes = transactionSpendingLimit ? transactionSpendingLimit.toBytes() : [];
+    const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer, ...transactionSpendingLimitBytes]);
     const accessSignature = this.signingService.signHashes(privateUser.seedHex, [accessHash])[0];
 
-    // We compute an owner JWT with a month-long expiration. This is needed for some backend endpoints.
-    const keyEncoder = new KeyEncoder('secp256k1');
-    const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
-    const jwt = jsonwebtoken.sign({ }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+    // Set the default messaging key name
+    const messagingKeyName = this.globalVars.defaultMessageKeyName;
+    // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
+    const messagingPrivateKeyBuff = this.cryptoService.deriveMessagingKey(privateUser.seedHex, messagingKeyName);
+    const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
+    const ec = new EC('secp256k1');
 
-    // We compute a derived key JWT with a month-long expiration. This is needed for shared secret endpoint.
-    const encodedDerivedPrivateKey = keyEncoder.encodePrivate(derivedSeedHex, 'raw', 'pem');
-    const derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+    // We do this to compress the messaging public key from 65 bytes to 33 bytes.
+    const messagingPublicKey = ec.keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array').getPublic(true, 'hex');
+    const messagingPublicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
+      ec.keyFromPrivate(messagingPrivateKeyBuff), this.globalVars.network)
+
+    // Messaging key signature is needed so if derived key submits the messaging public key,
+    // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )
+    const messagingKeyHash = sha256.x2([...new Buffer(messagingPublicKey, 'hex'), ...new Buffer(messagingKeyName, 'utf8')]);
+    const messagingKeySignature = this.signingService.signHashes(privateUser.seedHex, [messagingKeyHash])[0];
 
     return {
       derivedSeedHex,
-      derivedPublicKey,
-      publicKey,
+      derivedPublicKeyBase58Check,
+      publicKeyBase58Check,
       btcDepositAddress,
       ethDepositAddress,
       expirationBlock,
       network,
       accessSignature,
       jwt,
-      derivedJwt
+      derivedJwt,
+      messagingPublicKeyBase58Check,
+      messagingPrivateKey,
+      messagingKeyName,
+      messagingKeySignature
     };
   }
 

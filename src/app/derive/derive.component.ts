@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {BackendAPIService} from '../backend-api.service';
+import {DerivePayload, IdentityService} from '../identity.service';
+import {BackendAPIService, CoinLimitOperationString, CoinOperationLimitMap, TransactionSpendingLimitResponse, User} from '../backend-api.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {GoogleDriveService} from '../google-drive.service';
 import {UserProfile} from '../../types/identity';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {RouteNames} from '../app-routing.module';
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 @Component({
   selector: 'app-derive',
@@ -16,7 +17,14 @@ import {RouteNames} from '../app-routing.module';
 export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
+  transactionSpendingLimit: TransactionSpendingLimit | undefined;
+  transactionSpendingLimitResponse: TransactionSpendingLimitResponse | undefined;
   hasUsers = false;
+  derivePayload: DerivePayload | null = null;
+  userMap: { [k: string]: User } = {};
+
+  publicKeyBase58Check: string | undefined = undefined;
+  derivedPublicKeyBase58Check: string | undefined = undefined;
 
   constructor(
     private accountService: AccountService,
@@ -25,6 +33,7 @@ export class DeriveComponent implements OnInit {
     private googleDrive: GoogleDriveService,
     private backendApi: BackendAPIService,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -36,6 +45,22 @@ export class DeriveComponent implements OnInit {
         this.allUsers = profiles;
       });
 
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params.publicKey) {
+        this.publicKeyBase58Check = params.publicKey;
+      }
+      if (params.derivedPublicKey) {
+        this.derivedPublicKeyBase58Check = params.derivedPublicKey;
+      }
+      if (params.transactionSpendingLimitResponse) {
+        this.transactionSpendingLimitResponse = JSON.parse(decodeURIComponent(params.transactionSpendingLimitResponse));
+        this.backendApi.GetTransactionSpendingLimitHexString(
+          this.transactionSpendingLimitResponse as TransactionSpendingLimitResponse
+        ).subscribe((res) => {
+          this.transactionSpendingLimit = res;
+        })
+      }
+    })
     // Set derive to true
     this.globalVars.derive = true;
   }
@@ -54,7 +79,19 @@ export class DeriveComponent implements OnInit {
 
   selectAccountAndDeriveKey(publicKey: string): void {
     this.identityService.derive({
-      publicKey
+      publicKey,
+      transactionSpendingLimit: this.transactionSpendingLimit,
+    });
+  }
+
+  approveDerivedKey(): void {
+    if (!this.publicKeyBase58Check) {
+      return;
+    }
+    this.identityService.derive({
+      publicKey: this.publicKeyBase58Check,
+      derivedPublicKey: this.derivedPublicKeyBase58Check,
+      transactionSpendingLimit: this.transactionSpendingLimit,
     });
   }
 }

@@ -1,3 +1,5 @@
+import { TransactionSpendingLimit } from "src/lib/deso/transaction";
+
 export interface PrivateUserInfo {
   seedHex: string;
   mnemonic: string;
@@ -30,8 +32,8 @@ export interface PublicUserInfo {
 
 export interface DerivedPrivateUserInfo {
   derivedSeedHex: string;
-  derivedPublicKey: string;
-  publicKey: string;
+  derivedPublicKeyBase58Check: string;
+  publicKeyBase58Check: string;
   btcDepositAddress: string;
   ethDepositAddress: string;
   expirationBlock: number;
@@ -39,6 +41,10 @@ export interface DerivedPrivateUserInfo {
   accessSignature: string;
   jwt: string;
   derivedJwt: string;
+  messagingPublicKeyBase58Check: string;
+  messagingPrivateKey: string;
+  messagingKeyName: string;
+  messagingKeySignature: string;
 }
 
 export interface UserProfile {
@@ -51,6 +57,19 @@ export interface DerivedKey {
   ownerPublicKeyBase58Check: string;
   expirationBlock: number;
   isValid: boolean;
+  transactionSpendingLimit?: TransactionSpendingLimit | null;
+}
+
+export interface EncryptedMessage {
+  EncryptedHex: string,
+  PublicKey: string,
+  IsSender: boolean,
+  Legacy: boolean,
+  Version?: number,
+  SenderMessagingPublicKey?: string,
+  SenderMessagingGroupKeyName?: string,
+  RecipientMessagingPublicKey?: string,
+  RecipientMessagingGroupKeyName?: string
 }
 
 export enum Network {

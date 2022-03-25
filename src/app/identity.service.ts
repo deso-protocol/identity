@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import {Observable, of, Subject, zip} from 'rxjs';
 import {v4 as uuid} from 'uuid';
 import {AccessLevel, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
@@ -7,7 +7,7 @@ import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
 import {SigningService} from './signing.service';
 import {HttpParams} from '@angular/common/http';
-import {BackendAPIService} from './backend-api.service';
+import {BackendAPIService, TransactionSpendingLimitResponse} from './backend-api.service';
 import {AccountService} from './account.service';
 import {
   Transaction,
@@ -32,8 +32,15 @@ import {
   TransactionMetadataUpdateNFT,
   TransactionMetadataCreateNFT,
   TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin
+  TransactionMetadataTransferDAOCoin,
+  TransactionSpendingLimit
 } from '../lib/deso/transaction';
+
+export type DerivePayload = {
+  publicKey: string;
+  derivedPublicKey?: string;
+  transactionSpendingLimit?: TransactionSpendingLimit;
+};
 
 @Injectable({
   providedIn: 'root'
@@ -77,15 +84,25 @@ export class IdentityService {
     jumioSuccess?: boolean,
     phoneNumberSuccess?: boolean,
   }): void {
-    this.cast('login', payload);
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      let httpParams = new HttpParams();
+      for (const key in payload) {
+        if (payload.hasOwnProperty(key)) {
+          httpParams = httpParams.append(key, (payload as any)[key].toString());
+        }
+      }
+      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+    } else {
+      this.cast('login', payload);
+    }
   }
 
-  derive(payload: {
-    publicKey: string,
-  }): void {
-    this.backendApi.GetAppState().subscribe( res => {
+  derive(payload: DerivePayload): void {
+      this.backendApi.GetAppState().subscribe( (res) => {
       const blockHeight = res.BlockHeight;
-      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(payload.publicKey, blockHeight);
+      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
+        payload.publicKey, blockHeight, payload.transactionSpendingLimit, payload.derivedPublicKey);
       if (this.globalVars.callback) {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();
@@ -168,12 +185,15 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, recipientPublicKey, message} } = data;
+    const { id, payload: { encryptedSeedHex, senderGroupKeyName, recipientPublicKey, message} } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const encryptedMessage = this.signingService.encryptMessage(seedHex, recipientPublicKey, message);
-    this.respond(id, {
-      encryptedMessage
-    });
+
+    // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
+    // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
+    // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
+    // senderGroupKeyName parameter.
+    const encryptedMessage = this.signingService.encryptMessage(seedHex, senderGroupKeyName, recipientPublicKey, message);
+    this.respond(id, encryptedMessage);
   }
 
   private handleDecrypt(data: any): void {
@@ -190,7 +210,7 @@ export class IdentityService {
       const encryptedHexes = data.payload.encryptedHexes;
       decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
     } else {
-      // Shared secret decryption
+      // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
       decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
     }
@@ -249,9 +269,9 @@ export class IdentityService {
 
   private getRequiredAccessLevel(transactionHex: string): AccessLevel {
     const txBytes = new Buffer(transactionHex, 'hex');
-    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
 
-    switch (transaction.metadata.constructor) {
+    switch (transaction.metadata?.constructor) {
       case TransactionMetadataBasicTransfer:
       case TransactionMetadataBitcoinExchange:
       case TransactionMetadataUpdateBitcoinUSDExchangeRate:
@@ -300,7 +320,7 @@ export class IdentityService {
     // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
     if (accessLevel === AccessLevel.ApproveLarge) {
       const txBytes = new Buffer(transactionHex, 'hex');
-      const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+      const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
       for (const output of transaction.outputs) {
         if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
           this.respond(data.id, {approvalRequired: true});
