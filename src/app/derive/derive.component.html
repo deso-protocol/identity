@@ -8,10 +8,6 @@
     <div class="font-weight-bold fs-30px mb-20px" *ngIf="globalVars.callback">
       Grant signing access
     </div>
-    <app-transaction-spending-limit
-      [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
-      *ngIf="transactionSpendingLimitResponse"
-    ></app-transaction-spending-limit>
 
     <div *ngIf="!globalVars.callback">
       <div class="fs-18px mt-30px">

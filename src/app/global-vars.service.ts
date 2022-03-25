@@ -114,10 +114,4 @@ export class GlobalVarsService {
   ObjectKeyLength(obj: { [k: string]: any} | undefined): number {
     return obj ? Object.keys(obj).length : 0;
   }
-
-  cleanSpendingLimitOperationName(opName: string): string {
-    return opName.split("_").map((token) =>
-      token.toLocaleLowerCase() === "nft" ? "NFT" : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
-    ).join(" ");
-  }
 }

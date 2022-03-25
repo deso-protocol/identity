@@ -12,7 +12,6 @@ import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
 import {ec as EC} from 'elliptic';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -86,7 +85,6 @@ export class AccountService {
   }
 
   getDerivedPrivateUser(publicKeyBase58Check: string, blockHeight: number,
-                        transactionSpendingLimit: TransactionSpendingLimit | undefined = undefined,
                         derivedPublicKeyBase58CheckInput: string | undefined = undefined): DerivedPrivateUserInfo{
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
@@ -133,8 +131,7 @@ export class AccountService {
     const expirationBlock = blockHeight + 10000;
 
     const expirationBlockBuffer = uint64ToBufBigEndian(expirationBlock);
-    const transactionSpendingLimitBytes = transactionSpendingLimit ? transactionSpendingLimit.toBytes() : [];
-    const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer, ...transactionSpendingLimitBytes]);
+    const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer]);
     const accessSignature = this.signingService.signHashes(privateUser.seedHex, [accessHash])[0];
 
     // Set the default messaging key name
@@ -147,7 +144,7 @@ export class AccountService {
     // We do this to compress the messaging public key from 65 bytes to 33 bytes.
     const messagingPublicKey = ec.keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array').getPublic(true, 'hex');
     const messagingPublicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
-      ec.keyFromPrivate(messagingPrivateKeyBuff), this.globalVars.network)
+      ec.keyFromPrivate(messagingPrivateKeyBuff), this.globalVars.network);
 
     // Messaging key signature is needed so if derived key submits the messaging public key,
     // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )

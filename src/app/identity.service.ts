@@ -7,7 +7,7 @@ import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
 import {SigningService} from './signing.service';
 import {HttpParams} from '@angular/common/http';
-import {BackendAPIService, TransactionSpendingLimitResponse} from './backend-api.service';
+import {BackendAPIService} from './backend-api.service';
 import {AccountService} from './account.service';
 import {
   Transaction,
@@ -32,14 +32,12 @@ import {
   TransactionMetadataUpdateNFT,
   TransactionMetadataCreateNFT,
   TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin,
-  TransactionSpendingLimit
+  TransactionMetadataTransferDAOCoin
 } from '../lib/deso/transaction';
 
 export type DerivePayload = {
   publicKey: string;
   derivedPublicKey?: string;
-  transactionSpendingLimit?: TransactionSpendingLimit;
 };
 
 @Injectable({
@@ -99,10 +97,10 @@ export class IdentityService {
   }
 
   derive(payload: DerivePayload): void {
-      this.backendApi.GetAppState().subscribe( (res) => {
+    this.backendApi.GetAppState().subscribe( (res) => {
       const blockHeight = res.BlockHeight;
       const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
-        payload.publicKey, blockHeight, payload.transactionSpendingLimit, payload.derivedPublicKey);
+        payload.publicKey, blockHeight, payload.derivedPublicKey);
       if (this.globalVars.callback) {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();

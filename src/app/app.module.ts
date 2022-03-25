@@ -32,12 +32,7 @@ import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
 import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component';
-import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
-import { TransactionSpendingLimitSectionComponent } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
-import { TransactionSpendingLimitCoinComponent } from './transaction-spending-limit/transaction-spending-limit-coin/transaction-spending-limit-coin.component';
-import { TransactionSpendingLimitNftComponent } from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component'
-import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
-import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -60,12 +55,6 @@ import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
     SignUpGetStarterDESOComponent,
     FreeDesoMessageComponent,
     FreeDeSoDisclaimerComponent,
-    TransactionSpendingLimitComponent,
-    TransactionSpendingLimitSectionComponent,
-    TransactionSpendingLimitCoinComponent,
-    TransactionSpendingLimitNftComponent,
-    SanitizePostBodyPipe,
-    SanitizeVideoUrlPipe,
   ],
   imports: [
     BrowserModule,

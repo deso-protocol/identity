@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  hostname: 'identity.deso.org',
-  nodeHostname: 'node.deso.org',
+  hostname: 'localhost',
+  nodeHostname: 'localhost',
   fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost', 'node.deso.org'],
   noAccessHostnames: [''],
   jumioSupported: true,

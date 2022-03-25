@@ -19,7 +19,7 @@ export class CryptoService {
   constructor(
     private cookieService: CookieService,
     private globalVars: GlobalVarsService
-    ) {}
+  ) {}
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -170,7 +170,7 @@ export class CryptoService {
     const ec = new EC('secp256k1');
     return ec.keyFromPublic(payload, 'array');
   }
-  
+
   // Decode public key base58check to Buffer of secp256k1 public key
   publicKeyToECBuffer(publicKey: string): Buffer {
     const publicKeyEC = this.publicKeyToECKeyPair(publicKey);
