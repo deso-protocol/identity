@@ -335,6 +335,26 @@ export class TransactionMetadataTransferDAOCoin extends BinaryRecord {
   receiverPublicKey: Buffer = Buffer.alloc(0);
 }
 
+export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
+  @Transcode(VarBuffer)
+  buyingDAOCoinCreatorPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  sellingDAOCoinCreatorPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  priceNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  quantityNanos: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  cancelExistingOrder: boolean = false;
+
+  @Transcode(VarBuffer)
+  matchingBidsInputsMap: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -360,6 +380,7 @@ export const TransactionTypeMetadataMap = {
   23: TransactionMetadataMessagingGroup,
   24: TransactionMetadataDAOCoin,
   25: TransactionMetadataTransferDAOCoin,
+  26: TransactionMetadataDAOCoinLimitOrder,
 };
 
 export class Transaction<T> extends BinaryRecord {
