@@ -4,7 +4,12 @@
   <div class="d-flex justify-content-between flex-grow-1">
     <div class="d-flex justify-content-start align-items-center">
       <div class="avatar mr-15px" [appAvatar]="coinPublicKey" *ngIf="coinPublicKey"></div>
-      <div>{{ coinPublicKey === "" ? "All Creators" : user?.ProfileEntryResponse?.Username || coinPublicKey }}</div>
+      <div
+        class="d-block"
+        style="text-overflow: ellipsis; display: block; max-width: 200px; overflow: hidden;"
+      >
+        {{ coinPublicKey === "" ? "All Creators" : user?.ProfileEntryResponse?.Username || coinPublicKey }}
+      </div>
       <!-- TODO: Add verified check -->
     </div>
     <div class="d-flex justify-content-end fs-14px">
