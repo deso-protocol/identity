@@ -342,17 +342,17 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   @Transcode(VarBuffer)
   sellingDAOCoinCreatorPublicKey: Buffer = Buffer.alloc(0);
 
-  @Transcode(VarBuffer)
-  priceNanos: Buffer = Buffer.alloc(0);
+  @Transcode(FixedBuffer(32))
+  scaledExchangeRateCoinsToSellPerCoinToBuy: Buffer = Buffer.alloc(0);
 
-  @Transcode(VarBuffer)
-  quantityNanos: Buffer = Buffer.alloc(0);
+  @Transcode(FixedBuffer(32))
+  quantityToBuyInBaseUnits: Buffer = Buffer.alloc(0);
 
   @Transcode(VarBuffer)
   cancelExistingOrder: boolean = false;
 
   @Transcode(VarBuffer)
-  matchingBidsInputsMap: Buffer = Buffer.alloc(0);
+  matchedBidsTransactors: Buffer = Buffer.alloc(0);
 }
 
 export const TransactionTypeMetadataMap = {

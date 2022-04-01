@@ -249,12 +249,16 @@ export class ApproveComponent implements OnInit {
         description = `register group key with name "${groupKeyName}"`
         break
       case TransactionMetadataDAOCoinLimitOrder:
-        const buyingDAOCoinCreatorPublicKey = this.base58KeyCheck(this.transaction.metadata.buyingDAOCoinCreatorPublicKey);
-        const sellingDAOCoinCreatorPublicKey = this.base58KeyCheck(this.transaction.metadata.sellingDAOCoinCreatorPublicKey);
-        const priceUnits = this.hexNanosToUnitString(this.transaction.metadata.priceNanos);
-        const quantityUnits = this.hexNanosToUnitString(this.transaction.metadata.quantityNanos);
-        description = `create DAO coin limit order to trade ${sellingDAOCoinCreatorPublicKey} coin ` +
-          `for ${buyingDAOCoinCreatorPublicKey} coin with price ${priceUnits} and quantity ${quantityUnits}`
+        let buyingDAOCoinCreatorPublicKey = this.base58KeyCheck(this.transaction.metadata.buyingDAOCoinCreatorPublicKey);
+        if (buyingDAOCoinCreatorPublicKey == "") {
+          buyingDAOCoinCreatorPublicKey = "DESO";
+        }
+        let sellingDAOCoinCreatorPublicKey = this.base58KeyCheck(this.transaction.metadata.sellingDAOCoinCreatorPublicKey);
+        if (sellingDAOCoinCreatorPublicKey == "") {
+          sellingDAOCoinCreatorPublicKey = "DESO"
+        }
+        description = `create DAO coin limit order to sell ${sellingDAOCoinCreatorPublicKey} ` +
+          `to buy ${buyingDAOCoinCreatorPublicKey}`
     }
 
     // Set the transaction description based on the description populated with public keys.
