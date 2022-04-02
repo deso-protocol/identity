@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
@@ -56,6 +56,10 @@ export class BackendAPIService {
     private accountService: AccountService,
     private globalVars: GlobalVarsService,
   ) { }
+
+  get(path: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.endpoint}/${path}`);
+  }
 
   post(path: string, body: any): Observable<any> {
     return this.httpClient.post<any>(`${this.endpoint}/${path}`, body);
