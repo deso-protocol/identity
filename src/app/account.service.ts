@@ -86,7 +86,7 @@ export class AccountService {
   }
 
   getDerivedPrivateUser(publicKeyBase58Check: string, blockHeight: number,
-                        transactionSpendingLimit: TransactionSpendingLimit | undefined = undefined,
+                        transactionSpendingLimitHex: string | undefined = undefined,
                         derivedPublicKeyBase58CheckInput: string | undefined = undefined): DerivedPrivateUserInfo{
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
@@ -133,7 +133,7 @@ export class AccountService {
     const expirationBlock = blockHeight + 10000;
 
     const expirationBlockBuffer = uint64ToBufBigEndian(expirationBlock);
-    const transactionSpendingLimitBytes = transactionSpendingLimit ? transactionSpendingLimit.toBytes() : [];
+    const transactionSpendingLimitBytes = transactionSpendingLimitHex ? [... new Buffer(transactionSpendingLimitHex, 'hex')] : [];
     const accessHash = sha256.x2([...derivedPublicKeyBuffer, ...expirationBlockBuffer, ...transactionSpendingLimitBytes]);
     const accessSignature = this.signingService.signHashes(privateUser.seedHex, [accessHash])[0];
 
@@ -168,7 +168,8 @@ export class AccountService {
       messagingPublicKeyBase58Check,
       messagingPrivateKey,
       messagingKeyName,
-      messagingKeySignature
+      messagingKeySignature,
+      transactionSpendingLimitHex
     };
   }
 

@@ -17,11 +17,9 @@ import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
-  transactionSpendingLimit: TransactionSpendingLimit | undefined;
+  transactionSpendingLimitHex: string | undefined;
   transactionSpendingLimitResponse: TransactionSpendingLimitResponse | undefined;
   hasUsers = false;
-  derivePayload: DerivePayload | null = null;
-  userMap: { [k: string]: User } = {};
 
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
@@ -54,13 +52,19 @@ export class DeriveComponent implements OnInit {
       }
       if (params.transactionSpendingLimitResponse) {
         this.transactionSpendingLimitResponse = JSON.parse(decodeURIComponent(params.transactionSpendingLimitResponse));
+        // TODO: There is a small attack surface here. If someone gains control of the
+        // backendApi node, they can swap a fake value into here, and trick the user
+        // into giving up control of their key. The solution is to force users to pass
+        // the transactionSpendingLimitHex directly, but this is a worse developer
+        // experience. So we trade a little bit of security for developer convenience
+        // here, and do the conversion in Identity rather than forcing the devs to do it.
         this.backendApi.GetTransactionSpendingLimitHexString(
           this.transactionSpendingLimitResponse as TransactionSpendingLimitResponse
         ).subscribe((res) => {
-          this.transactionSpendingLimit = res;
-        })
+          this.transactionSpendingLimitHex = res;
+        });
       }
-    })
+    });
     // Set derive to true
     this.globalVars.derive = true;
   }
@@ -80,7 +84,7 @@ export class DeriveComponent implements OnInit {
   selectAccountAndDeriveKey(publicKey: string): void {
     this.identityService.derive({
       publicKey,
-      transactionSpendingLimit: this.transactionSpendingLimit,
+      transactionSpendingLimitHex: this.transactionSpendingLimitHex,
     });
   }
 
@@ -91,7 +95,7 @@ export class DeriveComponent implements OnInit {
     this.identityService.derive({
       publicKey: this.publicKeyBase58Check,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
-      transactionSpendingLimit: this.transactionSpendingLimit,
+      transactionSpendingLimitHex: this.transactionSpendingLimitHex,
     });
   }
 }

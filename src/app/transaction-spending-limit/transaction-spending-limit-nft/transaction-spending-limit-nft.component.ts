@@ -33,7 +33,7 @@ export class TransactionSpendingLimitNftComponent implements OnInit {
   ngOnInit(): void {
     (
       this.nftPostHashHex ?
-        this.backendApi.GetSinglePost(this.nftPostHashHex) : 
+        this.backendApi.GetSinglePost(this.nftPostHashHex) :
         of(undefined)
     ).subscribe((res) => {
         this.post = res;

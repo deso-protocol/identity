@@ -39,7 +39,7 @@ import {
 export type DerivePayload = {
   publicKey: string;
   derivedPublicKey?: string;
-  transactionSpendingLimit?: TransactionSpendingLimit;
+  transactionSpendingLimitHex?: string;
 };
 
 @Injectable({
@@ -102,7 +102,7 @@ export class IdentityService {
       this.backendApi.GetAppState().subscribe( (res) => {
       const blockHeight = res.BlockHeight;
       const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
-        payload.publicKey, blockHeight, payload.transactionSpendingLimit, payload.derivedPublicKey);
+        payload.publicKey, blockHeight, payload.transactionSpendingLimitHex, payload.derivedPublicKey);
       if (this.globalVars.callback) {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();

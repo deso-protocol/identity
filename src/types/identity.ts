@@ -45,6 +45,7 @@ export interface DerivedPrivateUserInfo {
   messagingPrivateKey: string;
   messagingKeyName: string;
   messagingKeySignature: string;
+  transactionSpendingLimitHex: string | undefined;
 }
 
 export interface UserProfile {

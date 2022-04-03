@@ -71,7 +71,7 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
       case TransactionSpendingLimitComponent.CreatorCoinLimitsSection:
         return "creator coin";
       case TransactionSpendingLimitComponent.DAOCoinLimitsSection:
-        return "DAO"
+        return "DAO coin"
       case TransactionSpendingLimitComponent.NFTLimitsSection:
         return "NFT"
       default:
@@ -93,12 +93,12 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
 
   sectionSummary(): string {
     const operationsStr = this.sectionTitle !== TransactionSpendingLimitComponent.TransactionLimitsSection ?
-      "operations on specific " : "";
+      "operations on " : "";
     const keyLen = this.globalVars.ObjectKeyLength(this.sectionMap)
     const sectionItemType = this.sectionItemType();
-    return `This app can perform the following ${operationsStr}${
+    return `This app can execute the following ${operationsStr}${
       keyLen
-    } ${
+    } specific ${
       sectionItemType
     }${
       keyLen > 1 ? "s" : ""

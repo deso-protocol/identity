@@ -155,13 +155,14 @@ export type TransactionSpendingLimitResponse = {
   CreatorCoinOperationLimitMap?: CreatorCoinOperationLimitMap;
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
+  DerivedKeyMemo?: string;
 };
 
 @Injectable({
   providedIn: 'root'
 })
 export class BackendAPIService {
-  endpoint = `https://${environment.nodeHostname}/api/v0`;
+  endpoint = `${environment.nodeURL}/api/v0`;
 
   constructor(
     private httpClient: HttpClient,
@@ -372,17 +373,17 @@ export class BackendAPIService {
 
   GetTransactionSpendingLimitHexString(
     TransactionSpendingLimitResponse: TransactionSpendingLimitResponse
-  ): Observable<TransactionSpendingLimit> {
+  ): Observable<string> {
     return this.post("get-transaction-spending-limit-hex-string", {
       TransactionSpendingLimit: TransactionSpendingLimitResponse,
     }).pipe(
       map(
         res => {
-          return TransactionSpendingLimit.fromBytes(Buffer.from(res.HexString, 'hex'))[0] as TransactionSpendingLimit
+          return res.HexString;
     }),
       catchError((err) => {
         console.error(err);
-        return throwError(err)
+        return throwError(err);
       }));
   }
 

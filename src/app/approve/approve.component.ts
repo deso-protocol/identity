@@ -236,6 +236,12 @@ export class ApproveComponent implements OnInit {
         for (const kv of this.transaction.extraData?.kvs || []) {
           if (kv.key.toString() === "TransactionSpendingLimit") {
             // Hit the backend to get the TransactionSpendingLimit response from the bytes we have in the value.
+            //
+            // TODO: There is a small attack surface here. If someone gains control of the
+            // backendApi node, they can swap a fake value into here, and trick the user
+            // into giving up control of their key. The solution is to parse the hex here in
+            // the frontend code rather than relying on the backend to do it, but we're
+            // OK trading off some security for convenience here short-term.
             this.backendApi.GetTransactionSpendingLimitResponseFromHex(kv.value.toString("hex")).subscribe((res) => {
               this.transactionSpendingLimitResponse = res;
             })
