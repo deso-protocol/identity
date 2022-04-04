@@ -5,7 +5,7 @@ import {IdentityService} from '../identity.service';
 import {AccountService} from '../account.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {SigningService} from '../signing.service';
-import {BackendAPIService, ProfileEntryResponse, User} from '../backend-api.service';
+import {BackendAPIService, CreatorCoinLimitOperationString, ProfileEntryResponse, TransactionSpendingLimitResponse, User} from '../backend-api.service';
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {
@@ -32,7 +32,8 @@ import {
   TransactionMetadataAuthorizeDerivedKey,
   TransactionMetadataMessagingGroup,
   TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin
+  TransactionMetadataTransferDAOCoin,
+  TransactionSpendingLimit
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 
@@ -42,12 +43,16 @@ import bs58check from 'bs58check';
   styleUrls: ['./approve.component.scss']
 })
 export class ApproveComponent implements OnInit {
-  transaction: any;
+  transaction: Transaction = new Transaction;
   publicKey: any;
   transactionHex: any;
   username: any;
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
+  tsl: TransactionSpendingLimit | null = null;
+
+  derivedKeyMemo: string = "";
+  transactionSpendingLimitResponse: TransactionSpendingLimitResponse | undefined = undefined;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -66,7 +71,7 @@ export class ApproveComponent implements OnInit {
         this.transactionDeSoSpent = res ? this.nanosToUnitString(res) : false;
       });
       const txBytes = new Buffer(this.transactionHex, 'hex');
-      this.transaction = Transaction.fromBytes(txBytes)[0];
+      this.transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
       this.publicKey = this.base58KeyCheck(this.transaction.publicKey);
 
       this.generateTransactionDescription();
@@ -97,7 +102,8 @@ export class ApproveComponent implements OnInit {
   generateTransactionDescription(): void {
     let description = 'sign an unknown transaction';
     let publicKeys: string[] = [];
-    switch (this.transaction.metadata.constructor) {
+
+    switch (this.transaction.metadata?.constructor) {
       case TransactionMetadataBasicTransfer:
         const outputs: any[] = [];
         let sendingToSelf = true;
@@ -144,28 +150,30 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataFollow:
-        const followAction = this.transaction.metadata.isUnfollow ? "unfollow" : "follow";
-        const followedPublicKey = this.base58KeyCheck(this.transaction.metadata.followedPublicKey);
+        const followMetadata = this.transaction.metadata as TransactionMetadataFollow;
+        const followAction = followMetadata.isUnfollow ? "unfollow" : "follow";
+        const followedPublicKey = this.base58KeyCheck(followMetadata.followedPublicKey);
         publicKeys = [followedPublicKey];
         description = `${followAction} ${followedPublicKey}`;
         break;
 
       case TransactionMetadataLike:
-        description = this.transaction.metadata.isUnlike ? 'unlike a post' : 'like a post';
+        description = (this.transaction.metadata as TransactionMetadataLike).isUnlike ? 'unlike a post' : 'like a post';
         break;
 
       case TransactionMetadataCreatorCoin:
-        const operationType = this.transaction.metadata.operationType;
-        const creatorCoinPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        const ccMetadata = this.transaction.metadata as TransactionMetadataCreatorCoin;
+        const operationType = ccMetadata.operationType;
+        const creatorCoinPublicKey = this.base58KeyCheck(ccMetadata.profilePublicKey);
         publicKeys = [creatorCoinPublicKey];
         if (operationType === 0) {
-          const desoToSell = this.nanosToUnitString(this.transaction.metadata.desoToSellNanos);
+          const desoToSell = this.nanosToUnitString(ccMetadata.desoToSellNanos);
           description = `spend ${desoToSell} $DESO to buy the creator coin of ${creatorCoinPublicKey}`;
         } else if (operationType === 1) {
-          const creatorCoinToSell = this.nanosToUnitString(this.transaction.metadata.creatorCoinToSellNanos);
+          const creatorCoinToSell = this.nanosToUnitString(ccMetadata.creatorCoinToSellNanos);
           description = `sell ${creatorCoinToSell} creator coins of ${creatorCoinPublicKey}`;
         } else if (operationType === 2) {
-          const desoToAdd = this.nanosToUnitString(this.transaction.metadata.desoToAddNanos);
+          const desoToAdd = this.nanosToUnitString(ccMetadata.desoToAddNanos);
           description = `add ${creatorCoinPublicKey} creator coin for ${desoToAdd} $DESO`;
         }
         break;
@@ -179,9 +187,10 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataCreatorCoinTransfer:
-        const transferAmount = this.nanosToUnitString(this.transaction.metadata.creatorCoinToTransferNanos);
-        const creatorCoinTransferPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        const receiverPublicKey = this.base58KeyCheck(this.transaction.metadata.receiverPublicKey);
+        const ccTransferMetadata = this.transaction.metadata as TransactionMetadataCreatorCoinTransfer
+        const transferAmount = this.nanosToUnitString(ccTransferMetadata.creatorCoinToTransferNanos);
+        const creatorCoinTransferPublicKey = this.base58KeyCheck(ccTransferMetadata.profilePublicKey);
+        const receiverPublicKey = this.base58KeyCheck(ccTransferMetadata.receiverPublicKey);
         publicKeys = [creatorCoinTransferPublicKey, receiverPublicKey];
         description = `transfer ${transferAmount} creator coin of ${creatorCoinTransferPublicKey} to ${receiverPublicKey}`;
         break;
@@ -215,36 +224,59 @@ export class ApproveComponent implements OnInit {
         break;
 
       case TransactionMetadataAuthorizeDerivedKey:
-        if (this.transaction.metadata.operationType === 0){
+        const authorizeDKMetadata = this.transaction.metadata as TransactionMetadataAuthorizeDerivedKey;
+        if (authorizeDKMetadata.operationType === 0){
           description = 'de-authorize a derived key';
-        }  else if (this.transaction.metadata.operationType === 1){
+        }  else if (authorizeDKMetadata.operationType === 1){
           description = 'authorize a derived key';
+        }
+
+        // Parse the transaction spending limit and memo from the extra data
+        for (const kv of this.transaction.extraData?.kvs || []) {
+          if (kv.key.toString() === "TransactionSpendingLimit") {
+            // Hit the backend to get the TransactionSpendingLimit response from the bytes we have in the value.
+            //
+            // TODO: There is a small attack surface here. If someone gains control of the
+            // backendApi node, they can swap a fake value into here, and trick the user
+            // into giving up control of their key. The solution is to parse the hex here in
+            // the frontend code rather than relying on the backend to do it, but we're
+            // OK trading off some security for convenience here short-term.
+            this.backendApi.GetTransactionSpendingLimitResponseFromHex(kv.value.toString("hex")).subscribe((res) => {
+              this.transactionSpendingLimitResponse = res;
+            })
+          }
+          if (kv.key.toString() === "DerivedKeyMemo") {
+            this.derivedKeyMemo = new Buffer(kv.value.toString(), 'hex').toString();
+          }
         }
         break;
       case TransactionMetadataDAOCoin:
-        const daoCoinPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
+        const daoCoinMetadata = this.transaction.metadata as TransactionMetadataDAOCoin;
+        const daoCoinPublicKey = this.base58KeyCheck(daoCoinMetadata.profilePublicKey);
         publicKeys = [daoCoinPublicKey]
-        if (this.transaction.metadata.operationType === 0) {
-          const mintAmount = this.hexNanosToUnitString(this.transaction.metadata.coinsToMintNanos);
+        if (daoCoinMetadata.operationType === 0) {
+          const mintAmount = this.hexNanosToUnitString(daoCoinMetadata.coinsToMintNanos);
           description = `mint ${mintAmount} ${daoCoinPublicKey} DAO coins`;
-        } else if (this.transaction.metadata.operationType === 1) {
-          const burnAmount = this.hexNanosToUnitString(this.transaction.metadata.coinsToBurnNanos);
+        } else if (daoCoinMetadata.operationType === 1) {
+          const burnAmount = this.hexNanosToUnitString(daoCoinMetadata.coinsToBurnNanos);
           description = `burn ${burnAmount} ${daoCoinPublicKey} DAO coins`;
-        } else if (this.transaction.metadata.operationType === 2) {
+        } else if (daoCoinMetadata.operationType === 2) {
           description = `disabling minting of ${daoCoinPublicKey} DAO coins`;
-        } else if (this.transaction.metadata.operationType === 3) {
+        } else if (daoCoinMetadata.operationType === 3) {
           description = `update transfer restriction status for ${daoCoinPublicKey} DAO coins`;
         }
         break;
       case TransactionMetadataTransferDAOCoin:
-        const daoCoinTransferAmount = this.hexNanosToUnitString(this.transaction.metadata.daoCoinToTransferNanos);
-        const daoCoinTransferPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        const daoCoinReceiverPublicKey = this.base58KeyCheck(this.transaction.metadata.receiverPublicKey);
+        const daoCoinTransferMetadata = this.transaction.metadata as TransactionMetadataTransferDAOCoin;
+        const daoCoinTransferAmount = this.hexNanosToUnitString(daoCoinTransferMetadata.daoCoinToTransferNanos);
+        const daoCoinTransferPublicKey = this.base58KeyCheck(daoCoinTransferMetadata.profilePublicKey);
+        const daoCoinReceiverPublicKey = this.base58KeyCheck(daoCoinTransferMetadata.receiverPublicKey);
         publicKeys = [daoCoinTransferPublicKey, daoCoinReceiverPublicKey];
         description = `transfer ${daoCoinTransferAmount} ${daoCoinTransferPublicKey} DAO coins to ${daoCoinReceiverPublicKey}`;
         break;
       case TransactionMetadataMessagingGroup:
-        const groupKeyName = this.transaction.metadata.messagingGroupKeyName
+        const messagingGroupMetadata = this.transaction.metadata as TransactionMetadataMessagingGroup;
+        const groupKeyName = messagingGroupMetadata.messagingGroupKeyName
         description = `register group key with name "${groupKeyName}"`
         break
     }

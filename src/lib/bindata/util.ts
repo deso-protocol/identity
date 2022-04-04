@@ -1,6 +1,6 @@
 export const bufToUvarint64 = (buffer: Buffer): [number, Buffer] => {
-  let x = 0;
-  let s = 0;
+  let x = BigInt(0);
+  let s = BigInt(0);
 
   for (let i = 0; true; i++) {
       const byte = buffer[i];
@@ -11,8 +11,8 @@ export const bufToUvarint64 = (buffer: Buffer): [number, Buffer] => {
         return [Number(BigInt(x) | BigInt(byte) << BigInt(s)), buffer.slice(i + 1)];
       }
 
-      x |= (byte & 0x7F) << s;
-      s += 7;
+    x |= BigInt((byte & 0x7F)) << BigInt(s);
+    s += BigInt(7);
   }
 };
 
@@ -20,8 +20,8 @@ export const uvarint64ToBuf = (uint: number): Buffer => {
   const result = [];
 
   while (uint >= 0x80) {
-    result.push((uint & 0xFF) | 0x80);
-    uint >>>= 7;
+    result.push(Number((BigInt(uint) & BigInt(0xFF)) | BigInt(0x80)));
+    uint = Number(BigInt(uint) >> BigInt(7));
   }
 
   result.push(uint | 0);

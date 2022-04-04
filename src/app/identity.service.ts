@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import {Observable, of, Subject, zip} from 'rxjs';
 import {v4 as uuid} from 'uuid';
 import {AccessLevel, PublicUserInfo} from '../types/identity';
 import {CryptoService} from './crypto.service';
@@ -7,7 +7,7 @@ import {GlobalVarsService} from './global-vars.service';
 import {CookieService} from 'ngx-cookie';
 import {SigningService} from './signing.service';
 import {HttpParams} from '@angular/common/http';
-import {BackendAPIService} from './backend-api.service';
+import {BackendAPIService, TransactionSpendingLimitResponse} from './backend-api.service';
 import {AccountService} from './account.service';
 import {
   Transaction,
@@ -32,8 +32,15 @@ import {
   TransactionMetadataUpdateNFT,
   TransactionMetadataCreateNFT,
   TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin
+  TransactionMetadataTransferDAOCoin,
+  TransactionSpendingLimit
 } from '../lib/deso/transaction';
+
+export type DerivePayload = {
+  publicKey: string;
+  derivedPublicKey?: string;
+  transactionSpendingLimitHex?: string;
+};
 
 @Injectable({
   providedIn: 'root'
@@ -91,12 +98,11 @@ export class IdentityService {
     }
   }
 
-  derive(payload: {
-    publicKey: string,
-  }): void {
-    this.backendApi.GetAppState().subscribe( res => {
+  derive(payload: DerivePayload): void {
+      this.backendApi.GetAppState().subscribe( (res) => {
       const blockHeight = res.BlockHeight;
-      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(payload.publicKey, blockHeight);
+      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
+        payload.publicKey, blockHeight, payload.transactionSpendingLimitHex, payload.derivedPublicKey);
       if (this.globalVars.callback) {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();
@@ -263,9 +269,9 @@ export class IdentityService {
 
   private getRequiredAccessLevel(transactionHex: string): AccessLevel {
     const txBytes = new Buffer(transactionHex, 'hex');
-    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
 
-    switch (transaction.metadata.constructor) {
+    switch (transaction.metadata?.constructor) {
       case TransactionMetadataBasicTransfer:
       case TransactionMetadataBitcoinExchange:
       case TransactionMetadataUpdateBitcoinUSDExchangeRate:
@@ -314,7 +320,7 @@ export class IdentityService {
     // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
     if (accessLevel === AccessLevel.ApproveLarge) {
       const txBytes = new Buffer(transactionHex, 'hex');
-      const transaction = Transaction.fromBytes(txBytes)[0] as Transaction<any>;
+      const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
       for (const output of transaction.outputs) {
         if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
           this.respond(data.id, {approvalRequired: true});

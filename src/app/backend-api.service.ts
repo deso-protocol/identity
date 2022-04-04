@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {DerivedKey, UserProfile} from '../types/identity';
+import {DerivedKey, Network, UserProfile} from '../types/identity';
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export class ProfileEntryResponse {
   Username: string | null = null;
@@ -28,6 +29,65 @@ export class ProfileEntryResponse {
   IsVerified?: boolean;
 }
 
+export class PostEntryReaderState {
+  // This is true if the reader has liked the associated post.
+  LikedByReader?: boolean;
+
+  // This is true if the reader has reposted the associated post.
+  RepostedByReader?: boolean;
+
+  // This is the post hash hex of the repost
+  RepostPostHashHex?: string;
+
+  // Level of diamond the user gave this post.
+  DiamondLevelBestowed?: number;
+}
+
+export type PostEntryResponse = {
+  PostHashHex: string;
+  PosterPublicKeyBase58Check: string;
+  ParentStakeID: string;
+  Body: string;
+  RepostedPostHashHex: string;
+  ImageURLs: string[];
+  VideoURLs: string[];
+  RepostPost: PostEntryResponse;
+  CreatorBasisPoints: number;
+  StakeMultipleBasisPoints: number;
+  TimestampNanos: number;
+  IsHidden: boolean;
+  ConfirmationBlockHeight: number;
+  // PostEntryResponse of the post that this post reposts.
+  RepostedPostEntryResponse: PostEntryResponse;
+  // The profile associated with this post.
+  ProfileEntryResponse: ProfileEntryResponse;
+  // The comments associated with this post.
+  Comments: PostEntryResponse[];
+  LikeCount: number;
+  RepostCount: number;
+  QuoteRepostCount: number;
+  DiamondCount: number;
+  // Information about the reader's state w/regard to this post (e.g. if they liked it).
+  PostEntryReaderState?: PostEntryReaderState;
+  // True if this post hash hex is in the global feed.
+  InGlobalFeed: boolean;
+  CommentCount: number;
+  // A list of parent posts for this post (ordered: root -> closest parent post).
+  ParentPosts: PostEntryResponse[];
+  InMempool: boolean;
+  IsPinned: boolean;
+  DiamondsFromSender?: number;
+  NumNFTCopies: number;
+  NumNFTCopiesForSale: number;
+  HasUnlockable: boolean;
+  IsNFT: boolean;
+  NFTRoyaltyToCoinBasisPoints: number;
+  NFTRoyaltyToCreatorBasisPoints: number;
+  AdditionalDESORoyaltiesMap: { [k: string]: number };
+  AdditionalCoinRoyaltiesMap: { [k: string]: number };
+}
+
+
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
   PublicKeyBase58Check: string = "";
@@ -43,11 +103,66 @@ type CountryLevelSignUpBonus = {
   KickbackAmountOverrideUSDCents: number;
 };
 
+export enum CreatorCoinLimitOperationString {
+  ANY = "any",
+  BUY = "buy",
+  SELL = "sell",
+  TRANSFER = "transfer",
+}
+
+export enum DAOCoinLimitOperationString {
+  ANY = "any",
+  MINT = "mint",
+  BURN = "burn",
+  DISABLE_MINTING = "disable_minting",
+  UPDATE_TRANSFER_RESTRICTION_STATUS = "update_transfer_restriction_status",
+  TRANSFER = "transfer",
+}
+
+export type CoinLimitOperationString = DAOCoinLimitOperationString | CreatorCoinLimitOperationString;
+
+export type CoinOperationLimitMap<T extends CoinLimitOperationString> = {
+  [public_key: string]: OperationToCountMap<T>;
+};
+
+export type OperationToCountMap<T extends LimitOperationString> = {
+  [operation in T]?: number;
+};
+
+export type LimitOperationString = DAOCoinLimitOperationString | CreatorCoinLimitOperationString | NFTLimitOperationString;
+export type CreatorCoinOperationLimitMap = CoinOperationLimitMap<CreatorCoinLimitOperationString>;
+export type DAOCoinOperationLimitMap = CoinOperationLimitMap<DAOCoinLimitOperationString>;
+
+export enum NFTLimitOperationString {
+  ANY = "any",
+  UPDATE = "update",
+  BID = "nft_bid",
+  ACCEPT_BID = "accept_nft_bid",
+  TRANSFER = "transfer",
+  BURN = "burn",
+  ACCEPT_TRANSFER = "accept_nft_transfer",
+}
+export type NFTOperationLimitMap = {
+  [post_hash_hex: string]: {
+    [serial_number: number]: OperationToCountMap<NFTLimitOperationString>;
+  };
+};
+
+export type TransactionSpendingLimitResponse = {
+  GlobalDESOLimit: number;
+  // TODO: make enum for transaction type string
+  TransactionCountLimitMap?: { [k: string]: number };
+  CreatorCoinOperationLimitMap?: CreatorCoinOperationLimitMap;
+  DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
+  NFTOperationLimitMap?: NFTOperationLimitMap;
+  DerivedKeyMemo?: string;
+};
+
 @Injectable({
   providedIn: 'root'
 })
 export class BackendAPIService {
-  endpoint = `https://${environment.nodeHostname}/api/v0`;
+  endpoint = `${environment.nodeURL}/api/v0`;
 
   constructor(
     private httpClient: HttpClient,
@@ -57,8 +172,20 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService,
   ) { }
 
+  getRoute(path: string): string {
+    let endpoint = this.endpoint;
+    if (this.globalVars.network === Network.testnet && this.endpoint.startsWith("https://node.deso.org")) {
+      endpoint = "https://test.deso.org/api/v0";
+    }
+    return `${endpoint}/${path}`;
+  }
+
+  get(path: string): Observable<any> {
+    return this.httpClient.get<any>(this.getRoute(path));
+  }
+
   post(path: string, body: any): Observable<any> {
-    return this.httpClient.post<any>(`${this.endpoint}/${path}`, body);
+    return this.httpClient.post<any>(this.getRoute(path), body);
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
@@ -85,8 +212,7 @@ export class BackendAPIService {
   GetUsersStateless(
     publicKeys: string[], SkipForLeaderboard: boolean = false,
   ): Observable<{ UserList: User[]}> {
-    return this.httpClient.post<any>(
-      `${this.endpoint}/get-users-stateless`,
+    return this.post('get-users-stateless',
       {
         PublicKeysBase58Check: publicKeys,
         SkipForLeaderboard,
@@ -124,7 +250,7 @@ export class BackendAPIService {
   }
 
   GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {
-    return `${this.endpoint}/get-single-profile-picture/${PublicKeyBase58Check}`;
+    return `${this.getRoute('get-single-profile-picture')}/${PublicKeyBase58Check}`;
   }
 
   JumioBegin(PublicKey: string, ReferralHashBase58: string, SuccessURL: string, ErrorURL: string): Observable<any> {
@@ -136,8 +262,7 @@ export class BackendAPIService {
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
     const jwt = this.signingService.signJWT(seedHex);
 
-    return this.httpClient.post<any>(
-      `${this.endpoint}/jumio-begin`,
+    return this.post('jumio-begin',
       {
         JWT: jwt,
         PublicKey,
@@ -149,7 +274,7 @@ export class BackendAPIService {
   }
 
   GetAppState(): Observable<any> {
-    return this.httpClient.post<any>(`${this.endpoint}/get-app-state`, {
+    return this.post('get-app-state', {
       PublicKeyBase58Check: '',
     });
   }
@@ -163,7 +288,7 @@ export class BackendAPIService {
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
     const jwt = this.signingService.signJWT(seedHex);
 
-    return this.httpClient.post<any>(`${this.endpoint}/jumio-flow-finished`, {
+    return this.post('jumio-flow-finished', {
       PublicKey,
       JumioInternalReference,
       JWT: jwt,
@@ -173,7 +298,7 @@ export class BackendAPIService {
   GetReferralInfoForReferralHash(
     ReferralHash: string
   ): Observable<{ ReferralInfoResponse: any; CountrySignUpBonus: CountryLevelSignUpBonus }> {
-    return this.httpClient.post<any>(`${this.endpoint}/get-referral-info-for-referral-hash`, {
+    return this.post('get-referral-info-for-referral-hash', {
       ReferralHash,
     });
   }
@@ -182,8 +307,7 @@ export class BackendAPIService {
     ownerPublicKey: string
   ): Observable< { [key: string]: DerivedKey } > {
     const derivedKeys: { [key: string]: DerivedKey } = {};
-    const req = this.httpClient.post<any>(
-      `${this.endpoint}/get-user-derived-keys`,
+    const req = this.post('get-user-derived-keys',
       {
         PublicKeyBase58Check: ownerPublicKey,
       },
@@ -197,6 +321,7 @@ export class BackendAPIService {
               ownerPublicKeyBase58Check: res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
               expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
               isValid: res.DerivedKeys[derivedKey]?.IsValid,
+              transactionSpendingLimit: res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
             };
           }
         }
@@ -208,8 +333,7 @@ export class BackendAPIService {
   GetTransactionSpending(
     transactionHex: string
   ): Observable<number> {
-    const req = this.httpClient.post<any>(
-      `${this.endpoint}/get-transaction-spending`,
+    const req = this.post('get-transaction-spending',
       {
         TransactionHex: transactionHex,
       },
@@ -249,5 +373,48 @@ export class BackendAPIService {
       PhoneNumberCountryCode,
       VerificationCode,
     });
+  }
+
+  GetTransactionSpendingLimitHexString(
+    TransactionSpendingLimitResponse: TransactionSpendingLimitResponse
+  ): Observable<string> {
+    return this.post("get-transaction-spending-limit-hex-string", {
+      TransactionSpendingLimit: TransactionSpendingLimitResponse,
+    }).pipe(
+      map(
+        res => {
+          return res.HexString;
+    }),
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  GetTransactionSpendingLimitResponseFromHex(
+    hex: string
+  ): Observable<TransactionSpendingLimitResponse> {
+    return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`)
+  }
+
+  GetSinglePost(PostHashHex: string,
+                ReaderPublicKeyBase58Check: string = "",
+                FetchParents: boolean = false,
+                CommentOffset: number = 0,
+                CommentLimit: number = 0,
+                AddGlobalFeedBool: boolean = false
+  ): Observable<PostEntryResponse | undefined> {
+    return this.post("get-single-post", {
+      PostHashHex,
+      ReaderPublicKeyBase58Check,
+      FetchParents,
+      CommentOffset,
+      CommentLimit,
+      AddGlobalFeedBool,
+    }).pipe(
+      map(
+        res => res.PostFound
+      )
+    );
   }
 }

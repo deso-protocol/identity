@@ -124,7 +124,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const y = window.outerHeight / 2 + window.screenY - h / 2;
     const x = window.outerWidth / 2 + window.screenX - w / 2;
 
-    window.open(`https://${environment.nodeHostname}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
   }
 
   ////// ENTROPY //////
