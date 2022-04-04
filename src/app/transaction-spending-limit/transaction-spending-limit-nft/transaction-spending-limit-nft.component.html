@@ -42,7 +42,8 @@
       </ng-container>
       <ng-container
         *ngIf="!post">
-        NFT Post not found
+        <div *ngIf="nftPostHashHex === ''">All NFTs</div>
+        <div *ngIf="nftPostHashHex !== ''">NFT Post not found</div>
       </ng-container>
     </div>
     <div
