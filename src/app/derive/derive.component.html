@@ -8,6 +8,20 @@
     <div class="font-weight-bold fs-30px mb-20px" *ngIf="globalVars.callback">
       Grant signing access
     </div>
+    <div
+      class="font-weight-bold fs-18px mb-20px"
+      style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"
+      *ngIf="publicKeyBase58Check"
+    >
+      Public Key: {{ publicKeyBase58Check }}
+    </div>
+    <div
+      class="font-weight-bold fs-18px mb-20px"
+      style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all;"
+      *ngIf="derivedPublicKeyBase58Check"
+    >
+      Derived Public Key: {{ derivedPublicKeyBase58Check }}
+    </div>
     <app-transaction-spending-limit
       [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       *ngIf="transactionSpendingLimitResponse"
