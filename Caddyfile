@@ -40,11 +40,24 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending-limit-hex-string
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending-limit-response-from-hex/
     {$DOMAIN:https://node.deso.org}/api/v0/get-single-post
+    https://test.deso.org/api/v0/get-users-stateless
+    https://test.deso.org/api/v0/get-app-state
+    https://test.deso.org/api/v0/jumio-begin
+    https://test.deso.org/api/v0/jumio-flow-finished
+    https://test.deso.org/api/v0/get-referral-info-for-referral-hash
+    https://test.deso.org/api/v0/get-user-derived-keys
+    https://test.deso.org/api/v0/get-transaction-spending
+    https://test.deso.org/api/v0/send-phone-number-verification-text
+    https://test.deso.org/api/v0/submit-phone-number-verification-code
+    https://test.deso.org/api/v0/get-transaction-spending-limit-hex-string
+    https://test.deso.org/api/v0/get-transaction-spending-limit-response-from-hex/
+    https://test.deso.org/api/v0/get-single-post
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files;
   img-src 'self'
       {$DOMAIN:https://node.deso.org}/api/v0/get-single-profile-picture/
+      https://test.deso.org/api/v0/get-single-profile-picture/
       i.imgur.com
       images.deso.org
       images.bitclout.com
