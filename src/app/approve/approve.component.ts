@@ -65,7 +65,6 @@ export class ApproveComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
     this.activatedRoute.queryParams.subscribe(params => {
       this.transactionHex = params.tx;
       this.backendApi.GetTransactionSpending(this.transactionHex).subscribe( res => {
