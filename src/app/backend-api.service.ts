@@ -7,7 +7,7 @@ import {SigningService} from './signing.service';
 import {AccountService} from './account.service';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {DerivedKey, UserProfile} from '../types/identity';
+import {DerivedKey, Network, UserProfile} from '../types/identity';
 import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export class ProfileEntryResponse {
@@ -172,12 +172,20 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService,
   ) { }
 
+  getRoute(path: string): string {
+    let endpoint = this.endpoint;
+    if (this.globalVars.network === Network.testnet && this.endpoint.startsWith("https://node.deso.org")) {
+      endpoint = "https://test.deso.org/api/v0";
+    }
+    return `${endpoint}/${path}`;
+  }
+
   get(path: string): Observable<any> {
-    return this.httpClient.get<any>(`${this.endpoint}/${path}`);
+    return this.httpClient.get<any>(this.getRoute(path));
   }
 
   post(path: string, body: any): Observable<any> {
-    return this.httpClient.post<any>(`${this.endpoint}/${path}`, body);
+    return this.httpClient.post<any>(this.getRoute(path), body);
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
@@ -204,8 +212,7 @@ export class BackendAPIService {
   GetUsersStateless(
     publicKeys: string[], SkipForLeaderboard: boolean = false,
   ): Observable<{ UserList: User[]}> {
-    return this.httpClient.post<any>(
-      `${this.endpoint}/get-users-stateless`,
+    return this.post('get-users-stateless',
       {
         PublicKeysBase58Check: publicKeys,
         SkipForLeaderboard,
@@ -243,7 +250,7 @@ export class BackendAPIService {
   }
 
   GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {
-    return `${this.endpoint}/get-single-profile-picture/${PublicKeyBase58Check}`;
+    return `${this.getRoute('get-single-profile-picture')}/${PublicKeyBase58Check}`;
   }
 
   JumioBegin(PublicKey: string, ReferralHashBase58: string, SuccessURL: string, ErrorURL: string): Observable<any> {
@@ -255,8 +262,7 @@ export class BackendAPIService {
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
     const jwt = this.signingService.signJWT(seedHex);
 
-    return this.httpClient.post<any>(
-      `${this.endpoint}/jumio-begin`,
+    return this.post('jumio-begin',
       {
         JWT: jwt,
         PublicKey,
@@ -268,7 +274,7 @@ export class BackendAPIService {
   }
 
   GetAppState(): Observable<any> {
-    return this.httpClient.post<any>(`${this.endpoint}/get-app-state`, {
+    return this.post('get-app-state', {
       PublicKeyBase58Check: '',
     });
   }
@@ -282,7 +288,7 @@ export class BackendAPIService {
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
     const jwt = this.signingService.signJWT(seedHex);
 
-    return this.httpClient.post<any>(`${this.endpoint}/jumio-flow-finished`, {
+    return this.post('jumio-flow-finished', {
       PublicKey,
       JumioInternalReference,
       JWT: jwt,
@@ -292,7 +298,7 @@ export class BackendAPIService {
   GetReferralInfoForReferralHash(
     ReferralHash: string
   ): Observable<{ ReferralInfoResponse: any; CountrySignUpBonus: CountryLevelSignUpBonus }> {
-    return this.httpClient.post<any>(`${this.endpoint}/get-referral-info-for-referral-hash`, {
+    return this.post('get-referral-info-for-referral-hash', {
       ReferralHash,
     });
   }
@@ -301,8 +307,7 @@ export class BackendAPIService {
     ownerPublicKey: string
   ): Observable< { [key: string]: DerivedKey } > {
     const derivedKeys: { [key: string]: DerivedKey } = {};
-    const req = this.httpClient.post<any>(
-      `${this.endpoint}/get-user-derived-keys`,
+    const req = this.post('get-user-derived-keys',
       {
         PublicKeyBase58Check: ownerPublicKey,
       },
@@ -328,8 +333,7 @@ export class BackendAPIService {
   GetTransactionSpending(
     transactionHex: string
   ): Observable<number> {
-    const req = this.httpClient.post<any>(
-      `${this.endpoint}/get-transaction-spending`,
+    const req = this.post('get-transaction-spending',
       {
         TransactionHex: transactionHex,
       },
