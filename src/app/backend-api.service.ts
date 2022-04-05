@@ -135,9 +135,7 @@ export type DAOCoinOperationLimitMap = CoinOperationLimitMap<DAOCoinLimitOperati
 export type DAOCoinLimitOrderLimitMap = { [buying_public_key: string]: { [selling_public_key: string]: number }};
 export type DAOCoinLimitOrderLimitItem = {
   BuyingPublicKey: string;
-  BuyingUser: User | undefined;
   SellingPublicKey: string;
-  SellingUser: User | undefined;
   OpCount: number;
 }
 

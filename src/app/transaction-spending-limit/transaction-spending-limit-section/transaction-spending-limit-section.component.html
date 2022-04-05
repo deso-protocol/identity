@@ -1,6 +1,6 @@
-<ng-container *ngIf="globalVars.ObjectKeyLength(sectionMap) || anyCreatorItem || anyNFTItem">
+<ng-container *ngIf="getSectionMapLength() || anyCreatorItem || anyNFTItem">
   <div class="flex-grow-1 transaction-spending-limit-separator pt-15px"></div>
-  <div *ngIf="globalVars.ObjectKeyLength(sectionMap)" class="py-15px">
+  <div *ngIf="getSectionMapLength()" class="py-15px">
     <div class="d-flex justify-content-between">
       <div class="d-flex flex-column">
         <div class="fs-18px">{{ sectionTitle }}</div>
@@ -54,7 +54,6 @@
           <app-transaction-spending-limit-coin
             coinPublicKey=""
             [coinOperationMap]="anyCreatorItem"
-            [sectionTitle]="sectionTitle"
           ></app-transaction-spending-limit-coin>
         </div>
         <div
@@ -67,7 +66,6 @@
           <app-transaction-spending-limit-coin
             [coinPublicKey]="coinLimitItem.key"
             [coinOperationMap]="coinLimitItem.value"
-            [sectionTitle]="sectionTitle"
             [user]="userMap[coinLimitItem.key]"
             class="pb-15px"
           ></app-transaction-spending-limit-coin>
@@ -83,7 +81,6 @@
           <app-transaction-spending-limit-nft
             nftPostHashHex=""
             [nftSerialNumToOperationMap]="anyNFTItem"
-            [sectionTitle]="sectionTitle"
           ></app-transaction-spending-limit-nft>
         </div>
         <div
@@ -97,7 +94,6 @@
           <app-transaction-spending-limit-nft
             [nftPostHashHex]="nftLimitItem.key"
             [nftSerialNumToOperationMap]="nftLimitItem.value"
-            [sectionTitle]="sectionTitle"
             class="pb-15px"
           ></app-transaction-spending-limit-nft>
           <div
@@ -109,19 +105,28 @@
       </ng-container>
       <ng-container
         *ngIf="sectionTitle == TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection">
-        <ng-container *ngFor="
+        <div class="d-flex pb-10px">
+          <div class="col-5">
+            Buying
+          </div>
+          <div class="col-5">
+            Selling
+          </div>
+          <div class="col-2">
+            Count
+          </div>
+        </div>
+        <div *ngFor="
         let daoCoinLimitOrderLimitItem of daoCoinLimitOrderLimitItems |
-          slice:0:(showAll ? globalVars.ObjectKeyLength(daoCoinLimitOrderLimitItems) : defaultNumShown);
-        let ii = index"
+          slice:0:(showAll ? daoCoinLimitOrderLimitItems.length : defaultNumShown)"
+             class="d-flex flex-column pb-15px"
         >
           <app-transaction-spending-limit-dao-coin-limit-order
             [daoCoinLimitOrderLimitItem]="daoCoinLimitOrderLimitItem"
+            [buyingUser]="userMap[daoCoinLimitOrderLimitItem.BuyingPublicKey]"
+            [sellingUser]="userMap[daoCoinLimitOrderLimitItem.SellingPublicKey]"
           ></app-transaction-spending-limit-dao-coin-limit-order>
-          <div
-            class="flex-grow-1 transaction-spending-limit-separator"
-            *ngIf="ii < (showAll ? globalVars.ObjectKeyLength(daoCoinLimitOrderLimitItems) : defaultNumShown) -1 "
-          ></div>
-        </ng-container>
+        </div>
       </ng-container>
     </div>
   </div>
@@ -130,8 +135,8 @@
     *ngIf="showDetails"
     class="d-flex justify-content-center mr-15px ml-15px"
     style="background: lightgray; border: 1px solid darkgray; border-radius: 2px"
-    (click)="showDetails = !showAll; showAll = !showAll || globalVars.ObjectKeyLength(sectionMap) <= defaultNumShown;"
+    (click)="showDetails = !showAll; showAll = !showAll || getSectionMapLength() <= defaultNumShown;"
   >
-    {{ showAll ? "Hide" : "Show all" }} {{ globalVars.ObjectKeyLength(sectionMap) }} {{ sectionItemType() }}s
+    {{ showAll ? "Hide" : "Show all" }} {{ getSectionMapLength() }} {{ sectionItemType() }}s
   </div>
 </ng-container>

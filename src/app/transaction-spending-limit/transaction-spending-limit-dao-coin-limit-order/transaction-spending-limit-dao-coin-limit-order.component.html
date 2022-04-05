@@ -2,46 +2,40 @@
   class="d-flex flex-column"
 >
   <div class="d-flex">
-    <div class="d-flex flex-column">
-      <div>Buying</div>
-      <div class="d-flex justify-content-start align-items-center">
+      <div class="d-flex justify-content-start align-items-center col-5">
         <div
           class="avatar mr-15px"
           [appAvatar]="daoCoinLimitOrderLimitItem?.BuyingPublicKey"
           *ngIf="daoCoinLimitOrderLimitItem?.BuyingPublicKey !== 'DESO'"></div>
         <div
           class="d-block"
-          style="text-overflow: ellipsis; display: block; max-width: 200px; overflow: hidden;"
+          style="text-overflow: ellipsis; display: block; max-width: 100px; overflow: hidden;"
         >
           {{
             daoCoinLimitOrderLimitItem?.BuyingPublicKey === "DESO" ? "DESO" :
-            daoCoinLimitOrderLimitItem?.BuyingUser?.ProfileEntryResponse?.Username ||
+            buyingUser?.ProfileEntryResponse?.Username ||
             daoCoinLimitOrderLimitItem?.BuyingPublicKey
           }}
         </div>
       </div>
-    </div>
-    <div class="d-flex flex-column">
-      <div>Selling</div>
-      <div class="d-flex justify-content-start align-items-center">
+
+      <div class="d-flex justify-content-start align-items-center col-5">
         <div
           class="avatar mr-15px"
           [appAvatar]="daoCoinLimitOrderLimitItem?.SellingPublicKey"
           *ngIf="daoCoinLimitOrderLimitItem?.SellingPublicKey !== 'DESO'"></div>
         <div
           class="d-block"
-          style="text-overflow: ellipsis; display: block; max-width: 200px; overflow: hidden;"
+          style="text-overflow: ellipsis; display: block; max-width: 100px; overflow: hidden;"
         >
           {{
           daoCoinLimitOrderLimitItem?.SellingPublicKey === "DESO" ? "DESO" :
-          daoCoinLimitOrderLimitItem?.SellingUser?.ProfileEntryResponse?.Username ||
+          sellingUser?.ProfileEntryResponse?.Username ||
           daoCoinLimitOrderLimitItem?.SellingPublicKey
           }}
         </div>
       </div>
-    </div>
-    <div class="d-flex flex-column">
-      <div>Count</div>
+    <div class="d-flex col-2 align-items-center justify-content-center">
       <div>{{ daoCoinLimitOrderLimitItem?.OpCount }}</div>
     </div>
   </div>

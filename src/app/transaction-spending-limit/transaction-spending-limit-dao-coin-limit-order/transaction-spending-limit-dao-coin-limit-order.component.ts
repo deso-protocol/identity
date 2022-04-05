@@ -1,10 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {BackendAPIService,
-  CreatorCoinLimitOperationString,
+import { CreatorCoinLimitOperationString,
   DAOCoinLimitOperationString,
   DAOCoinLimitOrderLimitItem,
-  OperationToCountMap, User} from '../../backend-api.service';
-import {GlobalVarsService} from '../../global-vars.service';
+  OperationToCountMap, User } from '../../backend-api.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
 @Component({
@@ -14,25 +12,12 @@ import { TransactionSpendingLimitComponent } from '../transaction-spending-limit
 })
 export class TransactionSpendingLimitDaoCoinLimitOrderComponent implements OnInit {
 
-  @Input() daoCoinLimitOrderLimitItem: DAOCoinLimitOrderLimitItem | undefined; 
-  expandCreator: boolean = false;
-  defaultNumShown: number = 5;
+  @Input() daoCoinLimitOrderLimitItem: DAOCoinLimitOrderLimitItem | undefined;
+  @Input() buyingUser: User | undefined;
+  @Input() sellingUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
-  constructor(
-    public globalVars: GlobalVarsService,
-    private backendApi: BackendAPIService,
-  ) { }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
-
-  getOperationsString(operationsMap: OperationToCountMap<CreatorCoinLimitOperationString> | OperationToCountMap<DAOCoinLimitOperationString> | undefined): string {
-    if (!operationsMap) {
-      return "";
-    }
-    return Object.keys(operationsMap).sort().map(
-      (op) => this.globalVars.cleanSpendingLimitOperationName(op)
-    ).join(", ");
-  }
+  ngOnInit(): void {}
 }

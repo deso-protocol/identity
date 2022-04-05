@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {BackendAPIService,
-  CreatorCoinLimitOperationString,
+import { CreatorCoinLimitOperationString,
   DAOCoinLimitOperationString,
-  OperationToCountMap, User} from '../../backend-api.service';
+  OperationToCountMap, User } from '../../backend-api.service';
 import {GlobalVarsService} from '../../global-vars.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
@@ -15,16 +14,13 @@ export class TransactionSpendingLimitCoinComponent implements OnInit {
 
   @Input() coinPublicKey: string = "";
   @Input() coinOperationMap: OperationToCountMap<CreatorCoinLimitOperationString> | OperationToCountMap<DAOCoinLimitOperationString> | undefined;
-  @Input() sectionTitle: string = "";
 
   @Input() user: User | undefined;
   expandCreator: boolean = false;
-  defaultNumShown: number = 5;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
   constructor(
     public globalVars: GlobalVarsService,
-    private backendApi: BackendAPIService,
   ) { }
 
   ngOnInit(): void {
