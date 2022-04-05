@@ -107,8 +107,11 @@ export class IdentityService {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();
         for (const key in derivedPrivateUserInfo) {
-          if (derivedPrivateUserInfo.hasOwnProperty(key) && (derivedPrivateUserInfo as any)[key]) {
-            httpParams = httpParams.append(key, (derivedPrivateUserInfo as any)[key].toString());
+          if (derivedPrivateUserInfo.hasOwnProperty(key)) {
+            const paramVal = (derivedPrivateUserInfo as any)[key];
+            if (paramVal !== null && paramVal !== undefined) {
+              httpParams = httpParams.append(key, paramVal.toString());
+            }
           }
         }
         window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
