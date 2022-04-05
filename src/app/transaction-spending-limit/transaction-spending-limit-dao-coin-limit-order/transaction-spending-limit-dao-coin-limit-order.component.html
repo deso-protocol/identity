@@ -13,7 +13,7 @@
           style="text-overflow: ellipsis; display: block; max-width: 100px; overflow: hidden;"
         >
           {{
-            daoCoinLimitOrderLimitItem?.BuyingPublicKey === "DESO" ? "DESO" :
+            daoCoinLimitOrderLimitItem?.BuyingPublicKey === "DESO" ? "$DESO" :
             buyingUser?.ProfileEntryResponse?.Username ||
             daoCoinLimitOrderLimitItem?.BuyingPublicKey
           }}
@@ -30,7 +30,7 @@
           style="text-overflow: ellipsis; display: block; max-width: 100px; overflow: hidden;"
         >
           {{
-          daoCoinLimitOrderLimitItem?.SellingPublicKey === "DESO" ? "DESO" :
+          daoCoinLimitOrderLimitItem?.SellingPublicKey === "DESO" ? "$DESO" :
           sellingUser?.ProfileEntryResponse?.Username ||
           daoCoinLimitOrderLimitItem?.SellingPublicKey
           }}
