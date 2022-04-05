@@ -132,6 +132,14 @@ export type OperationToCountMap<T extends LimitOperationString> = {
 export type LimitOperationString = DAOCoinLimitOperationString | CreatorCoinLimitOperationString | NFTLimitOperationString;
 export type CreatorCoinOperationLimitMap = CoinOperationLimitMap<CreatorCoinLimitOperationString>;
 export type DAOCoinOperationLimitMap = CoinOperationLimitMap<DAOCoinLimitOperationString>;
+export type DAOCoinLimitOrderLimitMap = { [buying_public_key: string]: { [selling_public_key: string]: number }};
+export type DAOCoinLimitOrderLimitItem = {
+  BuyingPublicKey: string;
+  BuyingUser: User | undefined;
+  SellingPublicKey: string;
+  SellingUser: User | undefined;
+  OpCount: number;
+}
 
 export enum NFTLimitOperationString {
   ANY = "any",
@@ -155,6 +163,7 @@ export type TransactionSpendingLimitResponse = {
   CreatorCoinOperationLimitMap?: CreatorCoinOperationLimitMap;
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
+  DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
   DerivedKeyMemo?: string;
 };
 

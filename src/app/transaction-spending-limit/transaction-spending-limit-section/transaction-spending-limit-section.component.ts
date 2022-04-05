@@ -3,6 +3,8 @@ import {BackendAPIService,
   CreatorCoinLimitOperationString,
   CreatorCoinOperationLimitMap,
   DAOCoinLimitOperationString,
+  DAOCoinLimitOrderLimitItem,
+  DAOCoinLimitOrderLimitMap,
   DAOCoinOperationLimitMap,
   NFTLimitOperationString,
   NFTOperationLimitMap, OperationToCountMap, User} from '../../backend-api.service';
@@ -19,7 +21,8 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   @Input() sectionMap: { [k: string]: number } |
     CreatorCoinOperationLimitMap |
     DAOCoinOperationLimitMap |
-    NFTOperationLimitMap = {};
+    NFTOperationLimitMap |
+    DAOCoinLimitOrderLimitMap = {};
   @Input() sectionTitle: string = "";
 
   @Input() userMap: { [k: string]: User } = {};
@@ -36,6 +39,8 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   coinLimitMap: CreatorCoinOperationLimitMap | DAOCoinOperationLimitMap = {};
   txnLimitMap: { [k: string]: number} = {};
   nftLimitMap: NFTOperationLimitMap = {};
+  daoCoinLimitOrderLimitMap: DAOCoinLimitOrderLimitMap = {};
+  daoCoinLimitOrderLimitItems: DAOCoinLimitOrderLimitItem[] = [];
 
   constructor(
     public globalVars: GlobalVarsService,
@@ -43,23 +48,58 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.sectionTitle === TransactionSpendingLimitComponent.TransactionLimitsSection) {
-      this.txnLimitMap = this.sectionMap as { [k: string]: number }
+    switch (this.sectionTitle) {
+      case TransactionSpendingLimitComponent.TransactionLimitsSection:
+        this.txnLimitMap = this.sectionMap as { [k: string]: number };
+        break;
+      case TransactionSpendingLimitComponent.CreatorCoinLimitsSection:
+      case TransactionSpendingLimitComponent.DAOCoinLimitsSection:
+        this.anyCreatorItem = this.sectionMap[""] as (
+          OperationToCountMap<CreatorCoinLimitOperationString> |
+          OperationToCountMap<DAOCoinLimitOperationString> |
+          undefined);
+        delete this.sectionMap[""];
+        this.coinLimitMap = this.sectionMap as (CreatorCoinOperationLimitMap | DAOCoinOperationLimitMap);
+        break;
+      case TransactionSpendingLimitComponent.NFTLimitsSection:
+        this.anyNFTItem = this.sectionMap[""] as (OperationToCountMap<NFTLimitOperationString> | undefined);
+        delete this.sectionMap[""];
+        this.nftLimitMap = this.sectionMap as NFTOperationLimitMap;
+        break;
+      case TransactionSpendingLimitComponent.NFTLimitsSection:
+        this.daoCoinLimitOrderLimitMap = this.sectionMap as DAOCoinLimitOrderLimitMap;
+        for (const buyingPublicKey of Object.keys(this.daoCoinLimitOrderLimitMap)) {
+          const sellingPublicKeys = Object.keys(this.daoCoinLimitOrderLimitMap[buyingPublicKey]);
+          sellingPublicKeys.map(
+            (sellingPublicKey) => {
+              this.daoCoinLimitOrderLimitItems.push({
+                BuyingPublicKey: buyingPublicKey,
+                BuyingUser: this.userMap[buyingPublicKey],
+                SellingPublicKey: sellingPublicKey,
+                SellingUser: this.userMap[sellingPublicKey],
+                OpCount: this.daoCoinLimitOrderLimitMap[buyingPublicKey][sellingPublicKey],
+              });
+            })
+        }
     }
-    if (this.sectionTitle === TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
-      this.sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitsSection) {
-      this.anyCreatorItem = this.sectionMap[""] as (
-        OperationToCountMap<CreatorCoinLimitOperationString> |
-        OperationToCountMap<DAOCoinLimitOperationString> |
-        undefined);
-      delete this.sectionMap[""];
-      this.coinLimitMap = this.sectionMap as (CreatorCoinOperationLimitMap | DAOCoinOperationLimitMap)
-    }
-    if (this.sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection) {
-      this.anyNFTItem = this.sectionMap[""] as (OperationToCountMap<NFTLimitOperationString> | undefined);
-      delete this.sectionMap[""];
-      this.nftLimitMap = this.sectionMap as NFTOperationLimitMap;
-    }
+    // if (this.sectionTitle === TransactionSpendingLimitComponent.TransactionLimitsSection) {
+    //   this.txnLimitMap = this.sectionMap as { [k: string]: number }
+    // }
+    // if (this.sectionTitle === TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
+    //   this.sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitsSection) {
+    //   this.anyCreatorItem = this.sectionMap[""] as (
+    //     OperationToCountMap<CreatorCoinLimitOperationString> |
+    //     OperationToCountMap<DAOCoinLimitOperationString> |
+    //     undefined);
+    //   delete this.sectionMap[""];
+    //   this.coinLimitMap = this.sectionMap as (CreatorCoinOperationLimitMap | DAOCoinOperationLimitMap)
+    // }
+    // if (this.sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection) {
+    //   this.anyNFTItem = this.sectionMap[""] as (OperationToCountMap<NFTLimitOperationString> | undefined);
+    //   delete this.sectionMap[""];
+    //   this.nftLimitMap = this.sectionMap as NFTOperationLimitMap;
+    // }
+
     this.showAll = this.globalVars.ObjectKeyLength(this.sectionMap) <= this.defaultNumShown;
   }
 
@@ -74,6 +114,8 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return "DAO coin"
       case TransactionSpendingLimitComponent.NFTLimitsSection:
         return "NFT"
+      case TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection:
+        return "DAO coin limit order"
       default:
         return "";
     }

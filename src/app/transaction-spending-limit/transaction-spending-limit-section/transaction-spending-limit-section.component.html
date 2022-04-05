@@ -107,6 +107,22 @@
         </div>
 
       </ng-container>
+      <ng-container
+        *ngIf="sectionTitle == TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection">
+        <ng-container *ngFor="
+        let daoCoinLimitOrderLimitItem of daoCoinLimitOrderLimitItems |
+          slice:0:(showAll ? globalVars.ObjectKeyLength(daoCoinLimitOrderLimitItems) : defaultNumShown);
+        let ii = index"
+        >
+          <app-transaction-spending-limit-dao-coin-limit-order
+            [daoCoinLimitOrderLimitItem]="daoCoinLimitOrderLimitItem"
+          ></app-transaction-spending-limit-dao-coin-limit-order>
+          <div
+            class="flex-grow-1 transaction-spending-limit-separator"
+            *ngIf="ii < (showAll ? globalVars.ObjectKeyLength(daoCoinLimitOrderLimitItems) : defaultNumShown) -1 "
+          ></div>
+        </ng-container>
+      </ng-container>
     </div>
   </div>
 
