@@ -352,7 +352,7 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   cancelExistingOrder: boolean = false;
 
   @Transcode(VarBuffer)
-  matchedBidsTransactors: Buffer = Buffer.alloc(0);
+  bidderInputs: Buffer = Buffer.alloc(0);
 }
 
 export const TransactionTypeMetadataMap = {
