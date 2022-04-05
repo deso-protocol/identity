@@ -5,8 +5,9 @@
       <div class="d-flex justify-content-start align-items-center col-5">
         <div
           class="avatar mr-15px"
-          [appAvatar]="daoCoinLimitOrderLimitItem?.BuyingPublicKey"
-          *ngIf="daoCoinLimitOrderLimitItem?.BuyingPublicKey !== 'DESO'"></div>
+          [appAvatar]="daoCoinLimitOrderLimitItem?.BuyingPublicKey !== 'DESO' ?
+                        daoCoinLimitOrderLimitItem?.BuyingPublicKey : ''"
+        ></div>
         <div
           class="d-block"
           style="text-overflow: ellipsis; display: block; max-width: 100px; overflow: hidden;"
@@ -22,8 +23,8 @@
       <div class="d-flex justify-content-start align-items-center col-5">
         <div
           class="avatar mr-15px"
-          [appAvatar]="daoCoinLimitOrderLimitItem?.SellingPublicKey"
-          *ngIf="daoCoinLimitOrderLimitItem?.SellingPublicKey !== 'DESO'"></div>
+          [appAvatar]="daoCoinLimitOrderLimitItem?.SellingPublicKey !== 'DESO' ?
+                        daoCoinLimitOrderLimitItem?.SellingPublicKey : ''"></div>
         <div
           class="d-block"
           style="text-overflow: ellipsis; display: block; max-width: 100px; overflow: hidden;"
