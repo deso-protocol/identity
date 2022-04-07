@@ -148,7 +148,7 @@ export type NFTOperationLimitMap = {
   };
 };
 
-export type TransactionSpendingLimitResponse = {
+export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
   // TODO: make enum for transaction type string
   TransactionCountLimitMap?: { [k: string]: number };
