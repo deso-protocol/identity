@@ -145,7 +145,7 @@ export class SigningService {
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
     const transactionHash = new Buffer(sha256.x2(transactionBytes), 'hex');
-    const signature = privateKey.sign(transactionHash);
+    const signature = privateKey.sign(transactionHash, { canonical: true });
     const signatureBytes = new Buffer(signature.toDER());
     const signatureLength = uvarint64ToBuf(signatureBytes.length);
 
