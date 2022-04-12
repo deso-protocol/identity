@@ -37,8 +37,7 @@ export class TransactionSpendingLimitNftComponent implements OnInit {
         of(undefined)
     ).subscribe((res) => {
         this.post = res;
-        this.loaded = true;
-      });
+      }).add(() => this.loaded = true);
   }
 
   getOperationsString(operationsMap: { [k: number]: OperationToCountMap<NFTLimitOperationString>} | undefined): string {
