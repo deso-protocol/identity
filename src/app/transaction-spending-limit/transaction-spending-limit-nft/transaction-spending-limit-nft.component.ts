@@ -15,7 +15,6 @@ export class TransactionSpendingLimitNftComponent implements OnInit {
 
   @Input() nftPostHashHex: string = "";
   @Input() nftSerialNumToOperationMap: { [k: number]: OperationToCountMap<NFTLimitOperationString> } | undefined;
-  @Input() sectionTitle: string = "";
 
   showAll: boolean = false;
   expandNFT: boolean = false;

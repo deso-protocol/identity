@@ -26,6 +26,13 @@
     *ngIf="transactionSpendingLimitResponse.NFTOperationLimitMap"
   >
   </app-transaction-spending-limit-section>
+  <app-transaction-spending-limit-section
+    [sectionMap]="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
+    [sectionTitle]="TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection"
+    [userMap]="userMap"
+    *ngIf="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
+  >
+  </app-transaction-spending-limit-section>
   <div *ngIf="transactionSpendingLimitResponse.DerivedKeyMemo">
     <div class="flex-grow-1 transaction-spending-limit-separator pt-15px"></div>
     <div class="py-15px mb-2">

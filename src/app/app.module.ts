@@ -38,6 +38,7 @@ import { TransactionSpendingLimitCoinComponent } from './transaction-spending-li
 import { TransactionSpendingLimitNftComponent } from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component'
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
+import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,6 +67,7 @@ import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
     TransactionSpendingLimitNftComponent,
     SanitizePostBodyPipe,
     SanitizeVideoUrlPipe,
+    TransactionSpendingLimitDaoCoinLimitOrderComponent,
   ],
   imports: [
     BrowserModule,

@@ -6,11 +6,14 @@ import { BackendAPIService } from '../backend-api.service';
   selector: '[appAvatar]',
 })
 export class AvatarDirective implements OnChanges {
-  @Input() appAvatar = '';
+  @Input() appAvatar: string | undefined = '';
 
   constructor(private globalVars: GlobalVarsService, private backendApi: BackendAPIService, private el: ElementRef) {}
 
   setAvatar(): void {
+    if (!this.appAvatar) {
+      return;
+    }
     this.el.nativeElement.style.backgroundImage = `url(${this.backendApi.GetSingleProfilePictureURL(
       this.appAvatar
     )})`;
