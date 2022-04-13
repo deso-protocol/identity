@@ -23,7 +23,7 @@
       *ngIf="showDetails"
     >
       <ng-container
-        *ngIf="sectionTitle == TransactionSpendingLimitComponent.TransactionLimitsSection">
+        *ngIf="sectionTitle === TransactionSpendingLimitComponent.TransactionLimitsSection">
         <div
           class="d-flex justify-content-between fs-14px py-5px"
         >
@@ -43,8 +43,8 @@
         </div>
       </ng-container>
       <ng-container
-        *ngIf="sectionTitle == TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
-        sectionTitle == TransactionSpendingLimitComponent.DAOCoinLimitsSection"
+        *ngIf="sectionTitle === TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
+        sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitsSection"
       >
         <div
           *ngIf="anyCreatorItem"
@@ -72,7 +72,7 @@
         </div>
       </ng-container>
       <ng-container
-        *ngIf="sectionTitle == TransactionSpendingLimitComponent.NFTLimitsSection">
+        *ngIf="sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection">
         <div
           *ngIf="anyNFTItem"
           style="border: 2px solid goldenrod; border-radius: 5px;"
@@ -104,7 +104,7 @@
 
       </ng-container>
       <ng-container
-        *ngIf="sectionTitle == TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection">
+        *ngIf="sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection">
         <div class="d-flex pb-10px">
           <div class="col-5">
             Buying

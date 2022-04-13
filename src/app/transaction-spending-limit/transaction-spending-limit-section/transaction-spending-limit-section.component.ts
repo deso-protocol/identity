@@ -113,7 +113,7 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
 
   sectionSummary(): string {
     const operationsStr = this.sectionTitle !== TransactionSpendingLimitComponent.TransactionLimitsSection &&
-    this.sectionTitle != TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection ?
+    this.sectionTitle !== TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection ?
       "operations on " : "";
     const keyLen = this.getSectionMapLength();
     const sectionItemType = this.sectionItemType();
