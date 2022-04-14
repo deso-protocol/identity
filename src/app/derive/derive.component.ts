@@ -64,6 +64,8 @@ export class DeriveComponent implements OnInit {
         ).subscribe((res) => {
           this.transactionSpendingLimitHex = res;
         });
+        // Setting expiration days to 0 forces us to have a minimum transaction size that is still valid.
+        this.expirationDays = 0;
         return;
       }
       if (params.transactionSpendingLimitResponse) {
