@@ -24,6 +24,8 @@ export class DeriveComponent implements OnInit {
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
 
+  deleteKey = false;
+
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -49,6 +51,19 @@ export class DeriveComponent implements OnInit {
       }
       if (params.derivedPublicKey) {
         this.derivedPublicKeyBase58Check = params.derivedPublicKey;
+      }
+      // We can only revoke if we have both the public key and derived public key from query params.
+      if (params.deleteKey && this.publicKeyBase58Check && this.derivedPublicKeyBase58Check) {
+        this.deleteKey = params.deleteKey === 'true';
+        // We don't want or need to parse transaction spending limit when revoking derived key,
+        // so we initialize a spending limit object with no permissions
+        this.transactionSpendingLimitResponse = { GlobalDESOLimit: 0 };
+        this.backendApi.GetTransactionSpendingLimitHexString(
+          this.transactionSpendingLimitResponse
+        ).subscribe((res) => {
+          this.transactionSpendingLimitHex = res;
+        });
+        return;
       }
       if (params.transactionSpendingLimitResponse) {
         this.transactionSpendingLimitResponse = JSON.parse(decodeURIComponent(params.transactionSpendingLimitResponse));
