@@ -86,8 +86,9 @@ export class AccountService {
   }
 
   getDerivedPrivateUser(publicKeyBase58Check: string, blockHeight: number,
-                        transactionSpendingLimitHex: string | undefined = undefined,
-                        derivedPublicKeyBase58CheckInput: string | undefined = undefined): DerivedPrivateUserInfo{
+                        transactionSpendingLimitHex?: string,
+                        derivedPublicKeyBase58CheckInput?: string,
+                        expirationDays?: number): DerivedPrivateUserInfo{
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
 
@@ -96,6 +97,7 @@ export class AccountService {
     let derivedPublicKeyBase58Check: string;
     let jwt = '';
     let derivedJwt = '';
+    const numDaysBeforeExpiration = expirationDays || 30;
 
     this.entropyService.setNewTemporaryEntropy();
     const derivedMnemonic = this.entropyService.temporaryEntropy?.mnemonic;
@@ -114,7 +116,7 @@ export class AccountService {
 
       // We compute a derived key JWT with a month-long expiration. This is needed for shared secret endpoint.
       const encodedDerivedPrivateKey = keyEncoder.encodePrivate(derivedSeedHex, 'raw', 'pem');
-      derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: '30 days' });
+      derivedJwt = jsonwebtoken.sign({ }, encodedDerivedPrivateKey, { algorithm: 'ES256', expiresIn: `${ numDaysBeforeExpiration } days` });
     } else {
       // If the user has passed in a derived public key, use that instead.
       // Don't define the derived seed hex (a private key presumably already exists).
@@ -129,8 +131,11 @@ export class AccountService {
     const btcDepositAddress = 'Not implemented yet';
     const ethDepositAddress = 'Not implemented yet';
 
-    // By default we authorize this derived key for 10,000 blocks.
-    const expirationBlock = blockHeight + 10000;
+    // days * (24 hours / day) * (60 minutes / hour) * (1 block / 5 minutes) = blocks
+    const numBlocksBeforeExpiration = numDaysBeforeExpiration * 24 * 60 / 5;
+
+    // By default, we authorize this derived key for 8640 blocks, which is about 30 days.
+    const expirationBlock = blockHeight + numBlocksBeforeExpiration;
 
     const expirationBlockBuffer = uint64ToBufBigEndian(expirationBlock);
     const transactionSpendingLimitBytes = transactionSpendingLimitHex ? [... new Buffer(transactionSpendingLimitHex, 'hex')] : [];
@@ -147,7 +152,7 @@ export class AccountService {
     // We do this to compress the messaging public key from 65 bytes to 33 bytes.
     const messagingPublicKey = ec.keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array').getPublic(true, 'hex');
     const messagingPublicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
-      ec.keyFromPrivate(messagingPrivateKeyBuff), this.globalVars.network)
+      ec.keyFromPrivate(messagingPrivateKeyBuff), this.globalVars.network);
 
     // Messaging key signature is needed so if derived key submits the messaging public key,
     // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )
@@ -224,7 +229,7 @@ export class AccountService {
       }
 
       // Migrate from V0 -> V1
-      if (privateUser.version == PrivateUserVersion.V0) {
+      if (privateUser.version === PrivateUserVersion.V0) {
         // Add ethDepositAddress field
         privateUser.ethDepositAddress = this.cryptoService.seedHexToEthAddress(privateUser.seedHex);
 

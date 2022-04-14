@@ -23,6 +23,7 @@ export class DeriveComponent implements OnInit {
 
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
+  expirationDays = 30;
 
   constructor(
     private accountService: AccountService,
@@ -64,6 +65,12 @@ export class DeriveComponent implements OnInit {
           this.transactionSpendingLimitHex = res;
         });
       }
+      if (params.expirationDays) {
+        const numDays = parseInt(params.expirationDays, 10);
+        if (numDays > 0) {
+          this.expirationDays = numDays;
+        }
+      }
     });
     // Set derive to true
     this.globalVars.derive = true;
@@ -85,6 +92,7 @@ export class DeriveComponent implements OnInit {
     this.identityService.derive({
       publicKey,
       transactionSpendingLimitHex: this.transactionSpendingLimitHex,
+      expirationDays: this.expirationDays,
     });
   }
 
@@ -96,6 +104,7 @@ export class DeriveComponent implements OnInit {
       publicKey: this.publicKeyBase58Check,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
       transactionSpendingLimitHex: this.transactionSpendingLimitHex,
+      expirationDays: this.expirationDays,
     });
   }
 }
