@@ -342,17 +342,17 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   @Transcode(VarBuffer)
   sellingDAOCoinCreatorPublicKey: Buffer = Buffer.alloc(0);
 
-  @Transcode(FixedBuffer(32))
+  @Transcode(VarBuffer)
   scaledExchangeRateCoinsToSellPerCoinToBuy: Buffer = Buffer.alloc(0);
 
-  @Transcode(FixedBuffer(32))
+  @Transcode(VarBuffer)
   quantityToFillInBaseUnits: Buffer = Buffer.alloc(0);
 
-  @Transcode(FixedBuffer(8))
-  OperationType: Buffer = Buffer.alloc(0);
+  @Transcode(Uvarint64)
+  operationType: Buffer = Buffer.alloc(0);
 
-  @Transcode(Boolean)
-  cancelExistingOrder: boolean = false;
+  @Transcode(VarBuffer)
+  cancelOrderID: Buffer = Buffer.alloc(0);
 
   @Transcode(VarBuffer)
   bidderInputs: Buffer = Buffer.alloc(0);

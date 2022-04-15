@@ -224,7 +224,7 @@ export class ApproveComponent implements OnInit {
         break;
       case TransactionMetadataDAOCoin:
         const daoCoinPublicKey = this.base58KeyCheck(this.transaction.metadata.profilePublicKey);
-        publicKeys = [daoCoinPublicKey]
+        publicKeys = [daoCoinPublicKey];
         if (this.transaction.metadata.operationType === 0) {
           const mintAmount = this.hexNanosToUnitString(this.transaction.metadata.coinsToMintNanos);
           description = `mint ${mintAmount} ${daoCoinPublicKey} DAO coins`;
@@ -245,20 +245,53 @@ export class ApproveComponent implements OnInit {
         description = `transfer ${daoCoinTransferAmount} ${daoCoinTransferPublicKey} DAO coins to ${daoCoinReceiverPublicKey}`;
         break;
       case TransactionMetadataMessagingGroup:
-        const groupKeyName = this.transaction.metadata.messagingGroupKeyName
-        description = `register group key with name "${groupKeyName}"`
+        const groupKeyName = this.transaction.metadata.messagingGroupKeyName;
+        description = `register group key with name "${groupKeyName}"`;
         break
       case TransactionMetadataDAOCoinLimitOrder:
-        let buyingDAOCoinCreatorPublicKey = this.base58KeyCheck(this.transaction.metadata.buyingDAOCoinCreatorPublicKey);
-        if (buyingDAOCoinCreatorPublicKey == "") {
-          buyingDAOCoinCreatorPublicKey = "DESO";
+        if (this.transaction.metadata.cancelOrderID.length != 0) {
+          // The transaction is cancelling an existing limit order
+          const orderId = this.transaction.metadata.cancelOrderID.toString('hex');
+          description = `cancel DAO coin limit order with OrderID ${orderId}`;
+        } else {
+          // The transaction is creating a new limit order
+          publicKeys = [];
+
+          let buyingCoinName = "$DESO";
+          let sellingCoinName = "$DESO";
+
+          if (!this.isZeroByteArray(this.transaction.metadata.buyingDAOCoinCreatorPublicKey)) {
+            publicKeys.push(this.base58KeyCheck(this.transaction.metadata.buyingDAOCoinCreatorPublicKey));
+            buyingCoinName = this.base58KeyCheck(this.transaction.metadata.buyingDAOCoinCreatorPublicKey) + ' DAO coins';
+          }
+          if (!this.isZeroByteArray(this.transaction.metadata.sellingDAOCoinCreatorPublicKey)) {
+            publicKeys.push(this.base58KeyCheck(this.transaction.metadata.sellingDAOCoinCreatorPublicKey));
+            sellingCoinName = this.base58KeyCheck(this.transaction.metadata.sellingDAOCoinCreatorPublicKey) + ' DAO coins';
+          }
+
+          const exchangeRateCoinsToSellPerCoinToBuy = this.hexScaledExchangeRateToFloat(
+            this.transaction.metadata.scaledExchangeRateCoinsToSellPerCoinToBuy,
+          );
+          const quantityToFill = this.hexNanosToUnitString(this.transaction.metadata.quantityToFillInBaseUnits);
+
+          const daoCoinLimitOrderOperationType = this.transaction.metadata.operationType.toString();
+
+          if (daoCoinLimitOrderOperationType == '1') {
+            // -- ASK Order --
+            // Here, we invert the exchange rate so that the denominator refers to the coin being sold. This way the
+            // messaging for the user can easily verity quantity of coins being sold, and the price rate per coin
+            const exchangeRate = this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy);
+            description = `create a DAO coin limit order to sell ${quantityToFill} ${sellingCoinName} with an ` +
+              `exchange rate of ${exchangeRate} ${buyingCoinName} per ${sellingCoinName}`;
+            break;
+          } else if (daoCoinLimitOrderOperationType == '2') {
+            // -- BID Order --
+            const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
+            description = `create a DAO coin limit order to buy ${quantityToFill} ${buyingCoinName} with an ` +
+              `exchange rate of ${exchangeRate} ${sellingCoinName} per ${buyingCoinName}`;
+          }
         }
-        let sellingDAOCoinCreatorPublicKey = this.base58KeyCheck(this.transaction.metadata.sellingDAOCoinCreatorPublicKey);
-        if (sellingDAOCoinCreatorPublicKey == "") {
-          sellingDAOCoinCreatorPublicKey = "DESO"
-        }
-        description = `create DAO coin limit order to sell ${sellingDAOCoinCreatorPublicKey} ` +
-          `to buy ${buyingDAOCoinCreatorPublicKey}`
+        break;
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -281,9 +314,21 @@ export class ApproveComponent implements OnInit {
   }
 
   nanosToUnitString(nanos: number): string {
+    return this.toFixedLengthDecimalString((nanos / 1e9));
+  }
+
+  hexScaledExchangeRateToFloat(hex: Buffer): number {
+    return parseInt(hex.toString('hex'), 16) / 1e38;
+  }
+
+  toFixedLengthDecimalString(num: number): string {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
-    return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
+    return num.toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/, '$1');
+  }
+
+  isZeroByteArray(buffer: Buffer): boolean {
+    return parseInt(buffer.toString('hex'), 16) == 0;
   }
 
   // Fetch Usernames from API and replace public keys in description with Username
