@@ -296,14 +296,14 @@ export class ApproveComponent implements OnInit {
           // If the buying coin's public key is a zero byte array, then it means the is $DESO. Otherwise, it's a DAO coin
           if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)) {
             const buyingCoinPublicKey = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey);
-            buyingCoin = buyingCoinPublicKey + ' DAO coin';
+            buyingCoin = buyingCoinPublicKey + ' DAO coins';
             publicKeys.push(buyingCoinPublicKey);
           }
 
           // Similar to the above, a zero byte array means that $DESO is being sold. Otherwise, it's a DAO coin
           if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey)) {
             const sellingCoinPublicKey = this.base58KeyCheck(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey);
-            sellingCoin = sellingCoinPublicKey + ' DAO coin';
+            sellingCoin = sellingCoinPublicKey + ' DAO coins';
             publicKeys.push(sellingCoinPublicKey);
           }
 
