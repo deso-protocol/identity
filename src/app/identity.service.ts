@@ -33,7 +33,7 @@ import {
   TransactionMetadataCreateNFT,
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin,
-  TransactionMetadataDAOCoinLimitOrder
+  TransactionMetadataDAOCoinLimitOrder,
 } from '../lib/deso/transaction';
 
 export type DerivePayload = {

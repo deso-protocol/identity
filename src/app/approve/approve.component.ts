@@ -295,16 +295,16 @@ export class ApproveComponent implements OnInit {
 
           // If the buying coin's public key is a zero byte array, then it means the is $DESO. Otherwise, it's a DAO coin
           if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)) {
-            const buyingCoinName = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey);
-            buyingCoin = buyingCoinName + ' coins';
-            publicKeys.push(buyingCoinName);
+            const buyingCoinPublicKey = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey);
+            buyingCoin = buyingCoinPublicKey + ' DAO coin';
+            publicKeys.push(buyingCoinPublicKey);
           }
 
-          // Similar to the above, a zero buy array means that $DESO is being sold. Otherwise, it's a DAO coin
+          // Similar to the above, a zero byte array means that $DESO is being sold. Otherwise, it's a DAO coin
           if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey)) {
-            const sellingCoinName = this.base58KeyCheck(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey);
-            sellingCoin = sellingCoinName + ' coins';
-            publicKeys.push(sellingCoinName);
+            const sellingCoinPublicKey = this.base58KeyCheck(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey);
+            sellingCoin = sellingCoinPublicKey + ' DAO coin';
+            publicKeys.push(sellingCoinPublicKey);
           }
 
           const exchangeRateCoinsToSellPerCoinToBuy = this.hexScaledExchangeRateToFloat(
@@ -320,13 +320,13 @@ export class ApproveComponent implements OnInit {
             // can easily verify the quantity of coins being sold, and the exchange rate per coin sold
             const exchangeRate = this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy);
             description = `create a DAO coin limit order to sell ${quantityToFill} ${sellingCoin} with an ` +
-              `exchange rate of ${exchangeRate} ${buyingCoin} per coin`;
+              `exchange rate of ${exchangeRate} ${buyingCoin} per coin sold`;
             break;
           } else if (daoCoinLimitOrderOperationType == '2') {
             // -- BID Order --
             const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
             description = `create a DAO coin limit order to buy ${quantityToFill} ${buyingCoin} with an ` +
-              `exchange rate of ${exchangeRate} ${sellingCoin} per coin`;
+              `exchange rate of ${exchangeRate} ${sellingCoin} per coin bought`;
           }
         }
         break;
@@ -352,7 +352,7 @@ export class ApproveComponent implements OnInit {
   }
 
   nanosToUnitString(nanos: number): string {
-    return this.toFixedLengthDecimalString((nanos / 1e9));
+    return this.toFixedLengthDecimalString(nanos / 1e9);
   }
 
   hexScaledExchangeRateToFloat(hex: Buffer): number {
