@@ -277,8 +277,8 @@ export class ApproveComponent implements OnInit {
         break;
       case TransactionMetadataMessagingGroup:
         const messagingGroupMetadata = this.transaction.metadata as TransactionMetadataMessagingGroup;
-        const groupKeyName = messagingGroupMetadata.messagingGroupKeyName
-        description = `register group key with name "${groupKeyName}"`
+        const groupKeyName = messagingGroupMetadata.messagingGroupKeyName;
+        description = `register group key with name "${groupKeyName}"`;
         break
       case TransactionMetadataDAOCoinLimitOrder:
         const daoCoinLimitOrderMetadata = this.transaction.metadata as TransactionMetadataDAOCoinLimitOrder;
@@ -295,7 +295,7 @@ export class ApproveComponent implements OnInit {
 
           // If the buying coin's public key is a zero byte array, then it means the is $DESO. Otherwise, it's a DAO coin
           if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)) {
-            const buyingCoinName = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)
+            const buyingCoinName = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey);
             buyingCoin = buyingCoinName + ' coins';
             publicKeys.push(buyingCoinName);
           }
@@ -316,8 +316,8 @@ export class ApproveComponent implements OnInit {
 
           if (daoCoinLimitOrderOperationType == '1') {
             // -- ASK Order --
-            // Here, we invert the exchange rate so that the denominator refers to the coin being sold. This way the
-            // messaging for the user can easily verity quantity of coins being sold, and the price rate per coin
+            // Here, we invert the exchange rate so that the denominator refers to the coin being sold. This way the user
+            // can easily verify the quantity of coins being sold, and the exchange rate per coin sold
             const exchangeRate = this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy);
             description = `create a DAO coin limit order to sell ${quantityToFill} ${sellingCoin} with an ` +
               `exchange rate of ${exchangeRate} ${buyingCoin} per coin`;
