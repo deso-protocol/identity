@@ -33,7 +33,8 @@ import {
   TransactionMetadataMessagingGroup,
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin,
-  TransactionSpendingLimit
+  TransactionSpendingLimit,
+  TransactionMetadataDAOCoinLimitOrder,
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 
@@ -279,6 +280,56 @@ export class ApproveComponent implements OnInit {
         const groupKeyName = messagingGroupMetadata.messagingGroupKeyName
         description = `register group key with name "${groupKeyName}"`
         break
+      case TransactionMetadataDAOCoinLimitOrder:
+        const daoCoinLimitOrderMetadata = this.transaction.metadata as TransactionMetadataDAOCoinLimitOrder;
+        if (daoCoinLimitOrderMetadata.cancelOrderID.length != 0) {
+          // The transaction is cancelling an existing limit order
+          const orderId = daoCoinLimitOrderMetadata.cancelOrderID.toString('hex');
+          description = `cancel DAO coin limit order with OrderID: ${orderId}`;
+        } else {
+          // The transaction is creating a new limit order
+          publicKeys = [];
+
+          let buyingCoin = '$DESO';
+          let sellingCoin = '$DESO';
+
+          // If the buying coin's public key is a zero byte array, then it means the is $DESO. Otherwise, it's a DAO coin
+          if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)) {
+            const buyingCoinName = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)
+            buyingCoin = buyingCoinName + ' coins';
+            publicKeys.push(buyingCoinName);
+          }
+
+          // Similar to the above, a zero buy array means that $DESO is being sold. Otherwise, it's a DAO coin
+          if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey)) {
+            const sellingCoinName = this.base58KeyCheck(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey);
+            sellingCoin = sellingCoinName + ' coins';
+            publicKeys.push(sellingCoinName);
+          }
+
+          const exchangeRateCoinsToSellPerCoinToBuy = this.hexScaledExchangeRateToFloat(
+            daoCoinLimitOrderMetadata.scaledExchangeRateCoinsToSellPerCoinToBuy,
+          );
+          const quantityToFill = this.hexNanosToUnitString(daoCoinLimitOrderMetadata.quantityToFillInBaseUnits);
+
+          const daoCoinLimitOrderOperationType = daoCoinLimitOrderMetadata.operationType.toString();
+
+          if (daoCoinLimitOrderOperationType == '1') {
+            // -- ASK Order --
+            // Here, we invert the exchange rate so that the denominator refers to the coin being sold. This way the
+            // messaging for the user can easily verity quantity of coins being sold, and the price rate per coin
+            const exchangeRate = this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy);
+            description = `create a DAO coin limit order to sell ${quantityToFill} ${sellingCoin} with an ` +
+              `exchange rate of ${exchangeRate} ${buyingCoin} per coin`;
+            break;
+          } else if (daoCoinLimitOrderOperationType == '2') {
+            // -- BID Order --
+            const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
+            description = `create a DAO coin limit order to buy ${quantityToFill} ${buyingCoin} with an ` +
+              `exchange rate of ${exchangeRate} ${sellingCoin} per coin`;
+          }
+        }
+        break;
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -301,9 +352,21 @@ export class ApproveComponent implements OnInit {
   }
 
   nanosToUnitString(nanos: number): string {
+    return this.toFixedLengthDecimalString((nanos / 1e9));
+  }
+
+  hexScaledExchangeRateToFloat(hex: Buffer): number {
+    return parseInt(hex.toString('hex'), 16) / 1e38;
+  }
+
+  toFixedLengthDecimalString(num: number): string {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
-    return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
+    return num.toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/, '$1');
+  }
+
+  isZeroByteArray(buffer: Buffer): boolean {
+    return parseInt(buffer.toString('hex'), 16) == 0;
   }
 
   // Fetch Usernames from API and replace public keys in description with Username
