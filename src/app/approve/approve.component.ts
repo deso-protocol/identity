@@ -282,7 +282,9 @@ export class ApproveComponent implements OnInit {
         break
       case TransactionMetadataDAOCoinLimitOrder:
         const daoCoinLimitOrderMetadata = this.transaction.metadata as TransactionMetadataDAOCoinLimitOrder;
-        if (daoCoinLimitOrderMetadata.cancelOrderID.length != 0) {
+        if (daoCoinLimitOrderMetadata.cancelOrderID != null &&
+          daoCoinLimitOrderMetadata.cancelOrderID.length != 0) {
+
           // The transaction is cancelling an existing limit order
           const orderId = daoCoinLimitOrderMetadata.cancelOrderID.toString('hex');
           description = `cancel DAO coin limit order with OrderID: ${orderId}`;
@@ -328,6 +330,7 @@ export class ApproveComponent implements OnInit {
             description = `create a DAO coin limit order to buy ${quantityToFill} ${buyingCoin} with an ` +
               `exchange rate of ${exchangeRate} ${sellingCoin} per coin bought`;
           }
+          // FIXME: You always need to catch the error case!
         }
         break;
     }
