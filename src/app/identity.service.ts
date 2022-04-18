@@ -33,7 +33,7 @@ import {
   TransactionMetadataCreateNFT,
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin,
-  TransactionSpendingLimit
+  TransactionMetadataDAOCoinLimitOrder,
 } from '../lib/deso/transaction';
 
 export type DerivePayload = {
@@ -293,6 +293,7 @@ export class IdentityService {
       case TransactionMetadataAuthorizeDerivedKey:
       case TransactionMetadataDAOCoin:
       case TransactionMetadataTransferDAOCoin:
+      case TransactionMetadataDAOCoinLimitOrder:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:
