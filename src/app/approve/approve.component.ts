@@ -282,14 +282,12 @@ export class ApproveComponent implements OnInit {
         break
       case TransactionMetadataDAOCoinLimitOrder:
         const daoCoinLimitOrderMetadata = this.transaction.metadata as TransactionMetadataDAOCoinLimitOrder;
-        if (daoCoinLimitOrderMetadata.cancelOrderID != null &&
-          daoCoinLimitOrderMetadata.cancelOrderID.length != 0) {
-
+        if (daoCoinLimitOrderMetadata.cancelOrderID != null && daoCoinLimitOrderMetadata.cancelOrderID.length != 0) {
           // The transaction is cancelling an existing limit order
           const orderId = daoCoinLimitOrderMetadata.cancelOrderID.toString('hex');
-          description = `cancel DAO coin limit order with OrderID: ${orderId}`;
+          description = `cancel the DAO coin limit order with OrderID: ${orderId}`;
         } else {
-          // The transaction is creating a new limit order
+          // The transaction must be creating a new limit order
           publicKeys = [];
 
           let buyingCoin = '$DESO';
@@ -329,8 +327,14 @@ export class ApproveComponent implements OnInit {
             const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
             description = `create a DAO coin limit order to buy ${quantityToFill} ${buyingCoin} with an ` +
               `exchange rate of ${exchangeRate} ${sellingCoin} per coin bought`;
+          } else {
+            // Operation type is unknown, but we'll still try to interpret the order as best we can, and let the user
+            // decide what to do
+            const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
+            description = `create a DAO coin limit order with unknown OperationType=${daoCoinLimitOrderOperationType} ` +
+              `to swap ${sellingCoin} for ${buyingCoin} at an exchange rate of ${exchangeRate} and a quantity of ` +
+              `${quantityToFill}`;
           }
-          // FIXME: You always need to catch the error case!
         }
         break;
     }
