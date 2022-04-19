@@ -369,7 +369,7 @@ export class ApproveComponent implements OnInit {
   toFixedLengthDecimalString(num: number): string {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
-    return num.toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/, '$1');
+    return num.toFixed(9).replace(/^(\d*\.\d*?[1-9])0+$/, '$1');
   }
 
   isZeroByteArray(buffer: Buffer): boolean {

@@ -390,7 +390,7 @@ export class TransactionDAOCoinLimitOrderLimitMapItem extends BinaryRecord {
 
   @Transcode(VarBuffer)
   sellingDAOCoinCreatorPKID: Buffer = Buffer.alloc(0);
-  
+
   @Transcode(Uvarint64)
   value: number = 0;
 }
@@ -411,7 +411,7 @@ export class TransactionSpendingLimit extends BinaryRecord {
 
   @Transcode(ArrayOf(TransactionNFTOperationLimitMapItem))
   nftOperationLimitMap: TransactionNFTOperationLimitMapItem[] = [];
-  
+
   @Transcode(ArrayOf(TransactionDAOCoinLimitOrderLimitMapItem))
   daoCoinLimitOrderLimitMap: TransactionDAOCoinLimitOrderLimitMapItem[] = [];
 }
