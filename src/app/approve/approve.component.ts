@@ -333,20 +333,19 @@ export class ApproveComponent implements OnInit {
 
           if (daoCoinLimitOrderOperationType === '1') {
             // -- ASK Order --
-            description = `create ${daoCoinLimitOrderFillTypePhrase} DAO coin limit order to sell ${quantityToFill} ` +
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order to sell ${quantityToFill} ` +
               `${sellingCoin} ${exchangeRateCoinsToBuyPerCoinsToSellPhrase}`;
           } else if (daoCoinLimitOrderOperationType === '2') {
             // -- BID Order --
-            description = `create ${daoCoinLimitOrderFillTypePhrase} DAO coin limit order to buy ${quantityToFill} ` +
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order to buy ${quantityToFill} ` +
               `${buyingCoin} ${exchangeRateCoinsToSellPerCoinsToBuyPhrase}`;
           } else {
             // Operation type is unknown, so we'll print all the order metadata as-is without an interpretation.
             // The goal here is to give the user as much info as we know, and let them make the decision.
-            const operationTypePhrase = `an unknown OperationType=${daoCoinLimitOrderOperationType}`;
+            const daoCoinOperationTypePhrase = `an unknown OperationType=${daoCoinLimitOrderOperationType}`;
             const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
-            description = `create a DAO coin limit order with ${daoCoinLimitOrderFillTypePhrase} and ${operationTypePhrase}` +
-              `to swap ${sellingCoin} for ${buyingCoin} at an exchange rate of ${exchangeRate} and a quantity of ` +
-              `${quantityToFill}`;
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order with ${daoCoinOperationTypePhrase} to swap ` +
+              `${sellingCoin} for ${buyingCoin} at an exchange rate of ${exchangeRate} and a quantity of ${quantityToFill}`;
           }
         }
         break;
