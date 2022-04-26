@@ -316,13 +316,14 @@ export class ApproveComponent implements OnInit {
           const daoCoinLimitOrderOperationType = daoCoinLimitOrderMetadata.operationType.toString();
           const daoCoinLimitOrderFillType = daoCoinLimitOrderMetadata.fillType.toString();
 
-          const anyExchangeRatePhrase = 'at any exchange rate';
-          const exchangeRatePhrase = exchangeRateCoinsToSellPerCoinToBuy === 0 ? anyExchangeRatePhrase :
+          const exchangeRateCoinsToSellPerCoinsToBuyPhrase =
+            exchangeRateCoinsToSellPerCoinToBuy === 0 ? `using ${sellingCoin} at any exchange rate` :
             `at an exchange rate of ${this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy)} ` +
-              `${buyingCoin} per coin sold`;
-          const inverseExchangeRatePhrase = exchangeRateCoinsToSellPerCoinToBuy === 0 ? anyExchangeRatePhrase :
-            `at an exchange rate of ${this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy)} ` +
               `${sellingCoin} per coin bought`;
+          const exchangeRateCoinsToBuyPerCoinsToSellPhrase =
+            exchangeRateCoinsToSellPerCoinToBuy === 0 ? `for ${buyingCoin} at any exchange rate` :
+            `at an exchange rate of ${this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy)} ` +
+              `${buyingCoin} per coin sold`;
 
           const daoCoinLimitOrderFillTypePhrase =
             daoCoinLimitOrderFillType === '1' ? 'a Good-Till-Cancelled' :
@@ -332,14 +333,12 @@ export class ApproveComponent implements OnInit {
 
           if (daoCoinLimitOrderOperationType === '1') {
             // -- ASK Order --
-            // Here, we use the inverse exchange rate so that the denominator refers to the coin being sold. This way,
-            // the user can easily verify the quantity of coins being sold, and the exchange rate per coin sold
             description = `create ${daoCoinLimitOrderFillTypePhrase} DAO coin limit order to sell ${quantityToFill} ` +
-              ` ${sellingCoin} ${exchangeRatePhrase}`;
+              `${sellingCoin} ${exchangeRateCoinsToBuyPerCoinsToSellPhrase}`;
           } else if (daoCoinLimitOrderOperationType === '2') {
             // -- BID Order --
             description = `create ${daoCoinLimitOrderFillTypePhrase} DAO coin limit order to buy ${quantityToFill} ` +
-              `${buyingCoin} ${inverseExchangeRatePhrase}`;
+              `${buyingCoin} ${exchangeRateCoinsToSellPerCoinsToBuyPhrase}`;
           } else {
             // Operation type is unknown, so we'll print all the order metadata as-is without an interpretation.
             // The goal here is to give the user as much info as we know, and let them make the decision.
