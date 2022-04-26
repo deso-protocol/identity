@@ -440,6 +440,9 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   @Transcode(Uvarint64)
   operationType: Buffer = Buffer.alloc(0);
 
+  @Transcode(Uvarint64)
+  fillType: Buffer = Buffer.alloc(0);
+
   @Transcode(VarBuffer)
   cancelOrderID: Buffer = Buffer.alloc(0);
 
