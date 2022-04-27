@@ -310,30 +310,42 @@ export class ApproveComponent implements OnInit {
           const exchangeRateCoinsToSellPerCoinToBuy = this.hexScaledExchangeRateToFloat(
             daoCoinLimitOrderMetadata.scaledExchangeRateCoinsToSellPerCoinToBuy,
           );
-          const quantityToFill = this.hexNanosToUnitString(daoCoinLimitOrderMetadata.quantityToFillInBaseUnits);
-
+          const quantityToFill = this.hexNanosToUnitString(
+            daoCoinLimitOrderMetadata.quantityToFillInBaseUnits,
+          );
           const daoCoinLimitOrderOperationType = daoCoinLimitOrderMetadata.operationType.toString();
+          const daoCoinLimitOrderFillType = daoCoinLimitOrderMetadata.fillType.toString();
 
-          if (daoCoinLimitOrderOperationType == '1') {
+          const exchangeRateCoinsToSellPerCoinsToBuyPhrase =
+            exchangeRateCoinsToSellPerCoinToBuy === 0 ? `using ${sellingCoin} at any exchange rate` :
+            `at an exchange rate of ${this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy)} ` +
+              `${sellingCoin} per coin bought`;
+          const exchangeRateCoinsToBuyPerCoinsToSellPhrase =
+            exchangeRateCoinsToSellPerCoinToBuy === 0 ? `for ${buyingCoin} at any exchange rate` :
+            `at an exchange rate of ${this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy)} ` +
+              `${buyingCoin} per coin sold`;
+
+          const daoCoinLimitOrderFillTypePhrase =
+            daoCoinLimitOrderFillType === '1' ? 'a Good-Till-Cancelled' :
+            daoCoinLimitOrderFillType === '2' ? 'an Immediate-Or-Cancel' :
+            daoCoinLimitOrderFillType === '3' ? 'a Fill-Or-Kill' :
+            `an unknown fill type (${daoCoinLimitOrderFillType})`;
+
+          if (daoCoinLimitOrderOperationType === '1') {
             // -- ASK Order --
-            // Here, we invert the exchange rate so that the denominator refers to the coin being sold. This way the user
-            // can easily verify the quantity of coins being sold, and the exchange rate per coin sold
-            const exchangeRate = this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy);
-            description = `create a DAO coin limit order to sell ${quantityToFill} ${sellingCoin} with an ` +
-              `exchange rate of ${exchangeRate} ${buyingCoin} per coin sold`;
-            break;
-          } else if (daoCoinLimitOrderOperationType == '2') {
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order to sell ${quantityToFill} ` +
+              `${sellingCoin} ${exchangeRateCoinsToBuyPerCoinsToSellPhrase}`;
+          } else if (daoCoinLimitOrderOperationType === '2') {
             // -- BID Order --
-            const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
-            description = `create a DAO coin limit order to buy ${quantityToFill} ${buyingCoin} with an ` +
-              `exchange rate of ${exchangeRate} ${sellingCoin} per coin bought`;
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order to buy ${quantityToFill} ` +
+              `${buyingCoin} ${exchangeRateCoinsToSellPerCoinsToBuyPhrase}`;
           } else {
-            // Operation type is unknown, but we'll still try to interpret the order as best we can, and let the user
-            // decide what to do
+            // Operation type is unknown, so we'll print all the order metadata as-is without much interpretation.
+            // The goal here is to give the user as much info as we know, and let them make the decision.
+            const daoCoinOperationTypePhrase = `an unknown operation type (${daoCoinLimitOrderOperationType})`;
             const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
-            description = `create a DAO coin limit order with unknown OperationType=${daoCoinLimitOrderOperationType} ` +
-              `to swap ${sellingCoin} for ${buyingCoin} at an exchange rate of ${exchangeRate} and a quantity of ` +
-              `${quantityToFill}`;
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order that has ${daoCoinOperationTypePhrase} to swap ` +
+              `${sellingCoin} for ${buyingCoin} with an exchange rate of ${exchangeRate} and a quantity of ${quantityToFill}`;
           }
         }
         break;
