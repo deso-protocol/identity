@@ -131,11 +131,6 @@ export class GoogleComponent implements OnInit {
     });
   }
 
-  startJumio(): void {
-    this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-    this.showGetFreeDESO = true;
-  }
-
   finishFlow(signedUp: boolean): void {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
@@ -162,7 +157,7 @@ export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAu
     webview: false,
     testnet: false,
     jumio: false,
-    callback: "",
+    callback: '',
     derive: false,
   };
 
