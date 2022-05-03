@@ -68,10 +68,6 @@ export class AppComponent implements OnInit {
       this.globalVars.derive = true;
     }
 
-    if (params.get('jumio') || stateParamsFromGoogle.jumio) {
-      this.globalVars.jumio = true;
-    }
-
     const referralCodeKey = 'referralCode';
     let referralCode = params.get(referralCodeKey);
     // Request may fail if browser doesn't support local storage e.g. incognito, third party cookies blocked, etc

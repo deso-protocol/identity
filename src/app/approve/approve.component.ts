@@ -33,7 +33,8 @@ import {
   TransactionMetadataMessagingGroup,
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin,
-  TransactionSpendingLimit
+  TransactionSpendingLimit,
+  TransactionMetadataDAOCoinLimitOrder,
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
 
@@ -276,9 +277,78 @@ export class ApproveComponent implements OnInit {
         break;
       case TransactionMetadataMessagingGroup:
         const messagingGroupMetadata = this.transaction.metadata as TransactionMetadataMessagingGroup;
-        const groupKeyName = messagingGroupMetadata.messagingGroupKeyName
-        description = `register group key with name "${groupKeyName}"`
+        const groupKeyName = messagingGroupMetadata.messagingGroupKeyName;
+        description = `register group key with name "${groupKeyName}"`;
         break
+      case TransactionMetadataDAOCoinLimitOrder:
+        const daoCoinLimitOrderMetadata = this.transaction.metadata as TransactionMetadataDAOCoinLimitOrder;
+        if (daoCoinLimitOrderMetadata.cancelOrderID != null && daoCoinLimitOrderMetadata.cancelOrderID.length != 0) {
+          // The transaction is cancelling an existing limit order
+          const orderId = daoCoinLimitOrderMetadata.cancelOrderID.toString('hex');
+          description = `cancel the DAO coin limit order with OrderID: ${orderId}`;
+        } else {
+          // The transaction must be creating a new limit order
+          publicKeys = [];
+
+          let buyingCoin = '$DESO';
+          let sellingCoin = '$DESO';
+
+          // If the buying coin's public key is a zero byte array, then the coin is $DESO. Otherwise, it's a DAO coin
+          if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey)) {
+            const buyingCoinPublicKey = this.base58KeyCheck(daoCoinLimitOrderMetadata.buyingDAOCoinCreatorPublicKey);
+            buyingCoin = buyingCoinPublicKey + ' DAO coins';
+            publicKeys.push(buyingCoinPublicKey);
+          }
+
+          // Similar to the above, a zero byte array means that $DESO is being sold. Otherwise, it's a DAO coin
+          if (!this.isZeroByteArray(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey)) {
+            const sellingCoinPublicKey = this.base58KeyCheck(daoCoinLimitOrderMetadata.sellingDAOCoinCreatorPublicKey);
+            sellingCoin = sellingCoinPublicKey + ' DAO coins';
+            publicKeys.push(sellingCoinPublicKey);
+          }
+
+          const exchangeRateCoinsToSellPerCoinToBuy = this.hexScaledExchangeRateToFloat(
+            daoCoinLimitOrderMetadata.scaledExchangeRateCoinsToSellPerCoinToBuy,
+          );
+          const quantityToFill = this.hexNanosToUnitString(
+            daoCoinLimitOrderMetadata.quantityToFillInBaseUnits,
+          );
+          const daoCoinLimitOrderOperationType = daoCoinLimitOrderMetadata.operationType.toString();
+          const daoCoinLimitOrderFillType = daoCoinLimitOrderMetadata.fillType.toString();
+
+          const exchangeRateCoinsToSellPerCoinsToBuyPhrase =
+            exchangeRateCoinsToSellPerCoinToBuy === 0 ? `using ${sellingCoin} at any exchange rate` :
+            `at an exchange rate of ${this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy)} ` +
+              `${sellingCoin} per coin bought`;
+          const exchangeRateCoinsToBuyPerCoinsToSellPhrase =
+            exchangeRateCoinsToSellPerCoinToBuy === 0 ? `for ${buyingCoin} at any exchange rate` :
+            `at an exchange rate of ${this.toFixedLengthDecimalString(1 / exchangeRateCoinsToSellPerCoinToBuy)} ` +
+              `${buyingCoin} per coin sold`;
+
+          const daoCoinLimitOrderFillTypePhrase =
+            daoCoinLimitOrderFillType === '1' ? 'a Good-Till-Cancelled' :
+            daoCoinLimitOrderFillType === '2' ? 'an Immediate-Or-Cancel' :
+            daoCoinLimitOrderFillType === '3' ? 'a Fill-Or-Kill' :
+            `an unknown fill type (${daoCoinLimitOrderFillType})`;
+
+          if (daoCoinLimitOrderOperationType === '1') {
+            // -- ASK Order --
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order to sell ${quantityToFill} ` +
+              `${sellingCoin} ${exchangeRateCoinsToBuyPerCoinsToSellPhrase}`;
+          } else if (daoCoinLimitOrderOperationType === '2') {
+            // -- BID Order --
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order to buy ${quantityToFill} ` +
+              `${buyingCoin} ${exchangeRateCoinsToSellPerCoinsToBuyPhrase}`;
+          } else {
+            // Operation type is unknown, so we'll print all the order metadata as-is without much interpretation.
+            // The goal here is to give the user as much info as we know, and let them make the decision.
+            const daoCoinOperationTypePhrase = `an unknown operation type (${daoCoinLimitOrderOperationType})`;
+            const exchangeRate = this.toFixedLengthDecimalString(exchangeRateCoinsToSellPerCoinToBuy);
+            description = `create ${daoCoinLimitOrderFillTypePhrase} order that has ${daoCoinOperationTypePhrase} to swap ` +
+              `${sellingCoin} for ${buyingCoin} with an exchange rate of ${exchangeRate} and a quantity of ${quantityToFill}`;
+          }
+        }
+        break;
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -301,9 +371,23 @@ export class ApproveComponent implements OnInit {
   }
 
   nanosToUnitString(nanos: number): string {
+    return this.toFixedLengthDecimalString(nanos / 1e9);
+  }
+
+  hexScaledExchangeRateToFloat(hex: Buffer): number {
+    return parseInt(hex.toString('hex'), 16) / 1e38;
+  }
+
+  toFixedLengthDecimalString(num: number): string {
     // Change nanos into a formatted string of units. This combination of toFixed and regex removes trailing zeros.
     // If we do a regular toString(), some numbers can be represented in E notation which doesn't look as good.
-    return (nanos / 1e9).toFixed(9).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
+    const formattedNum = num.toFixed(9).replace(/^(\d*\.\d*?[1-9]?)0+$/, '$1');
+    // Integers may have a trailing decimal place, so if we end with a decimal place, we slice off the last character.
+    return formattedNum.endsWith('.') ? formattedNum.slice(0, formattedNum.length - 1) : formattedNum;
+  }
+
+  isZeroByteArray(buffer: Buffer): boolean {
+    return parseInt(buffer.toString('hex'), 16) == 0;
   }
 
   // Fetch Usernames from API and replace public keys in description with Username

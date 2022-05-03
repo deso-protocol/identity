@@ -6,6 +6,12 @@ import {environment} from '../environments/environment';
   providedIn: 'root'
 })
 export class GlobalVarsService {
+
+  constructor() { }
+
+  get environment(): { [k: string]: any } {
+    return environment;
+  }
   static fullAccessHostnames = environment.fullAccessHostnames;
   static noAccessHostnames = environment.noAccessHostnames;
 
@@ -25,14 +31,15 @@ export class GlobalVarsService {
   callback = '';
   callbackInvalid = false;
 
-  jumioUSDCents: number = 0;
-  referralUSDCents: number = 0;
+  jumioUSDCents = 0;
+  referralUSDCents = 0;
 
-  referralHashBase58: string = '';
+  referralHashBase58 = '';
 
-  defaultMessageKeyName: string = 'default-key';
+  defaultMessageKeyName = 'default-key';
 
-  constructor() { }
+  nanosPerUSDExchangeRate = 0;
+  nanosToDeSoMemo = {};
 
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
@@ -47,17 +54,9 @@ export class GlobalVarsService {
     }
   }
 
-  // tslint:disable-next-line:typedef
-  get environment() {
-    return environment;
-  }
-
   showJumio(): boolean {
     return environment.jumioSupported && !this.webview && this.jumio;
   }
-
-  nanosPerUSDExchangeRate: number = 0;
-  nanosToDeSoMemo = {};
 
   nanosToDeSo(nanos: number, maximumFractionDigits: number = 2): string {
     if (!maximumFractionDigits && nanos > 0) {
@@ -79,9 +78,9 @@ export class GlobalVarsService {
     // Always show at least 2 digits
     const minimumFractionDigits = 2;
     const num = nanos / 1e9;
-    return Number(num).toLocaleString("en-US", {
-      style: "decimal",
-      currency: "USD",
+    return Number(num).toLocaleString('en-US', {
+      style: 'decimal',
+      currency: 'USD',
       minimumFractionDigits,
       maximumFractionDigits,
     });
@@ -99,9 +98,9 @@ export class GlobalVarsService {
   }
 
   formatUSD(num: number, decimal: number): string {
-    return Number(num).toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
+    return Number(num).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
       minimumFractionDigits: decimal,
       maximumFractionDigits: decimal,
     });
@@ -116,8 +115,8 @@ export class GlobalVarsService {
   }
 
   cleanSpendingLimitOperationName(opName: string): string {
-    return opName.split("_").map((token) =>
-      token.toLocaleLowerCase() === "nft" ? "NFT" : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
-    ).join(" ");
+    return opName.split('_').map((token) =>
+      token.toLocaleLowerCase() === 'nft' ? 'NFT' : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
+    ).join(' ');
   }
 }

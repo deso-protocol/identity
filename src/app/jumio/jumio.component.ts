@@ -18,9 +18,9 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class JumioComponent implements OnInit, OnDestroy {
 
-  @Input() publicKey: string = "";
-  @Input() showSkip: boolean = true;
-  @Input() autoOpenJumio: boolean = true;
+  @Input() publicKey = '';
+  @Input() showSkip = true;
+  @Input() autoOpenJumio = true;
   @Output() skipJumio = new EventEmitter();
 
   constructor(
@@ -53,10 +53,10 @@ export class JumioComponent implements OnInit, OnDestroy {
     const regExp = /(http(s?):\/\/localhost:\d{0,5})$/;
     const match = origin.match(regExp);
     if (match) {
-      origin = "https://bitclout.com";
+      origin = 'https://bitclout.com';
     }
-    
-    const url = new URL(`${origin}/${routeSuffix}`)
+
+    const url = new URL(`${origin}/${routeSuffix}`);
     if (this.globalVars.network === Network.testnet) {
       url.searchParams.append('testnet', 'true');
     }
@@ -70,7 +70,12 @@ export class JumioComponent implements OnInit, OnDestroy {
   }
 
   openJumio(): void {
-    this.backendApi.JumioBegin(this.publicKey, this.globalVars.referralHashBase58, this.getJumioURL(RouteNames.JUMIO_SUCCESS), this.getJumioURL(RouteNames.JUMIO_ERROR)).subscribe((res) => {
+    this.backendApi.JumioBegin(
+      this.publicKey,
+      this.globalVars.referralHashBase58,
+      this.getJumioURL(RouteNames.JUMIO_SUCCESS),
+      this.getJumioURL(RouteNames.JUMIO_ERROR))
+      .subscribe((res) => {
       window.location.href = res.URL;
     });
   }

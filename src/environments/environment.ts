@@ -8,7 +8,7 @@ export const environment = {
   nodeURL: 'https://node.deso.org',
   fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost', 'node.deso.org'],
   noAccessHostnames: [''],
-  jumioSupported: true,
+  jumioSupported: false,
 };
 
 /*

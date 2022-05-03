@@ -390,7 +390,7 @@ export class TransactionDAOCoinLimitOrderLimitMapItem extends BinaryRecord {
 
   @Transcode(VarBuffer)
   sellingDAOCoinCreatorPKID: Buffer = Buffer.alloc(0);
-  
+
   @Transcode(Uvarint64)
   value: number = 0;
 }
@@ -411,9 +411,43 @@ export class TransactionSpendingLimit extends BinaryRecord {
 
   @Transcode(ArrayOf(TransactionNFTOperationLimitMapItem))
   nftOperationLimitMap: TransactionNFTOperationLimitMapItem[] = [];
-  
+
   @Transcode(ArrayOf(TransactionDAOCoinLimitOrderLimitMapItem))
   daoCoinLimitOrderLimitMap: TransactionDAOCoinLimitOrderLimitMapItem[] = [];
+}
+
+export class DeSoInputsByTransactor extends BinaryRecord {
+  @Transcode(FixedBuffer(33))
+  transactorPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(ArrayOf(TransactionInput))
+  inputs: TransactionInput[] = [];
+}
+
+export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
+  @Transcode(VarBuffer)
+  buyingDAOCoinCreatorPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  sellingDAOCoinCreatorPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  scaledExchangeRateCoinsToSellPerCoinToBuy: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  quantityToFillInBaseUnits: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  operationType: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  fillType: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  cancelOrderID: Buffer = Buffer.alloc(0);
+
+  @Transcode(ArrayOf(DeSoInputsByTransactor))
+  bidderInputs: DeSoInputsByTransactor[] = [];
 }
 
 export const TransactionTypeMetadataMap = {
@@ -441,6 +475,7 @@ export const TransactionTypeMetadataMap = {
   23: TransactionMetadataMessagingGroup,
   24: TransactionMetadataDAOCoin,
   25: TransactionMetadataTransferDAOCoin,
+  26: TransactionMetadataDAOCoinLimitOrder,
 };
 
 export class Transaction extends BinaryRecord {

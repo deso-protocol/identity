@@ -7,7 +7,7 @@
 
 <div *ngIf="!loading">
   <app-banner></app-banner>
-  <div class="page-container" *ngIf="!showGetFreeDESO">
+  <div class="page-container">
     <div class="title-text">Optional: Save your recovery code</div>
     <div class="subtitle-text">You can use this DeSo seed phrase to login if you lose access to your Google account.</div>
     <div class="warning-text">Do not share this with anyone.</div>
@@ -32,18 +32,9 @@
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-end">
-      <button (click)="finishFlow(true)" class="button button-primary button-large" *ngIf="!globalVars.showJumio()">
+      <button (click)="finishFlow(true)" class="button button-primary button-large">
         Continue to {{ globalVars.hostname }}
       </button>
-      <button (click)="startJumio()" class="button button-primary button-large" *ngIf="globalVars.showJumio()">
-        Earn <app-free-deso-message></app-free-deso-message> <b>Free</b>
-      </button>
     </div>
-    <div class="pt-5px">
-      <app-free-deso-disclaimer></app-free-deso-disclaimer>
-    </div>
-  </div>
-  <div class="container home-container" *ngIf="showGetFreeDESO">
-    <app-jumio [publicKey]="publicKey" (skipJumio)="finishFlow(true)" [autoOpenJumio]="false"></app-jumio>
   </div>
 </div>

@@ -43,13 +43,8 @@ const routes: Routes = [
   { path: RouteNames.APPROVE, component: ApproveComponent, pathMatch: 'full' },
   { path: RouteNames.AUTH_GOOGLE, component: GoogleComponent, pathMatch: 'full' },
   { path: RouteNames.DERIVE, component: DeriveComponent, pathMatch: 'full' },
-  { path: RouteNames.JUMIO_SUCCESS, component: JumioSuccessComponent, pathMatch: 'full'},
-  { path: RouteNames.JUMIO_ERROR, component: JumioErrorComponent, pathMatch: 'full' },
-  { path: RouteNames.GET_FREE_DESO, component: JumioComponent, pathMatch: 'full' },
   { path: RouteNames.GET_SHARED_SECRETS, component: SharedSecretComponent, pathMatch: 'full'},
   { path: RouteNames.VERIFY_PHONE_NUMBER, component: SignUpGetStarterDESOComponent, pathMatch: 'full'},
-  // redirect to get-free-deso page
-  { path: RouteNames.GET_FREE_CLOUT, redirectTo: RouteNames.GET_FREE_DESO, pathMatch: 'full' },
 
 ];
 

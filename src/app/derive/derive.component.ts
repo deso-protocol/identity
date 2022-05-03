@@ -24,8 +24,8 @@ export class DeriveComponent implements OnInit {
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
   expirationDays = 30;
-
   deleteKey = false;
+
 
   constructor(
     private accountService: AccountService,

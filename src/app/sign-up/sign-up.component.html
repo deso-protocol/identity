@@ -182,9 +182,4 @@
          on this page.-->
     <div style="padding-bottom: 85px"></div>
   </div>
-
-  <div *ngIf="stepNum == 3 && globalVars.showJumio()">
-    <div class="fs-15px fc-muted">STEP 3 of {{ stepTotal }}</div>
-    <app-jumio [publicKey]="publicKeyAdded" (skipJumio)="login()" [autoOpenJumio]="false"></app-jumio>
-  </div>
 </div>
