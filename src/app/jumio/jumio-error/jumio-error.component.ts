@@ -11,9 +11,9 @@ import {ActivatedRoute} from '@angular/router';
   styleUrls: ['./jumio-error.component.scss']
 })
 export class JumioErrorComponent implements OnInit, OnDestroy {
-  
-  publicKey: string = '';
-  hostname: string = '';
+
+  publicKey = '';
+  hostname = '';
   constructor(
     public globalVars: GlobalVarsService,
     private activatedRoute: ActivatedRoute,
@@ -23,7 +23,7 @@ export class JumioErrorComponent implements OnInit, OnDestroy {
     this.activatedRoute.queryParams.subscribe(params => {
       this.publicKey = params.public_key || '';
       this.hostname = globalVars.hostname;
-   })
+   });
   }
 
   ngOnInit(): void {
@@ -31,7 +31,7 @@ export class JumioErrorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
   }
-  
+
   finishFlow(): void {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
