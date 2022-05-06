@@ -2,7 +2,8 @@
 
 <div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
   <!-- Step 1 -->
-  <div *ngIf="stepNum == 1">
+  <!-- Generate seed phrase. -->
+  <div *ngIf="stepScreen === SignUpComponent.STEP_GENERATE_SEED">
     <div class="step-row">
       <div class="title-text">Store your DeSo seed phrase</div>
       <div class="step-title">Step 1 of {{ stepTotal }}</div>
@@ -127,7 +128,8 @@
   </div>
 
   <!-- Step 2 -->
-  <div *ngIf="stepNum == 2">
+  <!-- Verify seed phrase. -->
+  <div *ngIf="stepScreen === SignUpComponent.STEP_VERIFY_SEED" >
     <div class="step-row">
       <div class="title-text">Verify your DeSo seed phrase</div>
       <div class="step-title">Step 2 of {{ stepTotal }}</div>
@@ -183,7 +185,9 @@
     <div style="padding-bottom: 85px"></div>
   </div>
 
-  <div *ngIf="stepNum == 3">
+  <!-- Step 3 -->
+  <!-- Get Starter $DESO. -->
+  <div *ngIf="stepScreen === SignUpComponent.STEP_GET_STARTER_DESO">
     <div class="w-100 text-center fs-32px font-weight-bold">Get Starter $DESO</div>
     <div class="w-100 text-center mt-20px fs-20px font-weight-bold">
       Validate your phone number or buy your first $DESO.
@@ -194,7 +198,7 @@
       </div>
       <div class="w-100 text-center fs-18px mt-20px mb-10px font-weight-bold mb-10px">Choose an option</div>
       <button
-        (click)="launchSMSVerification()"
+        (click)="stepThreeNextPhone()"
         [ngStyle]="{ 'width': '40%', 'min-width': '300px' }"
         class="styled-primary-button mb-10px"
       >
@@ -202,31 +206,25 @@
       </button>
       <div class="fs-16px fc-muted">To earn under $1</div>
       <button
-        (click)="launchTransferDesoModal()"
+        (click)="stepThreeNextBuy()"
         [ngStyle]="{ 'width': '40%', 'min-width': '300px' }"
         class="styled-secondary-button mt-30px mb-10px"
       >
         Buy or Send $DESO Anonymously
       </button>
       <div class="fs-16px fc-muted">Transfer from an exchange or a DeSo account</div>
-      <!--        <button-->
-      <!--          (click)="launchJumioVerification()"-->
-      <!--          [ngStyle]="{ width: globalVars.isMobile() ? '100%' : '40%' }"-->
-      <!--          class="secondary-button mt-30px mb-10px"-->
-      <!--        >-->
-      <!--          Get $DESO with ID-->
-      <!--        </button>-->
-      <!--        <div class="fs-16px fc-muted">To earn <free-deso-message></free-deso-message></div>-->
-      <!--        <div style="max-width: 300px; margin-top: 60px" class="fs-16px text-center fc-muted">-->
-      <!--          Validating your identity lets us ensure that you're a real person and not a bot-->
-      <!--        </div>-->
     </div>
   </div>
 
-  <div *ngIf="stepNum == 4">
+  <div *ngIf="stepScreen === SignUpComponent.STEP_VERIFY_PHONE_NUMBER">
     <sign-up-get-starter-deso
-      [publicKey]="this.publicKeyAdded"
+      [displayForSignupFlow]="true"
+      [publicKey]="publicKeyAdded"
       [skipAppBanner]="true"
+      [finishFlowEventOnly]="true"
+      (phoneNumberVerified)="phoneNumberVerified()"
+      (finishFlowEvent)="finishFlowPhoneNumber()"
+      (skipButtonClicked)="finishFlowPhoneNumberSkip()"
     ></sign-up-get-starter-deso>
   </div>
 

@@ -37,6 +37,7 @@
 <div class="page-container" *ngIf="(globalVars.inTab || globalVars.webview || globalVars.callback) && !loading && user && !user.HasPhoneNumber">
 
   <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN">
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Get Starter $DESO with Phone Number</div>
     <div class="fs-18px">
       Verify your phone number for free DESO. Your phone number will never be shared with anyone.
     </div>
@@ -93,18 +94,18 @@
     </div>
 
     <div class="d-flex mt-15px justify-content-end">
-      <div>
+      <div class="full-screen">
         <a
           *ngIf="displayForSignupFlow"
           (click)="onSkipButtonClicked()"
-          class="button button-secondary button-small font-weight-bold fs-15px"
+          class="button button-secondary button-small font-weight-bold fs-15px floatl"
         >
           Skip
         </a>
         <a
           (click)="sendVerificationText()"
           [ngClass]="{ disabled: !phoneForm.valid, 'btn-loading': sendingPhoneNumberVerificationText }"
-          class="button button-primary button-small font-weight-bold fs-15px ml-10px"
+          class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
         >
           Next
         </a>
@@ -113,12 +114,9 @@
   </div>
 
   <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN">
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Verify Authentication Code</div>
     <div class="fs-18px">
       Enter the 6 digit code sent to {{ phoneNumber }}
-      <div class="mt-5px">
-        <a href="" (click)="resendVerificationCode($event)">Resend</a>
-        <i *ngIf="resentVerificationCode" class="far fa-check-circle fc-blue"></i>
-      </div>
 
       <div *ngIf="sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached" class="mt-5px fc-red fs-15px">
         You've requested too many verification codes. Please wait 10 minutes and try again.
@@ -146,32 +144,43 @@
       </div>
     </form>
 
-    <div class="d-flex mt-15px justify-content-between">
-      <div>
-        <a
-          *ngIf="displayForSignupFlow"
-          (click)="backButtonClickedOnSubmitVerificationScreen()"
-          class="button button-secondary button-small font-weight-bold fs-15px"
-        >
-          Back
-        </a>
+    <div class="fs-18px">
+      <div class="mt-5px">
+<!--        Resend button will have a 60s cooldown indicated by resentVerificationCode and resentVerificationCodeTimeout -->
+        <div *ngIf="!resentVerificationCode">
+          <a href="" (click)="resendVerificationCode($event)">Resend</a>
+        </div>
+        <div *ngIf="resentVerificationCode">
+          <div class="fc-muted">Resend {{resentVerificationCodeTimeout}}s</div>
+        </div>
+        <i *ngIf="resentVerificationCode" class="far fa-check-circle fc-blue"></i>
       </div>
-      <div>
-        <a
-          *ngIf="displayForSignupFlow"
-          (click)="onSkipButtonClicked()"
-          class="button button-secondary button-small font-weight-bold fs-15px"
-        >
-          Skip
-        </a>
-        <a
-          (click)="submitVerificationCode()"
-          [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
-          class="button button-primary button-small font-weight-bold fs-15px ml-10px"
-        >
-          Verify
-        </a>
-      </div>
+    </div>
+
+    <div class="mt-15px justify-content-between">
+      <a
+        *ngIf="displayForSignupFlow"
+        (click)="backButtonClickedOnSubmitVerificationScreen()"
+        class="button button-secondary button-small font-weight-bold fs-15px floatl"
+      >
+        Back
+      </a>
+<!--      align the Verify button as the rightmost element using float property.-->
+      <a
+        (click)="submitVerificationCode()"
+        [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
+        class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
+      >
+        Verify
+      </a>
+      <a
+        *ngIf="displayForSignupFlow"
+        (click)="onSkipButtonClicked()"
+        class="button button-secondary button-small font-weight-bold fs-15px m-0auto"
+      >
+        Skip
+      </a>
+
     </div>
   </div>
 

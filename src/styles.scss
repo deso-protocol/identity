@@ -274,8 +274,14 @@ h2,h3,h4,h5,h6,p {
 .mx-40px { margin-left: 40px; margin-right: 40px; }
 .my-40px { margin-top: 40px; margin-bottom: 40px; }
 
+.m-0auto { margin: 0 auto; }
+
 .br-3px { border-radius: 3px; }
 .br-12px { border-radius: $feed-border-radius; }
+
+// custom float classes
+.floatl {float: left;}
+.floatr {float: right;}
 
 .vh-100 { height: 100vh !important; }
 
@@ -434,6 +440,7 @@ h2,h3,h4,h5,h6,p {
   justify-content: center;
   align-items: center;
   font-size: 18px;
+  cursor: pointer;
 }
 
 .button-primary {

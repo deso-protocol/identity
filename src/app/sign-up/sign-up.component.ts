@@ -16,7 +16,14 @@ import {RouteNames} from '../app-routing.module';
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit, OnDestroy {
-  stepNum = 1;
+  static STEP_GENERATE_SEED = 'step_generate_seed';
+  static STEP_VERIFY_SEED = 'step_verify_seed';
+  static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
+  static STEP_VERIFY_PHONE_NUMBER = 'step_verify_phone_number';
+  static STEP_BUY_DESO = 'step_buy_deso';
+
+  stepScreen: string = SignUpComponent.STEP_GENERATE_SEED;
+  SignUpComponent = SignUpComponent;
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
@@ -31,6 +38,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   environment = environment;
 
   stepTotal: number;
+  phoneNumberSuccess = false;
 
   constructor(
     public entropyService: EntropyService,
@@ -57,7 +65,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.entropyService.advancedOpen = false;
   }
 
-  ////// STEP ONE BUTTONS ///////
+  ////// STEP ONE BUTTONS | STEP_GENERATE_SEED ///////
 
   stepOneCopy(): void {
     this.textService.copyText(this.entropyService.temporaryEntropy?.mnemonic || '');
@@ -74,11 +82,20 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   stepOneNext(): void {
-    this.stepNum = 2;
+    this.stepScreen = SignUpComponent.STEP_VERIFY_SEED;
     this.seedCopied = false; // Reset the copy icon.
   }
 
-  ////// STEP TWO BUTTONS ///////
+  clickTos(): void {
+    const h = 700;
+    const w = 600;
+    const y = window.outerHeight / 2 + window.screenY - h / 2;
+    const x = window.outerWidth / 2 + window.screenX - w / 2;
+
+    window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+  }
+
+  ////// STEP TWO BUTTONS | STEP_VERIFY_SEED ///////
 
   stepTwoNext(): void {
     // Add the new user to the account service registry.
@@ -92,34 +109,52 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    this.stepNum = 3;
+    this.stepScreen = SignUpComponent.STEP_GET_STARTER_DESO;
   }
 
   stepTwoBack(): void {
     this.extraTextCheck = '';
     this.mnemonicCheck = '';
-    this.stepNum = 1;
+    this.stepScreen = SignUpComponent.STEP_GENERATE_SEED;
   }
 
-  ////// STEP THREE BUTTONS ///////
+  ////// STEP THREE BUTTONS | STEP_GET_STARTER_DESO ///////
 
-  stepThreeNext(): void {
+  stepThreeNextPhone(): void {
+    this.stepScreen = SignUpComponent.STEP_VERIFY_PHONE_NUMBER;
+  }
 
+
+  stepThreeNextBuy(): void {
+    this.stepScreen = SignUpComponent.STEP_BUY_DESO;
+  }
+
+  ////// STEP FOUR BUTTONS | STEP_VERIFY_PHONE_NUMBER ///////
+
+  phoneNumberVerified(): void {
+    // Note: phoneNumberSuccess is only passed on login. That is if origin of this flow was /derive, and the user
+    //  created a new account and verified phone number, then we don't pass phoneNumberSuccess.
+    this.phoneNumberSuccess = true;
+  }
+
+  finishFlowPhoneNumber(): void {
+    this.finishFlow();
+  }
+
+  finishFlowPhoneNumberSkip(): void {
+    this.finishFlow();
+  }
+
+  ////// FINISH FLOW ///////
+
+  finishFlow(): void {
     if (this.globalVars.derive) {
       this.identityService.derive({
         publicKey: this.publicKeyAdded,
       });
     } else {
-      if (!this.globalVars.showJumio()) {
-        this.login();
-      } else {
-        this.stepNum = 4;
-      }
+      this.login();
     }
-  }
-
-  stepThreeBack(): void {
-    this.stepNum = 2;
   }
 
   login(): void {
@@ -127,16 +162,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKeyAdded,
       signedUp: true,
+      phoneNumberSuccess: this.phoneNumberSuccess,
     });
-  }
-
-  clickTos(): void {
-    const h = 700;
-    const w = 600;
-    const y = window.outerHeight / 2 + window.screenY - h / 2;
-    const x = window.outerWidth / 2 + window.screenX - w / 2;
-
-    window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
   }
 
   ////// ENTROPY //////
@@ -169,29 +196,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   getNewEntropy(): void {
     this.entropyService.setNewTemporaryEntropy();
-  }
-
-  launchSMSVerification(): void {
-    this.stepNum = 4;
-    // this.identityService
-    //   .launchPhoneNumberVerification(this.globalVars?.loggedInUser?.PublicKeyBase58Check)
-    //   .subscribe((res) => {
-    //     if (res.phoneNumberSuccess) {
-    //       this.globalVars.updateEverything().add(() => {
-    //         this.stepNum = 1;
-    //       });
-    //     }
-    //   });
-  }
-
-  launchTransferDesoModal(): void {
-    // const modalDetails = this.modalService.show(SignUpTransferDesoComponent, {
-    //   class: "modal-dialog-centered modal-wide",
-    // });
-    // const onHideEvent = modalDetails.onHide;
-    // onHideEvent.subscribe(() => {
-    //   this.refreshBalance();
-    // });
   }
 
 }
