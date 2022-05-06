@@ -242,6 +242,12 @@ h2,h3,h4,h5,h6,p {
 .mb-15px { margin-bottom: 15px; }
 .ml-15px { margin-left: 15px; }
 
+.m-16px { margin: 16px; }
+.mt-16px { margin-top: 16px; }
+.mr-16px { margin-right: 16px; }
+.mb-16px { margin-bottom: 16px; }
+.ml-16px { margin-left: 16px; }
+
 .m-20px { margin: 20px; }
 .mt-20px { margin-top: 20px; }
 .mr-20px { margin-right: 20px; }
@@ -311,7 +317,7 @@ h2,h3,h4,h5,h6,p {
   text-align: center;
   color: #FFF;
   border-bottom: 1px solid $border-grey;
-  margin-bottom: 80px;
+  margin-bottom: 60px;
   @media (max-width: 445px) {
     margin-bottom: 40px;
   }
@@ -359,6 +365,20 @@ h2,h3,h4,h5,h6,p {
 
 .sign-up-seed {
   background-image: url(/assets/sign_up_seed.png);
+}
+
+.onboarding-buy-deso-container {
+  background: #FFFFFF;
+  border-radius: 6px;
+  padding-top: 16px;
+}
+
+.onboarding-info-bar-circle {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $blue;
+  border-radius: 100%;
+  font-size: 18px;
 }
 
 .google-wrapper {

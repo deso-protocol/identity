@@ -1,0 +1,20 @@
+<!-- Top Bar -->
+<div
+  class="buy-deso__container p-16px"
+  style="padding-top: 0px"
+>
+  <span class="mint-nft__title mb-5px">{{ 'buy_deso.buy_complete' | transloco }}</span>
+  <div class="w-100 border-bottom"></div>
+  <div class="fs-15px pt-16px pb-30px">
+    <div class="mint-nft__title" style="font-size: 20px">
+      {{ 'buy_deso.new_balance' | transloco }}:
+      {{ globalVars.nanosToDeSo(globalVars.loggedInUser.BalanceNanos, 9) }} $DESO
+    </div>
+
+    <div class="d-flex align-items-center mt-15px">
+      <button class="primary-button" (click)="buyMoreDeSoClicked.emit()">{{ 'buy_deso.buy_more_deso' | transloco }}</button>
+      <span class="fs-15px ml-30px cursor-pointer fc-secondary" (click)="close()">Done</span>
+    </div>
+
+  </div>
+</div>

@@ -9,6 +9,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../text.service';
 import * as bip39 from 'bip39';
 import {RouteNames} from '../app-routing.module';
+import {BackendAPIService} from '../backend-api.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -20,7 +21,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   static STEP_VERIFY_SEED = 'step_verify_seed';
   static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
   static STEP_VERIFY_PHONE_NUMBER = 'step_verify_phone_number';
-  static STEP_BUY_DESO = 'step_buy_deso';
+  static STEP_OBTAIN_DESO = 'step_obtain_deso';
 
   stepScreen: string = SignUpComponent.STEP_GENERATE_SEED;
   SignUpComponent = SignUpComponent;
@@ -40,6 +41,15 @@ export class SignUpComponent implements OnInit, OnDestroy {
   stepTotal: number;
   phoneNumberSuccess = false;
 
+  publicKeyIsCopied = false;
+  scanQRCode = false;
+
+  // user balance
+  userBalanceNanos = 0;
+  refreshBalanceCooldown = false;
+  refreshBalanceRetryTime = 0;
+  refreshBalanceInterval: any;
+
   constructor(
     public entropyService: EntropyService,
     private cryptoService: CryptoService,
@@ -49,6 +59,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
+    private backendAPIService: BackendAPIService,
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
@@ -126,7 +137,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
 
   stepThreeNextBuy(): void {
-    this.stepScreen = SignUpComponent.STEP_BUY_DESO;
+    this.stepScreen = SignUpComponent.STEP_OBTAIN_DESO;
   }
 
   ////// STEP FOUR BUTTONS | STEP_VERIFY_PHONE_NUMBER ///////
@@ -142,6 +153,48 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   finishFlowPhoneNumberSkip(): void {
+    this.finishFlow();
+  }
+
+  ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
+
+  _copyPublicKey(): void {
+    this.textService.copyText(this.publicKeyAdded);
+    this.publicKeyIsCopied = true;
+    setInterval(() => {
+      this.publicKeyIsCopied = false;
+    }, 1000);
+  }
+
+  refreshBalance(): void {
+    if (this.refreshBalanceCooldown) {
+      return;
+    }
+    this.refreshBalanceCooldown = true;
+    this.refreshBalanceRetryTime = 30;
+
+    this.backendAPIService.GetUsersStateless([this.publicKeyAdded], false)
+      .subscribe( res => {
+        if (!res.UserList.length) {
+          return;
+        }
+        const user = res.UserList[0];
+        if (user.BalanceNanos) {
+          this.userBalanceNanos = user.BalanceNanos;
+        }
+      });
+
+    this.refreshBalanceInterval = setInterval(() => {
+      if (this.refreshBalanceRetryTime === 0) {
+        this.refreshBalanceCooldown = false;
+        clearInterval(this.refreshBalanceInterval);
+      } else {
+        this.refreshBalanceRetryTime--;
+      }
+    }, 1000);
+  }
+
+  finishFlowTransferDeSo(): void {
     this.finishFlow();
   }
 
