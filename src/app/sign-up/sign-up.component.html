@@ -182,4 +182,52 @@
          on this page.-->
     <div style="padding-bottom: 85px"></div>
   </div>
+
+  <div *ngIf="stepNum == 3">
+    <div class="w-100 text-center fs-32px font-weight-bold">Get Starter $DESO</div>
+    <div class="w-100 text-center mt-20px fs-20px font-weight-bold">
+      Validate your phone number or buy your first $DESO.
+    </div>
+    <div class="w-100 d-flex align-items-center flex-column">
+      <div style="max-width: 500px" class="w-100 text-center fs-18px mt-5px mb-30px text-muted fc-secondary">
+        This is the cryptocurrency that fuels the DeSo blockchain and allows you to invest in creators & buy NFTs.
+      </div>
+      <div class="w-100 text-center fs-18px mt-20px mb-10px font-weight-bold mb-10px">Choose an option</div>
+      <button
+        (click)="launchSMSVerification()"
+        [ngStyle]="{ 'width': '40%', 'min-width': '300px' }"
+        class="styled-primary-button mb-10px"
+      >
+        Get $DESO with Phone Number
+      </button>
+      <div class="fs-16px fc-muted">To earn under $1</div>
+      <button
+        (click)="launchTransferDesoModal()"
+        [ngStyle]="{ 'width': '40%', 'min-width': '300px' }"
+        class="styled-secondary-button mt-30px mb-10px"
+      >
+        Buy or Send $DESO Anonymously
+      </button>
+      <div class="fs-16px fc-muted">Transfer from an exchange or a DeSo account</div>
+      <!--        <button-->
+      <!--          (click)="launchJumioVerification()"-->
+      <!--          [ngStyle]="{ width: globalVars.isMobile() ? '100%' : '40%' }"-->
+      <!--          class="secondary-button mt-30px mb-10px"-->
+      <!--        >-->
+      <!--          Get $DESO with ID-->
+      <!--        </button>-->
+      <!--        <div class="fs-16px fc-muted">To earn <free-deso-message></free-deso-message></div>-->
+      <!--        <div style="max-width: 300px; margin-top: 60px" class="fs-16px text-center fc-muted">-->
+      <!--          Validating your identity lets us ensure that you're a real person and not a bot-->
+      <!--        </div>-->
+    </div>
+  </div>
+
+  <div *ngIf="stepNum == 4">
+    <sign-up-get-starter-deso
+      [publicKey]="this.publicKeyAdded"
+      [skipAppBanner]="true"
+    ></sign-up-get-starter-deso>
+  </div>
+
 </div>

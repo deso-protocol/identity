@@ -1,24 +1,25 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { CountryISO } from "ngx-intl-tel-input";
-import { GlobalVarsService } from "../global-vars.service";
-import { BackendAPIService, User } from "../backend-api.service";
-import { ActivatedRoute } from "@angular/router";
-import { IdentityService } from "../identity.service";
-import { AccountService } from "../account.service";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { CountryISO } from 'ngx-intl-tel-input';
+import { GlobalVarsService } from '../global-vars.service';
+import { BackendAPIService, User } from '../backend-api.service';
+import { ActivatedRoute } from '@angular/router';
+import { IdentityService } from '../identity.service';
+import { AccountService } from '../account.service';
 
 @Component({
-  selector: "sign-up-get-starter-deso",
-  templateUrl: "./sign-up-get-starter-deso.component.html",
-  styleUrls: ["./sign-up-get-starter-deso.component.scss"],
+  selector: 'sign-up-get-starter-deso',
+  templateUrl: './sign-up-get-starter-deso.component.html',
+  styleUrls: ['./sign-up-get-starter-deso.component.scss'],
 })
 export class SignUpGetStarterDESOComponent implements OnInit {
-  static CREATE_PHONE_NUMBER_VERIFICATION_SCREEN = "create_phone_number_verification_screen";
-  static SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN = "submit_phone_number_verification_screen";
-  static COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN = "completed_phone_number_verification_screen";
+  static CREATE_PHONE_NUMBER_VERIFICATION_SCREEN = 'create_phone_number_verification_screen';
+  static SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN = 'submit_phone_number_verification_screen';
+  static COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN = 'completed_phone_number_verification_screen';
 
-  @Input() displayForSignupFlow: boolean = false;
-  publicKey: string = "";
+  @Input() displayForSignupFlow = false;
+  @Input() publicKey = '';
+  @Input() skipAppBanner = false;
   @Output() backToPreviousSignupStepClicked = new EventEmitter();
   @Output() phoneNumberVerified = new EventEmitter();
   @Output() skipButtonClicked = new EventEmitter();
@@ -35,7 +36,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   submittingPhoneNumberVerificationCode = false;
   screenToShow: string | null = null;
   SignUpGetStarterDESOComponent = SignUpGetStarterDESOComponent;
-  phoneNumber: string = "";
+  phoneNumber = '';
   phoneNumberCountryCode: string | null = null;
   resentVerificationCode = false;
   sendPhoneNumberVerificationTextServerErrors = new SendPhoneNumberVerificationTextServerErrors();
@@ -54,8 +55,10 @@ export class SignUpGetStarterDESOComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
-      if (params.public_key) {
+      if (this.publicKey === '' && params.public_key) {
         this.publicKey = params.public_key;
+      }
+      if (this.publicKey !== '') {
         this.backendApi.GetUsersStateless([this.publicKey]).subscribe((res) => {
           if (res.UserList?.length) {
             this.user = res.UserList[0];

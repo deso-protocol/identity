@@ -95,6 +95,7 @@ h2,h3,h4,h5,h6,p {
 .fs-underline { text-decoration: underline }
 
 .fs-30px { font-size: 30px; }
+.fs-32px { font-size: 32px; }
 .fs-26px { font-size: 26px; }
 .fs-25px { font-size: 25px; }
 .fs-24px { font-size: 24px; }
@@ -461,6 +462,43 @@ h2,h3,h4,h5,h6,p {
 .button-small {
   height: 62px;
   width: 140px;
+}
+
+// Styled buttons
+.styled-primary-button {
+  --highlight: #005BFF;
+  --highlight-secondary: #E5F2FF;
+
+  width: 137px;
+  height: 48px;
+  background: var(--highlight);
+  border-radius: 6px;
+  color: white;
+  border: none;
+  &:hover {
+    color: white;
+  }
+  &.disabled-button {
+    background: var(--highlight-secondary)
+  }
+}
+
+.styled-secondary-button {
+  --highlight: #005BFF;
+  --highlight-secondary: #E5F2FF;
+
+  width: 137px;
+  height: 48px;
+  background: none;
+  border-radius: 6px;
+  color: var(--highlight);
+  border: 1px solid var(--highlight);
+  &:hover {
+    color: var(--highlight);
+  }
+  &.disabled-button {
+    background: var(--highlight-secondary)
+  }
 }
 
 .link {

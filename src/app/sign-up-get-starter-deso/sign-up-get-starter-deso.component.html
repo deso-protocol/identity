@@ -1,4 +1,5 @@
-<app-banner></app-banner>
+<app-banner *ngIf="!this.skipAppBanner"></app-banner>
+
 <ng-template #continueToHost>
   <div class="d-flex pt-15px justify-content-between">
     <button

@@ -81,6 +81,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   ////// STEP TWO BUTTONS ///////
 
   stepTwoNext(): void {
+    // Add the new user to the account service registry.
     const network = this.globalVars.network;
     const mnemonic = this.mnemonicCheck;
     const extraText = this.extraTextCheck;
@@ -91,6 +92,19 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
+    this.stepNum = 3;
+  }
+
+  stepTwoBack(): void {
+    this.extraTextCheck = '';
+    this.mnemonicCheck = '';
+    this.stepNum = 1;
+  }
+
+  ////// STEP THREE BUTTONS ///////
+
+  stepThreeNext(): void {
+
     if (this.globalVars.derive) {
       this.identityService.derive({
         publicKey: this.publicKeyAdded,
@@ -99,15 +113,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
       if (!this.globalVars.showJumio()) {
         this.login();
       } else {
-        this.stepNum = 3;
+        this.stepNum = 4;
       }
     }
   }
 
-  stepTwoBack(): void {
-    this.extraTextCheck = '';
-    this.mnemonicCheck = '';
-    this.stepNum = 1;
+  stepThreeBack(): void {
+    this.stepNum = 2;
   }
 
   login(): void {
@@ -158,4 +170,28 @@ export class SignUpComponent implements OnInit, OnDestroy {
   getNewEntropy(): void {
     this.entropyService.setNewTemporaryEntropy();
   }
+
+  launchSMSVerification(): void {
+    this.stepNum = 4;
+    // this.identityService
+    //   .launchPhoneNumberVerification(this.globalVars?.loggedInUser?.PublicKeyBase58Check)
+    //   .subscribe((res) => {
+    //     if (res.phoneNumberSuccess) {
+    //       this.globalVars.updateEverything().add(() => {
+    //         this.stepNum = 1;
+    //       });
+    //     }
+    //   });
+  }
+
+  launchTransferDesoModal(): void {
+    // const modalDetails = this.modalService.show(SignUpTransferDesoComponent, {
+    //   class: "modal-dialog-centered modal-wide",
+    // });
+    // const onHideEvent = modalDetails.onHide;
+    // onHideEvent.subscribe(() => {
+    //   this.refreshBalance();
+    // });
+  }
+
 }

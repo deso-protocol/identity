@@ -45,7 +45,6 @@ const routes: Routes = [
   { path: RouteNames.DERIVE, component: DeriveComponent, pathMatch: 'full' },
   { path: RouteNames.GET_SHARED_SECRETS, component: SharedSecretComponent, pathMatch: 'full'},
   { path: RouteNames.VERIFY_PHONE_NUMBER, component: SignUpGetStarterDESOComponent, pathMatch: 'full'},
-
 ];
 
 @NgModule({
