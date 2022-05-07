@@ -25,6 +25,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   stepScreen: string = SignUpComponent.STEP_GENERATE_SEED;
   SignUpComponent = SignUpComponent;
+  seedHex = '';
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
@@ -114,7 +115,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const mnemonic = this.mnemonicCheck;
     const extraText = this.extraTextCheck;
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
-
+    this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
     this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
 
     this.accountService.setAccessLevel(

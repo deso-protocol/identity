@@ -1,21 +1,21 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { GlobalVarsService } from "../../global-vars.service";
-import { HttpClient } from "@angular/common/http";
-import { WyreService } from "../../../lib/services/wyre/wyre";
-import { IdentityService } from "../../identity.service";
-import { BackendApiService } from "../../backend-api.service";
-import * as _ from "lodash";
-import Swal from "sweetalert2";
-import { ActivatedRoute, Router } from "@angular/router";
-import { SwalHelper } from "../../../lib/helpers/swal-helper";
-import { FeedComponent } from "../../feed/feed.component";
-import currencyToSymbolMap from "currency-symbol-map/map";
-import { BuyDeSoComponent } from "../buy-deso/buy-deso.component";
+import {Component, CUSTOM_ELEMENTS_SCHEMA, Input, NgModule, OnInit} from '@angular/core';
+import { GlobalVarsService } from '../../global-vars.service';
+import { HttpClient } from '@angular/common/http';
+import { WyreService } from '../../../lib/services/wyre/wyre';
+import { IdentityService } from '../../identity.service';
+import { BackendAPIService } from '../../backend-api.service';
+import * as _ from 'lodash';
+import Swal from 'sweetalert2';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SwalHelper } from '../../../lib/helpers/swal-helper';
+import currencyToSymbolMap from 'currency-symbol-map/map';
+import { BuyDeSoComponent } from '../buy-deso/buy-deso.component';
+import {SignUpBuyDesoComponent} from "../sign-up-buy-deso.component";
 
 @Component({
-  selector: "buy-deso-usd",
-  templateUrl: "./buy-deso-usd.component.html",
-  styleUrls: ["./buy-deso-usd.component.scss"],
+  selector: 'buy-deso-usd',
+  templateUrl: './buy-deso-usd.component.html',
+  styleUrls: ['./buy-deso-usd.component.scss'],
 })
 export class BuyDeSoUSDComponent implements OnInit {
   @Input() parentComponent: BuyDeSoComponent;
@@ -23,29 +23,29 @@ export class BuyDeSoUSDComponent implements OnInit {
 
   amount = 99;
   quotation: any;
-  desoReceived: string;
-  fees: number;
+  desoReceived = '';
+  fees = 0;
 
   debouncedGetQuotation: () => void;
 
   maxUsdAmount = 1000;
 
-  usdEquivalent: number;
-  supportedCountries: string[];
+  usdEquivalent = 0;
+  supportedCountries: string[] = [];
   supportedFiatCurrencies: { [k: string]: string };
 
-  selectedFiatCurrency = "USD";
-  selectedFiatCurrencySymbol = "$";
-  selectedCountry = "US";
+  selectedFiatCurrency = 'USD';
+  selectedFiatCurrencySymbol = '$';
+  selectedCountry = 'US';
 
-  quotationError: string = "";
-  reservationError: string = "";
+  quotationError = '';
+  reservationError = '';
 
   constructor(
     private globalVars: GlobalVarsService,
     private httpClient: HttpClient,
     private identityService: IdentityService,
-    private backendApi: BackendApiService,
+    private backendApi: BackendAPIService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -57,12 +57,10 @@ export class BuyDeSoUSDComponent implements OnInit {
     this.debouncedGetQuotation = _.debounce(this._refreshQuotation.bind(this), 300);
     this.route.queryParams.subscribe((queryParams) => {
       if (queryParams.destAmount) {
-        this.globalVars.logEvent("wyre : buy : success", { ...queryParams });
         const btcPurchased = queryParams.destAmount;
-        this.globalVars.celebrate();
         SwalHelper.fire({
-          target: this.globalVars.getTargetComponentSelector(),
-          icon: "success",
+          target: 'buy-deso-usd',
+          icon: 'success',
           title: `Purchase Completed`,
           html: `Your purchase of approximately ${this.getDeSoReceived(btcPurchased).toFixed(
             4
@@ -71,26 +69,20 @@ export class BuyDeSoUSDComponent implements OnInit {
           showCancelButton: true,
           reverseButtons: true,
           customClass: {
-            confirmButton: "btn btn-light",
-            cancelButton: "btn btn-light no",
+            confirmButton: 'btn btn-light',
+            cancelButton: 'btn btn-light no',
           },
-          confirmButtonText: "Continue to Feed ",
-          cancelButtonText: "Buy More",
+          confirmButtonText: 'Continue to Feed ',
+          cancelButtonText: 'Buy More',
         }).then((res) => {
-          queryParams = {};
-          if (res.isConfirmed) {
-            this.router.navigate(["/" + globalVars.RouteNames.BROWSE], {
-              queryParams: { feedTab: FeedComponent.GLOBAL_TAB },
-            });
-          } else {
-            this.router.navigate([], { queryParams: {} });
-          }
+          console.log('FINISH USD FLOW! res.isConfirmed:', res.isConfirmed);
+          // FIXME: do things here
         });
       }
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._refreshQuotation();
   }
 
@@ -98,35 +90,35 @@ export class BuyDeSoUSDComponent implements OnInit {
     if (this.quotationError) {
       return;
     }
-    this.wyreService.makeWalletOrderReservation(this.amount, this.selectedCountry, this.selectedFiatCurrency).subscribe(
+    this.wyreService.makeWalletOrderReservation(this.parentComponent.publicKey, this.amount,
+      this.selectedCountry, this.selectedFiatCurrency).subscribe(
       (res) => {
         const wyreUrl = res.url;
         if (res.url) {
           Swal.fire({
-            target: this.globalVars.getTargetComponentSelector(),
-            title: "Purchase $DESO",
+            target: 'buy-deso-usd',
+            title: 'Purchase $DESO',
             html: `You will complete your purchase through Wyre. Your ${this.selectedFiatCurrency} will be converted to <b>Bitcoin</b> and then into <b>$DESO</b> automatically.`,
             showCancelButton: true,
             showConfirmButton: true,
-            confirmButtonText: "Buy",
+            confirmButtonText: 'Buy',
             customClass: {
-              confirmButton: "btn btn-light",
-              cancelButton: "btn btn-light no",
+              confirmButton: 'btn btn-light',
+              cancelButton: 'btn btn-light no',
             },
             reverseButtons: true,
           }).then((res: any) => {
             if (res.isConfirmed) {
-              this.globalVars.logEvent("wyre : buy", { amount: this.amount });
               window.open(wyreUrl);
             }
           });
         } else {
           this.reservationError = res.message;
-          this.globalVars._alertError(res.message);
+          this.parentComponent._alertError(res.message);
         }
       },
       (err) => {
-        this.globalVars._alertError(err.error.message);
+        this.parentComponent._alertError(err.error.message);
       }
     );
   }
@@ -136,11 +128,11 @@ export class BuyDeSoUSDComponent implements OnInit {
   }
 
   _refreshQuotation(): void {
-    this.desoReceived = null;
-    this.fees = null;
+    this.desoReceived = '';
+    this.fees = 0;
     this.quotation = null;
-    this.usdEquivalent = null;
-    this.quotationError = "";
+    this.usdEquivalent = 0;
+    this.quotationError = '';
     this.wyreService.makeWalletOrderQuotation(this.amount, this.selectedCountry, this.selectedFiatCurrency).subscribe(
       (res) => {
         this.parseQuotation(res);
@@ -170,22 +162,30 @@ export class BuyDeSoUSDComponent implements OnInit {
   getDeSoReceived(btcReceived: number): number {
     return (
       (btcReceived * 1e8) /
-      (this.globalVars.satoshisPerDeSoExchangeRate * (1 + this.globalVars.BuyDeSoFeeBasisPoints / (100 * 100)))
+      (this.parentComponent.satoshisPerDeSoExchangeRate * (1 + this.parentComponent.BuyDeSoFeeBasisPoints / (100 * 100)))
     );
   }
 
-  onSelectFiatCurrency(event): void {
+  onSelectFiatCurrency(event: any): void {
     this.selectedFiatCurrency = event;
     this.selectedFiatCurrencySymbol = currencyToSymbolMap[event];
     this._refreshQuotation();
   }
 
-  onSelectCountry(event): void {
+  onSelectCountry(event: any): void {
     this.selectedCountry = event;
     this._refreshQuotation();
   }
 
-  getUSDEquivalent(quotation: any) {
+  getUSDEquivalent(quotation: any): any {
     return quotation.equivalencies.USD;
   }
 }
+
+@NgModule({
+  declarations: [BuyDeSoUSDComponent],
+  exports: [BuyDeSoUSDComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+})
+export class BuyDeSoUSDComponentWrapper {}
+

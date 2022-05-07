@@ -1,7 +1,7 @@
 <div class="buy-deso__container">
   <div *ngIf="!showBuyComplete; else showBuyCompleteElseBlock">
     <div class="mint-nft__title mx-16px">
-      {{ 'buy_deso.buy_deso' | transloco }}
+      {{ 'buy_deso.buy_deso' }}
     </div>
     <div class="d-flex flex-column">
       <div style="flex-grow: 1">
@@ -18,15 +18,15 @@
               (tabClick)="_handleTabClick($event)"
             ></tab-selector>
           </div>
-          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD && globalVars.showBuyWithUSD">
+          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD">
             <buy-deso-usd [parentComponent]="this"></buy-deso-usd>
           </div>
-          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_BTC || (!globalVars.showBuyWithUSD && !globalVars.showBuyWithETH)">
+          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_BTC">
             <div *ngIf="buyWithBTCStep === 1">
               <!-- Step One Box -->
               <div class="mx-16px">
                 <div class="fs-17px fc-secondary font-weight-bold mt-20px mb-5px">
-                  {{ 'buy_deso.step' | transloco }} 1/2
+                  {{ 'buy_deso.step' }} 1/2
                   <i
                     (click)="tooltip1.toggle()"
                     class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon"
@@ -35,9 +35,9 @@
                     #tooltip1="matTooltip"
                   ></i>
                 </div>
-                <div class="d-flex justify-content-between fs-17px fc-secondary" [ngClass]="{ 'align-items-start flex-column': globalVars.isMobile() }">
+                <div class="d-flex justify-content-between fs-17px fc-secondary">
                   <div>
-                    {{ 'buy_deso.send_bitcoin' | transloco }}
+                    {{ 'buy_deso.send_bitcoin' }}
                     <i
                       (click)="tooltip2.toggle()"
                       class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon"
@@ -46,31 +46,31 @@
                       #tooltip2="matTooltip"
                     ></i>
                   </div>
-                  <div class="d-flex justify-content-end" [ngClass]="{ 'mt-16px justify-content-between w-100': globalVars.isMobile() }">
+                  <div class="d-flex justify-content-end">
                     <div class="d-flex">
-                      <i-feather name="key" class="feather-large mr-5px"></i-feather>
+<!--                      <i-feather name="key" class="feather-large mr-5px"></i-feather>-->
                       <span class="mr-8px creator-profile__ellipsis-restriction">{{ btcDepositAddress() }}</span>
                     </div>
                     <div>
-                      <i-feather
-                        *ngIf="keyIsCopied"
-                        class="feather-small check-indicator position-relative"
-                        name="check-circle"
-                        style="top: -2px"
-                      ></i-feather>
+<!--                      <i-feather-->
+<!--                        *ngIf="keyIsCopied"-->
+<!--                        class="feather-small check-indicator position-relative"-->
+<!--                        name="check-circle"-->
+<!--                        style="top: -2px"-->
+<!--                      ></i-feather>-->
                       <a
                         *ngIf="!keyIsCopied"
                         (click)="_copyPublicKey()"
                         class="fs-16px fc-blue"
-                      >{{ 'buy_deso.copy' | transloco }}</a>
+                      >{{ 'buy_deso.copy' }}</a>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="w-100 border-bottom mt-25px"></div>
               <div class="p-16px">
-                <div class="mint-nft__sub-title">{{ 'buy_deso.amount_desposited' | transloco }}</div>
-                <div class="d-flex" [ngClass]="{ 'flex-column': globalVars.isMobile() }">
+                <div class="mint-nft__sub-title">{{ 'buy_deso.amount_desposited' }}</div>
+                <div class="d-flex">
                   <div class="d-flex w-100">
                     <div
                       class="d-flex"
@@ -83,35 +83,34 @@
                     </div>
                     <div class="position-relative w-100">
                       <div class="mint-nft__input" style="border-radius: 0px 6px 6px 0px">
-                        {{ queryingBitcoinAPI ? "Loading..." : (appData.latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(8) }}
+                        {{ queryingBitcoinAPI ? "Loading..." : (latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(8) }}
                       </div>
                       <span class="mint-nft__floating-span fc-muted" *ngIf="!queryingBitcoinAPI">
                         {{
-                          appData.formatUSD(
-                            (appData.latestBitcoinAPIResponse?.final_balance * appData.usdPerBitcoinExchangeRate) / 1e8,
+                          globalVars.formatUSD(
+                            (latestBitcoinAPIResponse?.final_balance * usdPerBitcoinExchangeRate) / 1e8,
                             2
                           )
                         }} USD</span>
                     </div>
                   </div>
                   <a
-                    [ngClass]="{ 'mt-10px': globalVars.isMobile() }"
-                    [ngStyle]="{ 'margin-left': globalVars.isMobile() ? '0px' : '16px' }"
+                    style="{ 'margin-left': '16px'}"
                     class="fc-blue fs-15px cursor-pointer d-flex align-items-center mx-16px"
                     (click)="_queryBitcoinAPI()"
                   >
-                    <i-feather
-                      name="rotate-cw"
-                      class="feather-small position-relative mr-5px"
-                      style="top: -5px"
-                    ></i-feather>
-                    <span>{{ 'buy_deso.refresh' | transloco }}</span>
+<!--                    <i-feather-->
+<!--                      name="rotate-cw"-->
+<!--                      class="feather-small position-relative mr-5px"-->
+<!--                      style="top: -5px"-->
+<!--                    ></i-feather>-->
+                    <span>{{ 'buy_deso.refresh' }}</span>
                   </a>
                 </div>
                 <div class="mt-16px fc-muted">
-                  <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
+<!--                  <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>-->
                   <span class="mint-nft__sub-text">
-                    {{ 'buy_deso.minimum_deposit' | transloco }}
+                    {{ 'buy_deso.minimum_deposit' }}
                     {{ ((buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB * 0.3) / 1e8).toFixed(4) }} Bitcoin
                     <i
                       (click)="tooltip3.toggle()"
@@ -130,20 +129,20 @@
                   class="light-button fc-default font-weight-bold fs-17px"
                   style="width: 200px"
                 >
-                {{ 'buy_deso.goto_next_step' | transloco }}
+                {{ 'buy_deso.goto_next_step' }}
                 </button>
-                <a class="fc-muted ml-25px" (click)="cancelButtonClicked()">{{ 'buy_deso.cancel' | transloco }}</a>
+                <a class="fc-muted ml-25px" (click)="cancelButtonClicked()">{{ 'buy_deso.cancel' }}</a>
               </div>
             </div>
             <div *ngIf="buyWithBTCStep === 2">
               <div class="mx-16px">
                 <div class="fs-17px font-weight-bold mt-20px mb-5px fc-default">
-                  {{ 'buy_deso.step' | transloco }} 2/2
+                  {{ 'buy_deso.step' }} 2/2
                 </div>
               </div>
               <div class="w-100 border-bottom"></div>
               <div class="p-16px">
-                <div class="mint-nft__sub-title">{{ 'buy_deso.bitcoin_balance' | transloco }}</div>
+                <div class="mint-nft__sub-title">{{ 'buy_deso.bitcoin_balance' }}</div>
                 <div class="d-flex">
                   <div
                     class="d-flex"
@@ -156,11 +155,11 @@
                   </div>
                   <div class="position-relative w-100">
                     <div class="mint-nft__input" style="border-radius: 0px 6px 6px 0px">
-                      {{ (appData.latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(8) }}
+                      {{ (latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(8) }}
                     </div>
                   </div>
                 </div>
-                <div class="mint-nft__sub-title">{{ 'buy_deso.deso_to_buy' | transloco }}</div>
+                <div class="mint-nft__sub-title">{{ 'buy_deso.deso_to_buy' }}</div>
                 <div class="d-flex">
                   <div
                     class="d-flex"
@@ -184,12 +183,12 @@
                     />
                     <span class="mint-nft__floating-span">
                       <a class="fc-blue" (click)="_clickMaxDeSo()">
-                        {{ 'buy_deso.max' | transloco }}
+                        {{ 'buy_deso.max' }}
                       </a>
                     </span>
                   </div>
                 </div>
-                <div class="mint-nft__sub-title">{{ 'buy_deso.bitcoin_to_swap' | transloco }}</div>
+                <div class="mint-nft__sub-title">{{ 'buy_deso.bitcoin_to_swap' }}</div>
                 <div class="d-flex">
                   <div
                     class="d-flex"
@@ -216,7 +215,7 @@
                 <div class="mt-16px fc-muted">
                   <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
                   <span class="mint-nft__sub-text">
-                    {{ 'buy_deso.bitcoin_network_fee' | transloco }}
+                    {{ 'buy_deso.bitcoin_network_fee' }}
                   </span>
                   <i
                     (click)="tooltip4.toggle()"
@@ -229,8 +228,8 @@
                     <span *ngIf="buyDeSoFields.error == null || buyDeSoFields.error === ''">
                       {{ (buyDeSoFields.bitcoinTotalTransactionFeeSatoshis / 1e8).toFixed(8) }} Bitcoin ≈
                       {{
-                      appData.formatUSD(
-                        (buyDeSoFields.bitcoinTotalTransactionFeeSatoshis * appData.usdPerBitcoinExchangeRate) /
+                      globalVars.formatUSD(
+                        (buyDeSoFields.bitcoinTotalTransactionFeeSatoshis * usdPerBitcoinExchangeRate) /
                         1e8,
                         2
                       )
@@ -238,14 +237,14 @@
                       USD
                     </span>
                     <span *ngIf="buyDeSoFields.error != null && buyDeSoFields.error !== ''" style="margin-top: 0">
-                      0.00000000 Bitcoin ≈ {{ appData.formatUSD(0, 2) }} USD
+                      0.00000000 Bitcoin ≈ {{ globalVars.formatUSD(0, 2) }} USD
                     </span>
                   </span>
                 </div>
                 <div class="mt-16px fc-muted">
                   <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
                   <span class="mint-nft__sub-text">
-                    {{ 'buy_deso.total_bitcoin_to_swap' | transloco }}
+                    {{ 'buy_deso.total_bitcoin_to_swap' }}
                   </span>
                     <span class="mt-1 w-100 fs-15px">
                       <span *ngIf="!buyDeSoFields.error">
@@ -258,10 +257,10 @@
                         }}
                         Bitcoin ≈
                         {{
-                        appData.formatUSD(
+                        globalVars.formatUSD(
                           ((buyDeSoFields.bitcoinToExchange * 1e8 +
                               buyDeSoFields.bitcoinTotalTransactionFeeSatoshis) *
-                            appData.usdPerBitcoinExchangeRate) /
+                            usdPerBitcoinExchangeRate) /
                           1e8,
                           2
                         )
@@ -269,7 +268,7 @@
                         USD
                       </span>
                     <span *ngIf="buyDeSoFields.error" style="margin-top: 0">
-                      0.00000000 Bitcoin ≈ {{ appData.formatUSD(0, 2) }} USD
+                      0.00000000 Bitcoin ≈ {{ globalVars.formatUSD(0, 2) }} USD
                     </span>
                   </span>
                 </div>
@@ -280,8 +279,8 @@
               </div>
               <div class="border-bottom w-100"></div>
               <div class="m-16px">
-                <button class="primary-button" (click)="_clickBuyDeSo()">{{ 'buy_deso.buy_deso' | transloco }}</button>
-                <a class="fc-muted ml-25px" (click)="buyWithBTCStep = 1">{{ 'buy_deso.back' | transloco }}</a>
+                <button class="primary-button" (click)="_clickBuyDeSo()">{{ 'buy_deso.buy_deso' }}</button>
+                <a class="fc-muted ml-25px" (click)="buyWithBTCStep = 1">{{ 'buy_deso.back' }}</a>
               </div>
             </div>
           </div>
