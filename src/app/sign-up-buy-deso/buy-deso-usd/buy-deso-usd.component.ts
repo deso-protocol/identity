@@ -8,9 +8,10 @@ import * as _ from 'lodash';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SwalHelper } from '../../../lib/helpers/swal-helper';
-import currencyToSymbolMap from 'currency-symbol-map/map';
 import { BuyDeSoComponent } from '../buy-deso/buy-deso.component';
-import {SignUpBuyDesoComponent} from "../sign-up-buy-deso.component";
+import {CommonModule} from "@angular/common";
+import {FormsModule} from "@angular/forms";
+const currencyToSymbolMap = require('currency-symbol-map/map');
 
 @Component({
   selector: 'buy-deso-usd',
@@ -18,6 +19,7 @@ import {SignUpBuyDesoComponent} from "../sign-up-buy-deso.component";
   styleUrls: ['./buy-deso-usd.component.scss'],
 })
 export class BuyDeSoUSDComponent implements OnInit {
+  // @ts-ignore
   @Input() parentComponent: BuyDeSoComponent;
   wyreService: WyreService;
 
@@ -184,6 +186,10 @@ export class BuyDeSoUSDComponent implements OnInit {
 
 @NgModule({
   declarations: [BuyDeSoUSDComponent],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   exports: [BuyDeSoUSDComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

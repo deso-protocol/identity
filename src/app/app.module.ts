@@ -40,7 +40,7 @@ import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe'
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
 import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
 import {SignUpBuyDesoComponent, SignUpBuyDesoComponentWrapper} from './sign-up-buy-deso/sign-up-buy-deso.component';
-import {BuyDeSoComponent} from './sign-up-buy-deso/buy-deso/buy-deso.component';
+import {BuyDeSoComponent, BuyDeSoComponentWrapper} from './sign-up-buy-deso/buy-deso/buy-deso.component';
 import {BuyDeSoCompleteComponent} from './sign-up-buy-deso/buy-deso-complete/buy-deso-complete.component';
 import {BuyDeSoEthComponent} from './sign-up-buy-deso/buy-deso-eth/buy-deso-eth.component';
 import {BuyDeSoUSDComponent, BuyDeSoUSDComponentWrapper} from './sign-up-buy-deso/buy-deso-usd/buy-deso-usd.component';
@@ -75,7 +75,6 @@ import {BuyDeSoUSDComponent, BuyDeSoUSDComponentWrapper} from './sign-up-buy-des
     SanitizePostBodyPipe,
     SanitizeVideoUrlPipe,
     TransactionSpendingLimitDaoCoinLimitOrderComponent,
-    BuyDeSoComponent,
     BuyDeSoCompleteComponent,
     BuyDeSoEthComponent,
   ],
@@ -91,6 +90,7 @@ import {BuyDeSoUSDComponent, BuyDeSoUSDComponentWrapper} from './sign-up-buy-des
     NgxIntlTelInputModule,
     SignUpBuyDesoComponentWrapper,
     BuyDeSoUSDComponentWrapper,
+    BuyDeSoComponentWrapper,
     CookieModule.forRoot()
   ],
   providers: [

@@ -21,6 +21,9 @@ import { isNil } from 'lodash';
 import {AccountService} from '../../account.service';
 import {TextService} from '../../text.service';
 import {SigningService} from '../../signing.service';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {FormsModule} from "@angular/forms";
+import {CommonModule} from "@angular/common";
 
 class Messages {
   static INCORRECT_PASSWORD = `The password you entered was incorrect.`;
@@ -598,6 +601,14 @@ export class BuyDeSoComponent implements OnInit {
     this._updateBitcoinFee(parseFloat(this.buyDeSoFields.bitcoinToExchange));
   }
 
+  _bitcoinToExchangeNumber(): number {
+    return parseFloat(this.buyDeSoFields.bitcoinToExchange);
+  }
+
+  _bitcoinTotalTransactionFeeSatoshisNumber(): number {
+    return parseFloat(this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis);
+  }
+
   _queryBitcoinAPI(): void {
     // If we are already querying the bitcoin API, abort mission!
     if (this.queryingBitcoinAPI) {
@@ -689,7 +700,19 @@ export class BuyDeSoComponent implements OnInit {
     this._updateDeSoExchangeRate();
   }
 
-  _handleTabClick(tab: string): void {
+  _handleTabClick(tab: any): void {
     this.activeTab = tab;
   }
 }
+
+@NgModule({
+  declarations: [BuyDeSoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatTooltipModule
+  ],
+  exports: [BuyDeSoComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+})
+export class BuyDeSoComponentWrapper {}

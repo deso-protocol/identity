@@ -7,7 +7,6 @@
       <div style="flex-grow: 1">
         <div class="global__mobile-scrollable-section disable-scrollbars" *ngIf="!waitingOnTxnConfirmation">
           <div
-            *ngIf="globalVars.showBuyWithUSD || globalVars.showBuyWithETH"
             [ngClass]="{ 'mb-10px': activeTab === BuyDeSoComponent.BUY_WITH_BTC }"
           >
             <tab-selector
@@ -226,10 +225,10 @@
                   ></i>
                   <span class="mt-1 w-100 fs-15px">
                     <span *ngIf="buyDeSoFields.error == null || buyDeSoFields.error === ''">
-                      {{ (buyDeSoFields.bitcoinTotalTransactionFeeSatoshis / 1e8).toFixed(8) }} Bitcoin ≈
+                      {{ (_bitcoinTotalTransactionFeeSatoshisNumber() / 1e8).toFixed(8) }} Bitcoin ≈
                       {{
                       globalVars.formatUSD(
-                        (buyDeSoFields.bitcoinTotalTransactionFeeSatoshis * usdPerBitcoinExchangeRate) /
+                        (_bitcoinTotalTransactionFeeSatoshisNumber() * usdPerBitcoinExchangeRate) /
                         1e8,
                         2
                       )
@@ -250,16 +249,16 @@
                       <span *ngIf="!buyDeSoFields.error">
                         {{
                         (
-                          (buyDeSoFields.bitcoinToExchange * 1e8 +
-                            buyDeSoFields.bitcoinTotalTransactionFeeSatoshis) /
+                          (_bitcoinToExchangeNumber() * 1e8 +
+                            _bitcoinTotalTransactionFeeSatoshisNumber()) /
                           1e8
                         ).toFixed(8)
                         }}
                         Bitcoin ≈
                         {{
                         globalVars.formatUSD(
-                          ((buyDeSoFields.bitcoinToExchange * 1e8 +
-                              buyDeSoFields.bitcoinTotalTransactionFeeSatoshis) *
+                          ((_bitcoinToExchangeNumber() * 1e8 +
+                              _bitcoinTotalTransactionFeeSatoshisNumber()) *
                             usdPerBitcoinExchangeRate) /
                           1e8,
                           2

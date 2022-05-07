@@ -13,16 +13,16 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "~11.1.1",
-    "@angular/cdk": "^11.1.1",
-    "@angular/common": "~11.1.1",
-    "@angular/compiler": "~11.1.1",
-    "@angular/core": "~11.1.1",
-    "@angular/forms": "~11.1.1",
-    "@angular/material": "^11.1.1",
-    "@angular/platform-browser": "~11.1.1",
-    "@angular/platform-browser-dynamic": "~11.1.1",
-    "@angular/router": "~11.1.1",
+    "@angular/animations": "^11.1.2",
+    "@angular/cdk": "~13.3.6",
+    "@angular/common": "~13.3.6",
+    "@angular/compiler": "~13.3.6",
+    "@angular/core": "~13.3.6",
+    "@angular/forms": "~13.3.6",
+    "@angular/material": "~13.3.6",
+    "@angular/platform-browser": "~13.3.6",
+    "@angular/platform-browser-dynamic": "~13.3.6",
+    "@angular/router": "~13.3.6",
     "@ethereumjs/common": "^2.6.4",
     "@ethereumjs/tx": "^3.5.1",
     "@ethereumjs/vm": "^5.9.0",
@@ -59,10 +59,10 @@
     "zone.js": "~0.11.3"
   },
   "devDependencies": {
-    "@angular-builders/custom-webpack": "^11.1.1",
+    "@angular-builders/custom-webpack": "^13.1.0",
     "@angular-devkit/build-angular": "~0.1101.2",
-    "@angular/cli": "~11.1.2",
-    "@angular/compiler-cli": "~11.1.1",
+    "@angular/cli": "~13.3.5",
+    "@angular/compiler-cli": "~13.3.6",
     "@types/bip39": "^3.0.0",
     "@types/bs58check": "^2.1.0",
     "@types/elliptic": "^6.4.12",
@@ -84,6 +84,6 @@
     "protractor": "~7.0.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
-    "typescript": "~4.1.2"
+    "typescript": "~4.4.0"
   }
 }

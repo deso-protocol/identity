@@ -604,10 +604,10 @@ export class BuyDeSoEthComponent implements OnInit {
         .QueryETHRPC(method, params, this.publicKey, jwt)
         .toPromise()
         .then(
-          (res) => {
+          (res: any) => {
             resolve(res.result);
           },
-          (err) => {
+          (err: any) => {
             console.error(err);
             reject(err);
           }
