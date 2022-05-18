@@ -10,7 +10,10 @@ import {GlobalVarsService} from '../global-vars.service';
 })
 export class SignUpBuyDesoComponent implements OnInit {
 
-  constructor(public globalVars: GlobalVarsService, private titleService: Title) {}
+  constructor(
+    public globalVars: GlobalVarsService,
+    private titleService: Title
+  ) {}
 
   ngOnInit(): void {
     this.titleService.setTitle(`Buy $DESO - ${environment.hostname}`);
@@ -18,10 +21,10 @@ export class SignUpBuyDesoComponent implements OnInit {
 
 }
 
-@NgModule({
-  declarations: [SignUpBuyDesoComponent],
-  exports: [SignUpBuyDesoComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
-export class SignUpBuyDesoComponentWrapper {}
-
+// @NgModule({
+//   declarations: [SignUpBuyDesoComponent],
+//   exports: [SignUpBuyDesoComponent],
+//   schemas: [CUSTOM_ELEMENTS_SCHEMA]
+// })
+// export class SignUpBuyDesoComponentWrapper {}
+//

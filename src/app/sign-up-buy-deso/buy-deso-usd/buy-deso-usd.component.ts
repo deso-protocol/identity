@@ -183,15 +183,3 @@ export class BuyDeSoUSDComponent implements OnInit {
     return quotation.equivalencies.USD;
   }
 }
-
-@NgModule({
-  declarations: [BuyDeSoUSDComponent],
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
-  exports: [BuyDeSoUSDComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
-export class BuyDeSoUSDComponentWrapper {}
-

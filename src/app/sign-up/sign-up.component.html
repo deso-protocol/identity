@@ -239,11 +239,6 @@
   </div>
 
   <div *ngIf="stepScreen === SignUpComponent.STEP_OBTAIN_DESO">
-    <!--    <div class="modal-header">-->
-    <!--      <div *ngIf="showModal" class="modal-header-x" (click)="bsModalRef.hide()">-->
-    <!--        <i-feather name="x"></i-feather>-->
-    <!--      </div>-->
-    <!--    </div>-->
     <div class="onboarding-buy-deso-container p-16px">
       <div class="fs-20px fc-muted pb-10px mb-10px">Easily transfer $DESO or purchase some directly</div>
       <div class="border-bottom w-100 mb-30px"></div>
@@ -264,8 +259,13 @@
             </div>
             <div class="d-flex justify-content-around">
               <div class="col-10 d-flex align-items-center flex-column">
-                <!--                (click)="openBuyDeSoModal(true)"-->
-                <button class="styled-primary-button mb-16px" style="width: 200px">Buy Now!</button>
+                <button
+                  (click)="stepFiveNextBuy()"
+                  class="styled-primary-button mb-16px"
+                  style="width: 200px"
+                >
+                  Buy Now!
+                </button>
                 <div class="fs-12px fc-muted text-center">We support 20 fiat currencies including USD and more.</div>
               </div>
             </div>
@@ -299,16 +299,16 @@
             <div class="w-100 border-bottom"></div>
             <div class="d-flex justify-content-around mt-10px mb-5px" (click)="_copyPublicKey()">
               <span>
-<!--                <i-feather-->
-<!--                  *ngIf="publicKeyIsCopied"-->
-<!--                  class="feather-small check-indicator position-relative"-->
-<!--                  name="check-circle"-->
-<!--                ></i-feather>-->
-<!--                <i-feather-->
-<!--                  *ngIf="!publicKeyIsCopied"-->
-<!--                  class="feather-small copy-button cursor-pointer position-relative"-->
-<!--                  name="copy"-->
-<!--                ></i-feather>-->
+                <i-feather
+                  *ngIf="publicKeyIsCopied"
+                  class="feather-small check-indicator position-relative"
+                  name="check-circle"
+                ></i-feather>
+                <i-feather
+                  *ngIf="!publicKeyIsCopied"
+                  class="feather-small copy-button cursor-pointer position-relative"
+                  name="copy"
+                ></i-feather>
                 <span class="fs-16px fc-blue ml-5px">Click to Copy</span>
               </span>
             </div>
@@ -321,7 +321,7 @@
               <div *ngIf="!refreshBalanceCooldown">
                 <div (click)="refreshBalance()" class="ml-10px d-flex align-items-center cursor-pointer">
                   <div class="d-flex">
-<!--                    <i-feather class="fc-default feather-small fs-0px mr-5px" name="refresh-cw"></i-feather>-->
+                    <i-feather class="fc-default feather-small fs-0px mr-5px" name="refresh-cw"></i-feather>
                   </div>
                   <span class="fc-blue">Refresh</span>
                 </div>
@@ -339,6 +339,14 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="stepScreen === SignUpComponent.STEP_BUY_DESO">
+    <buy-deso
+      [publicKey]="publicKeyAdded"
+      [seedHex]="seedHex"
+      [testnet]="globalVars.network == Network.testnet"
+    ></buy-deso>
   </div>
 
 </div>

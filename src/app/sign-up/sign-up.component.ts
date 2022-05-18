@@ -10,6 +10,7 @@ import {TextService} from '../text.service';
 import * as bip39 from 'bip39';
 import {RouteNames} from '../app-routing.module';
 import {BackendAPIService} from '../backend-api.service';
+import { Network } from 'src/types/identity';
 
 @Component({
   selector: 'app-sign-up',
@@ -22,7 +23,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
   static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
   static STEP_VERIFY_PHONE_NUMBER = 'step_verify_phone_number';
   static STEP_OBTAIN_DESO = 'step_obtain_deso';
+  static STEP_BUY_DESO = 'step_buy_deso';
 
+  Network = Network;
   stepScreen: string = SignUpComponent.STEP_GENERATE_SEED;
   SignUpComponent = SignUpComponent;
   seedHex = '';
@@ -117,6 +120,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
     this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
     this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
+    console.log("seed hex?", this.seedHex);
+    console.log("added new public key?", this.publicKeyAdded);
+    console.log("network globalvars", this.globalVars.network);
 
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
@@ -159,6 +165,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
 
+  stepFiveNextBuy(): void {
+    this.stepScreen = SignUpComponent.STEP_BUY_DESO;
+  }
+
   _copyPublicKey(): void {
     this.textService.copyText(this.publicKeyAdded);
     this.publicKeyIsCopied = true;
@@ -198,6 +208,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
   finishFlowTransferDeSo(): void {
     this.finishFlow();
   }
+
+  ////// STEP SIX BUTTONS | STEP_BUY_DESO ///////
+
+
 
   ////// FINISH FLOW ///////
 

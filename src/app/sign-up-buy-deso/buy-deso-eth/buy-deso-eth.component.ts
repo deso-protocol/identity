@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import {Component, OnInit, Input, NgModule, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import { GlobalVarsService } from '../../global-vars.service';
 import { BackendAPIService } from '../../backend-api.service';
 import { sprintf } from 'sprintf-js';
@@ -13,8 +13,8 @@ import { FeeMarketEIP1559TxData } from '@ethereumjs/tx/src/types';
 import { TextService } from '../../text.service';
 import { Transaction, TransactionOptions } from 'ethereumjs-tx';
 import { BN } from 'ethereumjs-util';
-import {AccountService} from '../../account.service';
-import {SigningService} from '../../signing.service';
+import { AccountService } from '../../account.service';
+import { SigningService } from '../../signing.service';
 
 const feeMarketTransaction = FeeMarketEIP1559Transaction;
 
@@ -724,3 +724,16 @@ export class BuyDeSoEthComponent implements OnInit {
     return this.stringToWeiBN(wei.toString());
   }
 }
+
+// @NgModule({
+//   declarations: [BuyDeSoEthComponent],
+//   imports: [
+//     IconsModule,
+//     MatTooltipModule,
+//     FormsModule,
+//     CommonModule,
+//   ],
+//   exports: [BuyDeSoEthComponent],
+//   schemas: [CUSTOM_ELEMENTS_SCHEMA]
+// })
+// export class BuyDeSoEthComponentWrapper {}

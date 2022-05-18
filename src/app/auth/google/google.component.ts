@@ -56,7 +56,7 @@ export class GoogleComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.fragment.subscribe((params) => {
-      const hashParams = new URLSearchParams(params);
+      const hashParams = new URLSearchParams(params as string);
       const accessToken = hashParams.get('access_token');
       if (!accessToken) {
         return;

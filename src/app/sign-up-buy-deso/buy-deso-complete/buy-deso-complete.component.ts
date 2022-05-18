@@ -1,24 +1,22 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { GlobalVarsService } from "../../global-vars.service";
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { GlobalVarsService } from '../../global-vars.service';
 
 @Component({
-  selector: "buy-deso-complete",
-  templateUrl: "./buy-deso-complete.component.html",
-  styleUrls: ["./buy-deso-complete.component.scss"],
+  selector: 'buy-deso-complete',
+  templateUrl: './buy-deso-complete.component.html',
+  styleUrls: ['./buy-deso-complete.component.scss'],
 })
 export class BuyDeSoCompleteComponent implements OnInit {
   @Output() buyMoreDeSoClicked = new EventEmitter();
   @Output() closeModal = new EventEmitter();
 
-  globalVars: GlobalVarsService;
+  amountOfDeSoBought = 0;
 
-  amountOfDeSoBought: number = 0;
+  constructor(
+    private globalVars: GlobalVarsService
+  ) {}
 
-  constructor(private _globalVars: GlobalVarsService) {
-    this.globalVars = _globalVars;
-  }
-
-  triggerBuyMoreDeSo() {
+  triggerBuyMoreDeSo(): void {
     this.buyMoreDeSoClicked.emit();
   }
 
@@ -26,7 +24,7 @@ export class BuyDeSoCompleteComponent implements OnInit {
     this.closeModal.emit();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     window.scroll(0, 0);
   }
 }

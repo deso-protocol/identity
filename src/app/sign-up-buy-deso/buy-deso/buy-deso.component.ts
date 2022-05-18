@@ -22,8 +22,14 @@ import {AccountService} from '../../account.service';
 import {TextService} from '../../text.service';
 import {SigningService} from '../../signing.service';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {FormsModule} from "@angular/forms";
-import {CommonModule} from "@angular/common";
+import {FormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {TabSelectorComponent} from '../tab-selector/tab-selector.component';
+import {BuyDeSoCompleteComponent} from '../buy-deso-complete/buy-deso-complete.component';
+import {BuyDeSoEthComponent} from '../buy-deso-eth/buy-deso-eth.component';
+import {BuyDeSoUSDComponent} from '../buy-deso-usd/buy-deso-usd.component';
+import {IconsModule} from '../../icons/icons.module';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 class Messages {
   static INCORRECT_PASSWORD = `The password you entered was incorrect.`;
@@ -42,27 +48,6 @@ class Messages {
   styleUrls: ['./buy-deso.component.scss'],
 })
 export class BuyDeSoComponent implements OnInit {
-
-  constructor(
-    public ref: ChangeDetectorRef,
-    public globalVars: GlobalVarsService,
-    private backendAPIService: BackendAPIService,
-    private identityService: IdentityService,
-    private accountService: AccountService,
-    private signingService: SigningService,
-    private textService: TextService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private httpClient: HttpClient
-  ) {
-    this.appData = globalVars;
-    this.route.queryParams.subscribe((params: Params) => {
-      if (params.btc) {
-        this.activeTab = BuyDeSoComponent.BUY_WITH_BTC;
-        this.router.navigate([], { queryParams: {} });
-      }
-    });
-  }
   static BUY_WITH_USD = 'Buy with fiat';
   static BUY_WITH_BTC = 'Buy with Bitcoin';
   static BUY_WITH_ETH = 'Buy with ETH';
@@ -112,6 +97,27 @@ export class BuyDeSoComponent implements OnInit {
     bitcoinTotalTransactionFeeSatoshis: '0',
     error: '',
   };
+
+  constructor(
+    public ref: ChangeDetectorRef,
+    public globalVars: GlobalVarsService,
+    private backendAPIService: BackendAPIService,
+    private identityService: IdentityService,
+    private accountService: AccountService,
+    private signingService: SigningService,
+    private textService: TextService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private httpClient: HttpClient
+  ) {
+    this.appData = globalVars;
+    this.route.queryParams.subscribe((params: Params) => {
+      if (params.btc) {
+        this.activeTab = BuyDeSoComponent.BUY_WITH_BTC;
+        this.router.navigate([], { queryParams: {} });
+      }
+    });
+  }
 
   btcDepositAddress(): string {
     const user = this.accountService.getEncryptedUsers()[this.publicKey];
@@ -667,6 +673,9 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.publicKey);
+    console.log(this.seedHex);
+    console.log(this.testnet);
     window.scroll(0, 0);
 
     // Add extra tabs
@@ -706,11 +715,20 @@ export class BuyDeSoComponent implements OnInit {
 }
 
 @NgModule({
-  declarations: [BuyDeSoComponent],
+  declarations: [
+    BuyDeSoComponent,
+    TabSelectorComponent,
+    BuyDeSoCompleteComponent,
+    BuyDeSoEthComponent,
+    BuyDeSoUSDComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    CommonModule,
+    IconsModule,
+    BsDropdownModule.forRoot(),
   ],
   exports: [BuyDeSoComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

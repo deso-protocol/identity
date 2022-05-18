@@ -502,10 +502,15 @@ export class BackendAPIService {
   }
 
   GetBitcoinAPIInfo(bitcoinAddr: string, isTestnet: boolean): Observable<any> {
-    let endpoint = `https://api.blockcypher.com/v1/btc/main/addrs/${bitcoinAddr}/full?token=${this.blockCypherToken}`;
+    let endpoint = `https://api.blockcypher.com/v1/btc/main/addrs/`;
     if (isTestnet) {
-      endpoint = `https://api.blockcypher.com/v1/btc/test3/addrs/${bitcoinAddr}/full?token=${this.blockCypherToken}`;
+      endpoint = `https://api.blockcypher.com/v1/btc/test3/addrs/`;
     }
+
+    if (bitcoinAddr !== '') {
+      endpoint += `${bitcoinAddr}/`;
+    }
+    endpoint += `full?token=${this.blockCypherToken}`;
 
     return this.httpClient.get<any>(endpoint).pipe(
       map((res) => {

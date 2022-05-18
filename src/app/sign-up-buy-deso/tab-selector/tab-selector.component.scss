@@ -1,0 +1,44 @@
+$tile-bg: #000000;
+$text: #47205c;
+$tile-secondary-bg: #111;
+$border: #dee2e6;
+$text-secondary: #bbbbbb;
+$text-muted: #999;
+$highlight: #005BFF;
+$highlight-secondary: #E5F2FF;
+
+.tab-selector-links {
+  border-bottom: 1px solid $border;
+  .active-tab {
+    color: $highlight;
+    border-bottom: 1.5px solid $highlight;
+    &.first-tab {
+      padding-left: 0px;
+    }
+  }
+}
+
+.tab-selector__container button {
+  background: $tile-bg;
+  height: 40px;
+  color: $highlight;
+  position: relative;
+  border: 0;
+  padding: 0;
+  font-size: 15px;
+}
+.tab-selector__container .new-tab-indicator {
+  background: $tile-bg;
+  color: $highlight;
+  position: relative;
+  top: -1px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  span {
+    position: relative;
+    font-size: 13px;
+    font-weight: normal;
+  }
+}

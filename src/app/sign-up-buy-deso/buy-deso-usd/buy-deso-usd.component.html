@@ -1,8 +1,8 @@
 <div class="w-100">
   <div>
     <div class="p-16px">
-      <div class="mint-nft__sub-title" style="margin-top: 0px">
-        {{ 'buy_deso.exchange_amount' }}
+      <div class="buy-deso__sub-title" style="margin-top: 0px">
+        Amount to exchange
       </div>
       <div class="d-flex">
         <div
@@ -12,7 +12,7 @@
           container="body"
           style="align-items: center"
         >
-          <button class="mint-nft__dropdown-btn d-flex align-content-between" role="button" dropdownToggle>
+          <button class="buy-deso__dropdown-btn d-flex align-content-between" role="button" dropdownToggle>
             <span>{{ selectedFiatCurrency }}</span>
             <i-feather name="chevron-down" class="feather-small"></i-feather>
           </button>
@@ -34,7 +34,7 @@
             (input)="updateQuotation()"
             style="border-radius: 0px 6px 6px 0px"
             aria-describedby="usd-label"
-            class="mint-nft__input"
+            class="buy-deso__input"
             type="number"
             min="0"
             placeholder="0"
@@ -42,8 +42,8 @@
         </div>
       </div>
 
-      <div class="mint-nft__sub-title" style="margin-top: 30px">
-        {{ 'buy_deso.receive_amount' }}
+      <div class="buy-deso__sub-title" style="margin-top: 30px">
+        Amount you receive
       </div>
 
       <div class="d-flex">
@@ -52,19 +52,19 @@
           container="body"
           style="align-items: center"
         >
-          <div class="mint-nft__dropdown-btn">
+          <div class="buy-deso__dropdown-btn">
             $DESO
           </div>
         </div>
         <div class="position-relative w-100">
-          <div class="mint-nft__input" style="border-radius: 0px 6px 6px 0px">
+          <div class="buy-deso__input" style="border-radius: 0px 6px 6px 0px">
             {{ desoReceived }}
           </div>
         </div>
       </div>
 
-      <div class="mint-nft__sub-title" style="margin-top: 30px">
-        {{ 'buy_deso.country' }}
+      <div class="buy-deso__sub-title" style="margin-top: 30px">
+        Country
       </div>
 
       <div
@@ -103,7 +103,7 @@
         [ngClass]="{ 'disabled-button': quotationError }"
         [disabled]="quotationError"
       >
-        {{ 'buy_deso.buy_deso' }}
+        Buy $DESO
       </button>
       <a class="fc-muted ml-25px" (click)="parentComponent.cancelButtonClicked()">Cancel</a>
     </div>
