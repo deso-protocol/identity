@@ -262,5 +262,4 @@ export class SignUpComponent implements OnInit, OnDestroy {
   getNewEntropy(): void {
     this.entropyService.setNewTemporaryEntropy();
   }
-
 }

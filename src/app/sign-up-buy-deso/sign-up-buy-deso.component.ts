@@ -20,11 +20,3 @@ export class SignUpBuyDesoComponent implements OnInit {
   }
 
 }
-
-// @NgModule({
-//   declarations: [SignUpBuyDesoComponent],
-//   exports: [SignUpBuyDesoComponent],
-//   schemas: [CUSTOM_ELEMENTS_SCHEMA]
-// })
-// export class SignUpBuyDesoComponentWrapper {}
-//
