@@ -276,15 +276,14 @@ export class BuyDeSoEthComponent implements OnInit {
             [signedHash]
           )
           .subscribe(
-            () => {
+            (res) => {
               // Reset all the form fields
               this.error = '';
               this.desoToBuy = 0;
               this.ethToExchange = 0;
               this.weiToExchange = new BN(0);
               // This will update the balance and a bunch of other things.
-              this.parentComponent._clickBuyDeSoSuccess(this.parentComponent);
-              this.parentComponent._clickBuyDeSoSuccessButTimeout(this.parentComponent);
+              this.parentComponent.waitForTransaction(res.DESOTxHash);
               resolve(true);
             },
             (err) => {

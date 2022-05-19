@@ -120,9 +120,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
     this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
     this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
-    console.log("seed hex?", this.seedHex);
-    console.log("added new public key?", this.publicKeyAdded);
-    console.log("network globalvars", this.globalVars.network);
 
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);

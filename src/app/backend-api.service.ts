@@ -556,7 +556,7 @@ export class BackendAPIService {
       BTCDepositAddress,
       FeeRateSatoshisPerKB,
       SignedHashes,
-      Broadcast: false,
+      Broadcast
     });
 
     return req.pipe(
@@ -616,7 +616,7 @@ export class BackendAPIService {
       ReferenceId: referenceId,
       SourceAmount: sourceAmount,
       Country: country,
-      SourceCurrency: sourceAmount,
+      SourceCurrency: sourceCurrency,
     });
 
     return req.pipe(
@@ -642,5 +642,11 @@ export class BackendAPIService {
         console.error(err);
         return throwError(err);
       }));
+  }
+
+  GetTxn(TxnHashHex: string): Observable<any> {
+    return this.post('get-txn', {
+      TxnHashHex,
+    });
   }
 }

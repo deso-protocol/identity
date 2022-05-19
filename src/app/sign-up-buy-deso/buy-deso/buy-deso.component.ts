@@ -364,7 +364,7 @@ export class BuyDeSoComponent implements OnInit {
             Math.floor(parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8),
             Math.floor(this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB),
             [],
-            true
+            false
           )
           .toPromise()
           .then(
@@ -380,7 +380,7 @@ export class BuyDeSoComponent implements OnInit {
                   this.publicKey,
                   Math.floor(parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8),
                   Math.floor(this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB),
-                  [hashes[0]],
+                  hashes,
                   true
                 )
                   .toPromise()
@@ -403,20 +403,14 @@ export class BuyDeSoComponent implements OnInit {
                       this.latestBitcoinAPIResponse = null;
 
                       // This will update the balance and a bunch of other things.
-                      // this.appData.updateEverything(
-                      //   res.DeSoTxnHashHex,
-                      //   this._clickBuyDeSoSuccess,
-                      //   this._clickBuyDeSoSuccessButTimeout,
-                      //   this
-                      // );
-                      this._clickBuyDeSoSuccess(this);
-                      this._clickBuyDeSoSuccessButTimeout(this);
+                      this.waitForTransaction(res.DeSoTxnHashHex);
                       return res;
                     },
                     (err) => {
                       console.error('Problem updating Bitcoin fee Satoshis Per KB', err);
                       this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis = '0';
                       this.buyDeSoFields.error = this._extractBurnError(err);
+                      this.waitingOnTxnConfirmation = false;
                       return null;
                     }
                   );
@@ -429,6 +423,39 @@ export class BuyDeSoComponent implements OnInit {
       }
       return null;
     });
+  }
+
+  waitForTransaction(waitTxn: string): void {
+    if (waitTxn !== '') {
+      let attempts = 0;
+      const numTries = 160;
+      const timeoutMillis = 750;
+      // Set an interval to repeat
+      const interval = setInterval(() => {
+        if (attempts >= numTries) {
+          this._clickBuyDeSoSuccessButTimeout(this);
+          clearInterval(interval);
+          return;
+        }
+        this.backendAPIService
+          .GetTxn(waitTxn)
+          .subscribe(
+            (res: any) => {
+              if (!res.TxnFound) {
+                return;
+              }
+              this._updateDeSoExchangeRate();
+              this._clickBuyDeSoSuccess(this);
+              clearInterval(interval);
+            },
+            (error) => {
+              this._clickBuyDeSoSuccessButTimeout(this);
+              clearInterval(interval);
+            }
+          )
+          .add(() => attempts++);
+      }, timeoutMillis) as any;
+    }
   }
 
   _alertSuccess(val: any, altTitle?: string, funcAfter?: any): void {
@@ -673,9 +700,6 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.publicKey);
-    console.log(this.seedHex);
-    console.log(this.testnet);
     window.scroll(0, 0);
 
     // Add extra tabs
