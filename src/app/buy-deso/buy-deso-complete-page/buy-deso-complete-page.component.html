@@ -1,9 +1,11 @@
-<!-- Top Bar -->
-<div class="buy-deso__container">
-  <buy-deso-complete
-    [publicKey]="publicKey"
-  >
-<!--    (closeModal)="cancelButtonClicked()"-->
-<!--    (buyMoreDeSoClicked)="onBuyMoreDeSoClicked()"-->
-  </buy-deso-complete>
+<app-banner></app-banner>
+<div class="page-container">
+  <!-- Top Bar -->
+  <div class="buy-deso__container">
+    <buy-deso-complete
+      [publicKey]="publicKey"
+      (buyMoreDeSoClicked)="onBuyMoreDeSoClicked()"
+    ></buy-deso-complete>
+  </div>
 </div>
+

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GetDesoComponent } from './sign-up.component';
+import { GetDesoComponent } from './get-deso.component';
 
 describe('SignUpComponent', () => {
   let component: GetDesoComponent;

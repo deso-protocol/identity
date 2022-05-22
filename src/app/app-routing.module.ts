@@ -9,12 +9,11 @@ import {ApproveComponent} from './approve/approve.component';
 import {LogInSeedComponent} from './log-in-seed/log-in-seed.component';
 import {GoogleComponent} from './auth/google/google.component';
 import {DeriveComponent} from './derive/derive.component';
-import {JumioSuccessComponent} from './jumio/jumio-success/jumio-success.component';
-import {JumioErrorComponent} from './jumio/jumio-error/jumio-error.component';
-import {JumioComponent} from './jumio/jumio.component';
 import {SharedSecretComponent} from './shared-secret/shared-secret.component';
 import {SignUpGetStarterDESOComponent} from './sign-up-get-starter-deso/sign-up-get-starter-deso.component';
-import {BuyDeSoCompleteComponent} from './buy-deso/buy-deso-complete/buy-deso-complete.component';
+import {GetDesoComponent} from './get-deso/get-deso.component';
+import {BuyDesoPageComponent} from './buy-deso/buy-deso-page/buy-deso-page.component';
+import {BuyDeSoCompletePageComponent} from './buy-deso/buy-deso-complete-page/buy-deso-complete-page.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -33,6 +32,8 @@ export class RouteNames {
   // Deprecated route - redirects to get-free-deso
   public static GET_FREE_CLOUT = 'get-free-clout';
   public static BUY_COMPLETE = 'buy-complete';
+  public static GET_DESO = 'get-deso';
+  public static BUY_DESO = 'buy-deso';
 }
 
 const routes: Routes = [
@@ -47,7 +48,9 @@ const routes: Routes = [
   { path: RouteNames.DERIVE, component: DeriveComponent, pathMatch: 'full' },
   { path: RouteNames.GET_SHARED_SECRETS, component: SharedSecretComponent, pathMatch: 'full'},
   { path: RouteNames.VERIFY_PHONE_NUMBER, component: SignUpGetStarterDESOComponent, pathMatch: 'full'},
-  { path: RouteNames.BUY_COMPLETE, component: BuyDeSoCompleteComponent, pathMatch: 'full' }
+  { path: RouteNames.BUY_COMPLETE, component: BuyDeSoCompletePageComponent, pathMatch: 'full' },
+  { path: RouteNames.GET_DESO, component: GetDesoComponent, pathMatch: 'full' },
+  { path: RouteNames.BUY_DESO, component: BuyDesoPageComponent, pathMatch: 'full' },
 ];
 
 @NgModule({

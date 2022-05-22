@@ -15,6 +15,7 @@ import { Transaction, TransactionOptions } from 'ethereumjs-tx';
 import { BN } from 'ethereumjs-util';
 import { AccountService } from '../../account.service';
 import { SigningService } from '../../signing.service';
+import { Network } from 'src/types/identity';
 
 const feeMarketTransaction = FeeMarketEIP1559Transaction;
 
@@ -681,11 +682,11 @@ export class BuyDeSoEthComponent implements OnInit {
   }
 
   getChain(): Chain {
-    return this.parentComponent.testnet ? Chain.Ropsten : Chain.Mainnet;
+    return this.globalVars.network === Network.testnet ? Chain.Ropsten : Chain.Mainnet;
   }
 
   getChainString(): string {
-    return this.parentComponent.testnet ? 'ropsten' : 'mainnet';
+    return this.globalVars.network === Network.testnet ? 'ropsten' : 'mainnet';
   }
 
   getHardfork(): Hardfork {

@@ -3,7 +3,7 @@
 <div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
   <!-- Step 3 -->
   <!-- Get Starter $DESO. -->
-  <div *ngIf="stepScreen === SignUpComponent.STEP_GET_STARTER_DESO">
+  <div *ngIf="stepScreen === GetDesoComponent.STEP_GET_STARTER_DESO">
     <div class="w-100 text-center fs-32px font-weight-bold">Get Starter $DESO</div>
     <div class="w-100 text-center mt-20px fs-20px font-weight-bold">
       Validate your phone number or buy your first $DESO.
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div *ngIf="stepScreen === SignUpComponent.STEP_VERIFY_PHONE_NUMBER">
+  <div *ngIf="stepScreen === GetDesoComponent.STEP_VERIFY_PHONE_NUMBER">
     <sign-up-get-starter-deso
       [displayForSignupFlow]="true"
       [publicKey]="publicKeyAdded"
@@ -41,10 +41,11 @@
       (phoneNumberVerified)="phoneNumberVerified()"
       (finishFlowEvent)="finishFlowPhoneNumber()"
       (skipButtonClicked)="finishFlowPhoneNumberSkip()"
+      (onCancelButtonClicked)="stepScreen = GetDesoComponent.STEP_GET_STARTER_DESO"
     ></sign-up-get-starter-deso>
   </div>
 
-  <div *ngIf="stepScreen === SignUpComponent.STEP_OBTAIN_DESO">
+  <div *ngIf="stepScreen === GetDesoComponent.STEP_OBTAIN_DESO">
     <div class="onboarding-buy-deso-container p-16px">
       <div class="fs-20px fc-muted pb-10px mb-10px">Easily transfer $DESO or purchase some directly</div>
       <div class="border-bottom w-100 mb-30px"></div>
@@ -145,14 +146,8 @@
         </div>
       </div>
     </div>
+    <div class="p-16px">
+      <a class="fc-muted ml-25px cursor-pointer" style="cursor: pointer" (click)="cancelButtonClicked()">Cancel</a>
+    </div>
   </div>
-
-  <div *ngIf="stepScreen === SignUpComponent.STEP_BUY_DESO">
-    <buy-deso
-      [publicKey]="publicKeyAdded"
-      [seedHex]="seedHex"
-      [testnet]="globalVars.network == Network.testnet"
-    ></buy-deso>
-  </div>
-
 </div>

@@ -20,10 +20,6 @@ import { Network } from 'src/types/identity';
 export class SignUpComponent implements OnInit, OnDestroy {
   static STEP_GENERATE_SEED = 'step_generate_seed';
   static STEP_VERIFY_SEED = 'step_verify_seed';
-  static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
-  static STEP_VERIFY_PHONE_NUMBER = 'step_verify_phone_number';
-  static STEP_OBTAIN_DESO = 'step_obtain_deso';
-  static STEP_BUY_DESO = 'step_buy_deso';
 
   Network = Network;
   stepScreen: string = SignUpComponent.STEP_GENERATE_SEED;
@@ -47,12 +43,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   publicKeyIsCopied = false;
   scanQRCode = false;
-
-  // user balance
-  userBalanceNanos = 0;
-  refreshBalanceCooldown = false;
-  refreshBalanceRetryTime = 0;
-  refreshBalanceInterval: any;
 
   constructor(
     public entropyService: EntropyService,
@@ -124,111 +114,15 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    this.stepScreen = SignUpComponent.STEP_GET_STARTER_DESO;
+    this.router.navigate(['/', RouteNames.GET_DESO], {
+      queryParams: {publicKey: this.publicKeyAdded },
+      queryParamsHandling: 'merge'});
   }
 
   stepTwoBack(): void {
     this.extraTextCheck = '';
     this.mnemonicCheck = '';
     this.stepScreen = SignUpComponent.STEP_GENERATE_SEED;
-  }
-
-  ////// STEP THREE BUTTONS | STEP_GET_STARTER_DESO ///////
-
-  stepThreeNextPhone(): void {
-    this.stepScreen = SignUpComponent.STEP_VERIFY_PHONE_NUMBER;
-  }
-
-
-  stepThreeNextBuy(): void {
-    this.stepScreen = SignUpComponent.STEP_OBTAIN_DESO;
-  }
-
-  ////// STEP FOUR BUTTONS | STEP_VERIFY_PHONE_NUMBER ///////
-
-  phoneNumberVerified(): void {
-    // Note: phoneNumberSuccess is only passed on login. That is if origin of this flow was /derive, and the user
-    //  created a new account and verified phone number, then we don't pass phoneNumberSuccess.
-    this.phoneNumberSuccess = true;
-  }
-
-  finishFlowPhoneNumber(): void {
-    this.finishFlow();
-  }
-
-  finishFlowPhoneNumberSkip(): void {
-    this.finishFlow();
-  }
-
-  ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
-
-  stepFiveNextBuy(): void {
-    this.stepScreen = SignUpComponent.STEP_BUY_DESO;
-  }
-
-  _copyPublicKey(): void {
-    this.textService.copyText(this.publicKeyAdded);
-    this.publicKeyIsCopied = true;
-    setInterval(() => {
-      this.publicKeyIsCopied = false;
-    }, 1000);
-  }
-
-  refreshBalance(): void {
-    if (this.refreshBalanceCooldown) {
-      return;
-    }
-    this.refreshBalanceCooldown = true;
-    this.refreshBalanceRetryTime = 30;
-
-    this.backendAPIService.GetUsersStateless([this.publicKeyAdded], false)
-      .subscribe( res => {
-        if (!res.UserList.length) {
-          return;
-        }
-        const user = res.UserList[0];
-        if (user.BalanceNanos) {
-          this.userBalanceNanos = user.BalanceNanos;
-        }
-      });
-
-    this.refreshBalanceInterval = setInterval(() => {
-      if (this.refreshBalanceRetryTime === 0) {
-        this.refreshBalanceCooldown = false;
-        clearInterval(this.refreshBalanceInterval);
-      } else {
-        this.refreshBalanceRetryTime--;
-      }
-    }, 1000);
-  }
-
-  finishFlowTransferDeSo(): void {
-    this.finishFlow();
-  }
-
-  ////// STEP SIX BUTTONS | STEP_BUY_DESO ///////
-
-
-
-  ////// FINISH FLOW ///////
-
-  finishFlow(): void {
-    if (this.globalVars.derive) {
-      this.identityService.derive({
-        publicKey: this.publicKeyAdded,
-      });
-    } else {
-      this.login();
-    }
-  }
-
-  login(): void {
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: this.publicKeyAdded,
-      signedUp: true,
-      phoneNumberSuccess: this.phoneNumberSuccess,
-    });
   }
 
   ////// ENTROPY //////

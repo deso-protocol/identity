@@ -17,29 +17,16 @@ import { Network } from 'src/types/identity';
   templateUrl: './get-deso.component.html',
   styleUrls: ['./get-deso.component.scss']
 })
-export class GetDesoComponent implements OnInit, OnDestroy {
-  static STEP_GENERATE_SEED = 'step_generate_seed';
-  static STEP_VERIFY_SEED = 'step_verify_seed';
+export class GetDesoComponent implements OnInit {
   static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
   static STEP_VERIFY_PHONE_NUMBER = 'step_verify_phone_number';
   static STEP_OBTAIN_DESO = 'step_obtain_deso';
-  static STEP_BUY_DESO = 'step_buy_deso';
 
   Network = Network;
-  stepScreen: string = GetDesoComponent.STEP_GENERATE_SEED;
-  SignUpComponent = GetDesoComponent;
-  seedHex = '';
-  seedCopied = false;
-  mnemonicCheck = '';
-  extraTextCheck = '';
+  stepScreen: string = GetDesoComponent.STEP_GET_STARTER_DESO;
+  GetDesoComponent = GetDesoComponent;
   publicKeyAdded = '';
 
-  // Advanced tab
-  advancedOpen = false;
-  showMnemonicError = false;
-  showEntropyHexError = false;
-
-  loginMessagePayload: any;
   environment = environment;
 
   stepTotal: number;
@@ -69,36 +56,14 @@ export class GetDesoComponent implements OnInit, OnDestroy {
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
       this.stepTotal = 2;
     }
+    this.activatedRoute.queryParams.subscribe((queryParams) => {
+      if (queryParams.publicKey) {
+        this.publicKeyAdded = queryParams.publicKey;
+      }
+    });
   }
 
   ngOnInit(): void {
-  }
-
-  ngOnDestroy(): void {
-    // Set new entropy for the next time they go through the flow.
-    this.entropyService.setNewTemporaryEntropy();
-    this.entropyService.advancedOpen = false;
-  }
-
-  ////// STEP ONE BUTTONS | STEP_GENERATE_SEED ///////
-
-  stepOneCopy(): void {
-    this.textService.copyText(this.entropyService.temporaryEntropy?.mnemonic || '');
-    this.seedCopied = true;
-  }
-
-  stepOneDownload(): void {
-    const contents = `${this.entropyService.temporaryEntropy?.mnemonic}\n\n${this.entropyService.temporaryEntropy?.extraText}`;
-    this.textService.downloadText(contents, 'deso-seed.txt');
-  }
-
-  stepOnePrint(): void {
-    window.print();
-  }
-
-  stepOneNext(): void {
-    this.stepScreen = GetDesoComponent.STEP_VERIFY_SEED;
-    this.seedCopied = false; // Reset the copy icon.
   }
 
   clickTos(): void {
@@ -110,28 +75,6 @@ export class GetDesoComponent implements OnInit, OnDestroy {
     window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
   }
 
-  ////// STEP TWO BUTTONS | STEP_VERIFY_SEED ///////
-
-  stepTwoNext(): void {
-    // Add the new user to the account service registry.
-    const network = this.globalVars.network;
-    const mnemonic = this.mnemonicCheck;
-    const extraText = this.extraTextCheck;
-    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
-    this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
-
-    this.accountService.setAccessLevel(
-      this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-
-    this.stepScreen = GetDesoComponent.STEP_GET_STARTER_DESO;
-  }
-
-  stepTwoBack(): void {
-    this.extraTextCheck = '';
-    this.mnemonicCheck = '';
-    this.stepScreen = GetDesoComponent.STEP_GENERATE_SEED;
-  }
 
   ////// STEP THREE BUTTONS | STEP_GET_STARTER_DESO ///////
 
@@ -163,7 +106,7 @@ export class GetDesoComponent implements OnInit, OnDestroy {
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
 
   stepFiveNextBuy(): void {
-    this.stepScreen = GetDesoComponent.STEP_BUY_DESO;
+    this.router.navigate(['/', RouteNames.BUY_DESO], { queryParamsHandling: 'merge'});
   }
 
   _copyPublicKey(): void {
@@ -231,35 +174,7 @@ export class GetDesoComponent implements OnInit, OnDestroy {
     });
   }
 
-  ////// ENTROPY //////
-
-  checkMnemonic(): void {
-    this.showMnemonicError = !this.entropyService.isValidMnemonic(this.entropyService.temporaryEntropy.mnemonic);
-    if (this.showMnemonicError) { return; }
-
-    // Convert the mnemonic into new entropy hex.
-    const entropy = bip39.mnemonicToEntropy(this.entropyService.temporaryEntropy.mnemonic);
-    this.entropyService.temporaryEntropy.customEntropyHex = entropy.toString();
-  }
-
-  checkEntropyHex(): void {
-    this.showEntropyHexError = !this.entropyService.isValidCustomEntropyHex(this.entropyService.temporaryEntropy.customEntropyHex);
-    if (this.showEntropyHexError) { return; }
-
-    // Convert entropy into new mnemonic.
-    const entropy = new Buffer(this.entropyService.temporaryEntropy.customEntropyHex, 'hex');
-    this.entropyService.temporaryEntropy.mnemonic = bip39.entropyToMnemonic(entropy);
-  }
-
-  normalizeExtraText(): void {
-    this.entropyService.temporaryEntropy.extraText = this.entropyService.temporaryEntropy.extraText.normalize('NFKD');
-  }
-
-  hasEntropyError(): boolean {
-    return this.showEntropyHexError || this.showMnemonicError;
-  }
-
-  getNewEntropy(): void {
-    this.entropyService.setNewTemporaryEntropy();
+  cancelButtonClicked(): void {
+    this.stepScreen = GetDesoComponent.STEP_GET_STARTER_DESO;
   }
 }

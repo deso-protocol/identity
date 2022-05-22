@@ -3,9 +3,10 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CountryISO } from 'ngx-intl-tel-input';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService, User } from '../backend-api.service';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { IdentityService } from '../identity.service';
 import { AccountService } from '../account.service';
+import {RouteNames} from '../app-routing.module';
 
 @Component({
   selector: 'sign-up-get-starter-deso',
@@ -25,6 +26,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   @Output() phoneNumberVerified = new EventEmitter();
   @Output() skipButtonClicked = new EventEmitter();
   @Output() finishFlowEvent = new EventEmitter();
+  @Output() onCancelButtonClicked = new EventEmitter();
 
   phoneForm = new FormGroup({
     phone: new FormControl(undefined, [Validators.required]),
@@ -55,6 +57,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private identityService: IdentityService,
     private accountService: AccountService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -242,6 +245,10 @@ export class SignUpGetStarterDESOComponent implements OnInit {
         phoneNumberSuccess: this.isPhoneNumberSuccess,
       });
     }
+  }
+
+  cancelButtonClicked(): void {
+    this.onCancelButtonClicked.emit();
   }
 }
 

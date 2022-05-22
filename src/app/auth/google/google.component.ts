@@ -104,7 +104,7 @@ export class GoogleComponent implements OnInit {
         this.finishFlow(false);
       } else {
         this.zone.run(() => {
-          this.router.navigate(['/', RouteNames.LOG_IN]);
+          this.router.navigate(['/', RouteNames.LOG_IN], { queryParamsHandling: 'merge' });
         });
       }
     });

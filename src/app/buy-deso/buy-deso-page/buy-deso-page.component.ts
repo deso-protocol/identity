@@ -7,11 +7,11 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {RouteNames} from '../../app-routing.module';
 
 @Component({
-  selector: 'buy-deso-complete-page',
-  templateUrl: './buy-deso-complete-page.component.html',
-  styleUrls: ['./buy-deso-complete-page.component.scss'],
+  selector: 'buy-deso-page',
+  templateUrl: './buy-deso-page.component.html',
+  styleUrls: ['./buy-deso-page.component.scss'],
 })
-export class BuyDeSoCompletePageComponent implements OnInit {
+export class BuyDesoPageComponent implements OnInit {
   publicKey = '';
   // TODO: handle buy more click.
   constructor(
