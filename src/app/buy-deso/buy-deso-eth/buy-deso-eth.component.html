@@ -42,7 +42,8 @@
           <a
             *ngIf="!keyIsCopied"
             (click)="_copyPublicKey()"
-            class="fs-16px fc-blue"
+            class="fs-16px fc-blue cursor-pointer"
+            style="cursor: pointer"
           >Copy</a>
         </div>
       </div>
@@ -105,7 +106,7 @@
     >
     Go to the next step
     </button>
-    <a class="fc-muted ml-25px" (click)="parentComponent.cancelButtonClicked()">Cancel</a>
+    <a class="fc-muted ml-25px cursor-pointer" style="cursor: pointer" (click)="parentComponent.cancelButtonClicked()">Cancel</a>
   </div>
 </div>
 
@@ -157,7 +158,7 @@
           placeholder="0"
         />
         <span class="buy-deso__floating-span">
-          <a class="fc-blue" (click)="clickMaxDESO()">Max</a>
+          <a class="fc-blue cursor-pointer" style="cursor: pointer" (click)="clickMaxDESO()">Max</a>
         </span>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <app-banner></app-banner>
 
 <div *ngIf="!globalVars.callbackInvalid">
-  <div class="container home-container">
+  <div class="container home-container" *ngIf="!deleteKey">
     <div class="font-weight-bold fs-30px mb-20px" *ngIf="!globalVars.callback">
       Grant signing access to {{ globalVars.hostname }}
     </div>
@@ -74,6 +74,17 @@
     </div>
 
 
+  </div>
+  <div class="container home-container" *ngIf="deleteKey">
+    <div>
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to revoke signing access for a Derived Public Key</b></span><br/>
+        This means <b>{{ derivedPublicKeyBase58Check }}</b> will no longer be able to make transactions on your behalf.
+      </div>
+    </div>
+    <div class="pt-15px">
+      <button type="button" class="button button-small button-primary" (click)="approveDerivedKey()">Approve</button>
+    </div>
   </div>
 </div>
 <div *ngIf="globalVars.callbackInvalid">

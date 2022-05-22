@@ -39,7 +39,7 @@
   <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN">
     <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Get Starter $DESO with Phone Number</div>
     <div class="fs-18px">
-      Verify your phone number for free $DESO. Your phone number will never be shared with anyone. We only check it to prevent spam.
+      Enter your phone number for free $DESO. Your phone number will never be shared with anyone. We only check it to prevent spam.
     </div>
 
     <form #f="ngForm" [formGroup]="phoneForm" class="form-group mt-15px">
@@ -95,26 +95,19 @@
 
     <div class="d-flex mt-15px justify-content-end">
       <div class="full-screen">
-        <a
-          *ngIf="displayForSignupFlow"
-          (click)="onSkipButtonClicked()"
-          class="button button-secondary button-small font-weight-bold fs-15px floatl"
-        >
-          Skip
-        </a>
-        <a
+        <button
           (click)="sendVerificationText()"
           [ngClass]="{ disabled: !phoneForm.valid, 'btn-loading': sendingPhoneNumberVerificationText }"
           class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
         >
           Next
-        </a>
+        </button>
       </div>
     </div>
   </div>
 
   <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN">
-    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Verify Authentication Code</div>
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Confirm Authentication Code</div>
     <div class="fs-18px">
       Enter the 6 digit code sent to {{ phoneNumber }}
 
@@ -158,28 +151,21 @@
     </div>
 
     <div class="mt-15px justify-content-between">
-      <a
+      <button
         *ngIf="displayForSignupFlow"
         (click)="backButtonClickedOnSubmitVerificationScreen()"
         class="button button-secondary button-small font-weight-bold fs-15px floatl"
       >
         Back
-      </a>
+      </button>
 <!--      align the Verify button as the rightmost element using float property.-->
-      <a
+      <button
         (click)="submitVerificationCode()"
         [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
         class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
       >
-        Verify
-      </a>
-      <a
-        *ngIf="displayForSignupFlow"
-        (click)="onSkipButtonClicked()"
-        class="button button-secondary button-small font-weight-bold fs-15px m-0auto"
-      >
-        Skip
-      </a>
+        Confirm
+      </button>
 
     </div>
   </div>

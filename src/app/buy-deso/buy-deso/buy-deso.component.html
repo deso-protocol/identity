@@ -60,7 +60,8 @@
                       <a
                         *ngIf="!keyIsCopied"
                         (click)="_copyPublicKey()"
-                        class="fs-16px fc-blue"
+                        class="fs-16px fc-blue cursor-pointer"
+                        style="cursor: pointer"
                       >Copy</a>
                     </div>
                   </div>
@@ -130,7 +131,7 @@
                 >
                 Go to the next step
                 </button>
-                <a class="fc-muted ml-25px" (click)="cancelButtonClicked()">Cancel</a>
+                <a class="fc-muted ml-25px cursor-pointer" style="cursor: pointer" (click)="cancelButtonClicked()">Cancel</a>
               </div>
             </div>
             <div *ngIf="buyWithBTCStep === 2">
@@ -181,7 +182,7 @@
                       placeholder="0"
                     />
                     <span class="buy-deso__floating-span">
-                      <a class="fc-blue" (click)="_clickMaxDeSo()">
+                      <a class="fc-blue cursor-pointer" style="cursor: pointer" (click)="_clickMaxDeSo()">
                         Max
                       </a>
                     </span>
