@@ -720,7 +720,7 @@ export class BuyDeSoComponent implements OnInit {
     this.buyTabs.unshift(BuyDeSoComponent.BUY_WITH_USD);
     this.activeTab = BuyDeSoComponent.BUY_WITH_USD;
     this.buyTabs.push(BuyDeSoComponent.BUY_WITH_ETH);
-    this.buyTabs.push(BuyDeSoComponent.BUY_ON_CB);
+    // this.buyTabs.push(BuyDeSoComponent.BUY_ON_CB);
 
     if (!isNil(this.activeTabInput)) {
       this.activeTab = this.activeTabInput;

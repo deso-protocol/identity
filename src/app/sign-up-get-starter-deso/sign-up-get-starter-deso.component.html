@@ -94,9 +94,12 @@
     </div>
 
     <div class="d-flex mt-15px justify-content-end">
-      <div class="full-screen">
+      <div
+        class="full-screen"
+        [ngClass]="{ ' d-flex align-items-center justify-content-between': displayForSignupFlow }"
+      >
         <a
-          class="fc-muted ml-25px cursor-pointer"
+          class="fc-muted cursor-pointer"
           style="cursor: pointer"
           (click)="cancelButtonClicked()"
           *ngIf="displayForSignupFlow"

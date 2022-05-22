@@ -52,6 +52,14 @@ export class AppComponent implements OnInit {
       this.globalVars.hideGoogle = true;
     }
 
+    if (params.get('signedUp') === 'true' || stateParamsFromGoogle.signedUp) {
+      this.globalVars.signedUp = params.get('signedUp') === 'true';
+    }
+
+    if (params.get('getFreeDeso') === 'true' || stateParamsFromGoogle.getFreeDeso) {
+      this.globalVars.getFreeDeso = true;
+    }
+
     // Callback should only be used in mobile applications, where payload is passed through URL parameters.
     const callback = params.get('callback') || stateParamsFromGoogle.callback;
     if (callback) {
@@ -85,7 +93,7 @@ export class AppComponent implements OnInit {
             this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
           } else if (
             res.ReferralInfoResponse.IsActive &&
-            (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals == 0)
+            (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals === 0)
           ) {
             this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
           } else {
@@ -127,7 +135,7 @@ export class AppComponent implements OnInit {
     try {
       this.accountService.migrate();
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
 
     // Finish loading

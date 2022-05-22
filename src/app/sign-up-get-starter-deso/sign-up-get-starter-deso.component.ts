@@ -62,6 +62,9 @@ export class SignUpGetStarterDESOComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
+      if (params.signedUp) {
+        this.displayForSignupFlow = params.signedUp === 'true';
+      }
       if (this.publicKey === '' && params.public_key) {
         this.publicKey = params.public_key;
       }
@@ -241,14 +244,14 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       this.identityService.login({
         users: this.accountService.getEncryptedUsers(),
         publicKeyAdded: this.publicKey,
-        signedUp: true,
+        signedUp: this.globalVars.signedUp,
         phoneNumberSuccess: this.isPhoneNumberSuccess,
       });
     }
   }
 
   cancelButtonClicked(): void {
-    this.onCancelButtonClicked.emit();
+    this.router.navigate(['/', RouteNames.GET_DESO], { queryParamsHandling: 'merge'});
   }
 }
 

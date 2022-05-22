@@ -79,6 +79,8 @@ export class GoogleDriveService {
       jumio: this.globalVars.jumio,
       derive: this.globalVars.derive,
       callback: this.globalVars.callback,
+      signedUp: this.globalVars.signedUp,
+      getFreeDeso: this.globalVars.getFreeDeso,
     };
 
     const stateString = btoa(JSON.stringify(stateParams));

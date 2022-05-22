@@ -1,12 +1,12 @@
 <!-- Step One Box -->
-<div *ngIf="buyWithEthStep === 1 && !parentComponent.waitingOnTxnConfirmation" class="pl-10px">
+<div *ngIf="buyWithEthStep === 1 && !parentComponent.waitingOnTxnConfirmation">
   <!-- Step One Box -->
   <div class="mx-16px">
-    <div class="fs-17px font-weight-bold mt-20px mb-5px">
+    <div class="fs-17px fc-secondary font-weight-bold mt-20px mb-5px">
       Step 1/2
       <i
         (click)="tooltip1.toggle()"
-        class="fas fa-info-circle text-greyC fs-15px global__tooltip-icon"
+        class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon"
         matTooltipClass="global__mat-tooltip global__mat-tooltip-font-size"
         [matTooltip]="stepOneTooltip()"
         #tooltip1="matTooltip"
@@ -19,7 +19,7 @@
         Send ETH to this address
         <i
           (click)="tooltip2.toggle()"
-          class="fas fa-info-circle text-greyC fs-15px global__tooltip-icon"
+          class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon"
           matTooltipClass="global__mat-tooltip global__mat-tooltip-font-size"
           [matTooltip]="depositEthTooltip()"
           #tooltip2="matTooltip"
@@ -191,7 +191,7 @@
       <span class="buy-deso__sub-text"> Ethereum network fee </span>
       <i
         (click)="tooltip4.toggle()"
-        class="fas fa-info-circle text-greyC fs-15px global__tooltip-icon"
+        class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon"
         matTooltipClass="global__mat-tooltip global__mat-tooltip-font-size"
         [matTooltip]="ethereumNetworkFeeTooltip()"
         #tooltip4="matTooltip"

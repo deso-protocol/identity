@@ -101,4 +101,6 @@ export interface GoogleAuthState {
   jumio: boolean;
   callback: string;
   derive: boolean;
+  getFreeDeso: boolean;
+  signedUp: boolean;
 }

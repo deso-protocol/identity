@@ -32,6 +32,6 @@ export class BuyDeSoCompletePageComponent implements OnInit {
   }
 
   onBuyMoreDeSoClicked(): void {
-    this.router.navigate(['/', RouteNames.BUY_DESO], { queryParamsHandling: 'merge'});
+    this.router.navigate(['/', RouteNames.BUY_DESO], { queryParams: { publicKey: this.publicKey }, queryParamsHandling: 'merge'});
   }
 }

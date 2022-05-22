@@ -11,6 +11,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../../text.service';
 import {GoogleAuthState, PrivateUserInfo} from '../../../types/identity';
 import {environment} from '../../../environments/environment';
+import {BackendAPIService} from '../../backend-api.service';
 
 
 @Component({
@@ -38,7 +39,7 @@ export class GoogleComponent implements OnInit {
     private router: Router,
     private zone: NgZone,
     private route: ActivatedRoute,
-    private activatedRoute: ActivatedRoute,
+    private backendApi: BackendAPIService,
   ) { }
 
   copySeed(): void {
@@ -139,12 +140,33 @@ export class GoogleComponent implements OnInit {
         publicKey: this.publicKey,
       });
     } else {
-      this.identityService.login({
-        users: this.accountService.getEncryptedUsers(),
-        publicKeyAdded: this.publicKey,
-        signedUp,
-      });
+      if (!this.globalVars.getFreeDeso) {
+        this.login(signedUp);
+      }
+      if (!signedUp) {
+        this.backendApi.GetUsersStateless([this.publicKey], false).subscribe((res) => {
+          if (res?.UserList?.length) {
+            if (res.UserList[0].BalanceNanos !== 0) {
+              this.login(signedUp);
+              return;
+            }
+          }
+          this.router.navigate(['/', RouteNames.GET_DESO],
+            { queryParams: { publicKey: this.publicKey, signedUp, }, queryParamsHandling: 'merge'});
+        });
+      } else {
+        this.router.navigate(['/', RouteNames.GET_DESO],
+          { queryParams: { publicKey: this.publicKey, signedUp, }, queryParamsHandling: 'merge'});
+      }
     }
+  }
+
+  login(signedUp: boolean): void {
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded: this.publicKey,
+      signedUp,
+    });
   }
 
   fileName(): string {
@@ -159,6 +181,8 @@ export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAu
     jumio: false,
     callback: '',
     derive: false,
+    getFreeDeso: false,
+    signedUp: false,
   };
 
   try {

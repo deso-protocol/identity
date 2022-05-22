@@ -32,7 +32,7 @@ export class BuyDeSoCompleteComponent implements OnInit {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
-      signedUp: true,
+      signedUp: this.globalVars.signedUp,
     });
   }
 

@@ -13,23 +13,17 @@ import {BackendAPIService} from '../backend-api.service';
 import { Network } from 'src/types/identity';
 
 @Component({
-  selector: 'app-get-deso',
-  templateUrl: './get-deso.component.html',
-  styleUrls: ['./get-deso.component.scss']
+  selector: 'app-buy-or-send-deso',
+  templateUrl: './buy-or-send-deso.component.html',
+  styleUrls: ['./buy-or-send-deso.component.scss']
 })
-export class GetDesoComponent implements OnInit {
-  static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
-  static STEP_VERIFY_PHONE_NUMBER = 'step_verify_phone_number';
-  static STEP_OBTAIN_DESO = 'step_obtain_deso';
+export class BuyOrSendDesoComponent implements OnInit {
 
   Network = Network;
-  stepScreen: string = GetDesoComponent.STEP_GET_STARTER_DESO;
-  GetDesoComponent = GetDesoComponent;
   publicKeyAdded = '';
 
   environment = environment;
 
-  stepTotal: number;
   phoneNumberSuccess = false;
 
   publicKeyIsCopied = false;
@@ -52,10 +46,6 @@ export class GetDesoComponent implements OnInit {
     private textService: TextService,
     private backendAPIService: BackendAPIService,
   ) {
-    this.stepTotal = globalVars.showJumio() ? 3 : 2;
-    if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
-      this.stepTotal = 2;
-    }
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       if (queryParams.publicKey) {
         this.publicKeyAdded = queryParams.publicKey;
@@ -64,43 +54,6 @@ export class GetDesoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  }
-
-  clickTos(): void {
-    const h = 700;
-    const w = 600;
-    const y = window.outerHeight / 2 + window.screenY - h / 2;
-    const x = window.outerWidth / 2 + window.screenX - w / 2;
-
-    window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
-  }
-
-
-  ////// STEP THREE BUTTONS | STEP_GET_STARTER_DESO ///////
-
-  stepThreeNextPhone(): void {
-    this.router.navigate(['/', RouteNames.VERIFY_PHONE_NUMBER], { queryParams: { public_key: this.publicKeyAdded }, queryParamsHandling: 'merge' });
-  }
-
-
-  stepThreeNextBuy(): void {
-    this.router.navigate(['/', RouteNames.BUY_OR_SEND_DESO], { queryParamsHandling: 'merge' });
-  }
-
-  ////// STEP FOUR BUTTONS | STEP_VERIFY_PHONE_NUMBER ///////
-
-  phoneNumberVerified(): void {
-    // Note: phoneNumberSuccess is only passed on login. That is if origin of this flow was /derive, and the user
-    //  created a new account and verified phone number, then we don't pass phoneNumberSuccess.
-    this.phoneNumberSuccess = true;
-  }
-
-  finishFlowPhoneNumber(): void {
-    this.finishFlow();
-  }
-
-  finishFlowPhoneNumberSkip(): void {
-    this.finishFlow();
   }
 
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
@@ -174,6 +127,6 @@ export class GetDesoComponent implements OnInit {
   }
 
   cancelButtonClicked(): void {
-    this.stepScreen = GetDesoComponent.STEP_GET_STARTER_DESO;
+    this.router.navigate(['/', RouteNames.GET_DESO], { queryParamsHandling: 'merge' });
   }
 }

@@ -114,9 +114,17 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.accountService.setAccessLevel(
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
-    this.router.navigate(['/', RouteNames.GET_DESO], {
-      queryParams: {publicKey: this.publicKeyAdded },
-      queryParamsHandling: 'merge'});
+    if (this.globalVars.getFreeDeso) {
+      this.router.navigate(['/', RouteNames.GET_DESO], {
+        queryParams: {publicKey: this.publicKeyAdded, signedUp: true },
+        queryParamsHandling: 'merge'});
+    } else {
+      this.identityService.login({
+        users: this.accountService.getEncryptedUsers(),
+        publicKeyAdded: this.publicKeyAdded,
+        signedUp: true,
+      });
+    }
   }
 
   stepTwoBack(): void {

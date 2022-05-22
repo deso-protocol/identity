@@ -95,7 +95,7 @@ export class BuyDeSoUSDComponent implements OnInit {
       return;
     }
     this.wyreService.makeWalletOrderReservation(this.parentComponent.publicKey, this.amount,
-      this.selectedCountry, this.selectedFiatCurrency, `${environment.hostname}/${RouteNames.BUY_COMPLETE}?public_key=${this.parentComponent.publicKey}` ).subscribe(
+      this.selectedCountry, this.selectedFiatCurrency, `${environment.hostname}/${RouteNames.BUY_COMPLETE}?publicKey=${this.parentComponent.publicKey}&signedUp=${this.globalVars.signedUp}` ).subscribe(
       (res) => {
         const wyreUrl = res.url;
         if (res.url) {
