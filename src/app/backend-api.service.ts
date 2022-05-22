@@ -610,13 +610,15 @@ export class BackendAPIService {
     referenceId: string,
     sourceAmount: number,
     country: string,
-    sourceCurrency: string
+    sourceCurrency: string,
+    redirectURL: string,
   ): Observable<any> {
     const req = this.post('get-wyre-wallet-order-reservation', {
       ReferenceId: referenceId,
       SourceAmount: sourceAmount,
       Country: country,
       SourceCurrency: sourceCurrency,
+      RedirectUrl: redirectURL,
     });
 
     return req.pipe(

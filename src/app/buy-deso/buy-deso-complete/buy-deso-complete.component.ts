@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { GlobalVarsService } from '../../global-vars.service';
 import {BackendAPIService} from '../../backend-api.service';
-import {IdentityService} from "../../identity.service";
-import {AccountService} from "../../account.service";
+import {IdentityService} from '../../identity.service';
+import {AccountService} from '../../account.service';
 
 @Component({
   selector: 'buy-deso-complete',

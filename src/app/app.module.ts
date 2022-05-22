@@ -39,7 +39,7 @@ import { TransactionSpendingLimitNftComponent } from './transaction-spending-lim
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
 import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
-import { BuyDeSoComponentWrapper } from './sign-up-buy-deso/buy-deso/buy-deso.component';
+import { BuyDeSoComponentWrapper } from './buy-deso/buy-deso/buy-deso.component';
 import {IconsModule} from './icons/icons.module';
 
 
