@@ -39,7 +39,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
   environment = environment;
 
   stepTotal: number;
-  phoneNumberSuccess = false;
 
   publicKeyIsCopied = false;
   scanQRCode = false;

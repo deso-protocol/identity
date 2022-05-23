@@ -30,7 +30,6 @@ export class GetDesoComponent implements OnInit {
   environment = environment;
 
   stepTotal: number;
-  phoneNumberSuccess = false;
 
   publicKeyIsCopied = false;
   scanQRCode = false;
@@ -87,22 +86,6 @@ export class GetDesoComponent implements OnInit {
     this.router.navigate(['/', RouteNames.BUY_OR_SEND_DESO], { queryParamsHandling: 'merge' });
   }
 
-  ////// STEP FOUR BUTTONS | STEP_VERIFY_PHONE_NUMBER ///////
-
-  phoneNumberVerified(): void {
-    // Note: phoneNumberSuccess is only passed on login. That is if origin of this flow was /derive, and the user
-    //  created a new account and verified phone number, then we don't pass phoneNumberSuccess.
-    this.phoneNumberSuccess = true;
-  }
-
-  finishFlowPhoneNumber(): void {
-    this.finishFlow();
-  }
-
-  finishFlowPhoneNumberSkip(): void {
-    this.finishFlow();
-  }
-
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
 
   stepFiveNextBuy(): void {
@@ -145,14 +128,6 @@ export class GetDesoComponent implements OnInit {
     }, 1000);
   }
 
-  finishFlowTransferDeSo(): void {
-    this.finishFlow();
-  }
-
-  ////// STEP SIX BUTTONS | STEP_BUY_DESO ///////
-
-
-
   ////// FINISH FLOW ///////
   finishFlow(): void {
     if (this.globalVars.derive) {
@@ -169,7 +144,6 @@ export class GetDesoComponent implements OnInit {
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKeyAdded,
       signedUp: this.globalVars.signedUp,
-      phoneNumberSuccess: this.phoneNumberSuccess,
     });
   }
 
