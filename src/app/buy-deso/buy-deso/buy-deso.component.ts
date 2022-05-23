@@ -54,9 +54,9 @@ class Messages {
   styleUrls: ['./buy-deso.component.scss'],
 })
 export class BuyDeSoComponent implements OnInit {
-  static BUY_WITH_USD = 'Buy with fiat';
+  static BUY_WITH_USD = 'Buy with Credit Card';
   static BUY_WITH_BTC = 'Buy with Bitcoin';
-  static BUY_WITH_ETH = 'Buy with ETH';
+  static BUY_WITH_ETH = 'Buy with Ethereum';
   static BUY_ON_CB = 'Buy on Coinbase';
   static CB_LINK = 'https://www.coinbase.com/price/decentralized-social';
 
@@ -717,10 +717,10 @@ export class BuyDeSoComponent implements OnInit {
     window.scroll(0, 0);
 
     // Add extra tabs
-    this.buyTabs.unshift(BuyDeSoComponent.BUY_WITH_USD);
-    this.activeTab = BuyDeSoComponent.BUY_WITH_USD;
-    this.buyTabs.push(BuyDeSoComponent.BUY_WITH_ETH);
-    // this.buyTabs.push(BuyDeSoComponent.BUY_ON_CB);
+    this.activeTab = BuyDeSoComponent.BUY_WITH_ETH;
+    this.buyTabs.unshift(BuyDeSoComponent.BUY_WITH_ETH);
+    this.buyTabs.push(BuyDeSoComponent.BUY_WITH_USD);
+    this.buyTabs.push(BuyDeSoComponent.BUY_ON_CB);
 
     if (!isNil(this.activeTabInput)) {
       this.activeTab = this.activeTabInput;

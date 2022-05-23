@@ -154,7 +154,7 @@
           "configurations": {
             "production": {
               "devServerTarget": "identity:serve:production"
-            },
+            }
           }
         }
       }
