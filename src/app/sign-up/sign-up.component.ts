@@ -9,6 +9,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TextService} from '../text.service';
 import * as bip39 from 'bip39';
 import {RouteNames} from '../app-routing.module';
+import {BackendAPIService} from '../backend-api.service';
+import { Network } from 'src/types/identity';
 
 @Component({
   selector: 'app-sign-up',
@@ -16,7 +18,13 @@ import {RouteNames} from '../app-routing.module';
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit, OnDestroy {
-  stepNum = 1;
+  static STEP_GENERATE_SEED = 'step_generate_seed';
+  static STEP_VERIFY_SEED = 'step_verify_seed';
+
+  Network = Network;
+  stepScreen: string = SignUpComponent.STEP_GENERATE_SEED;
+  SignUpComponent = SignUpComponent;
+  seedHex = '';
   seedCopied = false;
   mnemonicCheck = '';
   extraTextCheck = '';
@@ -31,6 +39,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
   environment = environment;
 
   stepTotal: number;
+  phoneNumberSuccess = false;
+
+  publicKeyIsCopied = false;
+  scanQRCode = false;
 
   constructor(
     public entropyService: EntropyService,
@@ -41,6 +53,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
+    private backendAPIService: BackendAPIService,
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
@@ -57,7 +70,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.entropyService.advancedOpen = false;
   }
 
-  ////// STEP ONE BUTTONS ///////
+  ////// STEP ONE BUTTONS | STEP_GENERATE_SEED ///////
 
   stepOneCopy(): void {
     this.textService.copyText(this.entropyService.temporaryEntropy?.mnemonic || '');
@@ -74,48 +87,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   stepOneNext(): void {
-    this.stepNum = 2;
+    this.stepScreen = SignUpComponent.STEP_VERIFY_SEED;
     this.seedCopied = false; // Reset the copy icon.
-  }
-
-  ////// STEP TWO BUTTONS ///////
-
-  stepTwoNext(): void {
-    const network = this.globalVars.network;
-    const mnemonic = this.mnemonicCheck;
-    const extraText = this.extraTextCheck;
-    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
-
-    this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
-
-    this.accountService.setAccessLevel(
-      this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
-
-    if (this.globalVars.derive) {
-      this.identityService.derive({
-        publicKey: this.publicKeyAdded,
-      });
-    } else {
-      if (!this.globalVars.showJumio()) {
-        this.login();
-      } else {
-        this.stepNum = 3;
-      }
-    }
-  }
-
-  stepTwoBack(): void {
-    this.extraTextCheck = '';
-    this.mnemonicCheck = '';
-    this.stepNum = 1;
-  }
-
-  login(): void {
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: this.publicKeyAdded,
-      signedUp: true,
-    });
   }
 
   clickTos(): void {
@@ -125,6 +98,39 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const x = window.outerWidth / 2 + window.screenX - w / 2;
 
     window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+  }
+
+  ////// STEP TWO BUTTONS | STEP_VERIFY_SEED ///////
+
+  stepTwoNext(): void {
+    // Add the new user to the account service registry.
+    const network = this.globalVars.network;
+    const mnemonic = this.mnemonicCheck;
+    const extraText = this.extraTextCheck;
+    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+    this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
+    this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
+
+    this.accountService.setAccessLevel(
+      this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+
+    if (this.globalVars.getFreeDeso) {
+      this.router.navigate(['/', RouteNames.GET_DESO], {
+        queryParams: {publicKey: this.publicKeyAdded, signedUp: true },
+        queryParamsHandling: 'merge'});
+    } else {
+      this.identityService.login({
+        users: this.accountService.getEncryptedUsers(),
+        publicKeyAdded: this.publicKeyAdded,
+        signedUp: true,
+      });
+    }
+  }
+
+  stepTwoBack(): void {
+    this.extraTextCheck = '';
+    this.mnemonicCheck = '';
+    this.stepScreen = SignUpComponent.STEP_GENERATE_SEED;
   }
 
   ////// ENTROPY //////

@@ -32,4 +32,17 @@ export class TextService {
     element.click();
     document.body.removeChild(element);
   }
+
+  // Assemble a URL to hit the BE with.
+  makeRequestURL(endpoint: string, routeName: string, adminPublicKey?: string): string {
+    let queryURL = location.protocol + '//' + endpoint + routeName;
+    // If the protocol is specified within the endpoint then use that.
+    if (endpoint.startsWith('http')) {
+      queryURL = endpoint + routeName;
+    }
+    if (adminPublicKey) {
+      queryURL += `?admin_public_key=${adminPublicKey}`;
+    }
+    return queryURL;
+  }
 }

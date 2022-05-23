@@ -1,4 +1,5 @@
-<app-banner></app-banner>
+<app-banner *ngIf="!this.skipAppBanner"></app-banner>
+
 <ng-template #continueToHost>
   <div class="d-flex pt-15px justify-content-between">
     <button
@@ -36,8 +37,9 @@
 <div class="page-container" *ngIf="(globalVars.inTab || globalVars.webview || globalVars.callback) && !loading && user && !user.HasPhoneNumber">
 
   <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN">
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Get Starter $DESO with Phone Number</div>
     <div class="fs-18px">
-      Verify your phone number for free DESO. Your phone number will never be shared with anyone.
+      Enter your phone number for free $DESO. Your phone number will never be shared with anyone. We only check it to prevent spam.
     </div>
 
     <form #f="ngForm" [formGroup]="phoneForm" class="form-group mt-15px">
@@ -92,32 +94,31 @@
     </div>
 
     <div class="d-flex mt-15px justify-content-end">
-      <div>
+      <div
+        class="full-screen"
+        [ngClass]="{ ' d-flex align-items-center justify-content-between': displayForSignupFlow }"
+      >
         <a
+          class="fc-muted cursor-pointer"
+          style="cursor: pointer"
+          (click)="cancelButtonClicked()"
           *ngIf="displayForSignupFlow"
-          (click)="onSkipButtonClicked()"
-          class="button button-secondary button-small font-weight-bold fs-15px"
-        >
-          Skip
-        </a>
-        <a
+        >Cancel</a>
+        <button
           (click)="sendVerificationText()"
           [ngClass]="{ disabled: !phoneForm.valid, 'btn-loading': sendingPhoneNumberVerificationText }"
-          class="button button-primary button-small font-weight-bold fs-15px ml-10px"
+          class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
         >
           Next
-        </a>
+        </button>
       </div>
     </div>
   </div>
 
   <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN">
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Confirm Authentication Code</div>
     <div class="fs-18px">
       Enter the 6 digit code sent to {{ phoneNumber }}
-      <div class="mt-5px">
-        <a href="" (click)="resendVerificationCode($event)">Resend</a>
-        <i *ngIf="resentVerificationCode" class="far fa-check-circle fc-blue"></i>
-      </div>
 
       <div *ngIf="sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached" class="mt-5px fc-red fs-15px">
         You've requested too many verification codes. Please wait 10 minutes and try again.
@@ -145,32 +146,36 @@
       </div>
     </form>
 
-    <div class="d-flex mt-15px justify-content-between">
-      <div>
-        <a
-          *ngIf="displayForSignupFlow"
-          (click)="backButtonClickedOnSubmitVerificationScreen()"
-          class="button button-secondary button-small font-weight-bold fs-15px"
-        >
-          Back
-        </a>
+    <div class="fs-18px">
+      <div class="mt-5px">
+<!--        Resend button will have a 60s cooldown indicated by resentVerificationCode and resentVerificationCodeTimeout -->
+        <div *ngIf="!resentVerificationCode">
+          <a href="" (click)="resendVerificationCode($event)">Resend</a>
+        </div>
+        <div *ngIf="resentVerificationCode">
+          <div class="fc-muted">Resend {{resentVerificationCodeTimeout}}s</div>
+        </div>
+        <i *ngIf="resentVerificationCode" class="far fa-check-circle fc-blue"></i>
       </div>
-      <div>
-        <a
-          *ngIf="displayForSignupFlow"
-          (click)="onSkipButtonClicked()"
-          class="button button-secondary button-small font-weight-bold fs-15px"
-        >
-          Skip
-        </a>
-        <a
-          (click)="submitVerificationCode()"
-          [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
-          class="button button-primary button-small font-weight-bold fs-15px ml-10px"
-        >
-          Verify
-        </a>
-      </div>
+    </div>
+
+    <div class="mt-15px justify-content-between">
+      <button
+        *ngIf="displayForSignupFlow"
+        (click)="backButtonClickedOnSubmitVerificationScreen()"
+        class="button button-secondary button-small font-weight-bold fs-15px floatl"
+      >
+        Back
+      </button>
+<!--      align the Verify button as the rightmost element using float property.-->
+      <button
+        (click)="submitVerificationCode()"
+        [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
+        class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
+      >
+        Confirm
+      </button>
+
     </div>
   </div>
 

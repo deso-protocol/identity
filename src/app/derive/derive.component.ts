@@ -94,11 +94,11 @@ export class DeriveComponent implements OnInit {
   }
 
   redirectLoadSeed(): void {
-    this.router.navigate(['/', RouteNames.LOAD_SEED]);
+    this.router.navigate(['/', RouteNames.LOAD_SEED], { queryParamsHandling: 'merge' });
   }
 
   redirectSignUp(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP]);
+    this.router.navigate(['/', RouteNames.SIGN_UP], { queryParamsHandling: 'merge' });
   }
 
   launchGoogle(): void {

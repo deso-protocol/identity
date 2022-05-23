@@ -1,0 +1,4 @@
+export const Lock2 = `<svg width="16" height="22" viewBox="0 0 16 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.9557 9.38818H2.34391C1.63135 9.38818 1.05371 9.96582 1.05371 10.6784V19.7098C1.05371 20.4223 1.63135 21 2.34391 21H13.9557C14.6682 21 15.2459 20.4223 15.2459 19.7098V10.6784C15.2459 9.96582 14.6682 9.38818 13.9557 9.38818Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3.63403 9.38821V6.16272C3.63403 4.96509 4.10979 3.8165 4.95665 2.96965C5.8035 2.12279 6.95209 1.64703 8.14972 1.64703C9.34735 1.64703 10.4959 2.12279 11.3428 2.96965C12.1896 3.8165 12.6654 4.96509 12.6654 6.16272V9.38821" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`

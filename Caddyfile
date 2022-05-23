@@ -40,6 +40,8 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending-limit-hex-string
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending-limit-response-from-hex/
     {$DOMAIN:https://node.deso.org}/api/v0/get-single-post
+    {$DOMAIN:https://node.deso.org}/api/v0/get-wyre-wallet-order-quotation
+    {$DOMAIN:https://node.deso.org}/api/v0/get-wyre-wallet-order-reservation
     https://test.deso.org/api/v0/get-users-stateless
     https://test.deso.org/api/v0/get-app-state
     https://test.deso.org/api/v0/jumio-begin
@@ -52,9 +54,12 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/get-transaction-spending-limit-hex-string
     https://test.deso.org/api/v0/get-transaction-spending-limit-response-from-hex/
     https://test.deso.org/api/v0/get-single-post
+    https://test.deso.org/api/v0/get-wyre-wallet-order-quotation
+    https://test.deso.org/api/v0/get-wyre-wallet-order-reservation
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
-    https://www.googleapis.com/upload/drive/v3/files;
+    https://www.googleapis.com/upload/drive/v3/files
+    https://api.blockcypher.com/v1/btc/main/addrs/full;
   img-src 'self'
       {$DOMAIN:https://node.deso.org}/api/v0/get-single-profile-picture/
       https://test.deso.org/api/v0/get-single-profile-picture/

@@ -15,6 +15,10 @@ export class GlobalVarsService {
   static fullAccessHostnames = environment.fullAccessHostnames;
   static noAccessHostnames = environment.noAccessHostnames;
 
+  static DEFAULT_NANOS_PER_USD_EXCHANGE_RATE = 1e9;
+  static NANOS_PER_UNIT = 1e9;
+  static WEI_PER_ETH = 1e18;
+
   network = Network.mainnet;
   hostname = '';
   accessLevelRequest = AccessLevel.ApproveAll;
@@ -23,6 +27,8 @@ export class GlobalVarsService {
   webview = false;
   hideGoogle = false;
   jumio = false;
+  signedUp = false;
+  getFreeDeso = false;
 
   // Set 'derive' url param to true to return a derived key when logging in or signing up
   derive = false;
@@ -90,7 +96,7 @@ export class GlobalVarsService {
     return nanos / this.nanosPerUSDExchangeRate;
   }
 
-  nanosToUSD(nanos: number, decimal?: number): string {
+  nanosToUSD(nanos: number, decimal?: number | null): string {
     if (decimal == null) {
       decimal = 4;
     }

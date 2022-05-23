@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  hostname: 'identity.deso.org',
+  hostname: 'http://localhost:4201',
   nodeURL: 'https://node.deso.org',
   fullAccessHostnames: ['bitclout.com', 'bitclout.green', 'bitclout.blue', 'localhost', 'node.deso.org'],
   noAccessHostnames: [''],

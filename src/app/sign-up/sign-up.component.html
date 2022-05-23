@@ -2,7 +2,8 @@
 
 <div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
   <!-- Step 1 -->
-  <div *ngIf="stepNum == 1">
+  <!-- Generate seed phrase. -->
+  <div *ngIf="stepScreen === SignUpComponent.STEP_GENERATE_SEED">
     <div class="step-row">
       <div class="title-text">Store your DeSo seed phrase</div>
       <div class="step-title">Step 1 of {{ stepTotal }}</div>
@@ -10,11 +11,16 @@
     <div class="subtitle-text">Write, download, print, or copy it somewhere safe.</div>
     <div class="warning-text">If you lose your DeSo seed phrase your account will be lost forever.</div>
     <div class="seed-phrase-container">
-      <div *ngIf="!entropyService.advancedOpen" class="px-25px pt-10px pb-30px border-bottom">{{ entropyService.temporaryEntropy.mnemonic }}</div>
+      <div *ngIf="!entropyService.advancedOpen" class="px-25px pt-10px pb-30px border-bottom">{{
+        entropyService.temporaryEntropy.mnemonic }}
+      </div>
       <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && hasEntropyError()">
-        Please fix errors in your advanced entropy configuration.</div>
-      <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && !hasEntropyError() && entropyService.temporaryEntropy.extraText.length > 0">
-        Note that you have added a passphrase in the advanced menu.</div>
+        Please fix errors in your advanced entropy configuration.
+      </div>
+      <div class="fc-red px-15px pt-15px"
+           *ngIf="!entropyService.advancedOpen && !hasEntropyError() && entropyService.temporaryEntropy.extraText.length > 0">
+        Note that you have added a passphrase in the advanced menu.
+      </div>
       <div class=" py-20px px-25px seed-actions-row">
         <div class="d-flex align-items-center">
           <button (click)="stepOneCopy()" class="seed-phrase-button d-flex align-items-center">
@@ -31,8 +37,12 @@
             <span>Print</span>
           </button>
         </div>
-        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="!entropyService.advancedOpen" (click)="entropyService.advancedOpen = true">Advanced</div>
-        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="entropyService.advancedOpen" (click)="entropyService.advancedOpen = false">Simple</div>
+        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="!entropyService.advancedOpen"
+             (click)="entropyService.advancedOpen = true">Advanced
+        </div>
+        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="entropyService.advancedOpen"
+             (click)="entropyService.advancedOpen = false">Simple
+        </div>
       </div>
       <div class="border-top border-color-grey" *ngIf="entropyService.advancedOpen">
         <div class="w-100 py-25px px-30px">
@@ -64,7 +74,8 @@
             <p class="title-text-small">Custom DeSo seed phrase (must be
               <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
               mnemonic):</p>
-            <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showMnemonicError">You've entered an invalid mnemonic.</p>
+            <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showMnemonicError">You've entered an invalid
+              mnemonic.</p>
             <div class="text-input-container-light mt-10px">
               <textarea [(ngModel)]="entropyService.temporaryEntropy.mnemonic"
                         (ngModelChange)="checkMnemonic()"
@@ -122,12 +133,13 @@
     <!-- If the "create a post" blue circle is showing, it will overlap the "Next" button. Adding space-->
     <!-- down here gives the user enough space to scroll down to reveal the next button.-->
     <!-- This works for now, but we should do something better long term, e.g. hide the blue circle
-         on this page.-->
+    on this page.-->
     <div style="padding-bottom: 85px"></div>
   </div>
 
   <!-- Step 2 -->
-  <div *ngIf="stepNum == 2">
+  <!-- Verify seed phrase. -->
+  <div *ngIf="stepScreen === SignUpComponent.STEP_VERIFY_SEED">
     <div class="step-row">
       <div class="title-text">Verify your DeSo seed phrase</div>
       <div class="step-title">Step 2 of {{ stepTotal }}</div>
@@ -179,7 +191,7 @@
     <!-- If the "create a post" blue circle is showing, it will overlap the "Next" button. Adding space-->
     <!-- down here gives the user enough space to scroll down to reveal the next button.-->
     <!-- This works for now, but we should do something better long term, e.g. hide the blue circle
-         on this page.-->
+    on this page.-->
     <div style="padding-bottom: 85px"></div>
   </div>
 </div>

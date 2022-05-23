@@ -169,6 +169,7 @@ export interface TransactionSpendingLimitResponse {
   providedIn: 'root'
 })
 export class BackendAPIService {
+  blockCypherToken = 'cd455c8a5d404bb0a23880b72f56aa86';
   endpoint = `${environment.nodeURL}/api/v0`;
 
   constructor(
@@ -217,12 +218,14 @@ export class BackendAPIService {
   // When SkipForLeaderboard is false, we also fetch the user's balance, profiles this user follows, hodlings,  and
   //  UserMetadata. Oftentimes, this information is not needed and excluding it significantly improves performance.
   GetUsersStateless(
-    publicKeys: string[], SkipForLeaderboard: boolean = false,
+    publicKeys: string[], SkipForLeaderboard: boolean = false, IncludeBalance: boolean = false, GetUnminedBalance: boolean = false,
   ): Observable<{ UserList: User[]}> {
     return this.post('get-users-stateless',
       {
         PublicKeysBase58Check: publicKeys,
         SkipForLeaderboard,
+        IncludeBalance,
+        GetUnminedBalance,
       },
     );
   }
@@ -423,5 +426,231 @@ export class BackendAPIService {
         res => res.PostFound
       )
     );
+  }
+
+  GetExchangeRate(): Observable<any> {
+    return this.get('get-exchange-rate');
+  }
+
+  GetBitcoinFeeRateSatoshisPerKB(): Observable<any> {
+    return this.httpClient.get<any>('https://api.blockchain.com/mempool/fees')
+      .pipe(
+        catchError((err) => {
+          console.error(err);
+          return throwError(err);
+        })
+      );
+  }
+
+  getAllTransactionOutputs(tx: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // If the tx doesn't have more outputs then return.
+      if (!tx.next_outputs || tx.outputs.length < 20) {
+        resolve(tx);
+        return;
+      }
+
+      // Else query the next_output and add the new outputs to the tx.
+      // Do this recursively until everything has been fetched.
+      this.httpClient
+        .get<any>(tx.next_outputs + `&token=${this.blockCypherToken}`)
+        .pipe(
+          map((res) => {
+            return res;
+          }),
+          catchError( (err) => {
+            console.error(err);
+            return throwError(err);
+          })
+        )
+        .subscribe(
+          (res) => {
+            // Add the next_outputs to the back of the txn
+            if (res.outputs) {
+              for (let ii = 0; ii < res.outputs.length; ii++) {
+                tx.outputs.push(res.outputs[ii]);
+              }
+            }
+
+            // If there are more outputs, then we do a dirty hack. We change
+            // the next_outputs of the current txn to the next_outputs of the
+            // response. Then call this function recursively to add the
+            // remaining outputs.
+            // BlockCypher also
+            // doesn't tell us when a transaction is out of outputs, so we have
+            // to assume it has more outputs if its at the maximum number of outputs,
+            // which is 20 for BlockCypher.
+            if (res.outputs.length >= 20) {
+              tx.next_outputs = res.next_outputs;
+              this.getAllTransactionOutputs(tx).then(
+                (res) => {
+                  resolve(res);
+                },
+                (err) => {
+                  console.error(err);
+                  resolve(tx);
+                }
+              );
+            } else {
+              resolve(tx);
+            }
+          },
+          (err) => {
+            console.error(err);
+            resolve(err);
+          }
+        );
+    });
+  }
+
+  GetBitcoinAPIInfo(bitcoinAddr: string, isTestnet: boolean): Observable<any> {
+    let endpoint = `https://api.blockcypher.com/v1/btc/main/addrs/`;
+    if (isTestnet) {
+      endpoint = `https://api.blockcypher.com/v1/btc/test3/addrs/`;
+    }
+
+    if (bitcoinAddr !== '') {
+      endpoint += `${bitcoinAddr}/`;
+    }
+    endpoint += `full?token=${this.blockCypherToken}`;
+
+    return this.httpClient.get<any>(endpoint).pipe(
+      map((res) => {
+        // If the response has no transactions or if the final balance is zero
+        // then just return it.
+        if (!res.txs || !res.final_balance) {
+          return new Promise((resolve, reject) => {
+            resolve(res);
+          });
+        }
+
+        // For each transaction, continuously fetch its outputs until we
+        // run out of them.
+        const txnPromises = [];
+        // TODO: This causes us to hit rate limits if there are too many
+        // transactions in the backlog. We should fix this at some point.
+        for (let ii = 0; ii < res.txs.length; ii++) {
+          txnPromises.push(this.getAllTransactionOutputs(res.txs[ii]));
+        }
+
+        return Promise.all(txnPromises).then((xxx) => res);
+      }),
+      catchError( (err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
+  }
+
+  ExchangeBitcoin(
+    LatestBitcionAPIResponse: any,
+    BTCDepositAddress: string,
+    PublicKeyBase58Check: string,
+    BurnAmountSatoshis: number,
+    FeeRateSatoshisPerKB: number,
+    SignedHashes: string[],
+    Broadcast: boolean
+  ): Observable<any> {
+    const req = this.post('exchange-bitcoin', {
+      PublicKeyBase58Check,
+      BurnAmountSatoshis,
+      LatestBitcionAPIResponse,
+      BTCDepositAddress,
+      FeeRateSatoshisPerKB,
+      SignedHashes,
+      Broadcast
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  SubmitETHTx(
+    PublicKeyBase58Check: string,
+    Tx: any,
+    ToSign: string[],
+    SignedHashes: string[]
+  ): Observable<any> {
+    const req = this.post('submit-eth-tx', {
+      PublicKeyBase58Check,
+      Tx,
+      ToSign,
+      SignedHashes,
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  QueryETHRPC(
+    method: string,
+    params: string[],
+    publicKeyBase58Check: string,
+    jwt: string
+  ): Observable<any> {
+    const req = this.post('query-eth-rpc', {
+      Method: method,
+      Params: params,
+      PublicKeyBase58Check: publicKeyBase58Check,
+      JWT: jwt
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  GetWyreWalletOrderReservation(
+    referenceId: string,
+    sourceAmount: number,
+    country: string,
+    sourceCurrency: string,
+    redirectURL: string,
+  ): Observable<any> {
+    const req = this.post('get-wyre-wallet-order-reservation', {
+      ReferenceId: referenceId,
+      SourceAmount: sourceAmount,
+      Country: country,
+      SourceCurrency: sourceCurrency,
+      RedirectUrl: redirectURL,
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  GetWyreWalletOrderQuotation(
+    sourceAmount: number,
+    country: string,
+    sourceCurrency: string
+  ): Observable<any> {
+    const req = this.post('get-wyre-wallet-order-quotation', {
+      SourceAmount: sourceAmount,
+      Country: country,
+      SourceCurrency: sourceCurrency,
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  GetTxn(TxnHashHex: string): Observable<any> {
+    return this.post('get-txn', {
+      TxnHashHex,
+    });
   }
 }

@@ -14,7 +14,7 @@ $light-blue: #E5F2FF;
 $input-background: #F7F7FC;
 
 // Font colors.
-$light-font-color: #A0A3BD;
+$light-font-color: #8D8F8F;
 $normal-font-color: #626480;
 $title-font-color: #0E0E23;
 $banner-font-color: #292941;
@@ -80,14 +80,36 @@ h2,h3,h4,h5,h6,p {
   font-family: 'color-emoji';
 }
 
+$text: #000000;
+$text-secondary: #545656;
+$text-muted: #999999;
+$landing-page-fc: #888;
+$landing-page-dark: #1B1C1E;
+$tile-bg: #ffffff;
+$tile-secondary-bg: #F4F6F6;
+$border: #DDDDDD;
+$highlight: #005BFF;
+$highlight-secondary: #E5F2FF;
+$success: #2CC99A;
+$error: #FF6939;
+
 // Custom font classes.
 .fc-title { color: $title-font-color }
+.fc-secondary { color: $text-secondary; }
 .fc-default { color: $normal-font-color; }
 .fc-muted { color: $light-font-color; }
 .fc-blue { color: $blue; }
+.fc-light-blue { color: $highlight-secondary; }
 .fc-red { color: $red-font-color; }
 .fc-green { color: $green-font-color; }
+.fc-success { color: $success; }
+.fc-error { color: $error; }
+.fc-landing-page { color: $landing-page-fc; }
+.fc-landing-page-title { color: $landing-page-dark; }
+.fc-none { color: rgba(0, 0, 0, 0); }
 
+
+.fs-0px { font-size: 0 !important; }
 .fs-1 { font-size: 2.5rem }
 .fs-2 { font-size: 2rem }
 .fs-3 { font-size: 1.75rem }
@@ -95,11 +117,13 @@ h2,h3,h4,h5,h6,p {
 .fs-underline { text-decoration: underline }
 
 .fs-30px { font-size: 30px; }
+.fs-32px { font-size: 32px; }
 .fs-26px { font-size: 26px; }
 .fs-25px { font-size: 25px; }
 .fs-24px { font-size: 24px; }
 .fs-20px { font-size: 20px; }
 .fs-18px { font-size: 18px; }
+.fs-17px { font-size: 17px; }
 .fs-16px { font-size: 16px; }
 .fs-15px { font-size: 15px; }
 .fs-15px-important { font-size: 15px !important; }
@@ -172,6 +196,14 @@ h2,h3,h4,h5,h6,p {
 .py-20px { padding-top: 20px; padding-bottom: 20px;}
 .px-20px { padding-left: 20px; padding-right: 20px;}
 
+.p-16px { padding: 16px; }
+.pt-16px { padding-top: 16px; }
+.pr-16px { padding-right: 16px; }
+.pb-16px { padding-bottom: 16px; }
+.pl-16px { padding-left: 16px; }
+.py-16px { padding-top: 16px; padding-bottom: 16px;}
+.px-16px { padding-left: 16px; padding-right: 16px;}
+
 .p-15px { padding: 15px; }
 .pt-15px { padding-top: 15px; }
 .pr-15px { padding-right: 15px; }
@@ -241,6 +273,13 @@ h2,h3,h4,h5,h6,p {
 .mb-15px { margin-bottom: 15px; }
 .ml-15px { margin-left: 15px; }
 
+.m-16px { margin: 16px; }
+.mt-16px { margin-top: 16px; }
+.mr-16px { margin-right: 16px; }
+.mb-16px { margin-bottom: 16px; }
+.ml-16px { margin-left: 16px; }
+.mx-16px { margin-left: 16px; margin-right: 16px; }
+
 .m-20px { margin: 20px; }
 .mt-20px { margin-top: 20px; }
 .mr-20px { margin-right: 20px; }
@@ -273,13 +312,59 @@ h2,h3,h4,h5,h6,p {
 .mx-40px { margin-left: 40px; margin-right: 40px; }
 .my-40px { margin-top: 40px; margin-bottom: 40px; }
 
+.m-0auto { margin: 0 auto; }
+
 .br-3px { border-radius: 3px; }
 .br-12px { border-radius: $feed-border-radius; }
+
+// custom float classes
+.floatl {float: left;}
+.floatr {float: right;}
 
 .vh-100 { height: 100vh !important; }
 
 .position-fixed { position: fixed; }
 .background-color-white { background-color: white; }
+
+i-feather[name="check-circle"] {
+  svg {
+    display: none;
+  }
+  background-image: url('/assets/img/verified-badge.svg');
+  background-size: contain;
+  position: relative;
+  top: 3px;
+}
+
+.feather-xsmall {
+  height: 14px !important;
+  width: 14px !important;
+}
+
+.feather-small {
+  height: 16px !important;
+  width: 16px !important;
+}
+
+.feather-medium {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.feather-large {
+  height: 24px !important;
+  width: 24px !important;
+}
+
+.feather-xlarge {
+  height: 34px !important;
+  width: 34px !important;
+}
+
+.feather-xxlarge {
+  height: 90px !important;
+  width: 90px !important;
+}
 
 .home-container {
   max-width: 515px;
@@ -304,7 +389,7 @@ h2,h3,h4,h5,h6,p {
   text-align: center;
   color: #FFF;
   border-bottom: 1px solid $border-grey;
-  margin-bottom: 80px;
+  margin-bottom: 60px;
   @media (max-width: 445px) {
     margin-bottom: 40px;
   }
@@ -352,6 +437,20 @@ h2,h3,h4,h5,h6,p {
 
 .sign-up-seed {
   background-image: url(/assets/sign_up_seed.png);
+}
+
+.onboarding-buy-deso-container {
+  background: #FFFFFF;
+  border-radius: 6px;
+  padding-top: 16px;
+}
+
+.onboarding-info-bar-circle {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $blue;
+  border-radius: 100%;
+  font-size: 18px;
 }
 
 .google-wrapper {
@@ -433,6 +532,7 @@ h2,h3,h4,h5,h6,p {
   justify-content: center;
   align-items: center;
   font-size: 18px;
+  cursor: pointer;
 }
 
 .button-primary {
@@ -461,6 +561,43 @@ h2,h3,h4,h5,h6,p {
 .button-small {
   height: 62px;
   width: 140px;
+}
+
+// Styled buttons
+.styled-primary-button {
+  --highlight: #005BFF;
+  --highlight-secondary: #E5F2FF;
+
+  width: 137px;
+  height: 48px;
+  background: var(--highlight);
+  border-radius: 6px;
+  color: white;
+  border: none;
+  &:hover {
+    color: white;
+  }
+  &.disabled-button {
+    background: var(--highlight-secondary)
+  }
+}
+
+.styled-secondary-button {
+  --highlight: #005BFF;
+  --highlight-secondary: #E5F2FF;
+
+  width: 137px;
+  height: 48px;
+  background: none;
+  border-radius: 6px;
+  color: var(--highlight);
+  border: 1px solid var(--highlight);
+  &:hover {
+    color: var(--highlight);
+  }
+  &.disabled-button {
+    background: var(--highlight-secondary)
+  }
 }
 
 .link {
@@ -664,3 +801,175 @@ h2,h3,h4,h5,h6,p {
 .transaction-spending-limit-separator {
   border-bottom: #AAAAAA solid 1px;
 }
+
+// ####################################
+//  Buy DeSo style
+// ####################################
+
+.buy-deso__container {
+  background: $tile-bg;
+  border-radius: 6px;
+  padding-top: 16px;
+}
+
+.buy-deso__title {
+  color: $text;
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.buy-deso__input {
+  padding: 12px;
+  height: 48px;
+  background: $tile-secondary-bg;
+  border: 1px solid $border;
+  border-radius: 6px;
+  font-size: 15px;
+  color: $text-secondary;
+  width: 100%;
+}
+
+.buy-deso__sub-title {
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  margin: 16px 0px 8px 0px;
+}
+
+.buy-deso__dropdown-btn {
+  border: 1px solid $border;
+  border-radius: 6px 0px 0px 6px;
+  background: $tile-secondary-bg;
+  width: 96px;
+  height: 48px;
+  padding: 12px;
+  color: $text-secondary;
+  font-size: 15px;
+}
+
+.buy-deso__floating-span {
+  position: absolute;
+  top: 12px;
+  right: 32px;
+}
+
+.buy-deso__sub-text {
+  font-size: 15px;
+  color: $text-secondary;
+}
+
+.buy-deso__country-selector {
+  background: $tile-secondary-bg;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $text-secondary;
+  font-size: 15px;
+  height: 48px;
+  padding: 12px;
+  width: 105px;
+}
+
+.buy-deso__country-selector {
+  border: 1px solid $border;
+  border-radius: 6px;
+  background: $tile-secondary-bg;
+  width: 105px;
+  height: 48px;
+  padding: 12px;
+  color: $text-secondary;
+  font-size: 15px;
+}
+
+.buy-deso__country-dropdown {
+  max-height: 28vh;
+  overflow-y: scroll;
+  right: -110px !important;
+}
+
+.global__mobile-scrollable-section {
+  padding-left: 10px;
+  flex-grow: 1;
+  overflow-y: scroll;
+}
+
+.disable-scrollbars {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
+}
+
+.creator-profile__ellipsis-restriction {
+  max-width: 150px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.light-button {
+  width: 137px;
+  height: 48px;
+  background: $tile-bg;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $text;
+  font-weight: 600;
+  &:hover {
+    color: $text;
+  }
+  &.disabled-button {
+    background: $tile-bg;
+  }
+}
+
+.text-greyC {
+  color: #a0a3bd;
+}
+
+.primary-button {
+  width: 137px;
+  height: 48px;
+  background: $highlight;
+  border-radius: 6px;
+  color: $tile-bg;
+  border: none;
+}
+
+.feed-post__dropdown-menu-item {
+  color: $text-muted;
+  padding: 10px;
+  padding-bottom: 0;
+  font-size: 14px !important;
+  &:last-of-type {
+    padding-bottom: 10px;
+  }
+  &:hover {
+    color: $text;
+  }
+  i-feather {
+    height: 14px;
+    width: 14px;
+  }
+}
+
+.bc-dropdown-menu div {
+  margin: 6px;
+}
+
+.bc-dropdown-menu {
+  background: $tile-bg;
+  border-radius: 6px;
+  border: none;
+  box-shadow: 6px 6px 0px $text;
+  border: 1px solid $text;
+  div {
+    margin: 6px;
+  }
+}
+
+bs-dropdown-container {
+  z-index: 3000 !important;
+}
+
+
