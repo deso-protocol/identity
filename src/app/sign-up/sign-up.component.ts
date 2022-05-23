@@ -115,6 +115,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
       this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
     if (this.globalVars.getFreeDeso) {
+      this.globalVars.signedUp = true;
       this.router.navigate(['/', RouteNames.GET_DESO], {
         queryParams: {publicKey: this.publicKeyAdded, signedUp: true },
         queryParamsHandling: 'merge'});

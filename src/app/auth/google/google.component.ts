@@ -133,6 +133,7 @@ export class GoogleComponent implements OnInit {
   }
 
   finishFlow(signedUp: boolean): void {
+    this.globalVars.signedUp = signedUp;
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
     if (this.globalVars.derive) {
