@@ -62,8 +62,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
-      if (params.signedUp) {
-        this.displayForSignupFlow = params.signedUp === 'true';
+      if (params.getFreeDeso) {
+        this.displayForSignupFlow = params.getFreeDeso === 'true';
       }
       if (this.publicKey === '' && params.public_key) {
         this.publicKey = params.public_key;

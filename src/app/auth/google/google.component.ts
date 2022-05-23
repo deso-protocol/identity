@@ -144,7 +144,7 @@ export class GoogleComponent implements OnInit {
         this.login(signedUp);
       }
       if (!signedUp) {
-        this.backendApi.GetUsersStateless([this.publicKey], false).subscribe((res) => {
+        this.backendApi.GetUsersStateless([this.publicKey], true, true, true).subscribe((res) => {
           if (res?.UserList?.length) {
             if (res.UserList[0].BalanceNanos !== 0) {
               this.login(signedUp);
