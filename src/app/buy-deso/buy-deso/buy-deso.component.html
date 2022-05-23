@@ -1,6 +1,6 @@
 <app-banner></app-banner>
 <div class="buy-deso__container">
-  <div *ngIf="!showBuyComplete; else showBuyCompleteElseBlock">
+  <div *ngIf="!publicKeyNotInIdentity; else showPublicKeyNotInIdentity">
     <div *ngIf="!waitingOnTxnConfirmation" class="buy-deso__title mx-16px">
       Buy $DESO
     </div>
@@ -327,11 +327,18 @@
     </div>
   </div>
 
-  <ng-template #showBuyCompleteElseBlock>
-    <buy-deso-complete
-      (closeModal)="cancelButtonClicked()"
-      (buyMoreDeSoClicked)="onBuyMoreDeSoClicked()"
-      [publicKey]="publicKey"
-    ></buy-deso-complete>
+  <ng-template #showPublicKeyNotInIdentity>
+    <div class="d-flex justify-content-center">
+      The public key provided was not found in identity and we cannot support buying DESO.
+      <br/>
+      <br/>
+      Please close this window and try again with a public key with which you are logged in.
+    </div>
+    <div class="py-16px">
+      <button type="button" class="styled-primary-button" (click)="goToLogin()">
+        Login
+      </button>
+    </div>
+
   </ng-template>
 </div>

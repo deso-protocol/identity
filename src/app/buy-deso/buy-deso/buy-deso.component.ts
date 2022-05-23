@@ -70,9 +70,6 @@ export class BuyDeSoComponent implements OnInit {
 
   waitingOnTxnConfirmation = false;
   queryingBitcoinAPI = false;
-  // @ts-ignore
-  wyreService: WyreService;
-  showBuyComplete = false;
   buyWithBTCStep = 1;
   keyIsCopied = false;
 
@@ -104,6 +101,8 @@ export class BuyDeSoComponent implements OnInit {
     error: '',
   };
 
+  publicKeyNotInIdentity = false;
+
   constructor(
     public ref: ChangeDetectorRef,
     public globalVars: GlobalVarsService,
@@ -116,6 +115,7 @@ export class BuyDeSoComponent implements OnInit {
     public router: Router,
     private httpClient: HttpClient,
     private cryptoService: CryptoService,
+    public wyreService: WyreService,
   ) {
     this.appData = globalVars;
     this.route.queryParams.subscribe((params: Params) => {
@@ -138,7 +138,6 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   onBuyMoreDeSoClicked(): void {
-    this.showBuyComplete = false;
     this._queryBitcoinAPI();
     this.buyWithBTCStep = 1;
   }
@@ -490,7 +489,6 @@ export class BuyDeSoComponent implements OnInit {
   _clickBuyDeSoSuccess(comp: BuyDeSoComponent): void {
     comp.waitingOnTxnConfirmation = false;
     comp.showCloseButton.emit(true);
-    comp.showBuyComplete = true;
     comp.router.navigate(['/', RouteNames.BUY_COMPLETE], { queryParamsHandling: 'merge' });
     comp.ref.detectChanges();
 
@@ -711,6 +709,8 @@ export class BuyDeSoComponent implements OnInit {
     // TODO: need some sort of UI for when we can't get encrypted user.
     if (!encryptedUser) {
       console.error('Encrypted User not found: Buying DESO will not work.');
+      this.publicKeyNotInIdentity = true;
+      return;
     } else {
       this.seedHex = this.cryptoService.decryptSeedHex(encryptedUser.encryptedSeedHex, this.globalVars.hostname);
     }
@@ -749,6 +749,10 @@ export class BuyDeSoComponent implements OnInit {
 
   _handleTabClick(tab: any): void {
     this.activeTab = tab;
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/', RouteNames.LOG_IN], { queryParamsHandling: 'merge' });
   }
 }
 
