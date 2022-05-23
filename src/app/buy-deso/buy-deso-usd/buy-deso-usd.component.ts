@@ -13,6 +13,7 @@ import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {environment} from '../../../environments/environment';
 import {RouteNames} from '../../app-routing.module';
+import {Network} from '../../../types/identity';
 const currencyToSymbolMap = require('currency-symbol-map/map');
 
 @Component({
@@ -95,7 +96,7 @@ export class BuyDeSoUSDComponent implements OnInit {
       return;
     }
     this.wyreService.makeWalletOrderReservation(this.parentComponent.publicKey, this.amount,
-      this.selectedCountry, this.selectedFiatCurrency, `${environment.hostname}/${RouteNames.BUY_COMPLETE}?publicKey=${this.parentComponent.publicKey}&signedUp=${this.globalVars.signedUp}` ).subscribe(
+      this.selectedCountry, this.selectedFiatCurrency, `${environment.hostname}/${RouteNames.BUY_COMPLETE}?publicKey=${this.parentComponent.publicKey}&signedUp=${this.globalVars.signedUp}${this.globalVars.network === Network.testnet ? '&testnet=true' : ''}` ).subscribe(
       (res) => {
         const wyreUrl = res.url;
         if (res.url) {
