@@ -218,12 +218,14 @@ export class BackendAPIService {
   // When SkipForLeaderboard is false, we also fetch the user's balance, profiles this user follows, hodlings,  and
   //  UserMetadata. Oftentimes, this information is not needed and excluding it significantly improves performance.
   GetUsersStateless(
-    publicKeys: string[], SkipForLeaderboard: boolean = false,
+    publicKeys: string[], SkipForLeaderboard: boolean = false, IncludeBalance: boolean = false, GetUnminedBalance: boolean = false,
   ): Observable<{ UserList: User[]}> {
     return this.post('get-users-stateless',
       {
         PublicKeysBase58Check: publicKeys,
         SkipForLeaderboard,
+        IncludeBalance,
+        GetUnminedBalance,
       },
     );
   }
@@ -610,13 +612,15 @@ export class BackendAPIService {
     referenceId: string,
     sourceAmount: number,
     country: string,
-    sourceCurrency: string
+    sourceCurrency: string,
+    redirectURL: string,
   ): Observable<any> {
     const req = this.post('get-wyre-wallet-order-reservation', {
       ReferenceId: referenceId,
       SourceAmount: sourceAmount,
       Country: country,
       SourceCurrency: sourceCurrency,
+      RedirectUrl: redirectURL,
     });
 
     return req.pipe(

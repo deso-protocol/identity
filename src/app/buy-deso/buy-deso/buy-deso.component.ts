@@ -30,6 +30,12 @@ import {BuyDeSoEthComponent} from '../buy-deso-eth/buy-deso-eth.component';
 import {BuyDeSoUSDComponent} from '../buy-deso-usd/buy-deso-usd.component';
 import {IconsModule} from '../../icons/icons.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import {CryptoService} from '../../crypto.service';
+import {SignUpBuyDesoComponent} from '../sign-up-buy-deso.component';
+import { RouteNames } from 'src/app/app-routing.module';
+import {Network} from '../../../types/identity';
+import {BuyDeSoCompletePageComponent} from '../buy-deso-complete-page/buy-deso-complete-page.component';
+import {BuyDesoPageComponent} from '../buy-deso-page/buy-deso-page.component';
 
 class Messages {
   static INCORRECT_PASSWORD = `The password you entered was incorrect.`;
@@ -48,26 +54,22 @@ class Messages {
   styleUrls: ['./buy-deso.component.scss'],
 })
 export class BuyDeSoComponent implements OnInit {
-  static BUY_WITH_USD = 'Buy with fiat';
+  static BUY_WITH_USD = 'Buy with Credit Card';
   static BUY_WITH_BTC = 'Buy with Bitcoin';
-  static BUY_WITH_ETH = 'Buy with ETH';
+  static BUY_WITH_ETH = 'Buy with Ethereum';
   static BUY_ON_CB = 'Buy on Coinbase';
   static CB_LINK = 'https://www.coinbase.com/price/decentralized-social';
 
   appData: GlobalVarsService;
   @Input() isModal = false;
   @Input() activeTabInput: string | null = null;
-  @Input() publicKey = '';
-  @Input() seedHex = '';
-  @Input() testnet = false;
   @Output() closeModal = new EventEmitter();
   @Output() showCloseButton = new EventEmitter<boolean>();
 
+  publicKey = '';
+
   waitingOnTxnConfirmation = false;
   queryingBitcoinAPI = false;
-  // @ts-ignore
-  wyreService: WyreService;
-  showBuyComplete = false;
   buyWithBTCStep = 1;
   keyIsCopied = false;
 
@@ -89,6 +91,7 @@ export class BuyDeSoComponent implements OnInit {
   BuyDeSoFeeBasisPoints = 0;
   nanosPerUSDExchangeRate = 0;
   desoToUSDExchangeRateToDisplay = '';
+  seedHex = '';
 
   buyDeSoFields = {
     desoToBuy: '',
@@ -97,6 +100,8 @@ export class BuyDeSoComponent implements OnInit {
     bitcoinTotalTransactionFeeSatoshis: '0',
     error: '',
   };
+
+  publicKeyNotInIdentity = false;
 
   constructor(
     public ref: ChangeDetectorRef,
@@ -107,14 +112,19 @@ export class BuyDeSoComponent implements OnInit {
     private signingService: SigningService,
     private textService: TextService,
     private route: ActivatedRoute,
-    private router: Router,
-    private httpClient: HttpClient
+    public router: Router,
+    private httpClient: HttpClient,
+    private cryptoService: CryptoService,
+    public wyreService: WyreService,
   ) {
     this.appData = globalVars;
     this.route.queryParams.subscribe((params: Params) => {
       if (params.btc) {
         this.activeTab = BuyDeSoComponent.BUY_WITH_BTC;
-        this.router.navigate([], { queryParams: {} });
+        this.router.navigate([], { queryParamsHandling: 'merge'} );
+      }
+      if (params.publicKey) {
+        this.publicKey = params.publicKey;
       }
     });
   }
@@ -128,7 +138,6 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   onBuyMoreDeSoClicked(): void {
-    this.showBuyComplete = false;
     this._queryBitcoinAPI();
     this.buyWithBTCStep = 1;
   }
@@ -181,13 +190,9 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   cancelButtonClicked(): void {
-    if (this.isModal) {
-      this.closeModal.emit();
-    } else {
-      // this.router.navigate(["/" + this.globalVars.RouteNames.BROWSE], {
-      //   queryParams: { feedTab: FeedComponent.FOLLOWING_TAB },
-      // });
-    }
+    this.router.navigate(['/' + RouteNames.GET_DESO], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   _copyPublicKey(): void {
@@ -484,7 +489,7 @@ export class BuyDeSoComponent implements OnInit {
   _clickBuyDeSoSuccess(comp: BuyDeSoComponent): void {
     comp.waitingOnTxnConfirmation = false;
     comp.showCloseButton.emit(true);
-    comp.showBuyComplete = true;
+    comp.router.navigate(['/', RouteNames.BUY_COMPLETE], { queryParamsHandling: 'merge' });
     comp.ref.detectChanges();
 
     console.log('NOW SHOULD CLOSE IDENTITY');
@@ -651,7 +656,7 @@ export class BuyDeSoComponent implements OnInit {
     this.latestBitcoinAPIResponse = null;
     this.queryingBitcoinAPI = true;
 
-    this.backendAPIService.GetBitcoinAPIInfo(this.btcDepositAddress(), this.testnet).subscribe(
+    this.backendAPIService.GetBitcoinAPIInfo(this.btcDepositAddress(), this.globalVars.network === Network.testnet).subscribe(
       (resProm: any) => {
         resProm
           .then((res: any) => {
@@ -700,12 +705,21 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const encryptedUser = this.accountService.getEncryptedUsers()[this.publicKey];
+    // TODO: need some sort of UI for when we can't get encrypted user.
+    if (!encryptedUser) {
+      console.error('Encrypted User not found: Buying DESO will not work.');
+      this.publicKeyNotInIdentity = true;
+      return;
+    } else {
+      this.seedHex = this.cryptoService.decryptSeedHex(encryptedUser.encryptedSeedHex, this.globalVars.hostname);
+    }
     window.scroll(0, 0);
 
     // Add extra tabs
-    this.buyTabs.unshift(BuyDeSoComponent.BUY_WITH_USD);
-    this.activeTab = BuyDeSoComponent.BUY_WITH_USD;
-    this.buyTabs.push(BuyDeSoComponent.BUY_WITH_ETH);
+    this.activeTab = BuyDeSoComponent.BUY_WITH_ETH;
+    this.buyTabs.unshift(BuyDeSoComponent.BUY_WITH_ETH);
+    this.buyTabs.push(BuyDeSoComponent.BUY_WITH_USD);
     this.buyTabs.push(BuyDeSoComponent.BUY_ON_CB);
 
     if (!isNil(this.activeTabInput)) {
@@ -736,6 +750,10 @@ export class BuyDeSoComponent implements OnInit {
   _handleTabClick(tab: any): void {
     this.activeTab = tab;
   }
+
+  goToLogin(): void {
+    this.router.navigate(['/', RouteNames.LOG_IN], { queryParamsHandling: 'merge' });
+  }
 }
 
 @NgModule({
@@ -744,7 +762,8 @@ export class BuyDeSoComponent implements OnInit {
     TabSelectorComponent,
     BuyDeSoCompleteComponent,
     BuyDeSoEthComponent,
-    BuyDeSoUSDComponent
+    BuyDeSoUSDComponent,
+    SignUpBuyDesoComponent,
   ],
   imports: [
     CommonModule,
@@ -754,7 +773,7 @@ export class BuyDeSoComponent implements OnInit {
     IconsModule,
     BsDropdownModule.forRoot(),
   ],
-  exports: [BuyDeSoComponent],
+  exports: [BuyDeSoComponent, BuyDeSoCompleteComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class BuyDeSoComponentWrapper {}

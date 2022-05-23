@@ -8,6 +8,7 @@ import {CryptoService} from '../crypto.service';
 import {EntropyService} from '../entropy.service';
 import {GoogleDriveService} from '../google-drive.service';
 import {RouteNames} from '../app-routing.module';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-log-in',
@@ -29,6 +30,7 @@ export class LogInComponent implements OnInit {
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -50,6 +52,33 @@ export class LogInComponent implements OnInit {
 
   selectAccount(publicKey: string): void {
     this.accountService.setAccessLevel(publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    if (!this.globalVars.getFreeDeso) {
+      this.login(publicKey);
+    } else {
+      this.backendApi.GetUsersStateless(
+        [publicKey],
+        true,
+        true,
+        true
+      ).subscribe((res) => {
+        if (!res?.UserList.length || res.UserList[0].BalanceNanos === 0) {
+          this.navigateToGetDeso(publicKey);
+        } else {
+          this.login(publicKey);
+        }
+      }, (err) => {
+        console.error(err);
+        this.navigateToGetDeso(publicKey);
+      });
+
+    }
+  }
+
+  navigateToGetDeso(publicKey: string): void {
+    this.router.navigate(['/', RouteNames.GET_DESO], { queryParamsHandling: 'merge', queryParams: { publicKey } });
+  }
+
+  login(publicKey: string): void {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: publicKey,

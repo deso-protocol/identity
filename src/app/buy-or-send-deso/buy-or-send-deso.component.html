@@ -1,0 +1,106 @@
+<app-banner></app-banner>
+
+<div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
+    <div class="onboarding-buy-deso-container p-16px">
+      <div class="fs-20px fc-muted pb-10px mb-10px">Easily transfer $DESO or purchase some directly</div>
+      <div class="border-bottom w-100 mb-30px"></div>
+      <div class="d-flex mb-30px">
+        <div class="d-flex align-items-center flex-column fc-blue">
+          <div
+            style="border-color: #005BFF"
+            class="d-flex align-items-center justify-content-center fs-20px onboarding-info-bar-circle mb-10px"
+          >
+            A
+          </div>
+        </div>
+        <div class="ml-20px w-100">
+          <div class="fs-20px fc-default font-weight-bold mb-16px">Don't have any $DESO? We make it easy to buy.</div>
+          <div class="p-30px mb-20px bg-light br-10px d-flex flex-column align-items-center">
+            <div class="fc-default font-weight-bold fs-18px mb-20px text-center">Buy DESO with ETH, BTC, or fiat
+            </div>
+            <div class="d-flex justify-content-around">
+              <div class="col-10 d-flex align-items-center flex-column">
+                <button
+                  (click)="stepFiveNextBuy()"
+                  class="styled-primary-button mb-16px"
+                  style="width: 200px"
+                >
+                  Buy Now!
+                </button>
+                <div class="fs-12px fc-muted text-center">We support 20 fiat currencies including USD and more.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-bottom w-100 mb-30px"></div>
+      <div class="d-flex">
+        <div class="d-flex align-items-center flex-column fc-blue">
+          <div
+            style="border-color: #005BFF"
+            class="d-flex align-items-center justify-content-center fs-20px onboarding-info-bar-circle mb-10px"
+          >
+            B
+          </div>
+        </div>
+        <div class="ml-20px">
+          <div class="fs-20px fc-default font-weight-bold mb-16px">Transfer $DESO to your new account</div>
+          <div class="fs-16px fc-muted mb-30px">You will need at least 0.01 $DESO to create your new account. This could
+            be transferred from an exchange like Coinbase, or from another account on a DeSo app like Diamond.
+          </div>
+          <div class="fs-18px fc-default font-weight-semibold mb-10px">Send $DESO to this address</div>
+          <div
+            class="w-100 bg-light p-10px br-10px cursor-pointer mb-10px"
+          >
+            <div
+              class="fs-16px font-weight-normal fc-default mb-10px mt-5px text-center"
+            >
+              {{ publicKeyAdded }}
+            </div>
+            <div class="w-100 border-bottom"></div>
+            <div class="d-flex justify-content-around mt-10px mb-5px" (click)="_copyPublicKey()">
+              <span>
+                <i-feather
+                  *ngIf="publicKeyIsCopied"
+                  class="feather-small check-indicator position-relative"
+                  name="check-circle"
+                ></i-feather>
+                <i-feather
+                  *ngIf="!publicKeyIsCopied"
+                  class="feather-small copy-button cursor-pointer position-relative"
+                  name="copy"
+                ></i-feather>
+                <span class="fs-16px fc-blue ml-5px">Click to Copy</span>
+              </span>
+            </div>
+          </div>
+          <div class="d-flex mb-25px">
+            <div class="fc-default fs-16px mr-5px font-weight-semibold">Your current balance</div>
+            <div class="fs-16px fc-muted d-flex align-items-center">
+              <div>{{ globalVars.nanosToDeSo(userBalanceNanos) }} $DESO</div>
+
+              <div *ngIf="!refreshBalanceCooldown">
+                <div (click)="refreshBalance()" class="ml-10px d-flex align-items-center cursor-pointer">
+                  <div class="d-flex">
+                    <i-feather class="fc-default feather-small fs-0px mr-5px" name="refresh-cw"></i-feather>
+                  </div>
+                  <span class="fc-blue">Refresh</span>
+                </div>
+              </div>
+              <div *ngIf="refreshBalanceCooldown">
+                <div class="ml-10px">
+                  <span class="fc-muted">Refresh in {{refreshBalanceRetryTime}}s</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="userBalanceNanos > 0" class="d-flex align-items-center flex-column">
+            <button (click)="finishFlowTransferDeSo()" class="styled-secondary-button">Finish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="p-16px">
+      <a class="fc-muted ml-25px cursor-pointer" style="cursor: pointer" (click)="cancelButtonClicked()">Cancel</a>
+    </div>
+</div>

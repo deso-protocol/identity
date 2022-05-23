@@ -1,11 +1,12 @@
+<app-banner></app-banner>
 <div class="buy-deso__container">
-  <div *ngIf="!showBuyComplete; else showBuyCompleteElseBlock">
+  <div *ngIf="!publicKeyNotInIdentity; else showPublicKeyNotInIdentity">
     <div *ngIf="!waitingOnTxnConfirmation" class="buy-deso__title mx-16px">
       Buy $DESO
     </div>
     <div class="d-flex flex-column">
       <div style="flex-grow: 1">
-        <div class="global__mobile-scrollable-section disable-scrollbars" *ngIf="!waitingOnTxnConfirmation">
+        <div class="disable-scrollbars" *ngIf="!waitingOnTxnConfirmation">
           <div
             [ngClass]="{ 'mb-10px': activeTab === BuyDeSoComponent.BUY_WITH_BTC }"
           >
@@ -287,7 +288,7 @@
               <div class="border-bottom w-100"></div>
               <div class="m-16px">
                 <button class="primary-button" (click)="_clickBuyDeSo()">Buy $DESO</button>
-                <a class="fc-muted ml-25px" (click)="buyWithBTCStep = 1">Back</a>
+                <a class="fc-muted ml-25px cursor-pointer" (click)="buyWithBTCStep = 1">Back</a>
               </div>
             </div>
           </div>
@@ -326,11 +327,18 @@
     </div>
   </div>
 
-  <ng-template #showBuyCompleteElseBlock>
-    <buy-deso-complete
-      (closeModal)="cancelButtonClicked()"
-      (buyMoreDeSoClicked)="onBuyMoreDeSoClicked()"
-      [publicKey]="publicKey"
-    ></buy-deso-complete>
+  <ng-template #showPublicKeyNotInIdentity>
+    <div class="d-flex justify-content-center">
+      The public key provided was not found in identity and we cannot support buying DESO.
+      <br/>
+      <br/>
+      Please close this window and try again with a public key with which you are logged in.
+    </div>
+    <div class="py-16px">
+      <button type="button" class="styled-primary-button" (click)="goToLogin()">
+        Login
+      </button>
+    </div>
+
   </ng-template>
 </div>
