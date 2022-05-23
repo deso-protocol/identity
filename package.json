@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build_prod": "./node_modules/.bin/ng build --prod --base-href / --deploy-url /",
+    "build_prod": "./node_modules/.bin/ng build --configuration production --base-href / --deploy-url /",
     "ngcc": "./node_modules/.bin/ngcc --properties es2015"
   },
   "private": true,
