@@ -24,8 +24,6 @@ export class BuyOrSendDesoComponent implements OnInit {
 
   environment = environment;
 
-  phoneNumberSuccess = false;
-
   publicKeyIsCopied = false;
   scanQRCode = false;
 
@@ -122,7 +120,6 @@ export class BuyOrSendDesoComponent implements OnInit {
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKeyAdded,
       signedUp: this.globalVars.signedUp,
-      phoneNumberSuccess: this.phoneNumberSuccess,
     });
   }
 
