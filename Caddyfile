@@ -45,6 +45,7 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/get-exchange-rate
     {$DOMAIN:https://node.deso.org}/api/v0/query-eth-rpc
     {$DOMAIN:https://node.deso.org}/api/v0/submit-eth-tx
+    {$DOMAIN:https://node.deso.org}/api/v0/exchange-bitcoin-stateless
     https://test.deso.org/api/v0/get-users-stateless
     https://test.deso.org/api/v0/get-app-state
     https://test.deso.org/api/v0/jumio-begin
@@ -62,6 +63,7 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/get-exchange-rate
     https://test.deso.org/api/v0/query-eth-rpc
     https://test.deso.org/api/v0/submit-eth-tx
+    https://test.deso.org/api/v0/exchange-bitcoin-stateless
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files
