@@ -5,11 +5,11 @@ import HDKey from 'hdkey';
 import {ec as EC} from 'elliptic';
 import bs58check from 'bs58check';
 import {CookieService} from 'ngx-cookie';
-import {createHmac, createCipher, createDecipher, randomBytes} from 'crypto';
+import {createHmac, createCipher, createDecipher, randomBytes, createHash} from 'crypto';
 import {AccessLevel, Network} from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
-import * as sha256 from "sha256";
+import * as sha256 from 'sha256';
 
 @Injectable({
   providedIn: 'root'
@@ -170,7 +170,7 @@ export class CryptoService {
     const ec = new EC('secp256k1');
     return ec.keyFromPublic(payload, 'array');
   }
-  
+
   // Decode public key base58check to Buffer of secp256k1 public key
   publicKeyToECBuffer(publicKey: string): Buffer {
     const publicKeyEC = this.publicKeyToECKeyPair(publicKey);
@@ -194,6 +194,19 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
+  hash160(buf: Buffer): Buffer {
+    const sha = createHash('sha256').update(buf).digest();
+    return createHash('ripemd160').update(sha).digest();
+  }
+
+  publicKeyToBtcAddress(publicKey: Buffer, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitcoin;
+    const identifier = this.hash160(publicKey);
+    const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
+
+    return bs58check.encode(prefixAndKey);
+  }
+
   // Compute messaging private key as sha256x2( sha256x2(seed hex) || sha256x2(key name) )
   deriveMessagingKey(seedHex: string, keyName: string): Buffer {
     const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]), 'hex');
@@ -201,7 +214,7 @@ export class CryptoService {
     return new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
   }
 
-  // NOTE: Our ETH address uses the bitcion/bitclout derivation path, not the ETH path.
+  // NOTE: Our ETH address uses the bitcoin/bitclout derivation path, not the ETH path.
   // This is ugly but we only do it because they're just deposit addresses and we couldn't
   // backfill this data for existing users because we store the derived private key.
   // A user can still easily import their account to an ETH client to recover any ETH
@@ -211,11 +224,8 @@ export class CryptoService {
   // until LavaMoat is ready
   //
   // Reference implementation: https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L249
-  seedHexToEthAddress(seedHex: string): string {
-    const privateKey = this.seedHexToPrivateKey(seedHex);
-
-    // ETH uses the last 40 characters of the 64 byte SHA3 Keccak 256
-    const uncompressedKey = Buffer.from(privateKey.getPublic(false, 'array').slice(1));
+  publicKeyToEthAddress(keyPair: EC.KeyPair): string {
+    const uncompressedKey = Buffer.from(keyPair.getPublic(false, 'array').slice(1));
     const ethAddress = new Keccak(256).update(uncompressedKey).digest('hex').slice(24);
 
     // EIP-55 requires a checksum. Reference implementation: https://eips.ethereum.org/EIPS/eip-55
@@ -224,9 +234,9 @@ export class CryptoService {
 
     for (let i = 0; i < ethAddress.length; i++) {
       if (parseInt(checksumHash[i], 16) >= 8) {
-        ethAddressChecksum += ethAddress[i].toUpperCase()
+        ethAddressChecksum += ethAddress[i].toUpperCase();
       } else {
-        ethAddressChecksum += ethAddress[i]
+        ethAddressChecksum += ethAddress[i];
       }
     }
 

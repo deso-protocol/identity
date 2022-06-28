@@ -100,7 +100,7 @@ export class AccountService {
     const numDaysBeforeExpiration = expirationDays || 30;
 
     this.entropyService.setNewTemporaryEntropy();
-    const derivedMnemonic = this.entropyService.temporaryEntropy?.mnemonic;
+    const derivedMnemonic = this.entropyService.temporaryEntropy.mnemonic;
     const derivedKeychain = this.cryptoService.mnemonicToKeychain(derivedMnemonic);
     if (!derivedPublicKeyBase58CheckInput) {
       // If the user hasn't passed in a derived public key, create it.
@@ -182,8 +182,9 @@ export class AccountService {
 
   addUser(keychain: HDKey, mnemonic: string, extraText: string, network: Network, google?: boolean): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
+    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
-    const ethDepositAddress = this.cryptoService.seedHexToEthAddress(seedHex);
+    const ethDepositAddress = this.cryptoService.publicKeyToEthAddress(keyPair);
 
     return this.addPrivateUser({
       seedHex,
@@ -231,7 +232,8 @@ export class AccountService {
       // Migrate from V0 -> V1
       if (privateUser.version === PrivateUserVersion.V0) {
         // Add ethDepositAddress field
-        privateUser.ethDepositAddress = this.cryptoService.seedHexToEthAddress(privateUser.seedHex);
+        const keyPair = this.cryptoService.seedHexToPrivateKey(privateUser.seedHex);
+        privateUser.ethDepositAddress = this.cryptoService.publicKeyToEthAddress(keyPair);
 
         // Increment version
         privateUser.version = PrivateUserVersion.V1;

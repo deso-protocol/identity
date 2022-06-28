@@ -32,12 +32,12 @@ export const uvarint64ToBuf = (uint: number): Buffer => {
 export const uint64ToBufBigEndian = (uint: number): Buffer => {
   const result = [];
 
-  while (uint >= 0xFF) {
-    result.push(uint & 0xFF);
-    uint >>>= 8;
+  while (BigInt(uint) >= BigInt(0xFF)) {
+    result.push(Number(BigInt(uint) & BigInt(0xFF)));
+    uint = Number(BigInt(uint) >> BigInt(8));
   }
 
-  result.push(uint | 0);
+  result.push(Number(BigInt(uint) | BigInt(0)));
 
   while(result.length < 8){
     result.push(0);

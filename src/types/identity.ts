@@ -3,11 +3,13 @@ import { TransactionSpendingLimit } from "src/lib/deso/transaction";
 export interface PrivateUserInfo {
   seedHex: string;
   mnemonic: string;
+  publicKeyHex?: string;
   extraText: string;
   btcDepositAddress: string;
   ethDepositAddress: string;
   network: Network;
   google?: boolean;
+  metamask?: boolean;
   version: PrivateUserVersion;
 }
 

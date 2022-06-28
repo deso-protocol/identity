@@ -85,14 +85,14 @@ export type PostEntryResponse = {
   NFTRoyaltyToCreatorBasisPoints: number;
   AdditionalDESORoyaltiesMap: { [k: string]: number };
   AdditionalCoinRoyaltiesMap: { [k: string]: number };
-}
+};
 
 
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
-  PublicKeyBase58Check: string = "";
+  PublicKeyBase58Check = '';
   HasPhoneNumber: boolean | null = null;
-  BalanceNanos: number = 0;
+  BalanceNanos = 0;
   UsersYouHODL: any[] = [];
 }
 
@@ -104,19 +104,19 @@ type CountryLevelSignUpBonus = {
 };
 
 export enum CreatorCoinLimitOperationString {
-  ANY = "any",
-  BUY = "buy",
-  SELL = "sell",
-  TRANSFER = "transfer",
+  ANY = 'any',
+  BUY = 'buy',
+  SELL = 'sell',
+  TRANSFER = 'transfer',
 }
 
 export enum DAOCoinLimitOperationString {
-  ANY = "any",
-  MINT = "mint",
-  BURN = "burn",
-  DISABLE_MINTING = "disable_minting",
-  UPDATE_TRANSFER_RESTRICTION_STATUS = "update_transfer_restriction_status",
-  TRANSFER = "transfer",
+  ANY = 'any',
+  MINT = 'mint',
+  BURN = 'burn',
+  DISABLE_MINTING = 'disable_minting',
+  UPDATE_TRANSFER_RESTRICTION_STATUS = 'update_transfer_restriction_status',
+  TRANSFER = 'transfer',
 }
 
 export type CoinLimitOperationString = DAOCoinLimitOperationString | CreatorCoinLimitOperationString;
@@ -137,16 +137,16 @@ export type DAOCoinLimitOrderLimitItem = {
   BuyingPublicKey: string;
   SellingPublicKey: string;
   OpCount: number;
-}
+};
 
 export enum NFTLimitOperationString {
-  ANY = "any",
-  UPDATE = "update",
-  BID = "nft_bid",
-  ACCEPT_BID = "accept_nft_bid",
-  TRANSFER = "transfer",
-  BURN = "burn",
-  ACCEPT_TRANSFER = "accept_nft_transfer",
+  ANY = 'any',
+  UPDATE = 'update',
+  BID = 'nft_bid',
+  ACCEPT_BID = 'accept_nft_bid',
+  TRANSFER = 'transfer',
+  BURN = 'burn',
+  ACCEPT_TRANSFER = 'accept_nft_transfer',
 }
 export type NFTOperationLimitMap = {
   [post_hash_hex: string]: {
@@ -163,7 +163,7 @@ export interface TransactionSpendingLimitResponse {
   NFTOperationLimitMap?: NFTOperationLimitMap;
   DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
   DerivedKeyMemo?: string;
-};
+}
 
 @Injectable({
   providedIn: 'root'
@@ -182,8 +182,8 @@ export class BackendAPIService {
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
-    if (this.globalVars.network === Network.testnet && this.endpoint.startsWith("https://node.deso.org")) {
-      endpoint = "https://test.deso.org/api/v0";
+    if (this.globalVars.network === Network.testnet && this.endpoint.startsWith('https://node.deso.org')) {
+      endpoint = 'https://test.deso.org/api/v0';
     }
     return `${endpoint}/${path}`;
   }
@@ -248,7 +248,7 @@ export class BackendAPIService {
           })
         ).pipe(
           catchError(() => {
-            for(const publicKey of publicKeys) {
+            for (const publicKey of publicKeys) {
               userProfiles[publicKey] = {};
             }
             return of(userProfiles);
@@ -364,7 +364,7 @@ export class BackendAPIService {
     PhoneNumber: string,
     PhoneNumberCountryCode: string
   ): Observable<any> {
-    return this.jwtPost("send-phone-number-verification-text", PublicKeyBase58Check, {
+    return this.jwtPost('send-phone-number-verification-text', PublicKeyBase58Check, {
       PublicKeyBase58Check,
       PhoneNumber,
       PhoneNumberCountryCode,
@@ -377,7 +377,7 @@ export class BackendAPIService {
     PhoneNumberCountryCode: string,
     VerificationCode: string
   ): Observable<any> {
-    return this.jwtPost("submit-phone-number-verification-code", PublicKeyBase58Check, {
+    return this.jwtPost('submit-phone-number-verification-code', PublicKeyBase58Check, {
       PublicKeyBase58Check,
       PhoneNumber,
       PhoneNumberCountryCode,
@@ -388,7 +388,7 @@ export class BackendAPIService {
   GetTransactionSpendingLimitHexString(
     TransactionSpendingLimitResponse: TransactionSpendingLimitResponse
   ): Observable<string> {
-    return this.post("get-transaction-spending-limit-hex-string", {
+    return this.post('get-transaction-spending-limit-hex-string', {
       TransactionSpendingLimit: TransactionSpendingLimitResponse,
     }).pipe(
       map(
@@ -404,17 +404,17 @@ export class BackendAPIService {
   GetTransactionSpendingLimitResponseFromHex(
     hex: string
   ): Observable<TransactionSpendingLimitResponse> {
-    return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`)
+    return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`);
   }
 
   GetSinglePost(PostHashHex: string,
-                ReaderPublicKeyBase58Check: string = "",
+                ReaderPublicKeyBase58Check: string = '',
                 FetchParents: boolean = false,
                 CommentOffset: number = 0,
                 CommentLimit: number = 0,
                 AddGlobalFeedBool: boolean = false
   ): Observable<PostEntryResponse | undefined> {
-    return this.post("get-single-post", {
+    return this.post('get-single-post', {
       PostHashHex,
       ReaderPublicKeyBase58Check,
       FetchParents,
@@ -652,5 +652,44 @@ export class BackendAPIService {
     return this.post('get-txn', {
       TxnHashHex,
     });
+  }
+
+  AuthorizeDerivedKey(
+    OwnerPublicKeyBase58Check: string,
+    DerivedPublicKeyBase58Check: string,
+    AccessSignature: string,
+    TransactionSpendingLimits: string
+  ): Observable<any> {
+    const req = this.post('authorize-derived-key', {
+      OwnerPublicKeyBase58Check,
+      DerivedPublicKeyBase58Check,
+      DerivedKeySignature: true,
+      ExpirationBlock: 999999999999, // FIXME: fixxx
+      MinFeeRateNanosPerKB: 1000,
+      AccessSignature: AccessSignature.slice(2),
+      TransactionSpendingLimitHex: TransactionSpendingLimits,
+    });
+
+    return req.pipe(
+      catchError( (err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
+  }
+
+  SubmitTransaction(
+    TransactionHex: string
+  ): Observable<any> {
+    const req = this.post('submit-transaction', {
+      TransactionHex,
+    });
+
+    return req.pipe(
+      catchError( (err) => {
+        console.log(err);
+        return throwError(err);
+      })
+    );
   }
 }
