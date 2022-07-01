@@ -165,6 +165,11 @@ export interface TransactionSpendingLimitResponse {
   DerivedKeyMemo?: string;
 }
 
+export interface GetAccessBytesResponse {
+  SpendingLimitHex: string;
+  AccessBytesHex: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -396,6 +401,30 @@ export class BackendAPIService {
           return res.HexString;
     }),
       catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      }));
+  }
+
+  GetAccessBytes(
+    DerivedPublicKeyBase58Check: string,
+    ExpirationBlock: number,
+    // tslint:disable-next-line:no-shadowed-variable
+    TransactionSpendingLimit: TransactionSpendingLimitResponse
+  ): Observable<GetAccessBytesResponse> {
+    return this.post('get-access-bytes', {
+      DerivedPublicKeyBase58Check,
+      ExpirationBlock,
+      TransactionSpendingLimit
+    }).pipe(
+      map(
+        (res) => {
+          return {
+            SpendingLimitHex: res.SpendingLimitHex,
+            AccessBytesHex: res.AccessBytesHex,
+          };
+      }),
+      catchError( (err) => {
         console.error(err);
         return throwError(err);
       }));
@@ -657,17 +686,18 @@ export class BackendAPIService {
   AuthorizeDerivedKey(
     OwnerPublicKeyBase58Check: string,
     DerivedPublicKeyBase58Check: string,
+    ExpirationBlock: number,
     AccessSignature: string,
-    TransactionSpendingLimits: string
+    TransactionSpendingLimitHex: string
   ): Observable<any> {
     const req = this.post('authorize-derived-key', {
       OwnerPublicKeyBase58Check,
       DerivedPublicKeyBase58Check,
       DerivedKeySignature: true,
-      ExpirationBlock: 999999999999, // FIXME: fixxx
+      ExpirationBlock,
       MinFeeRateNanosPerKB: 1000,
-      AccessSignature: AccessSignature.slice(2),
-      TransactionSpendingLimitHex: TransactionSpendingLimits,
+      AccessSignature,
+      TransactionSpendingLimitHex,
     });
 
     return req.pipe(

@@ -1,7 +1,14 @@
 import {Injectable} from '@angular/core';
 import {CryptoService} from './crypto.service';
 import {GlobalVarsService} from './global-vars.service';
-import {AccessLevel, Network, DerivedPrivateUserInfo, PrivateUserInfo, PrivateUserVersion, PublicUserInfo} from '../types/identity';
+import {
+  AccessLevel,
+  DerivedPrivateUserInfo,
+  Network,
+  PrivateUserInfo,
+  PrivateUserVersion,
+  PublicUserInfo
+} from '../types/identity';
 import {CookieService} from 'ngx-cookie';
 import HDKey from 'hdkey';
 import {EntropyService} from './entropy.service';
@@ -12,7 +19,6 @@ import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
 import {ec as EC} from 'elliptic';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -198,6 +204,24 @@ export class AccountService {
     });
   }
 
+  addUserWithDepositAddresses(keychain: HDKey, mnemonic: string, extraText: string, network: Network, btcDepositAddress: string,
+                              ethDepositAddress: string, google?: boolean, publicKeyHex?: string): string {
+
+    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
+    return this.addPrivateUser({
+      seedHex,
+      mnemonic,
+      extraText,
+      btcDepositAddress,
+      ethDepositAddress,
+      network,
+      google,
+      metamask: !!publicKeyHex,
+      publicKeyHex,
+      version: PrivateUserVersion.V1,
+    });
+  }
+
   deleteUser(publicKey: string): void {
     const privateUsers = this.getPrivateUsersRaw();
 
@@ -265,7 +289,12 @@ export class AccountService {
   public addPrivateUser(userInfo: PrivateUserInfo): string {
     const privateUsers = this.getPrivateUsersRaw();
     const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
-    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, userInfo.network);
+
+    // Metamask login will be added with the master public key.
+    let publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, userInfo.network);
+    if (userInfo.metamask && userInfo.publicKeyHex) {
+      publicKey = this.cryptoService.publicKeyHexToDeSoPublicKey(userInfo.publicKeyHex, userInfo.network);
+    }
 
     privateUsers[publicKey] = userInfo;
 

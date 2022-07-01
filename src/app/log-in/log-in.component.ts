@@ -23,6 +23,8 @@ import HDKey from 'hdkey';
   styleUrls: ['./log-in.component.scss']
 })
 export class LogInComponent implements OnInit {
+  static UNLIMITED_DERIVED_KEY_EXPIRATION = 999999999999;
+
   loading = false;
   showAccessLevels = true;
 
@@ -78,7 +80,6 @@ export class LogInComponent implements OnInit {
         console.error(err);
         this.navigateToGetDeso(publicKey);
       });
-
     }
   }
 
@@ -158,19 +159,21 @@ export class LogInComponent implements OnInit {
   public signInWithMetamaskNewUser(): any {
     // generate a random derived key
     const network = this.globalVars.network;
+    const expirationBlock = LogInComponent.UNLIMITED_DERIVED_KEY_EXPIRATION;
     const { keychain, mnemonic, derivedPublicKeyBase58Check, derivedKeyPair } = this.generateDerivedKey(network);
     this.connectMetamaskMiddleware()
       .then( () => {
         // fetch a spending limit hex string based off of the permissions you're allowing
-        this.backendApi.GetTransactionSpendingLimitHexString(
+        this.backendApi.GetAccessBytes(
+          derivedPublicKeyBase58Check,
+          expirationBlock,
           getSpendingLimitsForMetamask() as TransactionSpendingLimitResponse
-        ).toPromise().then(spendingLimitHex => {
+        ).toPromise().then( (getAccessBytesResponse) => {
           //  we can now generate the message and sign it
           this.generateMessageAndSignature(
             derivedKeyPair,
-            spendingLimitHex
+            getAccessBytesResponse.AccessBytesHex
           ).then( ({message, signature}) => {
-
             this.verifySignatureAndRecoverAddress(message, signature)
               .then( publicEthAddress => {
                 // TODO: this needs backend's gringotts endpoint implemented.
@@ -180,18 +183,19 @@ export class LogInComponent implements OnInit {
                     const metamaskKeyPair = this.getMetaMaskMasterPublicKeyFromSignature(signature, message);
                     const metamaskPublicKey = Buffer.from(metamaskKeyPair.getPublic().encode('array', true));
                     const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
-                    const e = new ec('secp256k1');
-                    const pkRec = e.keyFromPublic(metamaskPublicKeyHex, 'hex');
                     const metamaskBtcAddress = this.cryptoService.publicKeyToBtcAddress(metamaskPublicKey, Network.mainnet);
                     const metamaskEthAddress = this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
                     const metamaskPublicKeyDeso = this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
+                    // Slice the '0x' prefix from the signature.
+                    const accessSignature = signature.slice(2);
 
                     // we now have all the arguments to generate an authorize derived key transaction
                     this.backendApi.AuthorizeDerivedKey(
                       metamaskPublicKeyDeso,
                       derivedPublicKeyBase58Check,
-                      signature,
-                      spendingLimitHex
+                      expirationBlock,
+                      accessSignature,
+                      getAccessBytesResponse.SpendingLimitHex
                     ).toPromise()
                       .then( response => {
                         // convert it to a byte array, sign it, submit it
@@ -200,19 +204,16 @@ export class LogInComponent implements OnInit {
                           response.TransactionHex);
                         this.backendApi.SubmitTransaction(signedTransactionHex).toPromise()
                           .then( res => {
-                            const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-                            this.accountService.addPrivateUser({
-                              seedHex,
+                            this.accountService.addUserWithDepositAddresses(
+                              keychain,
                               mnemonic,
-                              publicKeyHex: metamaskPublicKeyHex,
-                              extraText: '',
-                              btcDepositAddress: metamaskBtcAddress,
-                              ethDepositAddress: metamaskEthAddress,
-                              network: this.globalVars.network,
-                              google: false,
-                              metamask: true,
-                              version: PrivateUserVersion.V1,
-                            });
+                              '',
+                              this.globalVars.network,
+                              metamaskBtcAddress,
+                              metamaskEthAddress,
+                              false,
+                              metamaskPublicKeyHex,
+                            );
                           })
                           .catch( err => {
                             console.error('error', err);
@@ -272,9 +273,12 @@ export class LogInComponent implements OnInit {
    */
   private generateMessageAndSignature(
     derivedKeyPair: ec.KeyPair,
-    spendingLimits: string
+    accessBytesHex: string,
   ): Promise<{ message: number[]; signature: string }> {
     const numBlocksBeforeExpiration = 999999999999;
+
+    // Access Bytes Encoding 1.0
+/*
     const derivedMessage = [
       ...ethers.utils.toUtf8Bytes(
         derivedKeyPair.getPublic().encode('hex', true)
@@ -284,13 +288,10 @@ export class LogInComponent implements OnInit {
       ),
       ...ethers.utils.toUtf8Bytes(spendingLimits),
     ];
-    const message = derivedMessage;
-    // TODO: Json stringify spending limits and the derived key so that they display nicely in Metamask, needs core change.
+*/
 
-    // const message = JSON.stringify({
-    //   SpendingLimit: getSpendingLimitsForMetamask(),
-    //   DerivedKey: Buffer.from(derivedMessage).toString()
-    // }, null, 2);
+    // Access Bytes Encoding 2.0-
+    const message = [... Buffer.from(accessBytesHex, 'hex')];
     return new Promise<{ message: number[]; signature: string }>((resolve, reject) => {
       this.getProvider().getSigner().signMessage(message)
         .then( signature => {

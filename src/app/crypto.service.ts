@@ -125,11 +125,6 @@ export class CryptoService {
     return hmac === this.accessLevelHmac(accessLevel, seedHex);
   }
 
-  encryptedSeedHexToPrivateKey(encryptedSeedHex: string, domain: string): EC.KeyPair {
-    const seedHex = this.decryptSeedHex(encryptedSeedHex, domain);
-    return this.seedHexToPrivateKey(seedHex);
-  }
-
   mnemonicToKeychain(mnemonic: string, extraText?: string, nonStandard?: boolean): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
@@ -157,6 +152,12 @@ export class CryptoService {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
     const key = publicKey.getPublic().encode('array', true);
     return bs58check.encode(Buffer.from([...prefix, ...key]));
+  }
+
+  publicKeyHexToDeSoPublicKey(publicKeyHex: string, network: Network): string {
+    const ec = new EC('secp256k1');
+    const publicKey = ec.keyFromPublic(publicKeyHex, 'hex');
+    return this.publicKeyToDeSoPublicKey(publicKey, network);
   }
 
   publicKeyToECKeyPair(publicKey: string): EC.KeyPair {
@@ -194,6 +195,8 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
+  // Taken from https://github.com/cryptocoinjs/hdkey/blob/62c25cc655c9b554b3f9169d69809893408a877d/lib/hdkey.js#L39
+  // to compute the HDKey.identifier.
   hash160(buf: Buffer): Buffer {
     const sha = createHash('sha256').update(buf).digest();
     return createHash('ripemd160').update(sha).digest();
