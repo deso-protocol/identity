@@ -1,26 +1,29 @@
-import {Component, OnInit} from '@angular/core';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {BackendAPIService, TransactionSpendingLimitResponse} from '../backend-api.service';
-import {Network, PrivateUserVersion, UserProfile} from '../../types/identity';
-import {CryptoService} from '../crypto.service';
-import {EntropyService} from '../entropy.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {RouteNames} from '../app-routing.module';
-import {Router} from '@angular/router';
-import {ec} from 'elliptic';
-import {ethers} from 'ethers';
+import { Component, OnInit } from '@angular/core';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { GlobalVarsService } from '../global-vars.service';
+import {
+  BackendAPIService,
+  TransactionSpendingLimitResponse,
+} from '../backend-api.service';
+import { Network, PrivateUserVersion, UserProfile } from '../../types/identity';
+import { CryptoService } from '../crypto.service';
+import { EntropyService } from '../entropy.service';
+import { GoogleDriveService } from '../google-drive.service';
+import { RouteNames } from '../app-routing.module';
+import { Router } from '@angular/router';
+import { ec } from 'elliptic';
+import { ethers } from 'ethers';
 import * as bs58check from 'bs58check';
-import {uint64ToBufBigEndian, uvarint64ToBuf} from '../../lib/bindata/util';
+import { uint64ToBufBigEndian, uvarint64ToBuf } from '../../lib/bindata/util';
 import * as sha256 from 'sha256';
-import {SigningService} from '../signing.service';
+import { SigningService } from '../signing.service';
 import HDKey from 'hdkey';
 
 @Component({
   selector: 'app-log-in',
   templateUrl: './log-in.component.html',
-  styleUrls: ['./log-in.component.scss']
+  styleUrls: ['./log-in.component.scss'],
 })
 export class LogInComponent implements OnInit {
   static UNLIMITED_DERIVED_KEY_EXPIRATION = 999999999999;
@@ -28,7 +31,7 @@ export class LogInComponent implements OnInit {
   loading = false;
   showAccessLevels = true;
 
-  allUsers: {[key: string]: UserProfile} = {};
+  allUsers: { [key: string]: UserProfile } = {};
   hasUsers = false;
 
   constructor(
@@ -40,17 +43,16 @@ export class LogInComponent implements OnInit {
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
     private signingService: SigningService,
-    private router: Router,
-  ) { }
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
-    this.backendApi.GetUserProfiles(publicKeys)
-      .subscribe(profiles => {
-        this.allUsers = profiles;
-      });
+    this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
+      this.allUsers = profiles;
+    });
 
     // Set showAccessLevels
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
@@ -61,37 +63,44 @@ export class LogInComponent implements OnInit {
   }
 
   selectAccount(publicKey: string): void {
-    this.accountService.setAccessLevel(publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    this.accountService.setAccessLevel(
+      publicKey,
+      this.globalVars.hostname,
+      this.globalVars.accessLevelRequest
+    );
     if (!this.globalVars.getFreeDeso) {
       this.login(publicKey);
     } else {
-      this.backendApi.GetUsersStateless(
-        [publicKey],
-        true,
-        true,
-        true
-      ).subscribe((res) => {
-        if (!res?.UserList.length || res.UserList[0].BalanceNanos === 0) {
-          this.navigateToGetDeso(publicKey);
-        } else {
-          this.login(publicKey);
-        }
-      }, (err) => {
-        console.error(err);
-        this.navigateToGetDeso(publicKey);
-      });
+      this.backendApi
+        .GetUsersStateless([publicKey], true, true, true)
+        .subscribe(
+          (res) => {
+            if (!res?.UserList.length || res.UserList[0].BalanceNanos === 0) {
+              this.navigateToGetDeso(publicKey);
+            } else {
+              this.login(publicKey);
+            }
+          },
+          (err) => {
+            console.error(err);
+            this.navigateToGetDeso(publicKey);
+          }
+        );
     }
   }
 
   navigateToGetDeso(publicKey: string): void {
-    this.router.navigate(['/', RouteNames.GET_DESO], { queryParamsHandling: 'merge', queryParams: { publicKey } });
+    this.router.navigate(['/', RouteNames.GET_DESO], {
+      queryParamsHandling: 'merge',
+      queryParams: { publicKey },
+    });
   }
 
   login(publicKey: string): void {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: publicKey,
-      signedUp: false
+      signedUp: false,
     });
   }
 
@@ -104,50 +113,65 @@ export class LogInComponent implements OnInit {
   }
 
   public connectMetamaskMiddleware(): Promise<any> {
-    return new Promise<any>( (resolve, reject) => {
-      this.getProvider().listAccounts().then(
-        accounts => {
+    return new Promise<any>((resolve, reject) => {
+      this.getProvider()
+        .listAccounts()
+        .then((accounts) => {
           if (accounts.length === 0) {
-            this.getProvider().send('eth_requestAccounts', [])
-              .then( res => {
+            this.getProvider()
+              .send('eth_requestAccounts', [])
+              .then((res) => {
                 // Metamask successfully connected.
                 resolve(res);
               })
-              .catch( err => {
+              .catch((err) => {
                 // EIP-1193 userRejectedRequest error.
                 if (err.code === 4001) {
-                  console.error('user rejected the eth_requestAccounts request');
+                  console.error(
+                    'user rejected the eth_requestAccounts request'
+                  );
                 } else {
-                  console.error('error while sending eth_requestAccounts:', err);
+                  console.error(
+                    'error while sending eth_requestAccounts:',
+                    err
+                  );
                 }
                 reject(err);
               });
           } else {
             resolve(true);
           }
-        }
-      ).catch(
-        err => {
+        })
+        .catch((err) => {
           reject(err);
-        }
-      );
+        });
     });
   }
 
-  public verifySignatureAndRecoverAddress(message: number[], signature: string): Promise<any> {
+  public verifySignatureAndRecoverAddress(
+    message: number[],
+    signature: string
+  ): Promise<any> {
     const arrayify = ethers.utils.arrayify;
     const hash = ethers.utils.hashMessage;
-    const recoveredAddress = ethers.utils.recoverAddress(arrayify(hash(message)), signature);
-    return new Promise<any>( (resolve, reject) => {
-      this.getProvider().getSigner().getAddress()
-        .then( publicEthAddress => {
+    const recoveredAddress = ethers.utils.recoverAddress(
+      arrayify(hash(message)),
+      signature
+    );
+    return new Promise<any>((resolve, reject) => {
+      this.getProvider()
+        .getSigner()
+        .getAddress()
+        .then((publicEthAddress) => {
           if (recoveredAddress !== publicEthAddress) {
-            reject('Public key recovered from signature doesn\'t match the signer\'s public key!');
+            reject(
+              "Public key recovered from signature doesn't match the signer's public key!"
+            );
           } else {
             resolve(recoveredAddress);
           }
         })
-        .catch( err => {
+        .catch((err) => {
           reject(err);
         });
     });
@@ -160,77 +184,106 @@ export class LogInComponent implements OnInit {
     // generate a random derived key
     const network = this.globalVars.network;
     const expirationBlock = LogInComponent.UNLIMITED_DERIVED_KEY_EXPIRATION;
-    const { keychain, mnemonic, derivedPublicKeyBase58Check, derivedKeyPair } = this.generateDerivedKey(network);
+    const { keychain, mnemonic, derivedPublicKeyBase58Check, derivedKeyPair } =
+      this.generateDerivedKey(network);
     this.connectMetamaskMiddleware()
-      .then( () => {
+      .then(() => {
         // fetch a spending limit hex string based off of the permissions you're allowing
-        this.backendApi.GetAccessBytes(
-          derivedPublicKeyBase58Check,
-          expirationBlock,
-          getSpendingLimitsForMetamask() as TransactionSpendingLimitResponse
-        ).toPromise().then( (getAccessBytesResponse) => {
-          //  we can now generate the message and sign it
-          this.generateMessageAndSignature(
-            derivedKeyPair,
-            getAccessBytesResponse.AccessBytesHex
-          ).then( ({message, signature}) => {
-            this.verifySignatureAndRecoverAddress(message, signature)
-              .then( publicEthAddress => {
-                // TODO: this needs backend's gringotts endpoint implemented.
-                this.getFundsForNewUsers(signature, message, publicEthAddress)
-                  .then(() => {
-                    // once we have the signature we can fetch the public key from it
-                    const metamaskKeyPair = this.getMetaMaskMasterPublicKeyFromSignature(signature, message);
-                    const metamaskPublicKey = Buffer.from(metamaskKeyPair.getPublic().encode('array', true));
-                    const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
-                    const metamaskBtcAddress = this.cryptoService.publicKeyToBtcAddress(metamaskPublicKey, Network.mainnet);
-                    const metamaskEthAddress = this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
-                    const metamaskPublicKeyDeso = this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
-                    // Slice the '0x' prefix from the signature.
-                    const accessSignature = signature.slice(2);
+        this.backendApi
+          .GetAccessBytes(
+            derivedPublicKeyBase58Check,
+            expirationBlock,
+            getSpendingLimitsForMetamask() as TransactionSpendingLimitResponse
+          )
+          .toPromise()
+          .then((getAccessBytesResponse) => {
+            //  we can now generate the message and sign it
+            this.generateMessageAndSignature(
+              derivedKeyPair,
+              getAccessBytesResponse.AccessBytesHex
+            ).then(({ message, signature }) => {
+              this.verifySignatureAndRecoverAddress(message, signature).then(
+                (publicEthAddress) => {
+                  // TODO: this needs backend's gringotts endpoint implemented.
+                  this.getFundsForNewUsers(signature, message, publicEthAddress)
+                    .then(() => {
+                      // once we have the signature we can fetch the public key from it
+                      const metamaskKeyPair =
+                        this.getMetaMaskMasterPublicKeyFromSignature(
+                          signature,
+                          message
+                        );
+                      const metamaskPublicKey = Buffer.from(
+                        metamaskKeyPair.getPublic().encode('array', true)
+                      );
+                      const metamaskPublicKeyHex =
+                        metamaskPublicKey.toString('hex');
+                      const metamaskBtcAddress =
+                        this.cryptoService.publicKeyToBtcAddress(
+                          metamaskPublicKey,
+                          Network.mainnet
+                        );
+                      const metamaskEthAddress =
+                        this.cryptoService.publicKeyToEthAddress(
+                          metamaskKeyPair
+                        );
+                      const metamaskPublicKeyDeso =
+                        this.cryptoService.publicKeyToDeSoPublicKey(
+                          metamaskKeyPair,
+                          network
+                        );
+                      // Slice the '0x' prefix from the signature.
+                      const accessSignature = signature.slice(2);
 
-                    // we now have all the arguments to generate an authorize derived key transaction
-                    this.backendApi.AuthorizeDerivedKey(
-                      metamaskPublicKeyDeso,
-                      derivedPublicKeyBase58Check,
-                      expirationBlock,
-                      accessSignature,
-                      getAccessBytesResponse.SpendingLimitHex
-                    ).toPromise()
-                      .then( response => {
-                        // convert it to a byte array, sign it, submit it
-                        const signedTransactionHex = this.signingService.signTransaction(
-                          derivedKeyPair.getPrivate().toString('hex'),
-                          response.TransactionHex);
-                        this.backendApi.SubmitTransaction(signedTransactionHex).toPromise()
-                          .then( res => {
-                            this.accountService.addUserWithDepositAddresses(
-                              keychain,
-                              mnemonic,
-                              '',
-                              this.globalVars.network,
-                              metamaskBtcAddress,
-                              metamaskEthAddress,
-                              false,
-                              metamaskPublicKeyHex,
+                      // we now have all the arguments to generate an authorize derived key transaction
+                      this.backendApi
+                        .AuthorizeDerivedKey(
+                          metamaskPublicKeyDeso,
+                          derivedPublicKeyBase58Check,
+                          expirationBlock,
+                          accessSignature,
+                          getAccessBytesResponse.SpendingLimitHex
+                        )
+                        .toPromise()
+                        .then((response) => {
+                          // convert it to a byte array, sign it, submit it
+                          const signedTransactionHex =
+                            this.signingService.signTransaction(
+                              derivedKeyPair.getPrivate().toString('hex'),
+                              response.TransactionHex
                             );
-                          })
-                          .catch( err => {
-                            console.error('error', err);
-                          });
-                      })
-                      .catch( err => {
-                        console.error(err);
-                      });
-                })
-                .catch( err => {
-                  console.error(err);
-              });
+                          this.backendApi
+                            .SubmitTransaction(signedTransactionHex)
+                            .toPromise()
+                            .then((res) => {
+                              this.accountService.addUserWithDepositAddresses(
+                                keychain,
+                                mnemonic,
+                                '',
+                                this.globalVars.network,
+                                metamaskBtcAddress,
+                                metamaskEthAddress,
+                                false,
+                                metamaskPublicKeyHex
+                              );
+                            })
+                            .catch((err) => {
+                              console.error('error', err);
+                            });
+                        })
+                        .catch((err) => {
+                          console.error(err);
+                        });
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                    });
+                }
+              );
             });
           });
-        });
       })
-      .catch( err => {
+      .catch((err) => {
         console.error('error connecting Metamask:', err);
       });
   }
@@ -241,8 +294,8 @@ export class LogInComponent implements OnInit {
    * Generates a new derived key
    */
   private generateDerivedKey(network: Network): {
-    keychain: HDKey,
-    mnemonic: string,
+    keychain: HDKey;
+    mnemonic: string;
     derivedPublicKeyBase58Check: string;
     derivedKeyPair: ec.KeyPair;
   } {
@@ -259,7 +312,7 @@ export class LogInComponent implements OnInit {
       keychain,
       mnemonic,
       derivedPublicKeyBase58Check,
-      derivedKeyPair
+      derivedKeyPair,
     };
   }
 
@@ -273,12 +326,12 @@ export class LogInComponent implements OnInit {
    */
   private generateMessageAndSignature(
     derivedKeyPair: ec.KeyPair,
-    accessBytesHex: string,
+    accessBytesHex: string
   ): Promise<{ message: number[]; signature: string }> {
     const numBlocksBeforeExpiration = 999999999999;
 
     // Access Bytes Encoding 1.0
-/*
+    /*
     const derivedMessage = [
       ...ethers.utils.toUtf8Bytes(
         derivedKeyPair.getPublic().encode('hex', true)
@@ -291,16 +344,20 @@ export class LogInComponent implements OnInit {
 */
 
     // Access Bytes Encoding 2.0-
-    const message = [... Buffer.from(accessBytesHex, 'hex')];
-    return new Promise<{ message: number[]; signature: string }>((resolve, reject) => {
-      this.getProvider().getSigner().signMessage(message)
-        .then( signature => {
-          resolve({message, signature});
-        })
-        .catch( err => {
-          reject(err);
-        });
-    });
+    const message = [...Buffer.from(accessBytesHex, 'hex')];
+    return new Promise<{ message: number[]; signature: string }>(
+      (resolve, reject) => {
+        this.getProvider()
+          .getSigner()
+          .signMessage(message)
+          .then((signature) => {
+            resolve({ message, signature });
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      }
+    );
     // return { message: [...ethers.utils.toUtf8Bytes(message)], signature };
   }
 
@@ -309,7 +366,7 @@ export class LogInComponent implements OnInit {
       (window as any).ethereum
     );
     return provider;
-  }
+  };
 
   public getFundsForNewUsers(
     signature: string,
@@ -317,7 +374,9 @@ export class LogInComponent implements OnInit {
     publicAddress: string
   ): Promise<any> {
     // TODO: this needs to be added later
-    return new Promise<any>((resolve, reject) => {resolve(true); });
+    return new Promise<any>((resolve, reject) => {
+      resolve(true);
+    });
   }
 
   /**
@@ -344,6 +403,15 @@ export class LogInComponent implements OnInit {
     );
     return metamaskPublicKey;
   }
+  public truncatePublicKey(key: string) {
+    if (key.length !== 55) {
+      return key;
+    }
+    return `${key.substring(0, 7)}....${key.substring(
+      key.length - 4,
+      key.length
+    )}`;
+  }
 }
 
 export const getSpendingLimitsForMetamask = (): any => {
@@ -356,4 +424,3 @@ export const getSpendingLimitsForMetamask = (): any => {
     },
   };
 };
-
