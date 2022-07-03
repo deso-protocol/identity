@@ -19,7 +19,7 @@
       >
       <div class="saved-seeds-scroll">
         <li
-          *ngFor="let item of allUsers | keyvalue"
+          *ngFor="let item of allUsers | keyvalue; let i = index"
           class="list-group-item list-group-item-action cursor-pointer saved-seed"
           (click)="selectAccount(item.key)"
         >
@@ -39,7 +39,7 @@
             </div>
             <!-- replace the boolean with item.<ismetamask or isdesoaccount> -->
             <img
-              [src]="true ? 'assets/deso-logo.png' : 'assets/metamask.png'"
+              [src]="getLoginIcon(i)"
               height="32px"
               width="32px"
               class="mr-10px"

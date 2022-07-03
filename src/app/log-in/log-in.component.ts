@@ -412,6 +412,13 @@ export class LogInComponent implements OnInit {
       key.length
     )}`;
   }
+  public getLoginIcon(index: number) {
+    return {
+      0: 'assets/deso-logo.png',
+      1: 'assets/metamask.png',
+      2: 'assets/google_logo.svg',
+    }[index];
+  }
 }
 
 export const getSpendingLimitsForMetamask = (): any => {
