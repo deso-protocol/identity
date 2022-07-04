@@ -176,7 +176,7 @@ export class IdentityService {
     }
 
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
+    const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex, false);
 
     this.respond(id, {
       signedTransactionHex,

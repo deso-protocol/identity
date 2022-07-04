@@ -140,7 +140,7 @@ export class SigningService {
     return decryptedHexes;
   }
 
-  signTransaction(seedHex: string, transactionHex: string): string {
+  signTransaction(seedHex: string, transactionHex: string, isDerivedKey: boolean): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
@@ -148,6 +148,11 @@ export class SigningService {
     const signature = privateKey.sign(transactionHash, { canonical: true });
     const signatureBytes = new Buffer(signature.toDER());
     const signatureLength = uvarint64ToBuf(signatureBytes.length);
+
+    // If transaction is signed with a derived key, use DeSo-DER recoverable signature encoding.
+    if (isDerivedKey) {
+      signatureBytes[0] += 1 + (signature.recoveryParam as number);
+    }
 
     const signedTransactionBytes = Buffer.concat([
       // This slice is bad. We need to remove the existing signature length field prior to appending the new one.

@@ -84,7 +84,7 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex);
+    const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex, false);
     this.finishFlow(signedTransactionHex);
   }
 

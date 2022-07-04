@@ -693,7 +693,7 @@ export class BackendAPIService {
     const req = this.post('authorize-derived-key', {
       OwnerPublicKeyBase58Check,
       DerivedPublicKeyBase58Check,
-      DerivedKeySignature: true,
+      DerivedKeySignature: false,
       ExpirationBlock,
       MinFeeRateNanosPerKB: 1000,
       AccessSignature,
