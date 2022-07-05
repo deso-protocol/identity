@@ -1,34 +1,46 @@
 import { Component, OnInit } from '@angular/core';
-import {ethers} from 'ethers';
-import {BackendAPIService, TransactionSpendingLimitResponse} from '../backend-api.service';
-import {Network} from '../../types/identity';
+import { ethers } from 'ethers';
+import {
+  BackendAPIService,
+  TransactionSpendingLimitResponse,
+} from '../backend-api.service';
+import { Network } from '../../types/identity';
 import HDKey from 'hdkey';
-import {ec} from 'elliptic';
-import {CryptoService} from '../crypto.service';
+import { ec } from 'elliptic';
+import { CryptoService } from '../crypto.service';
 import * as bs58check from 'bs58check';
-import {getSpendingLimitsForMetamask} from '../log-in/log-in.component';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {EntropyService} from '../entropy.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {SigningService} from '../signing.service';
-import {Router} from '@angular/router';
-
+import { getSpendingLimitsForMetamask } from '../log-in/log-in.component';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { EntropyService } from '../entropy.service';
+import { GoogleDriveService } from '../google-drive.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { SigningService } from '../signing.service';
+import { Router } from '@angular/router';
+enum SCREEN {
+  CREATE_ACCOUNT = 0,
+  LOADING = 1,
+  ACCOUNT_SUCCESS = 2,
+  AUTHORIZE_MESSAGES = 3,
+  MESSAGES_SUCCESS = 4,
+}
+enum METAMASK {
+  START = 0,
+  CONNECT = 1,
+  ERROR = 2,
+}
 @Component({
   selector: 'app-sign-up-metamask',
   templateUrl: './sign-up-metamask.component.html',
-  styleUrls: ['./sign-up-metamask.component.scss']
+  styleUrls: ['./sign-up-metamask.component.scss'],
 })
 export class SignUpMetamaskComponent implements OnInit {
   static UNLIMITED_DERIVED_KEY_EXPIRATION = 999999999999;
 
-  SCREEN_CREATE_ACCOUNT = 0;
-  SCREEN_LOADING = 1;
-  SCREEN_ACCOUNT_SUCCESS = 2;
-  SCREEN_AUTHORIZE_MESSAGES = 3;
-  SCREEN_MESSAGES_SUCCESS = 4;
-  currentScreen = this.SCREEN_CREATE_ACCOUNT;
+  metamaskState: METAMASK = METAMASK.START;
+  currentScreen: SCREEN = SCREEN.CREATE_ACCOUNT;
+  SCREEN = SCREEN;
+  METAMASK = METAMASK;
 
   stopTimeout = false;
   timeoutTimer = 5;
@@ -44,7 +56,7 @@ export class SignUpMetamaskComponent implements OnInit {
     private backendApi: BackendAPIService,
     private signingService: SigningService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.computeTimeout = this.computeTimeout.bind(this);
@@ -115,7 +127,7 @@ export class SignUpMetamaskComponent implements OnInit {
         .then((publicEthAddress) => {
           if (recoveredAddress !== publicEthAddress) {
             reject(
-              'Public key recovered from signature doesn\'t match the signer\'s public key!'
+              "Public key recovered from signature doesn't match the signer's public key!"
             );
           } else {
             resolve(recoveredAddress);
@@ -126,17 +138,19 @@ export class SignUpMetamaskComponent implements OnInit {
         });
     });
   }
-
   /**
    * Flow for new deso users looking to sign in with metamask
    */
-  public signInWithMetamaskNewUser(): any {
+  public async signInWithMetamaskNewUser(): Promise<any> {
     // generate a random derived key
     const network = this.globalVars.network;
-    const expirationBlock = SignUpMetamaskComponent.UNLIMITED_DERIVED_KEY_EXPIRATION;
+    const expirationBlock =
+      SignUpMetamaskComponent.UNLIMITED_DERIVED_KEY_EXPIRATION;
     const { keychain, mnemonic, derivedPublicKeyBase58Check, derivedKeyPair } =
       this.generateDerivedKey(network);
-    this.connectMetamaskMiddleware()
+
+    this.metamaskState = METAMASK.CONNECT;
+    await this.connectMetamaskMiddleware()
       .then(() => {
         // fetch a spending limit hex string based off of the permissions you're allowing
         this.backendApi
@@ -152,19 +166,36 @@ export class SignUpMetamaskComponent implements OnInit {
               derivedKeyPair,
               getAccessBytesResponse.AccessBytesHex
             ).then(({ message, signature }) => {
-              this.currentScreen = this.SCREEN_LOADING;
               this.verifySignatureAndRecoverAddress(message, signature).then(
                 (publicEthAddress) => {
                   // TODO: this needs backend's gringotts endpoint implemented.
                   this.getFundsForNewUsers(signature, message, publicEthAddress)
                     .then(() => {
                       // once we have the signature we can fetch the public key from it
-                      const metamaskKeyPair = this.getMetaMaskMasterPublicKeyFromSignature(signature, message);
-                      const metamaskPublicKey = Buffer.from(metamaskKeyPair.getPublic().encode('array', true));
-                      const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
-                      const metamaskBtcAddress = this.cryptoService.publicKeyToBtcAddress(metamaskPublicKey, Network.mainnet);
-                      const metamaskEthAddress = this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
-                      const metamaskPublicKeyDeso = this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
+                      const metamaskKeyPair =
+                        this.getMetaMaskMasterPublicKeyFromSignature(
+                          signature,
+                          message
+                        );
+                      const metamaskPublicKey = Buffer.from(
+                        metamaskKeyPair.getPublic().encode('array', true)
+                      );
+                      const metamaskPublicKeyHex =
+                        metamaskPublicKey.toString('hex');
+                      const metamaskBtcAddress =
+                        this.cryptoService.publicKeyToBtcAddress(
+                          metamaskPublicKey,
+                          Network.mainnet
+                        );
+                      const metamaskEthAddress =
+                        this.cryptoService.publicKeyToEthAddress(
+                          metamaskKeyPair
+                        );
+                      const metamaskPublicKeyDeso =
+                        this.cryptoService.publicKeyToDeSoPublicKey(
+                          metamaskKeyPair,
+                          network
+                        );
                       // Slice the '0x' prefix from the signature.
                       const accessSignature = signature.slice(2);
 
@@ -190,17 +221,19 @@ export class SignUpMetamaskComponent implements OnInit {
                             .SubmitTransaction(signedTransactionHex)
                             .toPromise()
                             .then((res) => {
-                              this.publicKey = this.accountService.addUserWithDepositAddresses(
-                                keychain,
-                                mnemonic,
-                                '',
-                                this.globalVars.network,
-                                metamaskBtcAddress,
-                                metamaskEthAddress,
-                                false,
-                                metamaskPublicKeyHex
-                              );
-                              this.currentScreen = this.SCREEN_ACCOUNT_SUCCESS;
+                              this.publicKey =
+                                this.accountService.addUserWithDepositAddresses(
+                                  keychain,
+                                  mnemonic,
+                                  '',
+                                  this.globalVars.network,
+                                  metamaskBtcAddress,
+                                  metamaskEthAddress,
+                                  false,
+                                  metamaskPublicKeyHex
+                                );
+                              this.currentScreen = this.SCREEN.ACCOUNT_SUCCESS;
+                              this.metamaskState = this.METAMASK.START;
                               this.computeTimeout();
                             })
                             .catch((err) => {
@@ -301,7 +334,7 @@ export class SignUpMetamaskComponent implements OnInit {
       (window as any).ethereum
     );
     return provider;
-  }
+  };
 
   public getFundsForNewUsers(
     signature: string,
@@ -343,7 +376,7 @@ export class SignUpMetamaskComponent implements OnInit {
    * STEP SCREEN_LOADING
    */
   private computeTimeout(): void {
-    console.log("got here");
+    console.log('got here');
     if (this.stopTimeout) {
       return;
     }
@@ -381,5 +414,4 @@ export class SignUpMetamaskComponent implements OnInit {
   /**
    * STEP SCREEN_MESSAGES_SUCCESS
    */
-
 }
