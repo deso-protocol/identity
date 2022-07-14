@@ -91,10 +91,8 @@ export class SignUpMetamaskComponent implements OnInit {
           // EIP-1193 userRejectedRequest error.
           if (err.code === 4001) {
             this.errorMessage = 'user rejected the eth_requestAccounts request';
-            console.error(this.errorMessage);
           } else {
             this.errorMessage = 'error while sending eth_requestAccounts:';
-            console.error(this.errorMessage, err);
           }
           this.metamaskState = METAMASK.ERROR;
           return false;
@@ -192,6 +190,7 @@ export class SignUpMetamaskComponent implements OnInit {
     }).catch((e) => {
       this.metamaskState = METAMASK.ERROR;
       this.errorMessage = e?.error?.error || '';
+      return;
     }));
     // Slice the '0x' prefix from the signature.
     const accessSignature = signature.slice(2);
@@ -358,7 +357,6 @@ export class SignUpMetamaskComponent implements OnInit {
   }
 
   public login(): void {
-    console.log(this.publicKey);
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
