@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ethers } from 'ethers';
 import {
   BackendAPIService,
+  MetamaskSignInRequest,
   TransactionSpendingLimitResponse,
 } from '../backend-api.service';
 import { Network } from '../../types/identity';
@@ -17,7 +18,14 @@ import { GoogleDriveService } from '../google-drive.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { SigningService } from '../signing.service';
 import { Router } from '@angular/router';
-import {Transaction, TransactionMetadataAuthorizeDerivedKey} from '../../lib/deso/transaction';
+import { sign } from 'crypto';
+export interface MetamaskSignInResponse {
+  TxnHash: string;
+}
+import {
+  Transaction,
+  TransactionMetadataAuthorizeDerivedKey,
+} from '../../lib/deso/transaction';
 enum SCREEN {
   CREATE_ACCOUNT = 0,
   LOADING = 1,
@@ -45,6 +53,7 @@ export class SignUpMetamaskComponent implements OnInit {
   METAMASK = METAMASK;
   timeoutTimer = SignUpMetamaskComponent.TIMER_START_TIME;
   publicKey = '';
+  errorMessage = '';
 
   constructor(
     private accountService: AccountService,
@@ -71,25 +80,24 @@ export class SignUpMetamaskComponent implements OnInit {
    */
 
   launchMetamask(): void {
-    this.signInWithMetamaskNewUser().catch((err) => {
-      console.log('something went wrong with signing in through metamask', err);
-      this.metamaskState = METAMASK.ERROR;
-    });
+    this.errorMessage = '';
+    this.metamaskState = this.METAMASK.CONNECT;
+    this.signInWithMetamaskNewUser();
   }
 
-  public async connectMetamaskMiddleware(): Promise<boolean> {
+  public async connectMetamaskMiddleware(): Promise<any> {
     const accounts = await this.getProvider().listAccounts();
     if (accounts.length === 0) {
       return await this.getProvider()
         .send('eth_requestAccounts', [])
-        .then(() => true)
         .catch((err) => {
           // EIP-1193 userRejectedRequest error.
           if (err.code === 4001) {
-            console.error('user rejected the eth_requestAccounts request');
+            this.errorMessage = 'user rejected the eth_requestAccounts request';
           } else {
-            console.error('error while sending eth_requestAccounts:', err);
+            this.errorMessage = 'error while sending eth_requestAccounts:';
           }
+          this.metamaskState = METAMASK.ERROR;
           return false;
         });
     }
@@ -108,9 +116,10 @@ export class SignUpMetamaskComponent implements OnInit {
     );
     const publicEthAddress = await this.getProvider().getSigner().getAddress();
     if (recoveredAddress !== publicEthAddress) {
-      throw Error(
-        "Public key recovered from signature doesn't match the signer's public key!"
-      );
+      this.errorMessage =
+        "Public key recovered from signature doesn't match the signer's public key!";
+      this.metamaskState = METAMASK.ERROR;
+      throw Error(this.errorMessage);
     }
     return recoveredAddress;
   }
@@ -128,7 +137,9 @@ export class SignUpMetamaskComponent implements OnInit {
     this.metamaskState = METAMASK.CONNECT;
     const response = await this.connectMetamaskMiddleware();
     if (response !== true) {
-      alert('something with wrong with metamask signin');
+      this.errorMessage = 'something went wrong with metamask signin';
+      this.metamaskState = METAMASK.ERROR;
+      return;
     }
     // fetch a spending limit hex string based off of the permissions you're allowing
     const getAccessBytesResponse = await this.backendApi
@@ -137,7 +148,13 @@ export class SignUpMetamaskComponent implements OnInit {
         expirationBlock,
         getSpendingLimitsForMetamask() as TransactionSpendingLimitResponse
       )
-      .toPromise();
+      .toPromise()
+      .catch((e) => {
+        this.errorMessage = 'something went wrong when getting access bytes';
+        return;
+      });
+    if (!getAccessBytesResponse) return;
+
     //  we can now generate the message and sign it
     const { message, signature } = await this.generateMessageAndSignature(
       derivedKeyPair,
@@ -148,16 +165,16 @@ export class SignUpMetamaskComponent implements OnInit {
       message,
       signature
     );
-    // TODO: this needs backend's gringotts endpoint implemented.
-    await this.getFundsForNewUsers(signature, message, publicEthAddress);
     // once we have the signature we can fetch the public key from it
     const metamaskKeyPair = this.getMetaMaskMasterPublicKeyFromSignature(
       signature,
       message
     );
+
     const metamaskPublicKey = Buffer.from(
       metamaskKeyPair.getPublic().encode('array', true)
     );
+
     const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
     const metamaskBtcAddress = this.cryptoService.publicKeyToBtcAddress(
       metamaskPublicKey,
@@ -169,6 +186,19 @@ export class SignUpMetamaskComponent implements OnInit {
       metamaskKeyPair,
       network
     );
+    // TODO: this needs backend's gringotts endpoint implemented.
+    const success = !!(await this.getFundsForNewUsers({
+      Signature: signature.slice(2, signature.length),
+      Message: message,
+      RecipientEthAddress: publicEthAddress,
+      RecipientPublicKey: metamaskPublicKeyDeso,
+      AmountNanos: 1000,
+      Signer: metamaskKeyPair.getPublic().encode('array', true),
+    }).catch((e) => {
+      this.metamaskState = METAMASK.ERROR;
+      this.errorMessage = e?.error?.error || '';
+      return;
+    }));
     // Slice the '0x' prefix from the signature.
     const accessSignature = signature.slice(2);
 
@@ -183,9 +213,17 @@ export class SignUpMetamaskComponent implements OnInit {
       )
       .toPromise();
     // Sanity-check the transaction contains all the information we passed.
-    if (!this.verifyAuthorizeDerivedKeyTransaction(response.TransactionHex, derivedKeyPair,
-      expirationBlock, accessSignature)) {
-      console.error('Problem verifying authorized derived key transaction metadata');
+    if (
+      !this.verifyAuthorizeDerivedKeyTransaction(
+        response.TransactionHex,
+        derivedKeyPair,
+        expirationBlock,
+        accessSignature
+      )
+    ) {
+      console.error(
+        'Problem verifying authorized derived key transaction metadata'
+      );
       return;
     }
     // convert it to a byte array, sign it, submit it
@@ -215,21 +253,30 @@ export class SignUpMetamaskComponent implements OnInit {
       });
   }
 
-  private verifyAuthorizeDerivedKeyTransaction(transactionHex: string, derivedKeyPair: ec.KeyPair,
-                                               expirationBlock: number, accessSignature: string): boolean {
-
+  private verifyAuthorizeDerivedKeyTransaction(
+    transactionHex: string,
+    derivedKeyPair: ec.KeyPair,
+    expirationBlock: number,
+    accessSignature: string
+  ): boolean {
     const txBytes = new Buffer(transactionHex, 'hex');
     const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
 
     // Make sure the transaction has the correct metadata.
-    if (transaction.metadata?.constructor !== TransactionMetadataAuthorizeDerivedKey) {
+    if (
+      transaction.metadata?.constructor !==
+      TransactionMetadataAuthorizeDerivedKey
+    ) {
       return false;
     }
 
     // Verify the metadata
-    const transactionMetadata = transaction.metadata as TransactionMetadataAuthorizeDerivedKey;
-    if (transactionMetadata.derivedPublicKey.toString('hex') !==
-      derivedKeyPair.getPublic().encode('hex', true)) {
+    const transactionMetadata =
+      transaction.metadata as TransactionMetadataAuthorizeDerivedKey;
+    if (
+      transactionMetadata.derivedPublicKey.toString('hex') !==
+      derivedKeyPair.getPublic().encode('hex', true)
+    ) {
       return false;
     }
     if (transactionMetadata.expirationBlock !== expirationBlock) {
@@ -238,13 +285,18 @@ export class SignUpMetamaskComponent implements OnInit {
     if (transactionMetadata.operationType !== 1) {
       return false;
     }
-    if (transactionMetadata.accessSignature.toString('hex') !== accessSignature) {
+    if (
+      transactionMetadata.accessSignature.toString('hex') !== accessSignature
+    ) {
       return false;
     }
 
     // Verify the transaction outputs.
     for (const output of transaction.outputs) {
-      if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
+      if (
+        output.publicKey.toString('hex') !==
+        transaction.publicKey.toString('hex')
+      ) {
         return false;
       }
     }
@@ -330,15 +382,11 @@ export class SignUpMetamaskComponent implements OnInit {
     return provider;
   };
 
-  public getFundsForNewUsers(
-    signature: string,
-    message: number[],
-    publicAddress: string
-  ): Promise<any> {
-    // TODO: this needs to be added later
-    return new Promise<any>((resolve, reject) => {
-      resolve(true);
-    });
+  public async getFundsForNewUsers(
+    request: MetamaskSignInRequest
+  ): Promise<MetamaskSignInResponse> {
+    request.Signature = [...Buffer.from(request.Signature as string, 'hex')];
+    return this.backendApi.requestAirdrop(request).toPromise();
   }
 
   /**
@@ -372,8 +420,7 @@ export class SignUpMetamaskComponent implements OnInit {
   private startTimer(): void {
     this.timer = setInterval(() => {
       if (this.timeoutTimer === 0) {
-        this.stopTimer();
-        this.login();
+        // this.login();
         return;
       }
       this.timeoutTimer--;
