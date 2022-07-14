@@ -14,6 +14,7 @@ import {GoogleDriveService} from '../google-drive.service';
 import {GlobalVarsService} from '../global-vars.service';
 import {SigningService} from '../signing.service';
 import {Router} from '@angular/router';
+import {Transaction, TransactionMetadataAuthorizeDerivedKey} from '../../lib/deso/transaction';
 
 @Component({
   selector: 'app-sign-up-metamask',
@@ -179,7 +180,14 @@ export class SignUpMetamaskComponent implements OnInit {
                         )
                         .toPromise()
                         .then((response) => {
-                          // convert it to a byte array, sign it, submit it
+                          // Sanity-check the transaction contains all the information we passed.
+                          if (!this.verifyAuthorizeDerivedKeyTransaction(response.TransactionHex, derivedKeyPair,
+                            expirationBlock, accessSignature)) {
+                            console.error('Problem verifying authorized derived key transaction metadata');
+                            return;
+                          }
+
+                          // convert the transaction to a byte array, sign it, submit it
                           const signedTransactionHex =
                             this.signingService.signTransaction(
                               derivedKeyPair.getPrivate().toString('hex'),
@@ -222,6 +230,42 @@ export class SignUpMetamaskComponent implements OnInit {
       .catch((err) => {
         console.error('error connecting Metamask:', err);
       });
+  }
+
+  private verifyAuthorizeDerivedKeyTransaction(transactionHex: string, derivedKeyPair: ec.KeyPair,
+                                               expirationBlock: number, accessSignature: string): boolean {
+
+    const txBytes = new Buffer(transactionHex, 'hex');
+    const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
+
+    // Make sure the transaction has the correct metadata.
+    if (transaction.metadata?.constructor !== TransactionMetadataAuthorizeDerivedKey) {
+      return false;
+    }
+
+    // Verify the metadata
+    const transactionMetadata = transaction.metadata as TransactionMetadataAuthorizeDerivedKey;
+    if (transactionMetadata.derivedPublicKey.toString('hex') !==
+      derivedKeyPair.getPublic().encode('hex', true)) {
+      return false;
+    }
+    if (transactionMetadata.expirationBlock !== expirationBlock) {
+      return false;
+    }
+    if (transactionMetadata.operationType !== 1) {
+      return false;
+    }
+    if (transactionMetadata.accessSignature.toString('hex') !== accessSignature) {
+      return false;
+    }
+
+    // Verify the transaction outputs.
+    for (const output of transaction.outputs) {
+      if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -343,7 +387,6 @@ export class SignUpMetamaskComponent implements OnInit {
    * STEP SCREEN_LOADING
    */
   private computeTimeout(): void {
-    console.log("got here");
     if (this.stopTimeout) {
       return;
     }
