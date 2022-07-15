@@ -19,7 +19,7 @@ export class GlobalVarsService {
   static NANOS_PER_UNIT = 1e9;
   static WEI_PER_ETH = 1e18;
 
-  network = Network.mainnet;
+  network = Network.testnet;
   hostname = '';
   accessLevelRequest = AccessLevel.ApproveAll;
 

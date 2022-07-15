@@ -65,6 +65,7 @@ export interface DerivedPrivateUserInfo {
 export interface UserProfile {
   username: string;
   profilePic: any;
+  loginMethod: LoginMethod;
 }
 
 export interface DerivedKey {

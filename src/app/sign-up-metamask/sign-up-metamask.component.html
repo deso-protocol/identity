@@ -25,7 +25,7 @@
         creating a new wallet
       </p>
       <button
-        class="button button-large mb-20px bg-dark text-white mt-40px"
+        class="button button-large mb-20px bg-dark text-white mt-20px"
         (click)="launchMetamask()"
       >
         <img
@@ -49,8 +49,9 @@
           ></span
         >
       </button>
+
       <div *ngIf="metamaskState === METAMASK.ERROR" class="text-danger">
-        Something went wrong while connecting.
+        {{ errorMessage }}
       </div>
     </div>
   </div>
@@ -58,28 +59,23 @@
     <img src="assets/spinner.gif" />
   </div>
   <div *ngIf="this.currentScreen === SCREEN.ACCOUNT_SUCCESS">
-    <span class="title-text">You're in!</span>
+    <span class="title-text">Congratulations!</span>
     <div class="main-text mb-2">
-      a couple more steps to complete your account.
+      You created your deso account through metamask. Click below to login into
+      your account.
     </div>
-    <p class="txtalj mt-20px">
-      Click next to continue the account setup process and register your
+    <!-- <p> Click next to continue the account setup process and register your
       messaging keys. This step is optional, if you're not planning on using
       messaging apps on the DeSo blockchain, feel free to skip or wait for the
       timer to hit zero.
-    </p>
-    <div class="d-flex justify-content-between pl-80px pr-80px">
+    </p> -->
+    <!-- <p class="font-weight-bold">Time: {{ timeoutTimer }}s</p> -->
+    <div class="d-flex justify-content-center">
       <button
         (click)="login()"
-        class="button button-small mb-20px bg-dark text-white mt-40px"
+        class="button button-small mb-20px bg-dark text-white mt-20px"
       >
-        Skip
-      </button>
-      <button
-        (click)="continue()"
-        class="button button-small mb-20px bg-primary text-white mt-40px"
-      >
-        Continue
+        login
       </button>
     </div>
   </div>
