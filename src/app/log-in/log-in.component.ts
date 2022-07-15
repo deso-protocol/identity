@@ -1,24 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountService } from '../account.service';
+import { AccountService, AccountType } from '../account.service';
 import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
-import {
-  BackendAPIService,
-  TransactionSpendingLimitResponse,
-} from '../backend-api.service';
-import { Network, PrivateUserVersion, UserProfile } from '../../types/identity';
+import { BackendAPIService } from '../backend-api.service';
+import { UserProfile } from '../../types/identity';
 import { CryptoService } from '../crypto.service';
 import { EntropyService } from '../entropy.service';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
-import { ec } from 'elliptic';
-import { ethers } from 'ethers';
-import * as bs58check from 'bs58check';
-import { uint64ToBufBigEndian, uvarint64ToBuf } from '../../lib/bindata/util';
-import * as sha256 from 'sha256';
 import { SigningService } from '../signing.service';
-import HDKey from 'hdkey';
 
 @Component({
   selector: 'app-log-in',
@@ -36,12 +27,9 @@ export class LogInComponent implements OnInit {
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
-    private cryptoService: CryptoService,
-    private entropyService: EntropyService,
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
-    private signingService: SigningService,
     private router: Router
   ) {}
 
@@ -51,6 +39,7 @@ export class LogInComponent implements OnInit {
     this.hasUsers = publicKeys.length > 0;
     this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
       this.allUsers = profiles;
+      console.log(profiles);
     });
 
     // Set showAccessLevels
@@ -119,12 +108,12 @@ export class LogInComponent implements OnInit {
     )}`;
   }
 
-  public getLoginIcon(index: number): any {
+  public getLoginIcon(type: AccountType): any {
     return {
       0: 'assets/deso-logo.png',
-      1: 'assets/metamask.png',
-      2: 'assets/google_logo.svg',
-    }[index % 3];
+      1: 'assets/google_logo.svg',
+      2: 'assets/metamask.png',
+    }[type];
   }
 }
 
