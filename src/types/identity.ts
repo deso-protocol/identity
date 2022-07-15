@@ -1,4 +1,4 @@
-import { TransactionSpendingLimit } from "src/lib/deso/transaction";
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export interface PrivateUserInfo {
   seedHex: string;
@@ -53,6 +53,7 @@ export interface DerivedPrivateUserInfo {
 export interface UserProfile {
   username: string;
   profilePic: any;
+  accountType: number;
 }
 
 export interface DerivedKey {
@@ -64,15 +65,15 @@ export interface DerivedKey {
 }
 
 export interface EncryptedMessage {
-  EncryptedHex: string,
-  PublicKey: string,
-  IsSender: boolean,
-  Legacy: boolean,
-  Version?: number,
-  SenderMessagingPublicKey?: string,
-  SenderMessagingGroupKeyName?: string,
-  RecipientMessagingPublicKey?: string,
-  RecipientMessagingGroupKeyName?: string
+  EncryptedHex: string;
+  PublicKey: string;
+  IsSender: boolean;
+  Legacy: boolean;
+  Version?: number;
+  SenderMessagingPublicKey?: string;
+  SenderMessagingGroupKeyName?: string;
+  RecipientMessagingPublicKey?: string;
+  RecipientMessagingGroupKeyName?: string;
 }
 
 export enum Network {

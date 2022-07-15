@@ -270,6 +270,9 @@ export class BackendAPIService {
               userProfiles[user.PublicKeyBase58Check] = {
                 username: user.ProfileEntryResponse?.Username,
                 profilePic: user.ProfileEntryResponse?.ProfilePic,
+                accountType: this.accountService.getAccountType(
+                  user.PublicKeyBase58Check
+                ),
               };
             }
             return userProfiles;

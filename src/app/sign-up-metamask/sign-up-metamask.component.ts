@@ -75,10 +75,6 @@ export class SignUpMetamaskComponent implements OnInit {
     this.currentScreen += 1;
   }
 
-  /**
-   * STEP SCREEN_CREATE_ACCOUNT
-   */
-
   launchMetamask(): void {
     this.errorMessage = '';
     this.metamaskState = this.METAMASK.CONNECT;
@@ -180,13 +176,14 @@ export class SignUpMetamaskComponent implements OnInit {
       metamaskPublicKey,
       Network.mainnet
     );
+
     const metamaskEthAddress =
       this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
     const metamaskPublicKeyDeso = this.cryptoService.publicKeyToDeSoPublicKey(
       metamaskKeyPair,
       network
     );
-    // TODO: this needs backend's gringotts endpoint implemented.
+
     const success = !!(await this.getFundsForNewUsers({
       Signature: signature.slice(2, signature.length),
       Message: message,
@@ -345,19 +342,6 @@ export class SignUpMetamaskComponent implements OnInit {
   ): Promise<{ message: number[]; signature: string }> {
     const numBlocksBeforeExpiration = 999999999999;
 
-    // Access Bytes Encoding 1.0
-    /*
-        const derivedMessage = [
-          ...ethers.utils.toUtf8Bytes(
-            derivedKeyPair.getPublic().encode('hex', true)
-          ),
-          ...ethers.utils.toUtf8Bytes(
-            uint64ToBufBigEndian(numBlocksBeforeExpiration).toString('hex')
-          ),
-          ...ethers.utils.toUtf8Bytes(spendingLimits),
-        ];
-    */
-
     // Access Bytes Encoding 2.0
     const message = [...Buffer.from(accessBytesHex, 'hex')];
     return new Promise<{ message: number[]; signature: string }>(
@@ -414,9 +398,6 @@ export class SignUpMetamaskComponent implements OnInit {
     return metamaskPublicKey;
   }
 
-  /**
-   * STEP SCREEN_LOADING
-   */
   private startTimer(): void {
     this.timer = setInterval(() => {
       if (this.timeoutTimer === 0) {
@@ -443,16 +424,4 @@ export class SignUpMetamaskComponent implements OnInit {
   public continue(): void {
     this.stopTimer();
   }
-
-  /**
-   * STEP SCREEN_ACCOUNT_SUCCESS
-   */
-
-  /**
-   * STEP SCREEN_AUTHORIZE_MESSAGES
-   */
-
-  /**
-   * STEP SCREEN_MESSAGES_SUCCESS
-   */
 }
