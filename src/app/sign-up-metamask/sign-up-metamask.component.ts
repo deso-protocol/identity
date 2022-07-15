@@ -67,9 +67,7 @@ export class SignUpMetamaskComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
-    this.startTimer();
-  }
+  ngOnInit(): void {}
 
   nextStep(): void {
     this.currentScreen += 1;
@@ -113,7 +111,7 @@ export class SignUpMetamaskComponent implements OnInit {
     const publicEthAddress = await this.getProvider().getSigner().getAddress();
     if (recoveredAddress !== publicEthAddress) {
       this.errorMessage =
-        "Public key recovered from signature doesn't match the signer's public key!";
+        'Public key recovered from signature doesn\'t match the signer\'s public key!';
       this.metamaskState = METAMASK.ERROR;
       throw Error(this.errorMessage);
     }
@@ -149,7 +147,7 @@ export class SignUpMetamaskComponent implements OnInit {
         this.errorMessage = 'something went wrong when getting access bytes';
         return;
       });
-    if (!getAccessBytesResponse) return;
+    if (!getAccessBytesResponse) { return; }
 
     //  we can now generate the message and sign it
     const { message, signature } = await this.generateMessageAndSignature(
@@ -161,6 +159,10 @@ export class SignUpMetamaskComponent implements OnInit {
       message,
       signature
     );
+    if (!publicEthAddress) {
+      this.errorMessage = 'something went wrong while verifying the signature, this should never happen';
+      return;
+    }
 
     // once we have the signature we can fetch the public key from it
     const metamaskKeyPair = this.getMetaMaskMasterPublicKeyFromSignature(
@@ -197,10 +199,14 @@ export class SignUpMetamaskComponent implements OnInit {
         getAccessBytesResponse.SpendingLimitHex
       )
       .toPromise();
+    if (!authorizeDerivedKeyResponse) {
+      this.errorMessage = 'problem authorizing derived key, please try again';
+      return;
+    }
     // Sanity-check the transaction contains all the information we passed.
     if (
       !this.verifyAuthorizeDerivedKeyTransaction(
-        response.TransactionHex,
+        authorizeDerivedKeyResponse.TransactionHex,
         derivedKeyPair,
         expirationBlock,
         accessSignature
@@ -349,7 +355,7 @@ export class SignUpMetamaskComponent implements OnInit {
       (window as any).ethereum
     );
     return provider;
-  };
+  }
 
   public async getFundsForNewUsers(
     request: MetamaskSignInRequest
@@ -386,7 +392,7 @@ export class SignUpMetamaskComponent implements OnInit {
   private startTimer(): void {
     this.timer = setInterval(() => {
       if (this.timeoutTimer === 0) {
-        // this.login();
+        this.login();
         return;
       }
       this.timeoutTimer--;
