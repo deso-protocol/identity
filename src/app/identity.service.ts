@@ -231,7 +231,19 @@ export class IdentityService {
 
     const { id, payload: { encryptedSeedHex } } = data;
     const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const jwt = this.signingService.signJWT(seedHex);
+    const publicUsers = this.accountService.getEncryptedUsers();
+
+    // Check if this user was signed in via a derived key.
+    let isDerived = false;
+    for (const publicKey of Object.keys(publicUsers)) {
+      const user = publicUsers[publicKey];
+      if (user.encryptedSeedHex === encryptedSeedHex) {
+        isDerived = this.accountService.isDerivedKeyAccount(user);
+        break;
+      }
+    }
+
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
 
     this.respond(id, {
       jwt

@@ -4,6 +4,7 @@ import {GlobalVarsService} from './global-vars.service';
 import {
   AccessLevel,
   DerivedPrivateUserInfo,
+  LoginMethod,
   Network,
   PrivateUserInfo,
   PrivateUserVersion,
@@ -65,12 +66,18 @@ export class AccountService {
         version: privateUser.version,
         encryptedSeedHex,
         network: privateUser.network,
+        loginMethod: privateUser.loginMethod || LoginMethod.DESO,
         accessLevel,
         accessLevelHmac,
       };
     }
 
     return publicUsers;
+  }
+
+  // Check if the account is signed in via a derived key.
+  isDerivedKeyAccount(userInfo: PublicUserInfo): boolean {
+    return userInfo.loginMethod === LoginMethod.METAMASK;
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -192,6 +199,11 @@ export class AccountService {
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(keychain, network);
     const ethDepositAddress = this.cryptoService.publicKeyToEthAddress(keyPair);
 
+    let loginMethod: LoginMethod = LoginMethod.DESO;
+    if (google) {
+      loginMethod = LoginMethod.GOOGLE;
+    }
+
     return this.addPrivateUser({
       seedHex,
       mnemonic,
@@ -199,13 +211,13 @@ export class AccountService {
       btcDepositAddress,
       ethDepositAddress,
       network,
-      google,
-      version: PrivateUserVersion.V1,
+      loginMethod,
+      version: PrivateUserVersion.V2,
     });
   }
 
   addUserWithDepositAddresses(keychain: HDKey, mnemonic: string, extraText: string, network: Network, btcDepositAddress: string,
-                              ethDepositAddress: string, google?: boolean, publicKeyHex?: string): string {
+                              ethDepositAddress: string, loginMethod: LoginMethod, publicKeyHex: string): string {
 
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     return this.addPrivateUser({
@@ -215,10 +227,9 @@ export class AccountService {
       btcDepositAddress,
       ethDepositAddress,
       network,
-      google,
-      metamask: !!publicKeyHex,
+      loginMethod,
       publicKeyHex,
-      version: PrivateUserVersion.V1,
+      version: PrivateUserVersion.V2,
     });
   }
 
@@ -263,6 +274,19 @@ export class AccountService {
         privateUser.version = PrivateUserVersion.V1;
       }
 
+      // Migrate from V1 -> V2
+      if (privateUser.version === PrivateUserVersion.V1) {
+        // Add loginMethod field
+        if (privateUser.google) {
+          privateUser.loginMethod = LoginMethod.GOOGLE;
+        } else {
+          privateUser.loginMethod = LoginMethod.DESO;
+        }
+
+        // Increment version
+        privateUser.version = PrivateUserVersion.V2;
+      }
+
       privateUsers[publicKey] = privateUser;
     }
 
@@ -292,7 +316,7 @@ export class AccountService {
 
     // Metamask login will be added with the master public key.
     let publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, userInfo.network);
-    if (userInfo.metamask && userInfo.publicKeyHex) {
+    if (userInfo.loginMethod === LoginMethod.METAMASK && userInfo.publicKeyHex) {
       publicKey = this.cryptoService.publicKeyHexToDeSoPublicKey(userInfo.publicKeyHex, userInfo.network);
     }
 

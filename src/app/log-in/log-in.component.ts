@@ -130,11 +130,6 @@ export class LogInComponent implements OnInit {
 
 export const getSpendingLimitsForMetamask = (): any => {
   return {
-    GlobalDESOLimit: 1000000000,
-    TransactionCountLimitMap: {
-      SUBMIT_POST: 120000,
-      UPDATE_PROFILE: 120000,
-      AUTHORIZE_DERIVED_KEY: 120000,
-    },
+    IsUnlimited: true,
   };
 };

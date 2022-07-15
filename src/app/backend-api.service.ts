@@ -162,6 +162,7 @@ export interface TransactionSpendingLimitResponse {
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
   DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
+  IsUnlimited?: boolean;
   DerivedKeyMemo?: string;
 }
 
@@ -206,9 +207,10 @@ export class BackendAPIService {
     if (!publicUserInfo) {
       return of(null);
     }
+    const isDerived = this.accountService.isDerivedKeyAccount(publicUserInfo);
 
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
-    const jwt = this.signingService.signJWT(seedHex);
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
     return this.post(path, {...body, ...{JWT: jwt}});
   }
 
@@ -273,9 +275,10 @@ export class BackendAPIService {
     if (!publicUserInfo) {
       return of(null);
     }
+    const isDerived = this.accountService.isDerivedKeyAccount(publicUserInfo);
 
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
-    const jwt = this.signingService.signJWT(seedHex);
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
 
     return this.post('jumio-begin',
       {
@@ -299,9 +302,10 @@ export class BackendAPIService {
     if (!publicUserInfo) {
       return of(null);
     }
+    const isDerived = this.accountService.isDerivedKeyAccount(publicUserInfo);
 
     const seedHex = this.cryptoService.decryptSeedHex(publicUserInfo.encryptedSeedHex, this.globalVars.hostname);
-    const jwt = this.signingService.signJWT(seedHex);
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
 
     return this.post('jumio-flow-finished', {
       PublicKey,
@@ -620,14 +624,10 @@ export class BackendAPIService {
   QueryETHRPC(
     method: string,
     params: string[],
-    publicKeyBase58Check: string,
-    jwt: string
   ): Observable<any> {
     const req = this.post('query-eth-rpc', {
       Method: method,
       Params: params,
-      PublicKeyBase58Check: publicKeyBase58Check,
-      JWT: jwt
     });
 
     return req.pipe(

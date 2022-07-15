@@ -1,22 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { ethers } from 'ethers';
-import {
-  BackendAPIService,
-  TransactionSpendingLimitResponse,
-} from '../backend-api.service';
-import { Network } from '../../types/identity';
+import {Component, OnInit} from '@angular/core';
+import {ethers} from 'ethers';
+import {BackendAPIService, TransactionSpendingLimitResponse, } from '../backend-api.service';
+import {LoginMethod, Network} from '../../types/identity';
 import HDKey from 'hdkey';
-import { ec } from 'elliptic';
-import { CryptoService } from '../crypto.service';
+import {ec} from 'elliptic';
+import {CryptoService} from '../crypto.service';
 import * as bs58check from 'bs58check';
-import { getSpendingLimitsForMetamask } from '../log-in/log-in.component';
-import { AccountService } from '../account.service';
-import { IdentityService } from '../identity.service';
-import { EntropyService } from '../entropy.service';
-import { GoogleDriveService } from '../google-drive.service';
-import { GlobalVarsService } from '../global-vars.service';
-import { SigningService } from '../signing.service';
-import { Router } from '@angular/router';
+import {getSpendingLimitsForMetamask} from '../log-in/log-in.component';
+import {AccountService} from '../account.service';
+import {IdentityService} from '../identity.service';
+import {EntropyService} from '../entropy.service';
+import {GoogleDriveService} from '../google-drive.service';
+import {GlobalVarsService} from '../global-vars.service';
+import {SigningService} from '../signing.service';
+import {Router} from '@angular/router';
 import {Transaction, TransactionMetadataAuthorizeDerivedKey} from '../../lib/deso/transaction';
 enum SCREEN {
   CREATE_ACCOUNT = 0,
@@ -36,7 +33,7 @@ enum METAMASK {
   styleUrls: ['./sign-up-metamask.component.scss'],
 })
 export class SignUpMetamaskComponent implements OnInit {
-  private static UNLIMITED_DERIVED_KEY_EXPIRATION: Readonly<number> = 999999999999;
+  private static UNLIMITED_DERIVED_KEY_EXPIRATION: Readonly<number> = 100000000000;
   private static TIMER_START_TIME: Readonly<number> = 15;
   metamaskState: METAMASK = METAMASK.START;
   currentScreen: SCREEN = SCREEN.CREATE_ACCOUNT;
@@ -59,7 +56,6 @@ export class SignUpMetamaskComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.startTimer();
   }
 
   nextStep(): void {
@@ -109,7 +105,7 @@ export class SignUpMetamaskComponent implements OnInit {
     const publicEthAddress = await this.getProvider().getSigner().getAddress();
     if (recoveredAddress !== publicEthAddress) {
       throw Error(
-        "Public key recovered from signature doesn't match the signer's public key!"
+        'Public key recovered from signature doesn\'t match the signer\'s public key!'
       );
     }
     return recoveredAddress;
@@ -165,7 +161,7 @@ export class SignUpMetamaskComponent implements OnInit {
     );
     const metamaskEthAddress =
       this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
-    const metamaskPublicKeyDeso = this.cryptoService.publicKeyToDeSoPublicKey(
+    const metamaskPublicKeyBase58Check = this.cryptoService.publicKeyToDeSoPublicKey(
       metamaskKeyPair,
       network
     );
@@ -175,7 +171,7 @@ export class SignUpMetamaskComponent implements OnInit {
     // we now have all the arguments to generate an authorize derived key transaction
     const authorizeDerivedKeyResponse = await this.backendApi
       .AuthorizeDerivedKey(
-        metamaskPublicKeyDeso,
+        metamaskPublicKeyBase58Check,
         derivedPublicKeyBase58Check,
         expirationBlock,
         accessSignature,
@@ -183,7 +179,7 @@ export class SignUpMetamaskComponent implements OnInit {
       )
       .toPromise();
     // Sanity-check the transaction contains all the information we passed.
-    if (!this.verifyAuthorizeDerivedKeyTransaction(response.TransactionHex, derivedKeyPair,
+    if (!this.verifyAuthorizeDerivedKeyTransaction(authorizeDerivedKeyResponse.TransactionHex, derivedKeyPair,
       expirationBlock, accessSignature)) {
       console.error('Problem verifying authorized derived key transaction metadata');
       return;
@@ -206,12 +202,11 @@ export class SignUpMetamaskComponent implements OnInit {
           this.globalVars.network,
           metamaskBtcAddress,
           metamaskEthAddress,
-          false,
+          LoginMethod.METAMASK,
           metamaskPublicKeyHex
         );
         this.currentScreen = this.SCREEN.ACCOUNT_SUCCESS;
         this.metamaskState = this.METAMASK.START;
-        this.startTimer();
       });
   }
 
@@ -291,7 +286,6 @@ export class SignUpMetamaskComponent implements OnInit {
     derivedKeyPair: ec.KeyPair,
     accessBytesHex: string
   ): Promise<{ message: number[]; signature: string }> {
-    const numBlocksBeforeExpiration = 999999999999;
 
     // Access Bytes Encoding 1.0
     /*
@@ -328,7 +322,7 @@ export class SignUpMetamaskComponent implements OnInit {
       (window as any).ethereum
     );
     return provider;
-  };
+  }
 
   public getFundsForNewUsers(
     signature: string,
@@ -369,19 +363,8 @@ export class SignUpMetamaskComponent implements OnInit {
   /**
    * STEP SCREEN_LOADING
    */
-  private startTimer(): void {
-    this.timer = setInterval(() => {
-      if (this.timeoutTimer === 0) {
-        this.stopTimer();
-        this.login();
-        return;
-      }
-      this.timeoutTimer--;
-    }, 1000);
-  }
 
   public login(): void {
-    this.stopTimer();
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
@@ -389,12 +372,9 @@ export class SignUpMetamaskComponent implements OnInit {
     });
   }
 
-  public stopTimer(): void {
-    clearInterval(this.timer);
-    this.timeoutTimer = SignUpMetamaskComponent.TIMER_START_TIME;
-  }
   public continue(): void {
-    this.stopTimer();
+    console.log('ok');
+    // this.stopTimer();
   }
 
   /**
