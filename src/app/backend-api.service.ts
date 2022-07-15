@@ -95,6 +95,7 @@ export type PostEntryResponse = {
   AdditionalCoinRoyaltiesMap: { [k: string]: number };
 };
 
+
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
   PublicKeyBase58Check = '';
@@ -191,7 +192,7 @@ export interface GetAccessBytesResponse {
 })
 export class BackendAPIService {
   blockCypherToken = 'cd455c8a5d404bb0a23880b72f56aa86';
-  endpoint = `${'http://localhost:18001'}/api/v0`;
+  endpoint = `${environment.nodeURL}/api/v0`;
 
   constructor(
     private httpClient: HttpClient,
@@ -203,11 +204,8 @@ export class BackendAPIService {
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
-    if (
-      this.globalVars.network === Network.testnet &&
-      this.endpoint.startsWith('http://localhost:18001')
-    ) {
-      endpoint = 'http://localhost:18001/api/v0';
+    if (this.globalVars.network === Network.testnet && this.endpoint.startsWith('https://node.deso.org')) {
+      endpoint = 'https://test.deso.org/api/v0';
     }
     return `${endpoint}/${path}`;
   }
@@ -314,7 +312,7 @@ export class BackendAPIService {
     );
     const jwt = this.signingService.signJWT(seedHex);
 
-    return this.post('jumio-begin', {
+     return this.post('jumio-begin', {
       JWT: jwt,
       PublicKey,
       ReferralHashBase58,
@@ -351,7 +349,7 @@ export class BackendAPIService {
     });
   }
 
-  GetReferralInfoForReferralHash(ReferralHash: string): Observable<{
+   GetReferralInfoForReferralHash(ReferralHash: string): Observable<{
     ReferralInfoResponse: any;
     CountrySignUpBonus: CountryLevelSignUpBonus;
   }> {
@@ -487,10 +485,16 @@ export class BackendAPIService {
     return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`);
   }
   requestAirdrop(request: MetamaskSignInRequest): Observable<any> {
-    return this.post('send-starter-deso-for-metamask-account', request);
+    return this.post('send-starter-deso-for-metamask-account', request)
+      .pipe(
+        catchError((err) => {
+          console.error(err);
+          return throwError(err);
+        })
+      );
   }
 
-  GetSinglePost(
+   GetSinglePost(
     PostHashHex: string,
     ReaderPublicKeyBase58Check: string = '',
     FetchParents: boolean = false,
