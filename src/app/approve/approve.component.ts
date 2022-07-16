@@ -84,7 +84,9 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex, false);
+    const user = this.accountService.getEncryptedUsers()[this.publicKey];
+    const isDerived = this.accountService.isDerivedKeyAccount(user);
+    const signedTransactionHex = this.signingService.signTransaction(this.seedHex(), this.transactionHex, isDerived);
     this.finishFlow(signedTransactionHex);
   }
 

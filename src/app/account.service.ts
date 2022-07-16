@@ -85,6 +85,18 @@ export class AccountService {
   isDerivedKeyAccount(userInfo: PublicUserInfo): boolean {
     return userInfo.loginMethod === LoginMethod.METAMASK;
   }
+  isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
+    const publicUsers = this.getEncryptedUsers();
+
+    // Check if this user was signed in via a derived key.
+    for (const publicKey of Object.keys(publicUsers)) {
+      const user = publicUsers[publicKey];
+      if (user.encryptedSeedHex === encryptedSeedHex) {
+        return this.isDerivedKeyAccount(user);
+      }
+    }
+    return false;
+  }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
     if (GlobalVarsService.noAccessHostnames.includes(hostname)) {
