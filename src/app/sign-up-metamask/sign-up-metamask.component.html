@@ -36,13 +36,11 @@
           class="mr-10px"
         />
 
-        <img
+        <div
+          class="spinner-border mr-3"
+          style="width: 25px; height: 25px"
           *ngIf="metamaskState === METAMASK.CONNECT"
-          height="32px"
-          width="32px"
-          class="mr-3"
-          src="assets/spinner.gif"
-        />
+        ></div>
         <span class="font-weight-bold"
           >Connect<span *ngIf="metamaskState === METAMASK.CONNECT"
             >ing</span
@@ -50,13 +48,11 @@
         >
       </button>
 
-      <div *ngIf="metamaskState === METAMASK.ERROR" class="text-danger">
-        {{ errorMessage }}
+      <div *ngIf="metamaskState === METAMASK.ERROR">
+        <div class="text-danger">{{ errorMessage }}</div>
+        <div class="text-warning text-xs">{{ warningMessage }}</div>
       </div>
     </div>
-  </div>
-  <div *ngIf="this.currentScreen === SCREEN.LOADING">
-    <img src="assets/spinner.gif" />
   </div>
   <div *ngIf="this.currentScreen === SCREEN.ACCOUNT_SUCCESS">
     <span class="title-text">Success!</span>
