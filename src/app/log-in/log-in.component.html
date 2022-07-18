@@ -39,7 +39,7 @@
             </div>
             <!-- replace the boolean with item.<ismetamask or isdesoaccount> -->
             <img
-              [src]="getLoginIcon(item.value.loginMethod)"
+              [src]="getLoginIcon(accountService.getLoginMethodWithPublicKeyBase58Check(item.key))"
               height="32px"
               width="32px"
               class="mr-10px"

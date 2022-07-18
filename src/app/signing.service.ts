@@ -19,7 +19,7 @@ export class SigningService {
     private globalVars: GlobalVarsService,
   ) { }
 
-  signJWT(seedHex: string, isDerived: boolean): string {
+  signJWT(seedHex: string, isDerived: boolean, expiration: string | number = 60 * 10): string {
     const keyEncoder = new KeyEncoder('secp256k1');
     const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
     if (isDerived) {
@@ -30,15 +30,15 @@ export class SigningService {
       );
 
       return jsonwebtoken.sign(
-        {[this.globalVars.JwtDerivedPublicKeyClaim]: derivedPublicKeyBase58Check},
+        {[this.globalVars.claimJwtDerivedPublicKey]: derivedPublicKeyBase58Check},
         encodedPrivateKey,
-        { algorithm: 'ES256', expiresIn: 60 * 10 },
+        { algorithm: 'ES256', expiresIn: expiration },
       );
     } else {
       return jsonwebtoken.sign(
         {},
         encodedPrivateKey,
-        { algorithm: 'ES256', expiresIn: 60 * 10 },
+        { algorithm: 'ES256', expiresIn: expiration },
       );
     }
   }

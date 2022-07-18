@@ -39,7 +39,7 @@ import {
 export type DerivePayload = {
   publicKey: string;
   derivedPublicKey?: string;
-  transactionSpendingLimitHex?: string;
+  transactionSpendingLimit?: TransactionSpendingLimitResponse;
   expirationDays?: number;
 };
 
@@ -102,23 +102,28 @@ export class IdentityService {
   derive(payload: DerivePayload): void {
       this.backendApi.GetAppState().subscribe( (res) => {
       const blockHeight = res.BlockHeight;
-      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
-        payload.publicKey, blockHeight, payload.transactionSpendingLimitHex, payload.derivedPublicKey, payload.expirationDays);
-      if (this.globalVars.callback) {
-        // If callback is passed, we redirect to it with payload as URL parameters.
-        let httpParams = new HttpParams();
-        for (const key in derivedPrivateUserInfo) {
-          if (derivedPrivateUserInfo.hasOwnProperty(key)) {
-            const paramVal = (derivedPrivateUserInfo as any)[key];
-            if (paramVal !== null && paramVal !== undefined) {
-              httpParams = httpParams.append(key, paramVal.toString());
+      this.accountService.getDerivedPrivateUser(payload.publicKey, blockHeight,
+        payload.transactionSpendingLimit, payload.derivedPublicKey, payload.expirationDays)
+        .then( (derivedPrivateUserInfo) => {
+          if (this.globalVars.callback) {
+            // If callback is passed, we redirect to it with payload as URL parameters.
+            let httpParams = new HttpParams();
+            for (const key in derivedPrivateUserInfo) {
+              if (derivedPrivateUserInfo.hasOwnProperty(key)) {
+                const paramVal = (derivedPrivateUserInfo as any)[key];
+                if (paramVal !== null && paramVal !== undefined) {
+                  httpParams = httpParams.append(key, paramVal.toString());
+                }
+              }
             }
+            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+          } else {
+            this.cast('derive', derivedPrivateUserInfo);
           }
-        }
-        window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
-      } else {
-        this.cast('derive', derivedPrivateUserInfo);
-      }
+        })
+        .catch( (err) => {
+          console.error(err);
+        });
     });
   }
 

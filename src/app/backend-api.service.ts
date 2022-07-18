@@ -270,9 +270,6 @@ export class BackendAPIService {
               userProfiles[user.PublicKeyBase58Check] = {
                 username: user.ProfileEntryResponse?.Username,
                 profilePic: user.ProfileEntryResponse?.ProfilePic,
-                loginMethod: this.accountService.getLoginMethodWithPublicKeyBase58Check(
-                  user.PublicKeyBase58Check
-                ),
               };
             }
             return userProfiles;

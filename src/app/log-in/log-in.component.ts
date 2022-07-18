@@ -4,12 +4,9 @@ import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
 import {LoginMethod, UserProfile} from '../../types/identity';
-import { CryptoService } from '../crypto.service';
-import { EntropyService } from '../entropy.service';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
-import { SigningService } from '../signing.service';
 
 @Component({
   selector: 'app-log-in',
@@ -25,7 +22,7 @@ export class LogInComponent implements OnInit {
   hasUsers = false;
 
   constructor(
-    private accountService: AccountService,
+    public accountService: AccountService,
     private identityService: IdentityService,
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
