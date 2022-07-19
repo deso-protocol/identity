@@ -1,30 +1,33 @@
 import { Component, OnInit } from '@angular/core';
-import {AccountService} from '../account.service';
-import {DerivePayload, IdentityService} from '../identity.service';
-import {BackendAPIService, CoinLimitOperationString, CoinOperationLimitMap, TransactionSpendingLimitResponse, User} from '../backend-api.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {UserProfile} from '../../types/identity';
-import {ActivatedRoute, Router} from '@angular/router';
-import {RouteNames} from '../app-routing.module';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
+import { AccountService } from '../account.service';
+import { DerivePayload, IdentityService } from '../identity.service';
+import {
+  BackendAPIService,
+  TransactionSpendingLimitResponse,
+} from '../backend-api.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { GoogleDriveService } from '../google-drive.service';
+import { UserProfile } from '../../types/identity';
+import { ActivatedRoute, Router } from '@angular/router';
+import { RouteNames } from '../app-routing.module';
+import { truncatePublicKey } from '../utils';
 
 @Component({
   selector: 'app-derive',
   templateUrl: './derive.component.html',
-  styleUrls: ['./derive.component.scss']
+  styleUrls: ['./derive.component.scss'],
 })
 export class DeriveComponent implements OnInit {
-
-  allUsers: {[key: string]: UserProfile} = {};
-  transactionSpendingLimitResponse: TransactionSpendingLimitResponse | undefined;
+  allUsers: { [key: string]: UserProfile } = {};
+  transactionSpendingLimitResponse:
+    | TransactionSpendingLimitResponse
+    | undefined;
   hasUsers = false;
 
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
   expirationDays = 30;
   deleteKey = false;
-
 
   constructor(
     private accountService: AccountService,
@@ -33,19 +36,18 @@ export class DeriveComponent implements OnInit {
     private googleDrive: GoogleDriveService,
     private backendApi: BackendAPIService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
-  ) { }
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
-    this.backendApi.GetUserProfiles(publicKeys)
-      .subscribe(profiles => {
-        this.allUsers = profiles;
-      });
+    this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
+      this.allUsers = profiles;
+    });
 
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       if (params.publicKey) {
         this.publicKeyBase58Check = params.publicKey;
       }
@@ -53,7 +55,11 @@ export class DeriveComponent implements OnInit {
         this.derivedPublicKeyBase58Check = params.derivedPublicKey;
       }
       // We can only revoke if we have both the public key and derived public key from query params.
-      if (params.deleteKey && this.publicKeyBase58Check && this.derivedPublicKeyBase58Check) {
+      if (
+        params.deleteKey &&
+        this.publicKeyBase58Check &&
+        this.derivedPublicKeyBase58Check
+      ) {
         this.deleteKey = params.deleteKey === 'true';
         // We don't want or need to parse transaction spending limit when revoking derived key,
         // so we initialize a spending limit object with no permissions.
@@ -63,7 +69,9 @@ export class DeriveComponent implements OnInit {
         return;
       }
       if (params.transactionSpendingLimitResponse) {
-        this.transactionSpendingLimitResponse = JSON.parse(decodeURIComponent(params.transactionSpendingLimitResponse));
+        this.transactionSpendingLimitResponse = JSON.parse(
+          decodeURIComponent(params.transactionSpendingLimitResponse)
+        );
       }
       if (params.expirationDays) {
         const numDays = parseInt(params.expirationDays, 10);
@@ -77,11 +85,15 @@ export class DeriveComponent implements OnInit {
   }
 
   redirectLoadSeed(): void {
-    this.router.navigate(['/', RouteNames.LOAD_SEED], { queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.LOAD_SEED], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   redirectSignUp(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP], { queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.SIGN_UP], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   launchGoogle(): void {
@@ -106,5 +118,21 @@ export class DeriveComponent implements OnInit {
       transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
     });
+  }
+
+  public truncatePublicKey(key: string): string {
+    return truncatePublicKey(key);
+  }
+
+  public orderUsers(users: any[]): any[] {
+    if (!this.publicKeyBase58Check) return users;
+    let sortedUsers = [
+      users.find((u) => u?.key === this.publicKeyBase58Check),
+      ...users.filter((u) => u?.key !== this.publicKeyBase58Check),
+    ];
+
+    return sortedUsers.length > 0 && sortedUsers[0] === undefined
+      ? users
+      : sortedUsers;
   }
 }
