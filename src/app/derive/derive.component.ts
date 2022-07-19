@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../account.service';
-import { DerivePayload, IdentityService } from '../identity.service';
+import { IdentityService } from '../identity.service';
 import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
@@ -100,6 +100,9 @@ export class DeriveComponent implements OnInit {
     this.googleDrive.launchGoogle();
   }
 
+  selectAccount(key: string): void {
+    this.publicKeyBase58Check = key;
+  }
   selectAccountAndDeriveKey(publicKey: string): void {
     this.identityService.derive({
       publicKey,
@@ -108,12 +111,9 @@ export class DeriveComponent implements OnInit {
     });
   }
 
-  approveDerivedKey(): void {
-    if (!this.publicKeyBase58Check) {
-      return;
-    }
+  approveDerivedKey(publicKey: string): void {
     this.identityService.derive({
-      publicKey: this.publicKeyBase58Check,
+      publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
       transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
@@ -122,17 +122,5 @@ export class DeriveComponent implements OnInit {
 
   public truncatePublicKey(key: string): string {
     return truncatePublicKey(key);
-  }
-
-  public orderUsers(users: any[]): any[] {
-    if (!this.publicKeyBase58Check) return users;
-    let sortedUsers = [
-      users.find((u) => u?.key === this.publicKeyBase58Check),
-      ...users.filter((u) => u?.key !== this.publicKeyBase58Check),
-    ];
-
-    return sortedUsers.length > 0 && sortedUsers[0] === undefined
-      ? users
-      : sortedUsers;
   }
 }

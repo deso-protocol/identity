@@ -8,70 +8,24 @@
     Grant signing access
     <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
   </div>
-  <div
-    class="fs-18px mb-20px"
-    style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
-    *ngIf="publicKeyBase58Check"
-  >
-    <span class="fs-16px font-weight-normal">
-      Public Key: {{ publicKeyBase58Check }}
-    </span>
-  </div>
-  <div
-    class="fs-18px mb-20px"
-    style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
-    *ngIf="derivedPublicKeyBase58Check"
-  >
-    Derived Public Key:
-    <span class="fs-16px font-weight-normal">{{
-      derivedPublicKeyBase58Check
-    }}</span>
-  </div>
+
   <app-transaction-spending-limit
     [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
     *ngIf="transactionSpendingLimitResponse"
   ></app-transaction-spending-limit>
 
-  <div *ngIf="!globalVars.callback">
-    <div class="fs-18px mt-30px">
-      <span class="fs-underline"
-        ><b
-          >You're about to grant {{ globalVars.hostname }} with signing
-          access:</b
-        ></span
-      ><br />
-      This means <b>{{ globalVars.hostname }}</b> will be able to make
-      transactions on your behalf as if it knew your DeSo seed. This permission
-      can be revoked anytime and it will automatically expire in about
-      {{ expirationDays }} days.
-    </div>
-  </div>
-  <div *ngIf="globalVars.callback">
-    <div class="fs-18px mt-30px">
-      <span class="fs-underline"
-        ><b>You're about to grant signing access:</b></span
-      ><br />
-      This means the mobile application will be able to sign transactions on
-      your behalf as if it knew your DeSo seed. This permission can be revoked
-      anytime and it will automatically expire in about
-      {{ expirationDays }} days. <br /><br />
-      <span class="fs-underline"><b>DISCLAIMER:</b></span
-      ><br />
-      <b
-        >This session is only for mobile applications. If you are not using a
-        mobile application, you should exit this window.</b
-      >
-    </div>
-  </div>
   <div class="d-flex flex-column" *ngIf="hasUsers">
-    <ul class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll">
+    <ul
+      class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll"
+      style="max-height: 700px"
+    >
       <span class="saved-seeds-header d-flex align-items-center"
         ><span>Select an account</span></span
       >
       <li
-        *ngFor="let item of orderUsers(allUsers | keyvalue)"
+        *ngFor="let item of allUsers | keyvalue"
         class="list-group-item list-group-item-action cursor-pointer saved-seed"
-        (click)="selectAccountAndDeriveKey(item.key)"
+        (click)="selectAccount(item.key)"
         [ngClass]="{ selectedKey: item.key === publicKeyBase58Check }"
       >
         <div class="w-100 d-flex justify-content-between">
@@ -89,19 +43,29 @@
             <div class="">{{ item.value.username }}</div>
           </div>
         </div>
+        <a
+          class="link"
+          *ngIf="item.key === publicKeyBase58Check"
+          type="button"
+          (click)="approveDerivedKey(item.key)"
+        >
+          Approve
+        </a>
       </li>
     </ul>
   </div>
+  <div
+    class="fs-18px mb-20px"
+    style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
+    *ngIf="derivedPublicKeyBase58Check"
+  >
+    Derived Public Key:
+    <span class="fs-14px font-weight-normal">{{
+      derivedPublicKeyBase58Check
+    }}</span>
+  </div>
 
   <div class="d-flex align-items-center flex-column">
-    <button
-      *ngIf="publicKeyBase58Check"
-      type="button"
-      class="button button-large button-primary mb-20px font-weight-bold"
-      (click)="approveDerivedKey()"
-    >
-      Approve
-    </button>
     <button
       class="button button-large button-primary mb-20px"
       (click)="launchGoogle()"
@@ -138,16 +102,6 @@
         This means <b>{{ derivedPublicKeyBase58Check }}</b> will no longer be
         able to make transactions on your behalf.
       </div>
-    </div>
-    <div class="pt-15px">
-      <button
-        *ngIf="publicKeyBase58Check"
-        type="button"
-        class="button button-large button-primary mb-20px"
-        (click)="approveDerivedKey()"
-      >
-        Approve
-      </button>
     </div>
   </div>
 </div>
