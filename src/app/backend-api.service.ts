@@ -11,12 +11,13 @@ import { DerivedKey, Network, UserProfile } from '../types/identity';
 import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export interface MetamaskSignInRequest {
-  RecipientPublicKey: string;
-  RecipientEthAddress: string;
   AmountNanos: number;
-  Signer: number[] | string;
+  Signer: number[];
   Message: number[];
-  Signature: number[] | string;
+  Signature: number[];
+}
+export interface MetamaskSignInResponse {
+  TxnHash: string;
 }
 export class ProfileEntryResponse {
   Username: string | null = null;
@@ -94,7 +95,6 @@ export type PostEntryResponse = {
   AdditionalDESORoyaltiesMap: { [k: string]: number };
   AdditionalCoinRoyaltiesMap: { [k: string]: number };
 };
-
 
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
@@ -205,7 +205,10 @@ export class BackendAPIService {
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
-    if (this.globalVars.network === Network.testnet && this.endpoint.startsWith('https://node.deso.org')) {
+    if (
+      this.globalVars.network === Network.testnet &&
+      this.endpoint.startsWith('https://node.deso.org')
+    ) {
       endpoint = 'https://test.deso.org/api/v0';
     }
     return `${endpoint}/${path}`;
@@ -312,7 +315,7 @@ export class BackendAPIService {
     );
     const jwt = this.signingService.signJWT(seedHex, isDerived);
 
-     return this.post('jumio-begin', {
+    return this.post('jumio-begin', {
       JWT: jwt,
       PublicKey,
       ReferralHashBase58,
@@ -350,7 +353,7 @@ export class BackendAPIService {
     });
   }
 
-   GetReferralInfoForReferralHash(ReferralHash: string): Observable<{
+  GetReferralInfoForReferralHash(ReferralHash: string): Observable<{
     ReferralInfoResponse: any;
     CountrySignUpBonus: CountryLevelSignUpBonus;
   }> {
@@ -486,17 +489,18 @@ export class BackendAPIService {
     return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`);
   }
 
-  SendStarterDeSoForMetamaskAccount(request: MetamaskSignInRequest): Observable<any> {
-    return this.post('send-starter-deso-for-metamask-account', request)
-      .pipe(
-        catchError((err) => {
-          console.error(err);
-          return throwError(err);
-        })
-      );
+  SendStarterDeSoForMetamaskAccount(
+    request: MetamaskSignInRequest
+  ): Observable<any> {
+    return this.post('send-starter-deso-for-metamask-account', request).pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
   }
 
-   GetSinglePost(
+  GetSinglePost(
     PostHashHex: string,
     ReaderPublicKeyBase58Check: string = '',
     FetchParents: boolean = false,
@@ -677,10 +681,7 @@ export class BackendAPIService {
     );
   }
 
-  QueryETHRPC(
-    method: string,
-    params: string[],
-  ): Observable<any> {
+  QueryETHRPC(method: string, params: string[]): Observable<any> {
     const req = this.post('query-eth-rpc', {
       Method: method,
       Params: params,

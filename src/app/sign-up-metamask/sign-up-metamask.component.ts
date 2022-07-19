@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import {
   BackendAPIService,
   MetamaskSignInRequest,
+  MetamaskSignInResponse,
   TransactionSpendingLimitResponse,
 } from '../backend-api.service';
 import { LoginMethod, Network } from '../../types/identity';
@@ -11,14 +12,9 @@ import { CryptoService } from '../crypto.service';
 import { getSpendingLimitsForMetamask } from '../log-in/log-in.component';
 import { AccountService } from '../account.service';
 import { IdentityService } from '../identity.service';
-import { EntropyService } from '../entropy.service';
-import { GoogleDriveService } from '../google-drive.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { SigningService } from '../signing.service';
 import { MetamaskService } from '../metamask.service';
-export interface MetamaskSignInResponse {
-  TxnHash: string;
-}
 enum SCREEN {
   CREATE_ACCOUNT = 0,
   LOADING = 1,
@@ -47,17 +43,16 @@ export class SignUpMetamaskComponent implements OnInit {
   timeoutTimer = SignUpMetamaskComponent.TIMER_START_TIME;
   publicKey = '';
   errorMessage = '';
+  warningMessage = '';
 
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
     private cryptoService: CryptoService,
-    private entropyService: EntropyService,
-    private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
     private signingService: SigningService,
-    private metamaskService: MetamaskService,
+    private metamaskService: MetamaskService
   ) {}
 
   ngOnInit(): void {}
@@ -68,6 +63,7 @@ export class SignUpMetamaskComponent implements OnInit {
 
   launchMetamask(): void {
     this.errorMessage = '';
+    this.warningMessage = '';
     this.metamaskState = this.METAMASK.CONNECT;
     this.signInWithMetamaskNewUser();
   }
@@ -100,23 +96,28 @@ export class SignUpMetamaskComponent implements OnInit {
       )
       .toPromise()
       .catch((e) => {
-        this.errorMessage = 'Problem getting transaction spending limit. Please try again.';
+        this.errorMessage =
+          'Problem getting transaction spending limit. Please try again.';
         this.metamaskState = METAMASK.ERROR;
         return;
       });
-    if (!getAccessBytesResponse) { return; }
+    if (!getAccessBytesResponse) {
+      return;
+    }
 
     // we can now generate the message and sign it.
     let message: number[];
     let signature: string;
     try {
-      const resp = await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
-        getAccessBytesResponse.AccessBytesHex
-      );
+      const resp =
+        await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
+          getAccessBytesResponse.AccessBytesHex
+        );
       message = resp.message;
       signature = resp.signature;
     } catch (e) {
-      this.errorMessage = 'Something went wrong while producing Metamask signature. Please try again.';
+      this.errorMessage =
+        'Something went wrong while producing Metamask signature. Please try again.';
       this.metamaskState = METAMASK.ERROR;
       return;
     }
@@ -139,13 +140,25 @@ export class SignUpMetamaskComponent implements OnInit {
 
     const metamaskEthAddress =
       this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
-    const metamaskPublicKeyBase58Check = this.cryptoService.publicKeyToDeSoPublicKey(
-      metamaskKeyPair,
-      network
-    );
+    const metamaskPublicKeyBase58Check =
+      this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
+    await this.backendApi
+      .SendStarterDeSoForMetamaskAccount({
+        Signer: metamaskKeyPair.getPublic().encode('array', true),
+        AmountNanos: 1000,
+        Message: message,
+        Signature: [
+          ...Buffer.from(signature.slice(2, signature.length), 'hex'),
+        ],
+      })
+      .toPromise()
+      .catch((e) => {
+        this.warningMessage =
+          'Unable to send starter Deso, this is not an issue if you already have a Deso balance';
+        this.metamaskState = METAMASK.ERROR;
+      });
     // Slice the '0x' prefix from the signature.
     const accessSignature = signature.slice(2);
-
     // we now have all the arguments to generate an authorize derived key transaction
     let authorizeDerivedKeyResponse: any;
     try {
@@ -172,7 +185,8 @@ export class SignUpMetamaskComponent implements OnInit {
         accessSignature
       )
     ) {
-      this.errorMessage = 'Problem verifying authorized derived key transaction metadata';
+      this.errorMessage =
+        'Problem verifying authorized derived key transaction metadata';
       this.metamaskState = METAMASK.ERROR;
       return;
     }
@@ -199,19 +213,13 @@ export class SignUpMetamaskComponent implements OnInit {
         );
         this.currentScreen = this.SCREEN.ACCOUNT_SUCCESS;
         this.metamaskState = this.METAMASK.START;
-        this.startTimer();
+        // this.startTimer();
       })
       .catch((e) => {
-        this.errorMessage = 'Problem communicating with the blockchain. Please Try again.';
+        this.errorMessage =
+          'Problem communicating with the blockchain. Please Try again.';
         this.metamaskState = METAMASK.ERROR;
       });
-  }
-
-  public async getFundsForNewUsers(
-    request: MetamaskSignInRequest
-  ): Promise<MetamaskSignInResponse> {
-    request.Signature = [...Buffer.from(request.Signature as string, 'hex')];
-    return this.backendApi.SendStarterDeSoForMetamaskAccount(request).toPromise();
   }
 
   /**
