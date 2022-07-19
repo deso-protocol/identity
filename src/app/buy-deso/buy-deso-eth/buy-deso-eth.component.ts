@@ -599,9 +599,8 @@ export class BuyDeSoEthComponent implements OnInit {
 
   queryETHRPC<Type>(method: string, params: any[]): Promise<Type> {
     return new Promise<Type>((resolve, reject) => {
-      const jwt = this.signingService.signJWT(this.seedHex);
       this.backendAPIService
-        .QueryETHRPC(method, params, this.publicKey, jwt)
+        .QueryETHRPC(method, params)
         .toPromise()
         .then(
           (res: any) => {

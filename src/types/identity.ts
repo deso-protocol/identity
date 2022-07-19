@@ -1,14 +1,18 @@
-import { TransactionSpendingLimit } from "src/lib/deso/transaction";
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export interface PrivateUserInfo {
   seedHex: string;
   mnemonic: string;
+  publicKeyHex?: string;
   extraText: string;
   btcDepositAddress: string;
   ethDepositAddress: string;
   network: Network;
-  google?: boolean;
+  loginMethod?: LoginMethod;
   version: PrivateUserVersion;
+
+  /** DEPRECATED */
+  google?: boolean;
 }
 
 export enum PrivateUserVersion {
@@ -17,6 +21,15 @@ export enum PrivateUserVersion {
 
   // Adds "ethDepositAddress"
   V1 = 1,
+
+  // Adds "loginMethod"
+  V2 = 2,
+}
+
+export enum LoginMethod {
+  DESO = 'DESO',
+  GOOGLE = 'GOOGLE',
+  METAMASK = 'METAMASK',
 }
 
 export interface PublicUserInfo {
@@ -27,6 +40,7 @@ export interface PublicUserInfo {
   network: Network;
   accessLevel: AccessLevel;
   accessLevelHmac: string;
+  loginMethod?: LoginMethod;
   version: PrivateUserVersion;
 }
 
@@ -62,15 +76,15 @@ export interface DerivedKey {
 }
 
 export interface EncryptedMessage {
-  EncryptedHex: string,
-  PublicKey: string,
-  IsSender: boolean,
-  Legacy: boolean,
-  Version?: number,
-  SenderMessagingPublicKey?: string,
-  SenderMessagingGroupKeyName?: string,
-  RecipientMessagingPublicKey?: string,
-  RecipientMessagingGroupKeyName?: string
+  EncryptedHex: string;
+  PublicKey: string;
+  IsSender: boolean;
+  Legacy: boolean;
+  Version?: number;
+  SenderMessagingPublicKey?: string;
+  SenderMessagingGroupKeyName?: string;
+  RecipientMessagingPublicKey?: string;
+  RecipientMessagingGroupKeyName?: string;
 }
 
 export enum Network {

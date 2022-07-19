@@ -17,7 +17,6 @@ import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 export class DeriveComponent implements OnInit {
 
   allUsers: {[key: string]: UserProfile} = {};
-  transactionSpendingLimitHex: string | undefined;
   transactionSpendingLimitResponse: TransactionSpendingLimitResponse | undefined;
   hasUsers = false;
 
@@ -57,30 +56,14 @@ export class DeriveComponent implements OnInit {
       if (params.deleteKey && this.publicKeyBase58Check && this.derivedPublicKeyBase58Check) {
         this.deleteKey = params.deleteKey === 'true';
         // We don't want or need to parse transaction spending limit when revoking derived key,
-        // so we initialize a spending limit object with no permissions
+        // so we initialize a spending limit object with no permissions.
         this.transactionSpendingLimitResponse = { GlobalDESOLimit: 0 };
-        this.backendApi.GetTransactionSpendingLimitHexString(
-          this.transactionSpendingLimitResponse
-        ).subscribe((res) => {
-          this.transactionSpendingLimitHex = res;
-        });
         // Setting expiration days to 0 forces us to have a minimum transaction size that is still valid.
         this.expirationDays = 0;
         return;
       }
       if (params.transactionSpendingLimitResponse) {
         this.transactionSpendingLimitResponse = JSON.parse(decodeURIComponent(params.transactionSpendingLimitResponse));
-        // TODO: There is a small attack surface here. If someone gains control of the
-        // backendApi node, they can swap a fake value into here, and trick the user
-        // into giving up control of their key. The solution is to force users to pass
-        // the transactionSpendingLimitHex directly, but this is a worse developer
-        // experience. So we trade a little bit of security for developer convenience
-        // here, and do the conversion in Identity rather than forcing the devs to do it.
-        this.backendApi.GetTransactionSpendingLimitHexString(
-          this.transactionSpendingLimitResponse as TransactionSpendingLimitResponse
-        ).subscribe((res) => {
-          this.transactionSpendingLimitHex = res;
-        });
       }
       if (params.expirationDays) {
         const numDays = parseInt(params.expirationDays, 10);
@@ -108,7 +91,7 @@ export class DeriveComponent implements OnInit {
   selectAccountAndDeriveKey(publicKey: string): void {
     this.identityService.derive({
       publicKey,
-      transactionSpendingLimitHex: this.transactionSpendingLimitHex,
+      transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
     });
   }
@@ -120,7 +103,7 @@ export class DeriveComponent implements OnInit {
     this.identityService.derive({
       publicKey: this.publicKeyBase58Check,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
-      transactionSpendingLimitHex: this.transactionSpendingLimitHex,
+      transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
     });
   }
