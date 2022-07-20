@@ -9,11 +9,6 @@
     <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
   </div>
 
-  <app-transaction-spending-limit
-    [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
-    *ngIf="transactionSpendingLimitResponse"
-  ></app-transaction-spending-limit>
-
   <div class="d-flex flex-column" *ngIf="hasUsers">
     <ul
       (mouseleave)="endHover()"
@@ -45,8 +40,8 @@
           </div>
         </div>
         <a
-          class="link fs-13px"
-          *ngIf="i === hoveredAccount"
+          class="link fs-18px"
+          *ngIf="i === hoveredAccount || isSingleAccount"
           type="button"
           (click)="approveDerivedKey(item.key)"
         >
@@ -55,12 +50,17 @@
       </li>
     </ul>
   </div>
+  <app-transaction-spending-limit
+    [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
+    *ngIf="transactionSpendingLimitResponse"
+  ></app-transaction-spending-limit>
+  <div class="transaction-spending-limit-separator"></div>
   <div
-    class="fs-18px mb-20px"
+    class="fs-18px mb-20px pt-15px"
     style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
     *ngIf="derivedPublicKeyBase58Check"
   >
-    Derived Public Key:
+    <div class="d-flex justify-content-center">Derived Public Key:</div>
     <span class="fs-14px font-weight-normal">{{
       derivedPublicKeyBase58Check
     }}</span>
