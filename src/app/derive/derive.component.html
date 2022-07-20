@@ -16,6 +16,7 @@
 
   <div class="d-flex flex-column" *ngIf="hasUsers">
     <ul
+      (mouseleave)="endHover()"
       class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll"
       style="max-height: 700px"
     >
@@ -23,10 +24,10 @@
         ><span>Select an account</span></span
       >
       <li
-        *ngFor="let item of allUsers | keyvalue"
+        *ngFor="let item of allUsers | keyvalue; let i = index"
         class="list-group-item list-group-item-action cursor-pointer saved-seed"
         (click)="selectAccount(item.key)"
-        [ngClass]="{ selectedKey: item.key === publicKeyBase58Check }"
+        (mouseover)="onHover(i)"
       >
         <div class="w-100 d-flex justify-content-between">
           <div *ngIf="!item.value.username" class="text-left">
@@ -44,8 +45,8 @@
           </div>
         </div>
         <a
-          class="link"
-          *ngIf="item.key === publicKeyBase58Check"
+          class="link fs-13px"
+          *ngIf="i === hoveredAccount"
           type="button"
           (click)="approveDerivedKey(item.key)"
         >

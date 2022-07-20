@@ -23,7 +23,7 @@ export class DeriveComponent implements OnInit {
     | TransactionSpendingLimitResponse
     | undefined;
   hasUsers = false;
-
+  hoveredAccount = -1;
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
   expirationDays = 30;
@@ -118,6 +118,12 @@ export class DeriveComponent implements OnInit {
       transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
     });
+  }
+  onHover(i: number) {
+    this.hoveredAccount = i;
+  }
+  endHover() {
+    this.hoveredAccount = -1;
   }
 
   public truncatePublicKey(key: string): string {
