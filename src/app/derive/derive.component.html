@@ -2,68 +2,80 @@
 
 <div
   *ngIf="!globalVars.callbackInvalid && !deleteKey"
-  class="container home-container text-center"
+  class="container home-container text-center d-flex flex-column justify-content-between"
 >
-  <div class="title-text">
-    Grant signing access
-    <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
-  </div>
+  <div>
+    <div class="title-text">
+      Grant signing access
+      <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
+    </div>
 
-  <div class="d-flex flex-column" *ngIf="hasUsers">
-    <ul
-      (mouseleave)="endHover()"
-      class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll"
-      style="max-height: 700px"
-    >
-      <span class="saved-seeds-header d-flex align-items-center"
-        ><span>Select an account</span></span
+    <div class="d-flex flex-column" *ngIf="hasUsers && !isSingleAccount">
+      <ul
+        (mouseleave)="endHover()"
+        class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll"
+        style="max-height: 700px"
       >
-      <li
-        *ngFor="let item of allUsers | keyvalue; let i = index"
-        class="list-group-item list-group-item-action cursor-pointer saved-seed"
-        (click)="selectAccount(item.key)"
-        (mouseover)="onHover(i)"
-      >
-        <div class="w-100 d-flex justify-content-between">
-          <div *ngIf="!item.value.username" class="text-left">
-            <div class="my-1">
-              <img
-                class="avatar mr-15px"
-                src="assets/placeholder-account-image.png"
-              />
-              {{ truncatePublicKey(item.key) }}
+        <span class="saved-seeds-header d-flex align-items-center"
+          ><span>Select an account</span></span
+        >
+        <li
+          *ngFor="let item of allUsers | keyvalue; let i = index"
+          class="list-group-item list-group-item-action cursor-pointer saved-seed"
+          (click)="selectAccount(item.key)"
+          (mouseover)="onHover(i)"
+        >
+          <div class="w-100 d-flex justify-content-between">
+            <div *ngIf="!item.value.username" class="text-left">
+              <div class="my-1">
+                <img
+                  class="avatar mr-15px"
+                  src="assets/placeholder-account-image.png"
+                />
+                {{ truncatePublicKey(item.key) }}
+              </div>
+            </div>
+            <div *ngIf="item.value.username" class="d-flex align-items-center">
+              <div class="avatar mr-15px" [appAvatar]="item.key"></div>
+              <div class="">{{ item.value.username }}</div>
             </div>
           </div>
-          <div *ngIf="item.value.username" class="d-flex align-items-center">
-            <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-            <div class="">{{ item.value.username }}</div>
-          </div>
-        </div>
-        <a
-          class="link fs-18px"
-          *ngIf="i === hoveredAccount || isSingleAccount"
-          type="button"
-          (click)="approveDerivedKey(item.key)"
-        >
-          Approve
-        </a>
-      </li>
-    </ul>
-  </div>
-  <app-transaction-spending-limit
-    [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
-    *ngIf="transactionSpendingLimitResponse"
-  ></app-transaction-spending-limit>
-  <div class="transaction-spending-limit-separator"></div>
-  <div
-    class="fs-18px mb-20px pt-15px"
-    style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
-    *ngIf="derivedPublicKeyBase58Check"
-  >
-    <div class="pl-20px text-left">Derived Public Key</div>
-    <span class="fs-14px font-weight-normal pl-20px">{{
-      derivedPublicKeyBase58Check
-    }}</span>
+          <a
+            class="link fs-18px"
+            *ngIf="i === hoveredAccount && !isSingleAccount"
+            type="button"
+            (click)="approveDerivedKey(item.key)"
+          >
+            Approve
+          </a>
+        </li>
+      </ul>
+    </div>
+    <app-transaction-spending-limit
+      [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
+      *ngIf="transactionSpendingLimitResponse"
+    ></app-transaction-spending-limit>
+    <div
+      class="fs-18px mb-20px py-15px"
+      style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
+      *ngIf="derivedPublicKeyBase58Check"
+    >
+      <div class="pl-20px text-left">Public Key</div>
+      <span class="fs-14px font-weight-normal pl-20px">{{
+        publicKeyBase58Check
+      }}</span>
+      <div class="pl-20px text-left">Derived Public Key</div>
+      <span class="fs-14px font-weight-normal pl-20px">{{
+        derivedPublicKeyBase58Check
+      }}</span>
+
+      <button
+        class="button button-large mb-20px bg-dark text-white mt-20px font-weight-bold"
+        (click)="approveDerivedKey(publicKeyBase58Check)"
+      >
+        Approve
+      </button>
+    </div>
   </div>
 
   <div class="d-flex align-items-center flex-column">
@@ -87,7 +99,10 @@
     >
       <span class="font-weight-normal">Sign up with DeSo seed</span>
     </button>
-    <a class="link" (click)="redirectLoadSeed()" queryParamsHandling="merge"
+    <a
+      class="link mb-20px"
+      (click)="redirectLoadSeed()"
+      queryParamsHandling="merge"
       ><u>Log in with DeSo seed</u></a
     >
   </div>

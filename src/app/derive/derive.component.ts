@@ -132,7 +132,8 @@ export class DeriveComponent implements OnInit {
     });
   }
 
-  approveDerivedKey(publicKey: string): void {
+  approveDerivedKey(publicKey: string | undefined): void {
+    if (!publicKey) return;
     this.identityService.derive({
       publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
