@@ -43,7 +43,8 @@ export class TransactionSpendingLimitCoinComponent implements OnInit {
       .map((op) => this.globalVars.cleanSpendingLimitOperationName(op))
       .join(', ');
   }
+
   truncatePublicKey(key: string) {
-    return truncatePublicKey;
+    return truncatePublicKey(key);
   }
 }

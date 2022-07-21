@@ -12,7 +12,6 @@
 
     <div class="d-flex flex-column" *ngIf="hasUsers && !isSingleAccount">
       <ul
-        (mouseleave)="endHover()"
         class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll"
         style="max-height: 700px"
       >
@@ -24,7 +23,6 @@
           class="list-group-item list-group-item-action cursor-pointer saved-seed"
           [ngClass]="{ selectedKey: publicKeyBase58Check === item.key }"
           (click)="publicKeyBase58Check = item.key"
-          (mouseover)="onHover(i)"
         >
           <div class="w-100 d-flex justify-content-between">
             <div *ngIf="!item.value.username" class="text-left">
@@ -53,7 +51,7 @@
       </ul>
     </div>
     <div
-      class="fs-18px mb-20px py-15px"
+      class="fs-18px pt-15px pb-5px"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
       *ngIf="derivedPublicKeyBase58Check"
     >

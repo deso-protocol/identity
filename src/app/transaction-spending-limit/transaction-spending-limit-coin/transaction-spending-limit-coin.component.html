@@ -13,7 +13,8 @@
         {{
           coinPublicKey === ""
             ? "All Creators"
-            : user?.ProfileEntryResponse?.Username || coinPublicKey
+            : user?.ProfileEntryResponse?.Username ||
+              truncatePublicKey(coinPublicKey)
         }}
       </div>
       <!-- TODO: Add verified check -->

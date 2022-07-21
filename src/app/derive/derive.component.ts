@@ -8,7 +8,7 @@ import {
 import { GlobalVarsService } from '../global-vars.service';
 import { GoogleDriveService } from '../google-drive.service';
 import { UserProfile } from '../../types/identity';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouteNames } from '../app-routing.module';
 import { truncatePublicKey } from '../utils';
 import { map, switchMap } from 'rxjs/operators';
@@ -31,7 +31,7 @@ export class DeriveComponent implements OnInit {
   expirationDays = 30;
   deleteKey = false;
   isSingleAccount = false;
-
+  validationErrors = false;
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -46,10 +46,15 @@ export class DeriveComponent implements OnInit {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
-
+    // first grab the query params
     this.activatedRoute.queryParams
       .pipe(
         switchMap((params) => {
+          // verify they sent the correct parameter permutation
+          this.validationErrors = this.getParameterValidationErrors(params);
+          if (this.validationErrors) {
+            return throwError('invalid query parameter permutation');
+          }
           if (params.publicKey) {
             this.publicKeyBase58Check = params.publicKey;
             this.isSingleAccount = true;
@@ -102,22 +107,6 @@ export class DeriveComponent implements OnInit {
     this.globalVars.derive = true;
   }
 
-  redirectLoadSeed(): void {
-    this.router.navigate(['/', RouteNames.LOAD_SEED], {
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  redirectSignUp(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP], {
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  launchGoogle(): void {
-    this.googleDrive.launchGoogle();
-  }
-
   selectAccountAndDeriveKey(publicKey: string): void {
     this.identityService.derive({
       publicKey,
@@ -135,15 +124,41 @@ export class DeriveComponent implements OnInit {
       expirationDays: this.expirationDays,
     });
   }
-  onHover(i: number) {
-    this.hoveredAccount = i;
-  }
-  endHover() {
-    this.hoveredAccount = -1;
-  }
 
   public truncatePublicKey(key: string | undefined): string {
     if (!key) return '';
     return truncatePublicKey(key);
+  }
+
+  private getParameterValidationErrors(params: Params): boolean {
+    // listed out the different flows that can happen on the derive page
+    // if the params do not match these permutations return false and display the error page
+    const pkAndSpendingLimits =
+      params.publicKeyBase58Check && params.transactionSpendingLimitResponse;
+
+    const dkAndSpendingLimits =
+      params.derivedPublicKey && params.transactionSpendingLimitResponse;
+
+    const pkDkAndSpendingLimits =
+      params.publicKeyBase58Check &&
+      params.transactionSpendingLimitResponse &&
+      params.derivedPublicKey;
+
+    const deleteDerivedKey =
+      params.publicKeyBase58Check &&
+      params.deleteKey === 'true' &&
+      params.derivedPublicKey;
+    console.log({
+      pkAndSpendingLimits,
+      dkAndSpendingLimits,
+      pkDkAndSpendingLimits,
+      deleteDerivedKey,
+    });
+    return !(
+      pkAndSpendingLimits ||
+      dkAndSpendingLimits ||
+      pkDkAndSpendingLimits ||
+      deleteDerivedKey
+    );
   }
 }
