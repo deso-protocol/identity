@@ -98,9 +98,6 @@ export class DeriveComponent implements OnInit {
           }
         }
       });
-
-    // this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
-    // });
     // Set derive to true
     this.globalVars.derive = true;
   }
@@ -121,9 +118,6 @@ export class DeriveComponent implements OnInit {
     this.googleDrive.launchGoogle();
   }
 
-  selectAccount(key: string): void {
-    this.publicKeyBase58Check = key;
-  }
   selectAccountAndDeriveKey(publicKey: string): void {
     this.identityService.derive({
       publicKey,
@@ -148,7 +142,8 @@ export class DeriveComponent implements OnInit {
     this.hoveredAccount = -1;
   }
 
-  public truncatePublicKey(key: string): string {
+  public truncatePublicKey(key: string | undefined): string {
+    if (!key) return '';
     return truncatePublicKey(key);
   }
 }

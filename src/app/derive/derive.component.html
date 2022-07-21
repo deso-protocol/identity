@@ -2,7 +2,7 @@
 
 <div
   *ngIf="!globalVars.callbackInvalid && !deleteKey"
-  class="container home-container text-center d-flex flex-column justify-content-between"
+  class="container home-container text-center d-flex flex-column"
 >
   <div>
     <div class="title-text">
@@ -22,7 +22,8 @@
         <li
           *ngFor="let item of allUsers | keyvalue; let i = index"
           class="list-group-item list-group-item-action cursor-pointer saved-seed"
-          (click)="selectAccount(item.key)"
+          [ngClass]="{ selectedKey: publicKeyBase58Check === item.key }"
+          (click)="publicKeyBase58Check = item.key"
           (mouseover)="onHover(i)"
         >
           <div class="w-100 d-flex justify-content-between">
@@ -40,72 +41,49 @@
               <div class="">{{ item.value.username }}</div>
             </div>
           </div>
-          <a
+          <!-- <a
             class="link fs-18px"
             *ngIf="i === hoveredAccount && !isSingleAccount"
             type="button"
             (click)="approveDerivedKey(item.key)"
           >
             Approve
-          </a>
+          </a> -->
         </li>
       </ul>
     </div>
-    <app-transaction-spending-limit
-      [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
-      *ngIf="transactionSpendingLimitResponse"
-    ></app-transaction-spending-limit>
     <div
       class="fs-18px mb-20px py-15px"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
       *ngIf="derivedPublicKeyBase58Check"
     >
-      <div class="pl-20px text-left">Public Key</div>
-      <span class="fs-14px font-weight-normal pl-20px">{{
-        publicKeyBase58Check
-      }}</span>
-      <div class="pl-20px text-left">Derived Public Key</div>
-      <span class="fs-14px font-weight-normal pl-20px">{{
-        derivedPublicKeyBase58Check
-      }}</span>
-
-      <button
-        class="button button-large mb-20px bg-dark text-white mt-20px font-weight-bold"
-        (click)="approveDerivedKey(publicKeyBase58Check)"
-      >
-        Approve
-      </button>
+      <div class="pl-20px text-left d-flex justify-content-between">
+        Public Key
+        <span class="font-weight-normal pr-20px pb-15px text-left">{{
+          truncatePublicKey(publicKeyBase58Check)
+        }}</span>
+      </div>
+      <div class="pl-20px text-left d-flex justify-content-between">
+        Derived Public Key
+        <span class="font-weight-normal pr-20px">{{
+          truncatePublicKey(derivedPublicKeyBase58Check)
+        }}</span>
+      </div>
     </div>
   </div>
-
-  <div class="d-flex align-items-center flex-column">
-    <button
-      class="button button-large button-primary mb-20px"
-      (click)="launchGoogle()"
-      *ngIf="!globalVars.hideGoogle"
-    >
-      <img
-        src="assets/google_logo.svg"
-        height="32px"
-        width="32px"
-        class="mr-10px"
-      />
-      <span class="font-weight-bold">Sign up / log in with Google</span>
-    </button>
-    <button
-      class="button button-large button-secondary mb-20px"
-      (click)="redirectSignUp()"
-      queryParamsHandling="merge"
-    >
-      <span class="font-weight-normal">Sign up with DeSo seed</span>
-    </button>
-    <a
-      class="link mb-20px"
-      (click)="redirectLoadSeed()"
-      queryParamsHandling="merge"
-      ><u>Log in with DeSo seed</u></a
-    >
+  <div *ngIf="transactionSpendingLimitResponse" class="mb-40px">
+    <app-transaction-spending-limit
+      [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
+    ></app-transaction-spending-limit>
   </div>
+  <div></div>
+  <button
+    [disabled]="!publicKeyBase58Check"
+    class="button btn-primary button-large mb-20px text-white font-weight-bold"
+    (click)="approveDerivedKey(publicKeyBase58Check)"
+  >
+    Approve
+  </button>
 
   <div class="container home-container" *ngIf="deleteKey">
     <div>

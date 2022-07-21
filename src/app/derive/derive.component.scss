@@ -7,3 +7,7 @@ a.link {
 .container {
   min-height: calc(100% - 150px);
 }
+// used multiple classes to increase selection priority
+.button.btn-primary.button-large:disabled {
+  opacity: 0.4;
+}
