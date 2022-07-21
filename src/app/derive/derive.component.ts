@@ -36,9 +36,7 @@ export class DeriveComponent implements OnInit {
     private accountService: AccountService,
     private identityService: IdentityService,
     public globalVars: GlobalVarsService,
-    private googleDrive: GoogleDriveService,
     private backendApi: BackendAPIService,
-    private router: Router,
     private activatedRoute: ActivatedRoute
   ) {}
 
