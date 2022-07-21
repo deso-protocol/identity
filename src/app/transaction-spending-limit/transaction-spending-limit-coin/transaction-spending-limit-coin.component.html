@@ -6,10 +6,14 @@
         [appAvatar]="coinPublicKey"
         *ngIf="coinPublicKey"
       ></div>
-      <div
-        class="d-block"
-        style="display: block; max-width: 200px; overflow: hidden"
-      >
+      <div class="d-block" style="display: block; max-width: 200px">
+        <img
+          src="assets/{{ expandCreator ? 'down' : 'right' }}.png"
+          (click)="expandCreator = !expandCreator"
+          class="arrow"
+          width="25px"
+          height="25px"
+        />
         {{
           coinPublicKey === ""
             ? "All Creators"
@@ -23,20 +27,12 @@
       <div class="px-10px">
         {{ getOperationsString(coinOperationMap) }}
       </div>
-      <div
-        (click)="expandCreator = !expandCreator"
-        class="link"
-        style="font-size: 14px !important"
-      >
-        {{ expandCreator ? "Hide" : "Show" }}
-      </div>
+      <!-- <img src="assets/down.png" height="15px" />
+        {{ expandCreator ? "Hide" : "Show" }} -->
+      <!-- </div> -->
     </div>
   </div>
-  <div
-    class="d-flex flex-column p-15px m-15px"
-    style="background-color: lightgray; border: 1px solid gray"
-    *ngIf="expandCreator"
-  >
+  <div class="d-flex flex-column p-15px m-15px" *ngIf="expandCreator">
     <div class="d-flex fs-14px justify-content-between">
       <div>Operation Type</div>
       <div>Operation Limit</div>
