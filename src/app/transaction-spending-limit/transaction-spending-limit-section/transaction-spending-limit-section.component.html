@@ -6,18 +6,28 @@
   <div class="py-15px">
     <div class="d-flex justify-content-between">
       <div class="d-flex flex-column">
-        <div class="fs-18px text-left">{{ sectionTitle }}</div>
+        <div class="fs-18px text-left">
+          <img
+            src="assets/{{ showDetails ? 'down' : 'right' }}.png"
+            (click)="showDetails = !showDetails"
+            class="arrow"
+            width="25px"
+            height="25px"
+          />
+          {{ sectionTitle }}
+        </div>
         <div class="fs-14px text-left">
           {{ sectionSummary() }}
         </div>
       </div>
       <div class="d-flex justify-content-end">
-        <a
+        <!-- <a
           (click)="showDetails = !showDetails"
           class="link"
           style="font-size: 18px !important"
           >{{ showDetails ? "Hide" : "Show" }}
-        </a>
+
+        </a> -->
       </div>
     </div>
 

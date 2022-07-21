@@ -9,7 +9,7 @@
         height="25px"
       />
       <div
-        class="avatar mr-15px"
+        class="avatar ml-5px mr-5px"
         [appAvatar]="coinPublicKey"
         *ngIf="coinPublicKey"
       ></div>
@@ -27,9 +27,6 @@
       <div class="d-flex align-items-center justify-content-center">
         {{ getOperationsString(coinOperationMap) }}
       </div>
-      <!-- <img src="assets/down.png" height="15px" />
-        {{ expandCreator ? "Hide" : "Show" }} -->
-      <!-- </div> -->
     </div>
   </div>
   <div

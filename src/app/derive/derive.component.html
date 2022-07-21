@@ -1,7 +1,9 @@
 <app-banner></app-banner>
 
 <div
-  *ngIf="!globalVars.callbackInvalid && !deleteKey"
+  *ngIf="
+    !globalVars.callbackInvalid && !deleteKey && validationErrors === false
+  "
   class="container home-container text-center d-flex flex-column"
 >
   <div>
@@ -99,4 +101,7 @@
 </div>
 <div *ngIf="globalVars.callbackInvalid">
   <app-error-callback></app-error-callback>
+</div>
+<div *ngIf="validationErrors" class="text-center text-danger title-text">
+  There was an issue rendering this page, are the query parameters correct?
 </div>
