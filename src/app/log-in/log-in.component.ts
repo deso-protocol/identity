@@ -3,10 +3,11 @@ import { AccountService } from '../account.service';
 import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
-import {LoginMethod, UserProfile} from '../../types/identity';
+import { LoginMethod, UserProfile } from '../../types/identity';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
+import { truncatePublicKey } from '../utils';
 
 @Component({
   selector: 'app-log-in',
@@ -95,14 +96,8 @@ export class LogInComponent implements OnInit {
     });
   }
 
-  public truncatePublicKey(key: string): any {
-    if (key.length <= 12) {
-      return key;
-    }
-    return `${key.substring(0, 7)}....${key.substring(
-      key.length - 4,
-      key.length
-    )}`;
+  public truncatePublicKey(key: string): string {
+    return truncatePublicKey(key);
   }
 
   public getLoginIcon(loginMethod: LoginMethod): any {
