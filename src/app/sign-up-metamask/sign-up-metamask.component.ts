@@ -32,7 +32,6 @@ enum METAMASK {
 })
 export class SignUpMetamaskComponent implements OnInit {
   private static UNLIMITED_DERIVED_KEY_EXPIRATION: Readonly<number> = 100000000000;
-  private static TIMER_START_TIME: Readonly<number> = 15;
   metamaskState: METAMASK = METAMASK.START;
   currentScreen: SCREEN = SCREEN.CREATE_ACCOUNT;
   timer: any;

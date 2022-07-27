@@ -46,6 +46,7 @@ import { BuyDesoPageComponent } from './buy-deso/buy-deso-page/buy-deso-page.com
 import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.component';
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
 import { MetamaskService } from './metamask.service';
+import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
 
 
 @NgModule({
@@ -82,6 +83,7 @@ import { MetamaskService } from './metamask.service';
     BuyDesoPageComponent,
     BuyOrSendDesoComponent,
     SignUpMetamaskComponent,
+    ArrowToggleComponent,
   ],
   imports: [
     BrowserModule,

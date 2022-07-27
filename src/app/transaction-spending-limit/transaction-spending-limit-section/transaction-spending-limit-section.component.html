@@ -7,28 +7,23 @@
     <div class="d-flex justify-content-between">
       <div class="d-flex flex-column">
         <div class="fs-18px text-left">
-          <img
+          <app-arrow-toggle
+            (click)="showDetails = !showDetails"
+          ></app-arrow-toggle>
+          <!-- <img
             src="assets/{{ showDetails ? 'down' : 'right' }}.png"
             (click)="showDetails = !showDetails"
             class="arrow"
             width="25px"
             height="25px"
-          />
+          /> -->
           {{ sectionTitle }}
         </div>
         <div class="fs-14px text-left">
           {{ sectionSummary() }}
         </div>
       </div>
-      <div class="d-flex justify-content-end">
-        <!-- <a
-          (click)="showDetails = !showDetails"
-          class="link"
-          style="font-size: 18px !important"
-          >{{ showDetails ? "Hide" : "Show" }}
-
-        </a> -->
-      </div>
+      <div class="d-flex justify-content-end"></div>
     </div>
 
     <div class="d-flex flex-column pt-15px" *ngIf="showDetails">
@@ -69,11 +64,7 @@
             TransactionSpendingLimitComponent.DAOCoinLimitsSection
         "
       >
-        <div
-          *ngIf="anyCreatorItem"
-          style="border: 2px solid goldenrod; border-radius: 5px"
-          class="mb-15px px-5px py-15px"
-        >
+        <div *ngIf="anyCreatorItem" class="mb-15px px-5px py-15px">
           <app-transaction-spending-limit-coin
             coinPublicKey=""
             [coinOperationMap]="anyCreatorItem"
@@ -104,11 +95,7 @@
           sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection
         "
       >
-        <div
-          *ngIf="anyNFTItem"
-          style="border: 2px solid goldenrod; border-radius: 5px"
-          class="mb-15px px-5px py-15px"
-        >
+        <div *ngIf="anyNFTItem" class="mb-15px px-5px py-15px">
           <app-transaction-spending-limit-nft
             nftPostHashHex=""
             [nftSerialNumToOperationMap]="anyNFTItem"
@@ -179,7 +166,7 @@
   <div
     *ngIf="showDetails"
     class="d-flex justify-content-center mr-15px ml-15px"
-    style="background: lightgray; border-radius: 2px"
+    style=""
     (click)="
       showDetails = !showAll;
       showAll = !showAll || getSectionMapLength() <= defaultNumShown
