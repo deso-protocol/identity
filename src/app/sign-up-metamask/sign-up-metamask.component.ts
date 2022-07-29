@@ -39,7 +39,6 @@ export class SignUpMetamaskComponent implements OnInit {
   METAMASK = METAMASK;
   publicKey = '';
   errorMessage = '';
-  warningMessage = '';
 
   constructor(
     private accountService: AccountService,
@@ -59,7 +58,6 @@ export class SignUpMetamaskComponent implements OnInit {
 
   launchMetamask(): void {
     this.errorMessage = '';
-    this.warningMessage = '';
     this.metamaskState = this.METAMASK.CONNECT;
     this.signInWithMetamaskNewUser();
   }

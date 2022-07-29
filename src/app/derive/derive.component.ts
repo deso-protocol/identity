@@ -146,12 +146,6 @@ export class DeriveComponent implements OnInit {
       params.publicKeyBase58Check &&
       params.deleteKey === 'true' &&
       params.derivedPublicKey;
-    console.log({
-      pkAndSpendingLimits,
-      dkAndSpendingLimits,
-      pkDkAndSpendingLimits,
-      deleteDerivedKey,
-    });
     return !(
       pkAndSpendingLimits ||
       dkAndSpendingLimits ||

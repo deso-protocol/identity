@@ -10,13 +10,6 @@
           <app-arrow-toggle
             (click)="showDetails = !showDetails"
           ></app-arrow-toggle>
-          <!-- <img
-            src="assets/{{ showDetails ? 'down' : 'right' }}.png"
-            (click)="showDetails = !showDetails"
-            class="arrow"
-            width="25px"
-            height="25px"
-          /> -->
           {{ sectionTitle }}
         </div>
         <div class="fs-14px text-left">
@@ -171,7 +164,5 @@
       showDetails = !showAll;
       showAll = !showAll || getSectionMapLength() <= defaultNumShown
     "
-  >
-    <!-- {{ showAll ? "Hide" : "Show all" }} {{ getSectionMapLength() }} {{ sectionItemType() }}s -->
-  </div>
+  ></div>
 </div>

@@ -30,7 +30,6 @@ export class AvatarDirective implements OnChanges {
           )})`;
         } else {
           element.style.backgroundImage = `url( assets/placeholder-account-image.png)`;
-          console.log(this.el.nativeElement);
         }
       }
     );
