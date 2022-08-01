@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ethers } from 'ethers';
 import {
   BackendAPIService,
-  MetamaskSignInRequest,
-  MetamaskSignInResponse,
   TransactionSpendingLimitResponse,
 } from '../backend-api.service';
 import { LoginMethod, Network } from '../../types/identity';
@@ -34,16 +32,13 @@ enum METAMASK {
 })
 export class SignUpMetamaskComponent implements OnInit {
   private static UNLIMITED_DERIVED_KEY_EXPIRATION: Readonly<number> = 100000000000;
-  private static TIMER_START_TIME: Readonly<number> = 15;
   metamaskState: METAMASK = METAMASK.START;
   currentScreen: SCREEN = SCREEN.CREATE_ACCOUNT;
   timer: any;
   SCREEN = SCREEN;
   METAMASK = METAMASK;
-  timeoutTimer = SignUpMetamaskComponent.TIMER_START_TIME;
   publicKey = '';
   errorMessage = '';
-  warningMessage = '';
 
   constructor(
     private accountService: AccountService,
@@ -63,7 +58,6 @@ export class SignUpMetamaskComponent implements OnInit {
 
   launchMetamask(): void {
     this.errorMessage = '';
-    this.warningMessage = '';
     this.metamaskState = this.METAMASK.CONNECT;
     this.signInWithMetamaskNewUser();
   }
@@ -142,21 +136,25 @@ export class SignUpMetamaskComponent implements OnInit {
       this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
     const metamaskPublicKeyBase58Check =
       this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
-    await this.backendApi
-      .SendStarterDeSoForMetamaskAccount({
-        Signer: metamaskKeyPair.getPublic().encode('array', true),
-        AmountNanos: 1000,
-        Message: message,
-        Signature: [
-          ...Buffer.from(signature.slice(2, signature.length), 'hex'),
-        ],
-      })
-      .toPromise()
-      .catch((e) => {
-        this.warningMessage =
-          'Unable to send starter Deso, this is not an issue if you already have a Deso balance';
-        this.metamaskState = METAMASK.ERROR;
-      });
+    try {
+      await this.backendApi
+        .SendStarterDeSoForMetamaskAccount({
+          Signer: metamaskKeyPair.getPublic().encode('array', true),
+          AmountNanos: 1000,
+          Message: message,
+          Signature: [
+            ...Buffer.from(signature.slice(2, signature.length), 'hex'),
+          ],
+        })
+        .toPromise();
+    } catch (e) {
+      const err = (e as any)?.error?.error;
+      this.errorMessage =
+        err ||
+        'Unable to send starter Deso, this is not an issue if you already have a Deso balance';
+      this.metamaskState = METAMASK.ERROR;
+      return;
+    }
     // Slice the '0x' prefix from the signature.
     const accessSignature = signature.slice(2);
     // we now have all the arguments to generate an authorize derived key transaction
@@ -247,30 +245,11 @@ export class SignUpMetamaskComponent implements OnInit {
     return metamaskPublicKey;
   }
 
-  private startTimer(): void {
-    this.timer = setInterval(() => {
-      if (this.timeoutTimer === 0) {
-        this.login();
-        return;
-      }
-      this.timeoutTimer--;
-    }, 1000);
-  }
-
   public login(): void {
-    this.stopTimer();
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
       signedUp: false,
     });
-  }
-
-  public stopTimer(): void {
-    clearInterval(this.timer);
-    this.timeoutTimer = SignUpMetamaskComponent.TIMER_START_TIME;
-  }
-  public continue(): void {
-    this.stopTimer();
   }
 }
