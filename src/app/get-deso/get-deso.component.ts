@@ -131,9 +131,8 @@ export class GetDesoComponent implements OnInit {
   ////// FINISH FLOW ///////
   finishFlow(): void {
     if (this.globalVars.derive) {
-      this.identityService.derive({
-        publicKey: this.publicKeyAdded,
-      });
+      this.router.navigate(['/', RouteNames.DERIVE],
+        { queryParams: { publicKey: this.publicKeyAdded }, queryParamsHandling: 'merge' });
     } else {
       this.login();
     }

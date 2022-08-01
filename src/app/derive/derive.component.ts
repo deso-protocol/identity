@@ -106,19 +106,19 @@ export class DeriveComponent implements OnInit {
   }
 
   selectAccountAndDeriveKey(publicKey: string): void {
-    this.identityService.derive({
-      publicKey,
-      transactionSpendingLimitHex: this.transactionSpendingLimitHex,
-      expirationDays: this.expirationDays,
-    });
+    this.derive(publicKey);
   }
 
   approveDerivedKey(): void {
     if (!this.publicKeyBase58Check) {
       return;
     }
+    this.derive(this.publicKeyBase58Check);
+  }
+
+  derive(publicKey: string): void {
     this.identityService.derive({
-      publicKey: this.publicKeyBase58Check,
+      publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
       transactionSpendingLimitHex: this.transactionSpendingLimitHex,
       expirationDays: this.expirationDays,
