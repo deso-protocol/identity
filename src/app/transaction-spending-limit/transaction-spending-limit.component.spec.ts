@@ -8,9 +8,8 @@ describe('TransactionSpendingLimitComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TransactionSpendingLimitComponent ]
-    })
-    .compileComponents();
+      declarations: [TransactionSpendingLimitComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

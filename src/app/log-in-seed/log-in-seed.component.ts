@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {CryptoService} from '../crypto.service';
-import {EntropyService} from '../entropy.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {BackendAPIService} from '../backend-api.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { CryptoService } from '../crypto.service';
+import { EntropyService } from '../entropy.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { BackendAPIService } from '../backend-api.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import HDNode from 'hdkey';
-import {RouteNames} from '../app-routing.module';
+import { RouteNames } from '../app-routing.module';
 
 @Component({
   selector: 'app-log-in-seed',
   templateUrl: './log-in-seed.component.html',
-  styleUrls: ['./log-in-seed.component.scss']
+  styleUrls: ['./log-in-seed.component.scss'],
 })
 export class LogInSeedComponent implements OnInit {
   loading = false;
@@ -42,8 +42,7 @@ export class LogInSeedComponent implements OnInit {
     private activatedRoute: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   clickLoadAccount(): void {
     // Store mnemonic and extraText locally because we clear them below and otherwise
@@ -58,25 +57,46 @@ export class LogInSeedComponent implements OnInit {
     }
 
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
-    const keychainNonStandard = this.cryptoService.mnemonicToKeychain(mnemonic, extraText, true);
+    const keychainNonStandard = this.cryptoService.mnemonicToKeychain(
+      mnemonic,
+      extraText,
+      true
+    );
 
-    let userPublicKey = this.accountService.addUser(keychain, mnemonic, extraText, network);
+    let userPublicKey = this.accountService.addUser(
+      keychain,
+      mnemonic,
+      extraText,
+      network
+    );
 
     // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
     if (keychain.publicKey !== keychainNonStandard.publicKey) {
       const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
       const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-      const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, network);
+      const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+        privateKey,
+        network
+      );
 
       // We only want to add nonStandard derivations if the account is worth importing
-      this.backendApi.GetUsersStateless([publicKey]).subscribe(res => {
+      this.backendApi.GetUsersStateless([publicKey]).subscribe((res) => {
         if (!res.UserList.length) {
           return;
         }
         const user = res.UserList[0];
-        if (user.ProfileEntryResponse || user.BalanceNanos > 0 || user.UsersYouHODL?.length) {
+        if (
+          user.ProfileEntryResponse ||
+          user.BalanceNanos > 0 ||
+          user.UsersYouHODL?.length
+        ) {
           // Add the non-standard key if the user has a profile, a balance, or holdings
-          userPublicKey = this.accountService.addUser(keychainNonStandard, mnemonic, extraText, network);
+          userPublicKey = this.accountService.addUser(
+            keychainNonStandard,
+            mnemonic,
+            extraText,
+            network
+          );
         }
       });
     }
@@ -86,10 +106,14 @@ export class LogInSeedComponent implements OnInit {
     this.extraText = '';
 
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE],
-        { queryParams: { publicKey: userPublicKey }, queryParamsHandling: 'merge'});
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: { publicKey: userPublicKey },
+        queryParamsHandling: 'merge',
+      });
     } else {
-      this.router.navigate(['/', RouteNames.LOG_IN], {queryParamsHandling: 'merge'});
+      this.router.navigate(['/', RouteNames.LOG_IN], {
+        queryParamsHandling: 'merge',
+      });
     }
   }
 }

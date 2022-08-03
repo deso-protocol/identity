@@ -43,8 +43,7 @@ import { IconsModule } from './icons/icons.module';
 import { GetDesoComponent } from './get-deso/get-deso.component';
 import { BuyDeSoCompletePageComponent } from './buy-deso/buy-deso-complete-page/buy-deso-complete-page.component';
 import { BuyDesoPageComponent } from './buy-deso/buy-deso-page/buy-deso-page.component';
-import {BuyOrSendDesoComponent} from './buy-or-send-deso/buy-or-send-deso.component';
-
+import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.component';
 
 @NgModule({
   declarations: [
@@ -94,11 +93,7 @@ import {BuyOrSendDesoComponent} from './buy-or-send-deso/buy-or-send-deso.compon
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
   ],
-  providers: [
-    IdentityService,
-    EntropyService,
-    AccountService,
-  ],
-  bootstrap: [AppComponent]
+  providers: [IdentityService, EntropyService, AccountService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

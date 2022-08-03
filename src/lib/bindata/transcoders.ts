@@ -19,7 +19,7 @@ export const Uvarint64: Transcoder<number> = {
 };
 
 export const Boolean: Transcoder<boolean> = {
-  read: (bytes) => [(bytes.readUInt8(0) != 0), bytes.slice(1)],
+  read: (bytes) => [bytes.readUInt8(0) != 0, bytes.slice(1)],
   write: (bool) => {
     const result = Buffer.alloc(1);
     result.writeUInt8(bool ? 1 : 0, 0);
@@ -64,7 +64,12 @@ export const ChunkBuffer = (width: number): Transcoder<Buffer[]> => ({
   write: (chunks) => Buffer.concat([uvarint64ToBuf(chunks.length), ...chunks]),
 });
 
-export const ArrayOf = <T extends Serializable, C extends Deserializable<T> & ({ new(): T })>(klass: C): Transcoder<T[]> => ({
+export const ArrayOf = <
+  T extends Serializable,
+  C extends Deserializable<T> & { new (): T }
+>(
+  klass: C
+): Transcoder<T[]> => ({
   read: (bytes) => {
     let [count, buffer] = bufToUvarint64(bytes);
 
@@ -83,28 +88,41 @@ export const ArrayOf = <T extends Serializable, C extends Deserializable<T> & ({
   },
 });
 
-export const Record = <T extends Serializable, C extends Deserializable<T> & ({ new(): T })>(klass: C): Transcoder<T> => ({
+export const Record = <
+  T extends Serializable,
+  C extends Deserializable<T> & { new (): T }
+>(
+  klass: C
+): Transcoder<T> => ({
   read: (bytes) => klass.fromBytes(bytes),
   write: (object) => object.toBytes(),
 });
 
-export const Enum = <T extends Serializable, C extends Deserializable<T> & ({ new(): T })>(klassMap: {[index: string]: C}): Transcoder<T> => {
+export const Enum = <
+  T extends Serializable,
+  C extends Deserializable<T> & { new (): T }
+>(klassMap: {
+  [index: string]: C;
+}): Transcoder<T> => {
   const instanceToType = <T>(object: T): number => {
     for (let [key, value] of Object.entries(klassMap)) {
-      if(object instanceof value) return parseInt(key);
+      if (object instanceof value) return parseInt(key);
     }
     return -1;
   };
 
-  return ({
+  return {
     read: (bytes) => {
       let buffer = bytes;
       let type;
       [type, buffer] = bufToUvarint64(buffer);
-      let size
+      let size;
       [size, buffer] = bufToUvarint64(buffer);
 
-      return [klassMap[type].fromBytes(buffer.slice(0, size))[0], buffer.slice(size)];
+      return [
+        klassMap[type].fromBytes(buffer.slice(0, size))[0],
+        buffer.slice(size),
+      ];
     },
     write: (object) => {
       const type = uvarint64ToBuf(instanceToType(object));
@@ -113,5 +131,5 @@ export const Enum = <T extends Serializable, C extends Deserializable<T> & ({ ne
 
       return Buffer.concat([type, size, bytes]);
     },
-  });
+  };
 };

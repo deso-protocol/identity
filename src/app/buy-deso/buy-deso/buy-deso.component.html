@@ -8,7 +8,9 @@
       <div style="flex-grow: 1">
         <div class="disable-scrollbars" *ngIf="!waitingOnTxnConfirmation">
           <div
-            [ngClass]="{ 'mb-10px': activeTab === BuyDeSoComponent.BUY_WITH_BTC }"
+            [ngClass]="{
+              'mb-10px': activeTab === BuyDeSoComponent.BUY_WITH_BTC
+            }"
           >
             <tab-selector
               [buttonSelector]="false"
@@ -25,7 +27,9 @@
             <div *ngIf="buyWithBTCStep === 1">
               <!-- Step One Box -->
               <div class="mx-16px">
-                <div class="fs-17px fc-secondary font-weight-bold mt-20px mb-5px">
+                <div
+                  class="fs-17px fc-secondary font-weight-bold mt-20px mb-5px"
+                >
                   Step 1/2
                   <i
                     (click)="tooltip1.toggle()"
@@ -35,7 +39,9 @@
                     #tooltip1="matTooltip"
                   ></i>
                 </div>
-                <div class="d-flex justify-content-between fs-17px fc-secondary">
+                <div
+                  class="d-flex justify-content-between fs-17px fc-secondary"
+                >
                   <div>
                     Send Bitcoin to this address
                     <i
@@ -48,8 +54,14 @@
                   </div>
                   <div class="d-flex justify-content-end">
                     <div class="d-flex">
-                      <i-feather name="key" class="feather-large mr-5px"></i-feather>
-                      <span class="mr-8px creator-profile__ellipsis-restriction">{{ btcDepositAddress() }}</span>
+                      <i-feather
+                        name="key"
+                        class="feather-large mr-5px"
+                      ></i-feather>
+                      <span
+                        class="mr-8px creator-profile__ellipsis-restriction"
+                        >{{ btcDepositAddress() }}</span
+                      >
                     </div>
                     <div>
                       <i-feather
@@ -63,7 +75,8 @@
                         (click)="_copyPublicKey()"
                         class="fs-16px fc-blue cursor-pointer"
                         style="cursor: pointer"
-                      >Copy</a>
+                        >Copy</a
+                      >
                     </div>
                   </div>
                 </div>
@@ -78,21 +91,35 @@
                       container="body"
                       style="align-items: center"
                     >
-                      <div class="buy-deso__dropdown-btn">
-                        BTC
-                      </div>
+                      <div class="buy-deso__dropdown-btn">BTC</div>
                     </div>
                     <div class="position-relative w-100">
-                      <div class="buy-deso__input" style="border-radius: 0px 6px 6px 0px">
-                        {{ queryingBitcoinAPI ? "Loading..." : (latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(8) }}
+                      <div
+                        class="buy-deso__input"
+                        style="border-radius: 0px 6px 6px 0px"
+                      >
+                        {{
+                          queryingBitcoinAPI
+                            ? 'Loading...'
+                            : (
+                                latestBitcoinAPIResponse?.final_balance / 1e8
+                              ).toFixed(8)
+                        }}
                       </div>
-                      <span class="buy-deso__floating-span fc-muted" *ngIf="!queryingBitcoinAPI">
+                      <span
+                        class="buy-deso__floating-span fc-muted"
+                        *ngIf="!queryingBitcoinAPI"
+                      >
                         {{
                           globalVars.formatUSD(
-                            (latestBitcoinAPIResponse?.final_balance * usdPerBitcoinExchangeRate) / 1e8,
+                            (latestBitcoinAPIResponse?.final_balance *
+                              usdPerBitcoinExchangeRate) /
+                              1e8,
                             2
                           )
-                        }} USD</span>
+                        }}
+                        USD</span
+                      >
                     </div>
                   </div>
                   <a
@@ -109,10 +136,21 @@
                   </a>
                 </div>
                 <div class="mt-16px fc-muted">
-                  <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
+                  <i-feather
+                    name="info"
+                    class="feather-small position-relative"
+                    style="margin-top: -2px"
+                  ></i-feather>
                   <span class="buy-deso__sub-text">
                     Minimum deposit is currently
-                    {{ ((buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB * 0.3) / 1e8).toFixed(4) }} Bitcoin
+                    {{
+                      (
+                        (buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB *
+                          0.3) /
+                        1e8
+                      ).toFixed(4)
+                    }}
+                    Bitcoin
                     <i
                       (click)="tooltip3.toggle()"
                       class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon ml-2"
@@ -130,9 +168,14 @@
                   class="light-button fc-default font-weight-bold fs-17px"
                   style="width: 200px"
                 >
-                Go to the next step
+                  Go to the next step
                 </button>
-                <a class="fc-muted ml-25px cursor-pointer" style="cursor: pointer" (click)="cancelButtonClicked()">Cancel</a>
+                <a
+                  class="fc-muted ml-25px cursor-pointer"
+                  style="cursor: pointer"
+                  (click)="cancelButtonClicked()"
+                  >Cancel</a
+                >
               </div>
             </div>
             <div *ngIf="buyWithBTCStep === 2">
@@ -150,13 +193,18 @@
                     container="body"
                     style="align-items: center"
                   >
-                    <div class="buy-deso__dropdown-btn">
-                      BTC
-                    </div>
+                    <div class="buy-deso__dropdown-btn">BTC</div>
                   </div>
                   <div class="position-relative w-100">
-                    <div class="buy-deso__input" style="border-radius: 0px 6px 6px 0px">
-                      {{ (latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(8) }}
+                    <div
+                      class="buy-deso__input"
+                      style="border-radius: 0px 6px 6px 0px"
+                    >
+                      {{
+                        (latestBitcoinAPIResponse?.final_balance / 1e8).toFixed(
+                          8
+                        )
+                      }}
                     </div>
                   </div>
                 </div>
@@ -167,9 +215,7 @@
                     container="body"
                     style="align-items: center"
                   >
-                    <div class="buy-deso__dropdown-btn">
-                      $DESO
-                    </div>
+                    <div class="buy-deso__dropdown-btn">$DESO</div>
                   </div>
                   <div class="position-relative w-100">
                     <input
@@ -183,7 +229,11 @@
                       placeholder="0"
                     />
                     <span class="buy-deso__floating-span">
-                      <a class="fc-blue cursor-pointer" style="cursor: pointer" (click)="_clickMaxDeSo()">
+                      <a
+                        class="fc-blue cursor-pointer"
+                        style="cursor: pointer"
+                        (click)="_clickMaxDeSo()"
+                      >
                         Max
                       </a>
                     </span>
@@ -196,9 +246,7 @@
                     container="body"
                     style="align-items: center"
                   >
-                    <div class="buy-deso__dropdown-btn">
-                      BTC
-                    </div>
+                    <div class="buy-deso__dropdown-btn">BTC</div>
                   </div>
                   <div class="position-relative w-100">
                     <input
@@ -214,10 +262,12 @@
                   </div>
                 </div>
                 <div class="mt-16px fc-muted">
-                  <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
-                  <span class="buy-deso__sub-text">
-                    Bitcoin network fee
-                  </span>
+                  <i-feather
+                    name="info"
+                    class="feather-small position-relative"
+                    style="margin-top: -2px"
+                  ></i-feather>
+                  <span class="buy-deso__sub-text"> Bitcoin network fee </span>
                   <i
                     (click)="tooltip4.toggle()"
                     class="fas fa-info-circle fc-muted fs-15px global__tooltip-icon"
@@ -226,54 +276,81 @@
                     #tooltip4="matTooltip"
                   ></i>
                   <span class="mt-1 w-100 fs-15px">
-                    <span *ngIf="buyDeSoFields.error == null || buyDeSoFields.error === ''">
-                      {{ (_bitcoinTotalTransactionFeeSatoshisNumber() / 1e8).toFixed(8) }} Bitcoin ≈
+                    <span
+                      *ngIf="
+                        buyDeSoFields.error == null ||
+                        buyDeSoFields.error === ''
+                      "
+                    >
                       {{
-                      globalVars.formatUSD(
-                        (_bitcoinTotalTransactionFeeSatoshisNumber() * usdPerBitcoinExchangeRate) /
-                        1e8,
-                        2
-                      )
+                        (
+                          _bitcoinTotalTransactionFeeSatoshisNumber() / 1e8
+                        ).toFixed(8)
+                      }}
+                      Bitcoin ≈
+                      {{
+                        globalVars.formatUSD(
+                          (_bitcoinTotalTransactionFeeSatoshisNumber() *
+                            usdPerBitcoinExchangeRate) /
+                            1e8,
+                          2
+                        )
                       }}
                       USD
                     </span>
-                    <span *ngIf="buyDeSoFields.error != null && buyDeSoFields.error !== ''" style="margin-top: 0">
+                    <span
+                      *ngIf="
+                        buyDeSoFields.error != null &&
+                        buyDeSoFields.error !== ''
+                      "
+                      style="margin-top: 0"
+                    >
                       0.00000000 Bitcoin ≈ {{ globalVars.formatUSD(0, 2) }} USD
                     </span>
                   </span>
                 </div>
                 <div class="mt-16px fc-muted">
-                  <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
+                  <i-feather
+                    name="info"
+                    class="feather-small position-relative"
+                    style="margin-top: -2px"
+                  ></i-feather>
                   <span class="buy-deso__sub-text">
                     Total Bitcoin to swap
                   </span>
-                    <span class="mt-1 w-100 fs-15px">
-                      <span *ngIf="!buyDeSoFields.error">
-                        {{
+                  <span class="mt-1 w-100 fs-15px">
+                    <span *ngIf="!buyDeSoFields.error">
+                      {{
                         (
                           (_bitcoinToExchangeNumber() * 1e8 +
                             _bitcoinTotalTransactionFeeSatoshisNumber()) /
                           1e8
                         ).toFixed(8)
-                        }}
-                        Bitcoin ≈
-                        {{
+                      }}
+                      Bitcoin ≈
+                      {{
                         globalVars.formatUSD(
                           ((_bitcoinToExchangeNumber() * 1e8 +
-                              _bitcoinTotalTransactionFeeSatoshisNumber()) *
+                            _bitcoinTotalTransactionFeeSatoshisNumber()) *
                             usdPerBitcoinExchangeRate) /
-                          1e8,
+                            1e8,
                           2
                         )
-                        }}
-                        USD
-                      </span>
+                      }}
+                      USD
+                    </span>
                     <span *ngIf="buyDeSoFields.error" style="margin-top: 0">
                       0.00000000 Bitcoin ≈ {{ globalVars.formatUSD(0, 2) }} USD
                     </span>
                   </span>
                 </div>
-                <div *ngIf="buyDeSoFields.error != null && buyDeSoFields.error !== ''" class="mt-16px error-container" style="white-space: pre-line; color: red">
+                <div
+                  *ngIf="
+                    buyDeSoFields.error != null && buyDeSoFields.error !== ''
+                  "
+                  class="mt-16px error-container"
+                  style="white-space: pre-line; color: red"
+                >
                   <i
                     (click)="tooltip5.toggle()"
                     class="fas fa-info-circle fs-15px global__tooltip-icon"
@@ -287,8 +364,14 @@
               </div>
               <div class="border-bottom w-100"></div>
               <div class="m-16px">
-                <button class="primary-button" (click)="_clickBuyDeSo()">Buy $DESO</button>
-                <a class="fc-muted ml-25px cursor-pointer" (click)="buyWithBTCStep = 1">Back</a>
+                <button class="primary-button" (click)="_clickBuyDeSo()">
+                  Buy $DESO
+                </button>
+                <a
+                  class="fc-muted ml-25px cursor-pointer"
+                  (click)="buyWithBTCStep = 1"
+                  >Back</a
+                >
               </div>
             </div>
           </div>
@@ -318,7 +401,8 @@
             </div>
             <div>
               <div class="fc-secondary fs-15px text-center">
-                We are broadcasting your transaction to the blockchain. This can take up to a minute.
+                We are broadcasting your transaction to the blockchain. This can
+                take up to a minute.
               </div>
             </div>
           </div>
@@ -329,16 +413,17 @@
 
   <ng-template #showPublicKeyNotInIdentity>
     <div class="d-flex justify-content-center">
-      The public key provided was not found in identity and we cannot support buying DESO.
-      <br/>
-      <br/>
-      Please close this window and try again with a public key with which you are logged in.
+      The public key provided was not found in identity and we cannot support
+      buying DESO.
+      <br />
+      <br />
+      Please close this window and try again with a public key with which you
+      are logged in.
     </div>
     <div class="py-16px">
       <button type="button" class="styled-primary-button" (click)="goToLogin()">
         Login
       </button>
     </div>
-
   </ng-template>
 </div>

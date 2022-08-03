@@ -1,14 +1,25 @@
-<div
-  class="d-flex flex-column"
->
+<div class="d-flex flex-column">
   <div class="d-flex justify-content-between flex-grow-1">
     <div class="d-flex justify-content-start align-items-center">
-      <div class="avatar mr-15px" [appAvatar]="coinPublicKey" *ngIf="coinPublicKey"></div>
+      <div
+        class="avatar mr-15px"
+        [appAvatar]="coinPublicKey"
+        *ngIf="coinPublicKey"
+      ></div>
       <div
         class="d-block"
-        style="text-overflow: ellipsis; display: block; max-width: 200px; overflow: hidden;"
+        style="
+          text-overflow: ellipsis;
+          display: block;
+          max-width: 200px;
+          overflow: hidden;
+        "
       >
-        {{ coinPublicKey === "" ? "All Creators" : user?.ProfileEntryResponse?.Username || coinPublicKey }}
+        {{
+          coinPublicKey === ''
+            ? 'All Creators'
+            : user?.ProfileEntryResponse?.Username || coinPublicKey
+        }}
       </div>
       <!-- TODO: Add verified check -->
     </div>
@@ -16,14 +27,18 @@
       <div class="px-10px">
         {{ getOperationsString(coinOperationMap) }}
       </div>
-      <div (click)="expandCreator = !expandCreator" class="link" style="font-size: 14px !important;">
-        {{ expandCreator ? "Hide" : "Show" }}
+      <div
+        (click)="expandCreator = !expandCreator"
+        class="link"
+        style="font-size: 14px !important"
+      >
+        {{ expandCreator ? 'Hide' : 'Show' }}
       </div>
     </div>
   </div>
   <div
     class="d-flex flex-column p-15px m-15px"
-    style="background-color: lightgray; border: 1px solid gray;"
+    style="background-color: lightgray; border: 1px solid gray"
     *ngIf="expandCreator"
   >
     <div class="d-flex fs-14px justify-content-between">
@@ -34,7 +49,10 @@
       class="d-flex fs-18px justify-content-between py-10px"
       *ngFor="let opLimit of coinOperationMap | keyvalue; let ii = index"
       [ngStyle]="{
-      'border-bottom': ii < globalVars.ObjectKeyLength(coinOperationMap) - 1 ? '3px dotted darkgray' : 'none'
+        'border-bottom':
+          ii < globalVars.ObjectKeyLength(coinOperationMap) - 1
+            ? '3px dotted darkgray'
+            : 'none'
       }"
     >
       <div>{{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}</div>
