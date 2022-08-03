@@ -1,26 +1,24 @@
-import {Component, NgZone, OnInit} from '@angular/core';
-import {Subject} from 'rxjs';
-import {RouteNames} from '../../app-routing.module';
-import {AccountService} from '../../account.service';
-import {IdentityService} from '../../identity.service';
-import {CryptoService} from '../../crypto.service';
-import {EntropyService} from '../../entropy.service';
-import {GoogleDriveService} from '../../google-drive.service';
-import {GlobalVarsService} from '../../global-vars.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TextService} from '../../text.service';
-import {GoogleAuthState, PrivateUserInfo} from '../../../types/identity';
-import {environment} from '../../../environments/environment';
-import {BackendAPIService} from '../../backend-api.service';
-
+import { Component, NgZone, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { RouteNames } from '../../app-routing.module';
+import { AccountService } from '../../account.service';
+import { IdentityService } from '../../identity.service';
+import { CryptoService } from '../../crypto.service';
+import { EntropyService } from '../../entropy.service';
+import { GoogleDriveService } from '../../google-drive.service';
+import { GlobalVarsService } from '../../global-vars.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TextService } from '../../text.service';
+import { GoogleAuthState, PrivateUserInfo } from '../../../types/identity';
+import { environment } from '../../../environments/environment';
+import { BackendAPIService } from '../../backend-api.service';
 
 @Component({
   selector: 'app-google',
   templateUrl: './google.component.html',
-  styleUrls: ['./google.component.scss']
+  styleUrls: ['./google.component.scss'],
 })
 export class GoogleComponent implements OnInit {
-
   loading = true;
   seedCopied = false;
   publicKey = '';
@@ -39,8 +37,8 @@ export class GoogleComponent implements OnInit {
     private router: Router,
     private zone: NgZone,
     private route: ActivatedRoute,
-    private backendApi: BackendAPIService,
-  ) { }
+    private backendApi: BackendAPIService
+  ) {}
 
   copySeed(): void {
     this.textService.copyText(this.mnemonic);
@@ -65,7 +63,7 @@ export class GoogleComponent implements OnInit {
 
       this.googleDrive.setAccessToken(accessToken);
 
-      this.googleDrive.listFiles(this.fileName()).subscribe(res => {
+      this.googleDrive.listFiles(this.fileName()).subscribe((res) => {
         if (res.files.length > 0) {
           this.loadAccounts(res.files);
         } else {
@@ -80,14 +78,23 @@ export class GoogleComponent implements OnInit {
     let numLoaded = 0;
 
     for (const file of files) {
-      this.googleDrive.getFile(file.id).subscribe(fileContents => {
+      this.googleDrive.getFile(file.id).subscribe((fileContents) => {
         try {
           const mnemonic = fileContents.mnemonic;
           const extraText = fileContents.extraText;
           const network = fileContents.network;
-          const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+          const keychain = this.cryptoService.mnemonicToKeychain(
+            mnemonic,
+            extraText
+          );
 
-          this.publicKey = this.accountService.addUser(keychain, mnemonic, extraText, network, true);
+          this.publicKey = this.accountService.addUser(
+            keychain,
+            mnemonic,
+            extraText,
+            network,
+            true
+          );
         } catch (err) {
           console.error(err);
         }
@@ -105,7 +112,9 @@ export class GoogleComponent implements OnInit {
         this.finishFlow(false);
       } else {
         this.zone.run(() => {
-          this.router.navigate(['/', RouteNames.LOG_IN], { queryParamsHandling: 'merge' });
+          this.router.navigate(['/', RouteNames.LOG_IN], {
+            queryParamsHandling: 'merge',
+          });
         });
       }
     });
@@ -125,38 +134,61 @@ export class GoogleComponent implements OnInit {
       network,
     };
 
-    this.googleDrive.uploadFile(this.fileName(), JSON.stringify(userInfo)).subscribe(() => {
-      const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
-      this.publicKey = this.accountService.addUser(keychain, mnemonic, extraText, network, true);
-      this.loading = false;
-    });
+    this.googleDrive
+      .uploadFile(this.fileName(), JSON.stringify(userInfo))
+      .subscribe(() => {
+        const keychain = this.cryptoService.mnemonicToKeychain(
+          mnemonic,
+          extraText
+        );
+        this.publicKey = this.accountService.addUser(
+          keychain,
+          mnemonic,
+          extraText,
+          network,
+          true
+        );
+        this.loading = false;
+      });
   }
 
   finishFlow(signedUp: boolean): void {
     this.globalVars.signedUp = signedUp;
-    this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+    this.accountService.setAccessLevel(
+      this.publicKey,
+      this.globalVars.hostname,
+      this.globalVars.accessLevelRequest
+    );
 
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE],
-        { queryParams: { publicKey: this.publicKey }, queryParamsHandling: 'merge'});
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: { publicKey: this.publicKey },
+        queryParamsHandling: 'merge',
+      });
     } else {
       if (!this.globalVars.getFreeDeso) {
         this.login(signedUp);
       }
       if (!signedUp) {
-        this.backendApi.GetUsersStateless([this.publicKey], true, true, true).subscribe((res) => {
-          if (res?.UserList?.length) {
-            if (res.UserList[0].BalanceNanos !== 0) {
-              this.login(signedUp);
-              return;
+        this.backendApi
+          .GetUsersStateless([this.publicKey], true, true, true)
+          .subscribe((res) => {
+            if (res?.UserList?.length) {
+              if (res.UserList[0].BalanceNanos !== 0) {
+                this.login(signedUp);
+                return;
+              }
             }
-          }
-          this.router.navigate(['/', RouteNames.GET_DESO],
-            { queryParams: { publicKey: this.publicKey, signedUp, }, queryParamsHandling: 'merge'});
-        });
+            this.router.navigate(['/', RouteNames.GET_DESO], {
+              queryParams: { publicKey: this.publicKey, signedUp },
+              queryParamsHandling: 'merge',
+            });
+          });
       } else {
-        this.router.navigate(['/', RouteNames.GET_DESO],
-          { queryParams: { publicKey: this.publicKey, signedUp, }, queryParamsHandling: 'merge'});
+        this.router.navigate(['/', RouteNames.GET_DESO], {
+          queryParams: { publicKey: this.publicKey, signedUp },
+          queryParamsHandling: 'merge',
+        });
       }
     }
   }
@@ -174,7 +206,9 @@ export class GoogleComponent implements OnInit {
   }
 }
 
-export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAuthState => {
+export const getStateParamsFromGoogle = (
+  hashParams?: URLSearchParams
+): GoogleAuthState => {
   const defaultStateParams: GoogleAuthState = {
     webview: false,
     testnet: false,
@@ -187,7 +221,9 @@ export const getStateParamsFromGoogle = (hashParams?: URLSearchParams): GoogleAu
 
   try {
     const stateParamsString = hashParams?.get('state');
-    const stateParams: GoogleAuthState = stateParamsString ? JSON.parse(atob(stateParamsString)) : null;
+    const stateParams: GoogleAuthState = stateParamsString
+      ? JSON.parse(atob(stateParamsString))
+      : null;
     if (stateParams) {
       return stateParams;
     }

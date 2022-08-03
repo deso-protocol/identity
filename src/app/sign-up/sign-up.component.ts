@@ -1,21 +1,21 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {EntropyService} from '../entropy.service';
-import {CryptoService} from '../crypto.service';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {environment} from '../../environments/environment';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TextService} from '../text.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { EntropyService } from '../entropy.service';
+import { CryptoService } from '../crypto.service';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { environment } from '../../environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TextService } from '../text.service';
 import * as bip39 from 'bip39';
-import {RouteNames} from '../app-routing.module';
-import {BackendAPIService} from '../backend-api.service';
+import { RouteNames } from '../app-routing.module';
+import { BackendAPIService } from '../backend-api.service';
 import { Network } from 'src/types/identity';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.scss']
+  styleUrls: ['./sign-up.component.scss'],
 })
 export class SignUpComponent implements OnInit, OnDestroy {
   static STEP_GENERATE_SEED = 'step_generate_seed';
@@ -52,7 +52,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
-    private backendAPIService: BackendAPIService,
+    private backendAPIService: BackendAPIService
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
@@ -60,8 +60,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     // Set new entropy for the next time they go through the flow.
@@ -72,7 +71,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
   ////// STEP ONE BUTTONS | STEP_GENERATE_SEED ///////
 
   stepOneCopy(): void {
-    this.textService.copyText(this.entropyService.temporaryEntropy?.mnemonic || '');
+    this.textService.copyText(
+      this.entropyService.temporaryEntropy?.mnemonic || ''
+    );
     this.seedCopied = true;
   }
 
@@ -96,7 +97,11 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const y = window.outerHeight / 2 + window.screenY - h / 2;
     const x = window.outerWidth / 2 + window.screenX - w / 2;
 
-    window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    window.open(
+      `${environment.nodeURL}/tos`,
+      '',
+      `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`
+    );
   }
 
   ////// STEP TWO BUTTONS | STEP_VERIFY_SEED ///////
@@ -108,21 +113,31 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const extraText = this.extraTextCheck;
     const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
     this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    this.publicKeyAdded = this.accountService.addUser(keychain, mnemonic, extraText, network);
+    this.publicKeyAdded = this.accountService.addUser(
+      keychain,
+      mnemonic,
+      extraText,
+      network
+    );
 
     this.accountService.setAccessLevel(
-      this.publicKeyAdded, this.globalVars.hostname, this.globalVars.accessLevelRequest);
+      this.publicKeyAdded,
+      this.globalVars.hostname,
+      this.globalVars.accessLevelRequest
+    );
 
     if (this.globalVars.getFreeDeso) {
       this.globalVars.signedUp = true;
       this.router.navigate(['/', RouteNames.GET_DESO], {
-        queryParams: {publicKey: this.publicKeyAdded, signedUp: true },
-        queryParamsHandling: 'merge'});
+        queryParams: { publicKey: this.publicKeyAdded, signedUp: true },
+        queryParamsHandling: 'merge',
+      });
     } else if (this.globalVars.derive) {
       this.globalVars.signedUp = true;
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: {publicKey: this.publicKeyAdded, signedUp: true},
-        queryParamsHandling: 'merge'});
+        queryParams: { publicKey: this.publicKeyAdded, signedUp: true },
+        queryParamsHandling: 'merge',
+      });
     } else {
       this.identityService.login({
         users: this.accountService.getEncryptedUsers(),
@@ -141,25 +156,40 @@ export class SignUpComponent implements OnInit, OnDestroy {
   ////// ENTROPY //////
 
   checkMnemonic(): void {
-    this.showMnemonicError = !this.entropyService.isValidMnemonic(this.entropyService.temporaryEntropy.mnemonic);
-    if (this.showMnemonicError) { return; }
+    this.showMnemonicError = !this.entropyService.isValidMnemonic(
+      this.entropyService.temporaryEntropy.mnemonic
+    );
+    if (this.showMnemonicError) {
+      return;
+    }
 
     // Convert the mnemonic into new entropy hex.
-    const entropy = bip39.mnemonicToEntropy(this.entropyService.temporaryEntropy.mnemonic);
+    const entropy = bip39.mnemonicToEntropy(
+      this.entropyService.temporaryEntropy.mnemonic
+    );
     this.entropyService.temporaryEntropy.customEntropyHex = entropy.toString();
   }
 
   checkEntropyHex(): void {
-    this.showEntropyHexError = !this.entropyService.isValidCustomEntropyHex(this.entropyService.temporaryEntropy.customEntropyHex);
-    if (this.showEntropyHexError) { return; }
+    this.showEntropyHexError = !this.entropyService.isValidCustomEntropyHex(
+      this.entropyService.temporaryEntropy.customEntropyHex
+    );
+    if (this.showEntropyHexError) {
+      return;
+    }
 
     // Convert entropy into new mnemonic.
-    const entropy = new Buffer(this.entropyService.temporaryEntropy.customEntropyHex, 'hex');
-    this.entropyService.temporaryEntropy.mnemonic = bip39.entropyToMnemonic(entropy);
+    const entropy = new Buffer(
+      this.entropyService.temporaryEntropy.customEntropyHex,
+      'hex'
+    );
+    this.entropyService.temporaryEntropy.mnemonic =
+      bip39.entropyToMnemonic(entropy);
   }
 
   normalizeExtraText(): void {
-    this.entropyService.temporaryEntropy.extraText = this.entropyService.temporaryEntropy.extraText.normalize('NFKD');
+    this.entropyService.temporaryEntropy.extraText =
+      this.entropyService.temporaryEntropy.extraText.normalize('NFKD');
   }
 
   hasEntropyError(): boolean {

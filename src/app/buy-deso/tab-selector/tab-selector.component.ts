@@ -15,16 +15,16 @@ export class TabSelectorComponent {
   @Input() buttonSelector = true;
   @Input() deadTabs: Set<string> = new Set(); // A set of tabs that can't be clicked.
 
-  constructor(
-    public globalVars: GlobalVarsService
-  ) {}
+  constructor(public globalVars: GlobalVarsService) {}
 
   _tabClicked(tab: string): void {
     if (tab in this.linkTabs) {
       window.open(this.linkTabs[tab], '_blank');
     } else {
       this.tabClick.emit(tab);
-      if (this.deadTabs.has(tab)) {return;}
+      if (this.deadTabs.has(tab)) {
+        return;
+      }
       this.activeTab = tab;
     }
   }

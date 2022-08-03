@@ -12,43 +12,53 @@
         <a
           (click)="showDetails = !showDetails"
           class="link"
-          style="font-size: 18px !important;"
-        >{{ showDetails ? "Hide" : "Show" }}
+          style="font-size: 18px !important"
+          >{{ showDetails ? 'Hide' : 'Show' }}
         </a>
       </div>
     </div>
 
-    <div
-      class="d-flex flex-column pt-15px"
-      *ngIf="showDetails"
-    >
+    <div class="d-flex flex-column pt-15px" *ngIf="showDetails">
       <ng-container
-        *ngIf="sectionTitle === TransactionSpendingLimitComponent.TransactionLimitsSection">
-        <div
-          class="d-flex justify-content-between fs-14px py-5px"
-        >
+        *ngIf="
+          sectionTitle ===
+          TransactionSpendingLimitComponent.TransactionLimitsSection
+        "
+      >
+        <div class="d-flex justify-content-between fs-14px py-5px">
           <div>Txn Type</div>
           <div>Txn Limit</div>
         </div>
         <div
           *ngFor="
-          let txnLimitItem of txnLimitMap |
-            keyvalue |
-            slice:0:(showAll ? globalVars.ObjectKeyLength(sectionMap) : defaultNumShown) "
-          style="border-top: 1px dotted grey;"
+            let txnLimitItem of txnLimitMap
+              | keyvalue
+              | slice
+                : 0
+                : (showAll
+                    ? globalVars.ObjectKeyLength(sectionMap)
+                    : defaultNumShown)
+          "
+          style="border-top: 1px dotted grey"
           class="d-flex justify-content-between py-5px"
         >
-          <div>{{ globalVars.cleanSpendingLimitOperationName(txnLimitItem.key) }}</div>
+          <div>
+            {{ globalVars.cleanSpendingLimitOperationName(txnLimitItem.key) }}
+          </div>
           <div>{{ txnLimitItem.value }}</div>
         </div>
       </ng-container>
       <ng-container
-        *ngIf="sectionTitle === TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
-        sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitsSection"
+        *ngIf="
+          sectionTitle ===
+            TransactionSpendingLimitComponent.CreatorCoinLimitsSection ||
+          sectionTitle ===
+            TransactionSpendingLimitComponent.DAOCoinLimitsSection
+        "
       >
         <div
           *ngIf="anyCreatorItem"
-          style="border: 2px solid goldenrod; border-radius: 5px;"
+          style="border: 2px solid goldenrod; border-radius: 5px"
           class="mb-15px px-5px py-15px"
         >
           <app-transaction-spending-limit-coin
@@ -58,9 +68,14 @@
         </div>
         <div
           *ngFor="
-          let coinLimitItem of coinLimitMap |
-            keyvalue |
-            slice:0:(showAll ? globalVars.ObjectKeyLength(sectionMap) : defaultNumShown) "
+            let coinLimitItem of coinLimitMap
+              | keyvalue
+              | slice
+                : 0
+                : (showAll
+                    ? globalVars.ObjectKeyLength(sectionMap)
+                    : defaultNumShown)
+          "
           class="d-flex flex-column pb-15px"
         >
           <app-transaction-spending-limit-coin
@@ -72,10 +87,13 @@
         </div>
       </ng-container>
       <ng-container
-        *ngIf="sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection">
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection
+        "
+      >
         <div
           *ngIf="anyNFTItem"
-          style="border: 2px solid goldenrod; border-radius: 5px;"
+          style="border: 2px solid goldenrod; border-radius: 5px"
           class="mb-15px px-5px py-15px"
         >
           <app-transaction-spending-limit-nft
@@ -85,10 +103,15 @@
         </div>
         <div
           *ngFor="
-          let nftLimitItem of nftLimitMap |
-            keyvalue |
-            slice:0:(showAll ? globalVars.ObjectKeyLength(sectionMap) : defaultNumShown);
-          let ii = index "
+            let nftLimitItem of nftLimitMap
+              | keyvalue
+              | slice
+                : 0
+                : (showAll
+                    ? globalVars.ObjectKeyLength(sectionMap)
+                    : defaultNumShown);
+            let ii = index
+          "
           class="d-flex flex-column pb-15px"
         >
           <app-transaction-spending-limit-nft
@@ -98,28 +121,37 @@
           ></app-transaction-spending-limit-nft>
           <div
             class="flex-grow-1 transaction-spending-limit-separator"
-            *ngIf="ii < (showAll ? globalVars.ObjectKeyLength(sectionMap) : defaultNumShown) -1 "
+            *ngIf="
+              ii <
+              (showAll
+                ? globalVars.ObjectKeyLength(sectionMap)
+                : defaultNumShown) -
+                1
+            "
           ></div>
         </div>
-
       </ng-container>
       <ng-container
-        *ngIf="sectionTitle === TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection">
+        *ngIf="
+          sectionTitle ===
+          TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
+        "
+      >
         <div class="d-flex pb-10px">
-          <div class="col-5">
-            Buying
-          </div>
-          <div class="col-5">
-            Selling
-          </div>
-          <div class="col-2">
-            Count
-          </div>
+          <div class="col-5">Buying</div>
+          <div class="col-5">Selling</div>
+          <div class="col-2">Count</div>
         </div>
-        <div *ngFor="
-        let daoCoinLimitOrderLimitItem of daoCoinLimitOrderLimitItems |
-          slice:0:(showAll ? daoCoinLimitOrderLimitItems.length : defaultNumShown)"
-             class="d-flex flex-column pb-15px"
+        <div
+          *ngFor="
+            let daoCoinLimitOrderLimitItem of daoCoinLimitOrderLimitItems
+              | slice
+                : 0
+                : (showAll
+                    ? daoCoinLimitOrderLimitItems.length
+                    : defaultNumShown)
+          "
+          class="d-flex flex-column pb-15px"
         >
           <app-transaction-spending-limit-dao-coin-limit-order
             [daoCoinLimitOrderLimitItem]="daoCoinLimitOrderLimitItem"
@@ -134,9 +166,17 @@
   <div
     *ngIf="showDetails"
     class="d-flex justify-content-center mr-15px ml-15px"
-    style="background: lightgray; border: 1px solid darkgray; border-radius: 2px"
-    (click)="showDetails = !showAll; showAll = !showAll || getSectionMapLength() <= defaultNumShown;"
+    style="
+      background: lightgray;
+      border: 1px solid darkgray;
+      border-radius: 2px;
+    "
+    (click)="
+      showDetails = !showAll;
+      showAll = !showAll || getSectionMapLength() <= defaultNumShown
+    "
   >
-    {{ showAll ? "Hide" : "Show all" }} {{ getSectionMapLength() }} {{ sectionItemType() }}s
+    {{ showAll ? 'Hide' : 'Show all' }} {{ getSectionMapLength() }}
+    {{ sectionItemType() }}s
   </div>
 </ng-container>

@@ -1,24 +1,23 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {EntropyService} from '../entropy.service';
-import {CryptoService} from '../crypto.service';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {environment} from '../../environments/environment';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TextService} from '../text.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { EntropyService } from '../entropy.service';
+import { CryptoService } from '../crypto.service';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { environment } from '../../environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TextService } from '../text.service';
 import * as bip39 from 'bip39';
-import {RouteNames} from '../app-routing.module';
-import {BackendAPIService} from '../backend-api.service';
+import { RouteNames } from '../app-routing.module';
+import { BackendAPIService } from '../backend-api.service';
 import { Network } from 'src/types/identity';
 
 @Component({
   selector: 'app-buy-or-send-deso',
   templateUrl: './buy-or-send-deso.component.html',
-  styleUrls: ['./buy-or-send-deso.component.scss']
+  styleUrls: ['./buy-or-send-deso.component.scss'],
 })
 export class BuyOrSendDesoComponent implements OnInit {
-
   Network = Network;
   publicKeyAdded = '';
 
@@ -42,7 +41,7 @@ export class BuyOrSendDesoComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
-    private backendAPIService: BackendAPIService,
+    private backendAPIService: BackendAPIService
   ) {
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       if (queryParams.publicKey) {
@@ -51,13 +50,14 @@ export class BuyOrSendDesoComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
 
   stepFiveNextBuy(): void {
-    this.router.navigate(['/', RouteNames.BUY_DESO], { queryParamsHandling: 'merge'});
+    this.router.navigate(['/', RouteNames.BUY_DESO], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   _copyPublicKey(): void {
@@ -75,8 +75,9 @@ export class BuyOrSendDesoComponent implements OnInit {
     this.refreshBalanceCooldown = true;
     this.refreshBalanceRetryTime = 30;
 
-    this.backendAPIService.GetUsersStateless([this.publicKeyAdded], false)
-      .subscribe( res => {
+    this.backendAPIService
+      .GetUsersStateless([this.publicKeyAdded], false)
+      .subscribe((res) => {
         if (!res.UserList.length) {
           return;
         }
@@ -102,13 +103,13 @@ export class BuyOrSendDesoComponent implements OnInit {
 
   ////// STEP SIX BUTTONS | STEP_BUY_DESO ///////
 
-
-
   ////// FINISH FLOW ///////
   finishFlow(): void {
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE],
-        { queryParams: { publicKey: this.publicKeyAdded }, queryParamsHandling: 'merge' });
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: { publicKey: this.publicKeyAdded },
+        queryParamsHandling: 'merge',
+      });
     } else {
       this.login();
     }
@@ -123,6 +124,8 @@ export class BuyOrSendDesoComponent implements OnInit {
   }
 
   cancelButtonClicked(): void {
-    this.router.navigate(['/', RouteNames.GET_DESO], { queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.GET_DESO], {
+      queryParamsHandling: 'merge',
+    });
   }
 }

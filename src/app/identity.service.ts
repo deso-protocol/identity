@@ -1,14 +1,17 @@
-import {Injectable} from '@angular/core';
-import {Observable, of, Subject, zip} from 'rxjs';
-import {v4 as uuid} from 'uuid';
-import {AccessLevel, PublicUserInfo} from '../types/identity';
-import {CryptoService} from './crypto.service';
-import {GlobalVarsService} from './global-vars.service';
-import {CookieService} from 'ngx-cookie';
-import {SigningService} from './signing.service';
-import {HttpParams} from '@angular/common/http';
-import {BackendAPIService, TransactionSpendingLimitResponse} from './backend-api.service';
-import {AccountService} from './account.service';
+import { Injectable } from '@angular/core';
+import { Observable, of, Subject, zip } from 'rxjs';
+import { v4 as uuid } from 'uuid';
+import { AccessLevel, PublicUserInfo } from '../types/identity';
+import { CryptoService } from './crypto.service';
+import { GlobalVarsService } from './global-vars.service';
+import { CookieService } from 'ngx-cookie';
+import { SigningService } from './signing.service';
+import { HttpParams } from '@angular/common/http';
+import {
+  BackendAPIService,
+  TransactionSpendingLimitResponse,
+} from './backend-api.service';
+import { AccountService } from './account.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -44,11 +47,11 @@ export type DerivePayload = {
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class IdentityService {
   // All outbound request promises we still need to resolve
-  private outboundRequests: {[key: string]: any} = {};
+  private outboundRequests: { [key: string]: any } = {};
 
   // Opener can be null, parent is never null
   private currentWindow = opener || parent;
@@ -62,7 +65,7 @@ export class IdentityService {
     private cookieService: CookieService,
     private signingService: SigningService,
     private accountService: AccountService,
-    private backendApi: BackendAPIService,
+    private backendApi: BackendAPIService
   ) {
     window.addEventListener('message', (event) => this.handleMessage(event));
   }
@@ -78,12 +81,12 @@ export class IdentityService {
   }
 
   login(payload: {
-    users: {[key: string]: PublicUserInfo},
-    publicKeyAdded?: string,
-    signedUp?: boolean
-    signedTransactionHex?: string,
-    jumioSuccess?: boolean,
-    phoneNumberSuccess?: boolean,
+    users: { [key: string]: PublicUserInfo };
+    publicKeyAdded?: string;
+    signedUp?: boolean;
+    signedTransactionHex?: string;
+    jumioSuccess?: boolean;
+    phoneNumberSuccess?: boolean;
   }): void {
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
@@ -93,17 +96,23 @@ export class IdentityService {
           httpParams = httpParams.append(key, (payload as any)[key].toString());
         }
       }
-      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+      window.location.href =
+        this.globalVars.callback + `?${httpParams.toString()}`;
     } else {
       this.cast('login', payload);
     }
   }
 
   derive(payload: DerivePayload): void {
-      this.backendApi.GetAppState().subscribe( (res) => {
+    this.backendApi.GetAppState().subscribe((res) => {
       const blockHeight = res.BlockHeight;
       const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
-        payload.publicKey, blockHeight, payload.transactionSpendingLimitHex, payload.derivedPublicKey, payload.expirationDays);
+        payload.publicKey,
+        blockHeight,
+        payload.transactionSpendingLimitHex,
+        payload.derivedPublicKey,
+        payload.expirationDays
+      );
       if (this.globalVars.callback) {
         // If callback is passed, we redirect to it with payload as URL parameters.
         let httpParams = new HttpParams();
@@ -115,7 +124,8 @@ export class IdentityService {
             }
           }
         }
-        window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+        window.location.href =
+          this.globalVars.callback + `?${httpParams.toString()}`;
       } else {
         this.cast('derive', derivedPrivateUserInfo);
       }
@@ -129,9 +139,18 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedHashes = this.signingService.signHashes(seedHex, unsignedHashes);
+    const {
+      id,
+      payload: { encryptedSeedHex, unsignedHashes },
+    } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const signedHashes = this.signingService.signHashes(
+      seedHex,
+      unsignedHashes
+    );
 
     this.respond(id, {
       signedHashes,
@@ -143,9 +162,18 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, unsignedHashes } } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signatures = this.signingService.signHashesETH(seedHex, unsignedHashes);
+    const {
+      id,
+      payload: { encryptedSeedHex, unsignedHashes },
+    } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const signatures = this.signingService.signHashesETH(
+      seedHex,
+      unsignedHashes
+    );
 
     this.respond(id, {
       signatures,
@@ -153,7 +181,10 @@ export class IdentityService {
   }
 
   private handleSign(data: any): void {
-    const { id, payload: { encryptedSeedHex, transactionHex } } = data;
+    const {
+      id,
+      payload: { encryptedSeedHex, transactionHex },
+    } = data;
 
     // This will tell us whether we need full signing access or just ApproveLarge
     // level of access.
@@ -175,8 +206,14 @@ export class IdentityService {
       return;
     }
 
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    const signedTransactionHex = this.signingService.signTransaction(seedHex, transactionHex);
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const signedTransactionHex = this.signingService.signTransaction(
+      seedHex,
+      transactionHex
+    );
 
     this.respond(id, {
       signedTransactionHex,
@@ -184,19 +221,35 @@ export class IdentityService {
   }
 
   // Encrypt with shared secret
-  private handleEncrypt(data: any): void{
-    if (!this.approve(data, AccessLevel.ApproveAll)){
+  private handleEncrypt(data: any): void {
+    if (!this.approve(data, AccessLevel.ApproveAll)) {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex, senderGroupKeyName, recipientPublicKey, message} } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const {
+      id,
+      payload: {
+        encryptedSeedHex,
+        senderGroupKeyName,
+        recipientPublicKey,
+        message,
+      },
+    } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
 
     // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
     // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
     // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
     // senderGroupKeyName parameter.
-    const encryptedMessage = this.signingService.encryptMessage(seedHex, senderGroupKeyName, recipientPublicKey, message);
+    const encryptedMessage = this.signingService.encryptMessage(
+      seedHex,
+      senderGroupKeyName,
+      recipientPublicKey,
+      message
+    );
     this.respond(id, encryptedMessage);
   }
 
@@ -205,22 +258,31 @@ export class IdentityService {
       return;
     }
 
-    const seedHex = this.cryptoService.decryptSeedHex(data.payload.encryptedSeedHex, this.globalVars.hostname);
+    const seedHex = this.cryptoService.decryptSeedHex(
+      data.payload.encryptedSeedHex,
+      this.globalVars.hostname
+    );
     const id = data.id;
 
     let decryptedHexes;
-    if (data.payload.encryptedHexes){
+    if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      decryptedHexes = this.signingService.decryptMessagesLegacy(seedHex, encryptedHexes);
+      decryptedHexes = this.signingService.decryptMessagesLegacy(
+        seedHex,
+        encryptedHexes
+      );
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      decryptedHexes = this.signingService.decryptMessages(seedHex, encryptedMessages);
+      decryptedHexes = this.signingService.decryptMessages(
+        seedHex,
+        encryptedMessages
+      );
     }
 
     this.respond(id, {
-      decryptedHexes
+      decryptedHexes,
     });
   }
 
@@ -229,12 +291,18 @@ export class IdentityService {
       return;
     }
 
-    const { id, payload: { encryptedSeedHex } } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
+    const {
+      id,
+      payload: { encryptedSeedHex },
+    } = data;
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
     const jwt = this.signingService.signJWT(seedHex);
 
     this.respond(id, {
-      jwt
+      jwt,
     });
   }
 
@@ -267,7 +335,6 @@ export class IdentityService {
       browserSupported: this.browserSupported,
     });
   }
-
 
   // Access levels
 
@@ -308,18 +375,29 @@ export class IdentityService {
   }
 
   private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
-    const { payload: { encryptedSeedHex, accessLevel, accessLevelHmac }} = data;
+    const {
+      payload: { encryptedSeedHex, accessLevel, accessLevelHmac },
+    } = data;
     if (accessLevel < requiredAccessLevel) {
       return false;
     }
 
-    const seedHex = this.cryptoService.decryptSeedHex(encryptedSeedHex, this.globalVars.hostname);
-    return this.cryptoService.validAccessLevelHmac(accessLevel, seedHex, accessLevelHmac);
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    return this.cryptoService.validAccessLevelHmac(
+      accessLevel,
+      seedHex,
+      accessLevelHmac
+    );
   }
 
   // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
   private approveSpending(data: any): boolean {
-    const { payload: { accessLevel, transactionHex }} = data;
+    const {
+      payload: { accessLevel, transactionHex },
+    } = data;
 
     // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
     // attempt sending $DESO to a non-owner public key. If it does, we respond with approvalRequired.
@@ -327,8 +405,11 @@ export class IdentityService {
       const txBytes = new Buffer(transactionHex, 'hex');
       const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
       for (const output of transaction.outputs) {
-        if (output.publicKey.toString('hex') !== transaction.publicKey.toString('hex')) {
-          this.respond(data.id, {approvalRequired: true});
+        if (
+          output.publicKey.toString('hex') !==
+          transaction.publicKey.toString('hex')
+        ) {
+          this.respond(data.id, { approvalRequired: true });
           return false;
         }
       }
@@ -338,7 +419,9 @@ export class IdentityService {
 
   private approve(data: any, accessLevel: AccessLevel): boolean {
     const hasAccess = this.hasAccessLevel(data, accessLevel);
-    const hasEncryptionKey = this.cryptoService.hasSeedHexEncryptionKey(this.globalVars.hostname);
+    const hasEncryptionKey = this.cryptoService.hasSeedHexEncryptionKey(
+      this.globalVars.hostname
+    );
 
     if (!hasAccess || !hasEncryptionKey) {
       this.respond(data.id, { approvalRequired: true });
@@ -354,7 +437,9 @@ export class IdentityService {
     const { data } = event;
     const { service, method } = data;
 
-    if (service !== 'identity') { return; }
+    if (service !== 'identity') {
+      return;
+    }
 
     // Methods are present on incoming requests but not responses
     if (method) {
@@ -370,7 +455,7 @@ export class IdentityService {
 
     if (method === 'burn') {
       this.handleBurn(data);
-    } else if (method === 'encrypt'){
+    } else if (method === 'encrypt') {
       this.handleEncrypt(data);
     } else if (method === 'decrypt') {
       this.handleDecrypt(data);
@@ -389,7 +474,10 @@ export class IdentityService {
   }
 
   private handleResponse(event: MessageEvent): void {
-    const { data: { id, payload }, origin } = event;
+    const {
+      data: { id, payload },
+      origin,
+    } = event;
     const hostname = new URL(origin).hostname;
     const result = {
       id,
@@ -424,7 +512,7 @@ export class IdentityService {
     this.postMessage({
       id,
       service: 'identity',
-      payload
+      payload,
     });
   }
 
@@ -441,21 +529,43 @@ export class IdentityService {
   // Post message to correct client
   private postMessage(message: any): void {
     if (this.globalVars.webview) {
-      if (this.currentWindow.webkit?.messageHandlers?.desoIdentityAppInterface !== undefined) {
+      if (
+        this.currentWindow.webkit?.messageHandlers?.desoIdentityAppInterface !==
+        undefined
+      ) {
         // iOS Webview with registered "desoIdentityAppInterface" handler
-        this.currentWindow.webkit.messageHandlers.desoIdentityAppInterface.postMessage(message, '*');
+        this.currentWindow.webkit.messageHandlers.desoIdentityAppInterface.postMessage(
+          message,
+          '*'
+        );
       } else if (this.currentWindow.desoIdentityAppInterface !== undefined) {
         // Android Webview with registered "desoIdentityAppInterface" handler
-        this.currentWindow.desoIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+        this.currentWindow.desoIdentityAppInterface.postMessage(
+          JSON.stringify(message),
+          '*'
+        );
       } else if (this.currentWindow.ReactNativeWebView !== undefined) {
         // React Native Webview with registered "ReactNativeWebView" handler
-        this.currentWindow.ReactNativeWebView.postMessage(JSON.stringify(message));
-      } else if (this.currentWindow.webkit?.messageHandlers?.bitcloutIdentityAppInterface !== undefined) {
+        this.currentWindow.ReactNativeWebView.postMessage(
+          JSON.stringify(message)
+        );
+      } else if (
+        this.currentWindow.webkit?.messageHandlers
+          ?.bitcloutIdentityAppInterface !== undefined
+      ) {
         // DEPRECATED: iOS Webview with registered "bitcloutIdentityAppInterface" handler
-        this.currentWindow.webkit.messageHandlers.bitcloutIdentityAppInterface.postMessage(message, '*');
-      } else if (this.currentWindow.bitcloutIdentityAppInterface !== undefined) {
+        this.currentWindow.webkit.messageHandlers.bitcloutIdentityAppInterface.postMessage(
+          message,
+          '*'
+        );
+      } else if (
+        this.currentWindow.bitcloutIdentityAppInterface !== undefined
+      ) {
         // DEPRECATED: Android Webview with registered "bitcloutIdentityAppInterface" handler
-        this.currentWindow.bitcloutIdentityAppInterface.postMessage(JSON.stringify(message), '*');
+        this.currentWindow.bitcloutIdentityAppInterface.postMessage(
+          JSON.stringify(message),
+          '*'
+        );
       }
     } else {
       this.currentWindow.postMessage(message, '*');

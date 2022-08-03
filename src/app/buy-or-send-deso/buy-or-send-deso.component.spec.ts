@@ -8,9 +8,8 @@ describe('SignUpComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BuyOrSendDesoComponent ]
-    })
-    .compileComponents();
+      declarations: [BuyOrSendDesoComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

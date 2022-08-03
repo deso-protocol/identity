@@ -1,21 +1,21 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {EntropyService} from '../entropy.service';
-import {CryptoService} from '../crypto.service';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {environment} from '../../environments/environment';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TextService} from '../text.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { EntropyService } from '../entropy.service';
+import { CryptoService } from '../crypto.service';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { environment } from '../../environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TextService } from '../text.service';
 import * as bip39 from 'bip39';
-import {RouteNames} from '../app-routing.module';
-import {BackendAPIService} from '../backend-api.service';
+import { RouteNames } from '../app-routing.module';
+import { BackendAPIService } from '../backend-api.service';
 import { Network } from 'src/types/identity';
 
 @Component({
   selector: 'app-get-deso',
   templateUrl: './get-deso.component.html',
-  styleUrls: ['./get-deso.component.scss']
+  styleUrls: ['./get-deso.component.scss'],
 })
 export class GetDesoComponent implements OnInit {
   static STEP_GET_STARTER_DESO = 'step_get_starter_deso';
@@ -49,7 +49,7 @@ export class GetDesoComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
-    private backendAPIService: BackendAPIService,
+    private backendAPIService: BackendAPIService
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
@@ -62,8 +62,7 @@ export class GetDesoComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   clickTos(): void {
     const h = 700;
@@ -71,25 +70,34 @@ export class GetDesoComponent implements OnInit {
     const y = window.outerHeight / 2 + window.screenY - h / 2;
     const x = window.outerWidth / 2 + window.screenX - w / 2;
 
-    window.open(`${environment.nodeURL}/tos`, '', `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    window.open(
+      `${environment.nodeURL}/tos`,
+      '',
+      `toolbar=no, width=${w}, height=${h}, top=${y}, left=${x}`
+    );
   }
-
 
   ////// STEP THREE BUTTONS | STEP_GET_STARTER_DESO ///////
 
   stepThreeNextPhone(): void {
-    this.router.navigate(['/', RouteNames.VERIFY_PHONE_NUMBER], { queryParams: { public_key: this.publicKeyAdded }, queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.VERIFY_PHONE_NUMBER], {
+      queryParams: { public_key: this.publicKeyAdded },
+      queryParamsHandling: 'merge',
+    });
   }
 
-
   stepThreeNextBuy(): void {
-    this.router.navigate(['/', RouteNames.BUY_OR_SEND_DESO], { queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.BUY_OR_SEND_DESO], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
 
   stepFiveNextBuy(): void {
-    this.router.navigate(['/', RouteNames.BUY_DESO], { queryParamsHandling: 'merge'});
+    this.router.navigate(['/', RouteNames.BUY_DESO], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   _copyPublicKey(): void {
@@ -107,8 +115,9 @@ export class GetDesoComponent implements OnInit {
     this.refreshBalanceCooldown = true;
     this.refreshBalanceRetryTime = 30;
 
-    this.backendAPIService.GetUsersStateless([this.publicKeyAdded], false)
-      .subscribe( res => {
+    this.backendAPIService
+      .GetUsersStateless([this.publicKeyAdded], false)
+      .subscribe((res) => {
         if (!res.UserList.length) {
           return;
         }
@@ -131,8 +140,10 @@ export class GetDesoComponent implements OnInit {
   ////// FINISH FLOW ///////
   finishFlow(): void {
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE],
-        { queryParams: { publicKey: this.publicKeyAdded }, queryParamsHandling: 'merge' });
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: { publicKey: this.publicKeyAdded },
+        queryParamsHandling: 'merge',
+      });
     } else {
       this.login();
     }

@@ -8,4 +8,4 @@ export const SingleNft = `<svg width="92" height="92" viewBox="0 0 92 92" fill="
 <rect x="21" y="10" width="24" height="4" rx="2" fill="#E4EBEB" fill-opacity="0.5" stroke-width="0"/>
 <rect x="0.6" y="0.6" width="90.8" height="90.8" rx="4.4" stroke-width="0.5"/>
 </svg>
-`
+`;

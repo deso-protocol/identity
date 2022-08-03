@@ -1,6 +1,9 @@
 <app-banner></app-banner>
 
-<div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
+<div
+  class="page-container"
+  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback"
+>
   <!-- Step 1 -->
   <!-- Generate seed phrase. -->
   <div *ngIf="stepScreen === SignUpComponent.STEP_GENERATE_SEED">
@@ -8,123 +11,207 @@
       <div class="title-text">Store your DeSo seed phrase</div>
       <div class="step-title">Step 1 of {{ stepTotal }}</div>
     </div>
-    <div class="subtitle-text">Write, download, print, or copy it somewhere safe.</div>
-    <div class="warning-text">If you lose your DeSo seed phrase your account will be lost forever.</div>
+    <div class="subtitle-text">
+      Write, download, print, or copy it somewhere safe.
+    </div>
+    <div class="warning-text">
+      If you lose your DeSo seed phrase your account will be lost forever.
+    </div>
     <div class="seed-phrase-container">
-      <div *ngIf="!entropyService.advancedOpen" class="px-25px pt-10px pb-30px border-bottom">{{
-        entropyService.temporaryEntropy.mnemonic }}
+      <div
+        *ngIf="!entropyService.advancedOpen"
+        class="px-25px pt-10px pb-30px border-bottom"
+      >
+        {{ entropyService.temporaryEntropy.mnemonic }}
       </div>
-      <div class="fc-red px-15px pt-15px" *ngIf="!entropyService.advancedOpen && hasEntropyError()">
+      <div
+        class="fc-red px-15px pt-15px"
+        *ngIf="!entropyService.advancedOpen && hasEntropyError()"
+      >
         Please fix errors in your advanced entropy configuration.
       </div>
-      <div class="fc-red px-15px pt-15px"
-           *ngIf="!entropyService.advancedOpen && !hasEntropyError() && entropyService.temporaryEntropy.extraText.length > 0">
+      <div
+        class="fc-red px-15px pt-15px"
+        *ngIf="
+          !entropyService.advancedOpen &&
+          !hasEntropyError() &&
+          entropyService.temporaryEntropy.extraText.length > 0
+        "
+      >
         Note that you have added a passphrase in the advanced menu.
       </div>
-      <div class=" py-20px px-25px seed-actions-row">
+      <div class="py-20px px-25px seed-actions-row">
         <div class="d-flex align-items-center">
-          <button (click)="stepOneCopy()" class="seed-phrase-button d-flex align-items-center">
-            <img *ngIf="seedCopied" src="assets/check-square.svg" width="16px" height="16px" class="mr-5px"/>
-            <img *ngIf="!seedCopied" src="assets/copy.svg" class="mr-5px"/>
+          <button
+            (click)="stepOneCopy()"
+            class="seed-phrase-button d-flex align-items-center"
+          >
+            <img
+              *ngIf="seedCopied"
+              src="assets/check-square.svg"
+              width="16px"
+              height="16px"
+              class="mr-5px"
+            />
+            <img *ngIf="!seedCopied" src="assets/copy.svg" class="mr-5px" />
             <span>Copy</span>
           </button>
-          <button (click)="stepOneDownload()" class="seed-phrase-button d-flex align-items-center ml-10px">
-            <img src="assets/download.svg" class="mr-5px"/>
+          <button
+            (click)="stepOneDownload()"
+            class="seed-phrase-button d-flex align-items-center ml-10px"
+          >
+            <img src="assets/download.svg" class="mr-5px" />
             <span>Download</span>
           </button>
-          <button (click)="stepOnePrint()" class="seed-phrase-button d-flex align-items-center ml-10px">
-            <img src="assets/print.svg" class="mr-5px"/>
+          <button
+            (click)="stepOnePrint()"
+            class="seed-phrase-button d-flex align-items-center ml-10px"
+          >
+            <img src="assets/print.svg" class="mr-5px" />
             <span>Print</span>
           </button>
         </div>
-        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="!entropyService.advancedOpen"
-             (click)="entropyService.advancedOpen = true">Advanced
+        <div
+          class="fc-blue fs-16px cursor-pointer toggle-advanced"
+          *ngIf="!entropyService.advancedOpen"
+          (click)="entropyService.advancedOpen = true"
+        >
+          Advanced
         </div>
-        <div class="fc-blue fs-16px cursor-pointer toggle-advanced" *ngIf="entropyService.advancedOpen"
-             (click)="entropyService.advancedOpen = false">Simple
+        <div
+          class="fc-blue fs-16px cursor-pointer toggle-advanced"
+          *ngIf="entropyService.advancedOpen"
+          (click)="entropyService.advancedOpen = false"
+        >
+          Simple
         </div>
       </div>
-      <div class="border-top border-color-grey" *ngIf="entropyService.advancedOpen">
+      <div
+        class="border-top border-color-grey"
+        *ngIf="entropyService.advancedOpen"
+      >
         <div class="w-100 py-25px px-30px">
           <div class="fs-15px fc-default">
             <p>
-              The following displays the entropy (random numbers) used to generate the "DeSo seed phrase" above.
-              The entropy below was generated using a random number generator, but you can edit the
-              fields below to use your own randomness to generate the DeSo seed phrase (you can't go wrong
-              with a set of dice). You can also enter your own DeSo seed phrase directly if you prefer.
+              The following displays the entropy (random numbers) used to
+              generate the "DeSo seed phrase" above. The entropy below was
+              generated using a random number generator, but you can edit the
+              fields below to use your own randomness to generate the DeSo seed
+              phrase (you can't go wrong with a set of dice). You can also enter
+              your own DeSo seed phrase directly if you prefer.
             </p>
 
             <p class="pt-15px">
-              Because there is a standard for generating seed phrases for Bitcoin (called
-              <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>),
-              and because we use this same standard to generate DeSo seed phrases,
-              DeSo seed phrases can also be used with any Bitcoin wallet that implements
-              this standard under the m/44'/0'/0'/0/0 derivation path (e.g.
-              <a target="_blank" href="https://wallet.mycelium.com/">Mycelium</a>,
-              <a target="_blank" href="https://electrum.org">Electrum</a>).
-              Similarly, any standard
-              Bitcoin seed phrase you have can also be used as a DeSo seed phrase. Of course, all
-              of this can be verified using a tool like the
-              <a target="_blank" href="https://iancoleman.io/bip39/">Ian Coleman mnemonic generator</a>
-              (must click "show entropy details") so you know this generator is doing what it says it is.
+              Because there is a standard for generating seed phrases for
+              Bitcoin (called
+              <a
+                target="_blank"
+                href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
+                >BIP39</a
+              >), and because we use this same standard to generate DeSo seed
+              phrases, DeSo seed phrases can also be used with any Bitcoin
+              wallet that implements this standard under the m/44'/0'/0'/0/0
+              derivation path (e.g.
+              <a target="_blank" href="https://wallet.mycelium.com/">Mycelium</a
+              >, <a target="_blank" href="https://electrum.org">Electrum</a>).
+              Similarly, any standard Bitcoin seed phrase you have can also be
+              used as a DeSo seed phrase. Of course, all of this can be verified
+              using a tool like the
+              <a target="_blank" href="https://iancoleman.io/bip39/"
+                >Ian Coleman mnemonic generator</a
+              >
+              (must click "show entropy details") so you know this generator is
+              doing what it says it is.
             </p>
           </div>
 
           <div style="margin-top: 55px">
-            <p class="title-text-small">Custom DeSo seed phrase (must be
-              <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a>
-              mnemonic):</p>
-            <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showMnemonicError">You've entered an invalid
-              mnemonic.</p>
+            <p class="title-text-small">
+              Custom DeSo seed phrase (must be
+              <a
+                target="_blank"
+                href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
+                >BIP39</a
+              >
+              mnemonic):
+            </p>
+            <p
+              class="fc-red font-weight-normal fs-16px py-10px"
+              *ngIf="showMnemonicError"
+            >
+              You've entered an invalid mnemonic.
+            </p>
             <div class="text-input-container-light mt-10px">
-              <textarea [(ngModel)]="entropyService.temporaryEntropy.mnemonic"
-                        (ngModelChange)="checkMnemonic()"
-                        class="text-input"
-                        style="resize: none; height: 70px"
-                        rows="2"></textarea>
+              <textarea
+                [(ngModel)]="entropyService.temporaryEntropy.mnemonic"
+                (ngModelChange)="checkMnemonic()"
+                class="text-input"
+                style="resize: none; height: 70px"
+                rows="2"
+              ></textarea>
             </div>
           </div>
 
           <div class="mt-25px">
             <p class="title-text-small">Passphrase:</p>
             <div class="text-input-container-light mt-10px">
-              <textarea [(ngModel)]="entropyService.temporaryEntropy.extraText"
-                        (ngModelChange)="normalizeExtraText()"
-                        class="text-input"
-                        style="resize: none; height: 70px"
-                        rows="2"></textarea>
+              <textarea
+                [(ngModel)]="entropyService.temporaryEntropy.extraText"
+                (ngModelChange)="normalizeExtraText()"
+                class="text-input"
+                style="resize: none; height: 70px"
+                rows="2"
+              ></textarea>
             </div>
           </div>
 
           <div class="mt-25px">
-            <p class="title-text-small">Custom Entropy (hex = base16 = [0-9a-f]):</p>
-            <p class="fc-red font-weight-normal fs-16px py-10px" *ngIf="showEntropyHexError">
-              Entropy value must be a hexadecimal value with a total number of characters
-              that is a multiple of 8, less than 128, and greater than 32.</p>
+            <p class="title-text-small">
+              Custom Entropy (hex = base16 = [0-9a-f]):
+            </p>
+            <p
+              class="fc-red font-weight-normal fs-16px py-10px"
+              *ngIf="showEntropyHexError"
+            >
+              Entropy value must be a hexadecimal value with a total number of
+              characters that is a multiple of 8, less than 128, and greater
+              than 32.
+            </p>
             <div class="text-input-container-light mt-10px">
-              <textarea [(ngModel)]="entropyService.temporaryEntropy.customEntropyHex"
-                        (ngModelChange)="checkEntropyHex()"
-                        class="text-input"
-                        style="resize: none; height: 70px"
-                        rows="2"></textarea>
+              <textarea
+                [(ngModel)]="entropyService.temporaryEntropy.customEntropyHex"
+                (ngModelChange)="checkEntropyHex()"
+                class="text-input"
+                style="resize: none; height: 70px"
+                rows="2"
+              ></textarea>
             </div>
           </div>
 
-          <button (click)="getNewEntropy()" class="button button-small button-secondary mt-20px" style="height: 54px">
+          <button
+            (click)="getNewEntropy()"
+            class="button button-small button-secondary mt-20px"
+            style="height: 54px"
+          >
             Regenerate
           </button>
         </div>
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-end">
-      <button *ngIf="!hasEntropyError()"
-              (click)="stepOneNext()"
-              class="button button-primary button-small">
+      <button
+        *ngIf="!hasEntropyError()"
+        (click)="stepOneNext()"
+        class="button button-primary button-small"
+      >
         Next
       </button>
-      <button *ngIf="hasEntropyError()"
-              (click)="stepOneNext()"
-              class="button button-primary-disabled button-small" disabled>
+      <button
+        *ngIf="hasEntropyError()"
+        (click)="stepOneNext()"
+        class="button button-primary-disabled button-small"
+        disabled
+      >
         Next
       </button>
     </div>
@@ -144,44 +231,73 @@
       <div class="title-text">Verify your DeSo seed phrase</div>
       <div class="step-title">Step 2 of {{ stepTotal }}</div>
     </div>
-    <div class="subtitle-text">Never share your DeSo seed phrase with anyone.</div>
-    <div class="warning-text"><b>If you lose your DeSo seed phrase your account will be lost forever.</b></div>
-    <div class="text-input-container mt-25px">
-      <textarea [(ngModel)]="mnemonicCheck"
-                class="text-input"
-                rows="4"
-                placeholder="Enter your DeSo seed phrase"></textarea>
+    <div class="subtitle-text">
+      Never share your DeSo seed phrase with anyone.
     </div>
-    <div class="title-text-small pt-15px mb-20px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
+    <div class="warning-text">
+      <b
+        >If you lose your DeSo seed phrase your account will be lost forever.</b
+      >
+    </div>
+    <div class="text-input-container mt-25px">
+      <textarea
+        [(ngModel)]="mnemonicCheck"
+        class="text-input"
+        rows="4"
+        placeholder="Enter your DeSo seed phrase"
+      ></textarea>
+    </div>
+    <div
+      class="title-text-small pt-15px mb-20px"
+      *ngIf="entropyService.temporaryEntropy.extraText.length > 0"
+    >
       Enter your passphrase:
     </div>
-    <div class="text-input-container pt-10px" *ngIf="entropyService.temporaryEntropy.extraText.length > 0">
-      <textarea [(ngModel)]="extraTextCheck"
-                class="text-input"
-                rows="4"
-                placeholder="Enter your passphrase"></textarea>
+    <div
+      class="text-input-container pt-10px"
+      *ngIf="entropyService.temporaryEntropy.extraText.length > 0"
+    >
+      <textarea
+        [(ngModel)]="extraTextCheck"
+        class="text-input"
+        rows="4"
+        placeholder="Enter your passphrase"
+      ></textarea>
     </div>
     <div class="d-flex align-items-center" style="margin-top: -15px">
       <div class="fs-18px mt-15px fc-default font-weight-normal">
         By proceeding, you agree to the
-        <a (click)="clickTos()" class="font-weight-bold cursor-pointer">Terms of Service</a>.
+        <a (click)="clickTos()" class="font-weight-bold cursor-pointer"
+          >Terms of Service</a
+        >.
       </div>
     </div>
     <div class="d-flex pt-15px justify-content-between">
-      <button (click)="stepTwoBack()"
-              class="button button-small button-secondary">
+      <button
+        (click)="stepTwoBack()"
+        class="button button-small button-secondary"
+      >
         Back
       </button>
       <div>
-        <button *ngIf="entropyService.temporaryEntropy.mnemonic == mnemonicCheck
-                       && entropyService.temporaryEntropy.extraText == extraTextCheck"
-                (click)="stepTwoNext()"
-                class="button button-small button-primary">
+        <button
+          *ngIf="
+            entropyService.temporaryEntropy.mnemonic == mnemonicCheck &&
+            entropyService.temporaryEntropy.extraText == extraTextCheck
+          "
+          (click)="stepTwoNext()"
+          class="button button-small button-primary"
+        >
           Next
         </button>
-        <button *ngIf="entropyService.temporaryEntropy.mnemonic != mnemonicCheck
-                       || entropyService.temporaryEntropy.extraText != extraTextCheck"
-                class="button button-small button-primary-disabled" disabled>
+        <button
+          *ngIf="
+            entropyService.temporaryEntropy.mnemonic != mnemonicCheck ||
+            entropyService.temporaryEntropy.extraText != extraTextCheck
+          "
+          class="button button-small button-primary-disabled"
+          disabled
+        >
           Next
         </button>
       </div>

@@ -1,9 +1,10 @@
 <app-banner></app-banner>
 
-<div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
-  <div class="title-text">
-    Log in to {{ globalVars.hostname }}
-  </div>
+<div
+  class="page-container"
+  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback"
+>
+  <div class="title-text">Log in to {{ globalVars.hostname }}</div>
 
   <p class="main-text mb-20px">
     Enter your DeSo seed phrase to load your account
@@ -14,30 +15,36 @@
   </div>
 
   <div class="text-input-container">
-    <textarea [(ngModel)]="mnemonic"
-              class="text-input"
-              rows="4"
-              placeholder="Enter your DeSo seed phrase"></textarea>
+    <textarea
+      [(ngModel)]="mnemonic"
+      class="text-input"
+      rows="4"
+      placeholder="Enter your DeSo seed phrase"
+    ></textarea>
   </div>
 
   <div *ngIf="advancedOpen" class="main-text mb-20px">
     If you have a passphrase, enter it below.
   </div>
   <div *ngIf="advancedOpen" class="text-input-container">
-    <textarea [(ngModel)]="extraText"
-              class="text-input"
-              rows="4"
-              placeholder="Enter your passphrase"></textarea>
+    <textarea
+      [(ngModel)]="extraText"
+      class="text-input"
+      rows="4"
+      placeholder="Enter your passphrase"
+    ></textarea>
   </div>
 
-  <div *ngIf="!advancedOpen"
-       (click)="advancedOpen = true"
-       class="link mb-30px"><u>Advanced</u></div>
-  <div *ngIf="advancedOpen"
-       (click)="advancedOpen = false"
-       class="link mb-30px"><u>Simple</u></div>
-  <button (click)="clickLoadAccount()"
-          class="button button-primary button-large">
+  <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link mb-30px">
+    <u>Advanced</u>
+  </div>
+  <div *ngIf="advancedOpen" (click)="advancedOpen = false" class="link mb-30px">
+    <u>Simple</u>
+  </div>
+  <button
+    (click)="clickLoadAccount()"
+    class="button button-primary button-large"
+  >
     Load Account
   </button>
 </div>

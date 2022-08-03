@@ -7,7 +7,9 @@
       class="button button-secondary button-large font-weight-bold fs-15px sign-up-btn"
     >
       <div *ngIf="globalVars.callback; else elseBlock">Continue</div>
-      <ng-template #elseBlock>Continue to {{ globalVars.hostname }}</ng-template>
+      <ng-template #elseBlock
+        >Continue to {{ globalVars.hostname }}</ng-template
+      >
     </button>
   </div>
 </ng-template>
@@ -21,25 +23,49 @@
 </div>
 <div class="page-container" *ngIf="!loading && !user">
   <div class="fs-18px mb-5px">
-    We were unable to locate a user associated with the public key provided. Please exit and try again.
+    We were unable to locate a user associated with the public key provided.
+    Please exit and try again.
   </div>
   <div class="fs-15px mb-15px fc-muted">
     Public Key provided: {{ publicKey }}
   </div>
   <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
 </div>
-<div class="page-container" *ngIf="(globalVars.inTab || globalVars.webview || globalVars.callback) && !loading && user && user.HasPhoneNumber">
+<div
+  class="page-container"
+  *ngIf="
+    (globalVars.inTab || globalVars.webview || globalVars.callback) &&
+    !loading &&
+    user &&
+    user.HasPhoneNumber
+  "
+>
   <div class="fs-18px mb-15px">
     You have already received starter DESO for verifying your phone number.
   </div>
   <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
 </div>
-<div class="page-container" *ngIf="(globalVars.inTab || globalVars.webview || globalVars.callback) && !loading && user && !user.HasPhoneNumber">
-
-  <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN">
-    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Get Starter $DESO with Phone Number</div>
+<div
+  class="page-container"
+  *ngIf="
+    (globalVars.inTab || globalVars.webview || globalVars.callback) &&
+    !loading &&
+    user &&
+    !user.HasPhoneNumber
+  "
+>
+  <div
+    *ngIf="
+      screenToShow ==
+      SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN
+    "
+  >
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">
+      Get Starter $DESO with Phone Number
+    </div>
     <div class="fs-18px">
-      Enter your phone number for free $DESO. Your phone number will never be shared with anyone. We only check it to prevent spam.
+      Enter your phone number for free $DESO. Your phone number will never be
+      shared with anyone. We only check it to prevent spam.
     </div>
 
     <form #f="ngForm" [formGroup]="phoneForm" class="form-group mt-15px">
@@ -52,7 +78,7 @@
         [searchCountryFlag]="true"
         [selectFirstCountry]="false"
         [selectedCountryISO]="CountryISO.UnitedStates"
-        maxLength=15
+        maxLength="15"
         [phoneValidation]="true"
         (ngModelChange)="onPhoneNumberInputChanged()"
         name="phone"
@@ -61,52 +87,88 @@
 
       <div class="fc-red fs-15px">
         <!-- TODO: kinda obnoxious how this displays an error as soon as I start typing-->
-        <div *ngIf="f.form.value.phone && f.form.controls.phone.invalid" class="mt-10px">
+        <div
+          *ngIf="f.form.value.phone && f.form.controls.phone.invalid"
+          class="mt-10px"
+        >
           Please enter a valid phone number
         </div>
 
-        <div *ngIf="sendPhoneNumberVerificationTextServerErrors.phoneNumberAlreadyInUse" class="mt-10px">
-          This phone number is being used by another account. Please use a different phone number or sign into your other
-          account.
+        <div
+          *ngIf="
+            sendPhoneNumberVerificationTextServerErrors.phoneNumberAlreadyInUse
+          "
+          class="mt-10px"
+        >
+          This phone number is being used by another account. Please use a
+          different phone number or sign into your other account.
         </div>
 
-        <div *ngIf="sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached" class="mt-10px">
-          You've requested too many verification codes. Please wait 10 minutes and try again.
+        <div
+          *ngIf="
+            sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached
+          "
+          class="mt-10px"
+        >
+          You've requested too many verification codes. Please wait 10 minutes
+          and try again.
         </div>
 
-        <div *ngIf="sendPhoneNumberVerificationTextServerErrors.voipNumberNotAllowed" class="mt-10px">
-          This phone number is a VOIP number, which isn't allowed (to prevent spam). Please try again with a different
-          phone number.
+        <div
+          *ngIf="
+            sendPhoneNumberVerificationTextServerErrors.voipNumberNotAllowed
+          "
+          class="mt-10px"
+        >
+          This phone number is a VOIP number, which isn't allowed (to prevent
+          spam). Please try again with a different phone number.
         </div>
 
-        <div *ngIf="sendPhoneNumberVerificationTextServerErrors.chineseNumberNotAllowed" class="mt-10px">
-          Currently we can't send text messages to China. If you have a non-Chinese number, please try that. If not, click
-          "skip" below. You can still use the site by buying DeSo.
+        <div
+          *ngIf="
+            sendPhoneNumberVerificationTextServerErrors.chineseNumberNotAllowed
+          "
+          class="mt-10px"
+        >
+          Currently we can't send text messages to China. If you have a
+          non-Chinese number, please try that. If not, click "skip" below. You
+          can still use the site by buying DeSo.
         </div>
-        <div *ngIf="sendPhoneNumberVerificationTextServerErrors.unknownError" class="mt-10px">
+        <div
+          *ngIf="sendPhoneNumberVerificationTextServerErrors.unknownError"
+          class="mt-10px"
+        >
           {{ sendPhoneNumberVerificationTextServerErrors.unknownError }}
         </div>
       </div>
     </form>
 
     <div class="fs-10px">
-      By proceeding, you agree to receive text messages from deso.org (standard rates apply)
+      By proceeding, you agree to receive text messages from deso.org (standard
+      rates apply)
     </div>
 
     <div class="d-flex mt-15px justify-content-end">
       <div
         class="full-screen"
-        [ngClass]="{ ' d-flex align-items-center justify-content-between': displayForSignupFlow }"
+        [ngClass]="{
+          ' d-flex align-items-center justify-content-between':
+            displayForSignupFlow
+        }"
       >
         <a
           class="fc-muted cursor-pointer"
           style="cursor: pointer"
           (click)="cancelButtonClicked()"
           *ngIf="displayForSignupFlow"
-        >Cancel</a>
+          >Cancel</a
+        >
         <button
           (click)="sendVerificationText()"
-          [ngClass]="{ disabled: !phoneForm.valid, 'btn-loading': sendingPhoneNumberVerificationText }"
+          [ngClass]="{
+            disabled: !phoneForm.valid,
+            'btn-loading': sendingPhoneNumberVerificationText
+          }"
           class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
         >
           Next
@@ -115,17 +177,34 @@
     </div>
   </div>
 
-  <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN">
-    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">Confirm Authentication Code</div>
+  <div
+    *ngIf="
+      screenToShow ==
+      SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN
+    "
+  >
+    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">
+      Confirm Authentication Code
+    </div>
     <div class="fs-18px">
       Enter the 6 digit code sent to {{ phoneNumber }}
 
-      <div *ngIf="sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached" class="mt-5px fc-red fs-15px">
-        You've requested too many verification codes. Please wait 10 minutes and try again.
+      <div
+        *ngIf="
+          sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached
+        "
+        class="mt-5px fc-red fs-15px"
+      >
+        You've requested too many verification codes. Please wait 10 minutes and
+        try again.
       </div>
     </div>
 
-    <form #f="ngForm" [formGroup]="verificationCodeForm" class="form-group pt-10px">
+    <form
+      #f="ngForm"
+      [formGroup]="verificationCodeForm"
+      class="form-group pt-10px"
+    >
       <input
         class="form-control"
         name="verificationCode"
@@ -134,13 +213,25 @@
       />
 
       <div class="fc-red fs-15px">
-        <div *ngIf="submitPhoneNumberVerificationCodeServerErrors.invalidCode" class="mt-10px">
+        <div
+          *ngIf="submitPhoneNumberVerificationCodeServerErrors.invalidCode"
+          class="mt-10px"
+        >
           The code you entered is invalid. Please try again.
         </div>
-        <div *ngIf="submitPhoneNumberVerificationCodeServerErrors.maxCheckAttemptsReached" class="mt-10px">
-          You've checked too many codes and hit a rate limit. Please wait 10 minutes and try again.
+        <div
+          *ngIf="
+            submitPhoneNumberVerificationCodeServerErrors.maxCheckAttemptsReached
+          "
+          class="mt-10px"
+        >
+          You've checked too many codes and hit a rate limit. Please wait 10
+          minutes and try again.
         </div>
-        <div *ngIf="submitPhoneNumberVerificationCodeServerErrors.unknownError" class="mt-10px">
+        <div
+          *ngIf="submitPhoneNumberVerificationCodeServerErrors.unknownError"
+          class="mt-10px"
+        >
           {{ submitPhoneNumberVerificationCodeServerErrors.unknownError }}
         </div>
       </div>
@@ -148,14 +239,19 @@
 
     <div class="fs-18px">
       <div class="mt-5px">
-<!--        Resend button will have a 60s cooldown indicated by resentVerificationCode and resentVerificationCodeTimeout -->
+        <!--        Resend button will have a 60s cooldown indicated by resentVerificationCode and resentVerificationCodeTimeout -->
         <div *ngIf="!resentVerificationCode">
           <a href="" (click)="resendVerificationCode($event)">Resend</a>
         </div>
         <div *ngIf="resentVerificationCode">
-          <div class="fc-muted">Resend {{resentVerificationCodeTimeout}}s</div>
+          <div class="fc-muted">
+            Resend {{ resentVerificationCodeTimeout }}s
+          </div>
         </div>
-        <i *ngIf="resentVerificationCode" class="far fa-check-circle fc-blue"></i>
+        <i
+          *ngIf="resentVerificationCode"
+          class="far fa-check-circle fc-blue"
+        ></i>
       </div>
     </div>
 
@@ -167,21 +263,29 @@
       >
         Back
       </button>
-<!--      align the Verify button as the rightmost element using float property.-->
+      <!--      align the Verify button as the rightmost element using float property.-->
       <button
         (click)="submitVerificationCode()"
-        [ngClass]="{ disabled: !verificationCodeForm.valid, 'btn-loading': submittingPhoneNumberVerificationCode }"
+        [ngClass]="{
+          disabled: !verificationCodeForm.valid,
+          'btn-loading': submittingPhoneNumberVerificationCode
+        }"
         class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
       >
         Confirm
       </button>
-
     </div>
   </div>
 
-  <div *ngIf="screenToShow == SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN">
+  <div
+    *ngIf="
+      screenToShow ==
+      SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN
+    "
+  >
     <div class="fs-15px mb-15px">
-      Your phone number was verified. We sent you a small amount of DESO, which is enough to post and follow people.
+      Your phone number was verified. We sent you a small amount of DESO, which
+      is enough to post and follow people.
     </div>
     <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
   </div>

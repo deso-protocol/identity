@@ -8,9 +8,8 @@ describe('ErrorCallbackComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ErrorCallbackComponent ]
-    })
-    .compileComponents();
+      declarations: [ErrorCallbackComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

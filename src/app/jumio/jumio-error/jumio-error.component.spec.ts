@@ -8,9 +8,8 @@ describe('JumioErrorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ JumioErrorComponent ]
-    })
-    .compileComponents();
+      declarations: [JumioErrorComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
