@@ -8,9 +8,8 @@ describe('SignUpMetamaskComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SignUpMetamaskComponent ]
-    })
-    .compileComponents();
+      declarations: [SignUpMetamaskComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

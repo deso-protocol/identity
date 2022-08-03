@@ -35,10 +35,10 @@ $green-font-color: #19b028;
 
 @font-face {
   font-family: 'Eina01';
-  src: url("./assets/fonts/Eina01-Regular.ttf") format('truetype');
+  src: url('./assets/fonts/Eina01-Regular.ttf') format('truetype');
   font-weight: normal;
 }
-  
+
 html,
 body {
   font-family: Eina01, Arial, SansSerif;
@@ -80,7 +80,7 @@ p {
 }
 
 .font-emoji {
-  font-family: "color-emoji";
+  font-family: 'color-emoji';
 }
 
 $text: #000000;
@@ -745,7 +745,7 @@ i-feather[name='check-circle'] {
   svg {
     display: none;
   }
-  background-image: url("/assets/img/verified-badge.svg");
+  background-image: url('/assets/img/verified-badge.svg');
   background-size: contain;
   position: relative;
   top: 3px;
@@ -1313,7 +1313,7 @@ i-feather[name='check-circle'] {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
 }
- 
+
 .creator-profile__ellipsis-restriction {
   max-width: 150px;
   display: block;
