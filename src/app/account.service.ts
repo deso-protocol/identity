@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {CryptoService} from './crypto.service';
-import {GlobalVarsService} from './global-vars.service';
+import { Injectable } from '@angular/core';
+import { CryptoService } from './crypto.service';
+import { GlobalVarsService } from './global-vars.service';
 import {
   AccessLevel,
   DerivedPrivateUserInfo,
@@ -10,20 +10,27 @@ import {
   PrivateUserVersion,
   PublicUserInfo,
 } from '../types/identity';
-import {CookieService} from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie';
 import HDKey from 'hdkey';
-import {EntropyService} from './entropy.service';
-import {SigningService} from './signing.service';
+import { EntropyService } from './entropy.service';
+import { SigningService } from './signing.service';
 import sha256 from 'sha256';
-import {uint64ToBufBigEndian} from '../lib/bindata/util';
+import { uint64ToBufBigEndian } from '../lib/bindata/util';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
-import {ec as EC} from 'elliptic';
-import {BackendAPIService, GetAccessBytesResponse, TransactionSpendingLimitResponse} from './backend-api.service';
-import {MetamaskService} from './metamask.service';
+import { ec as EC } from 'elliptic';
+import {
+  BackendAPIService,
+  GetAccessBytesResponse,
+  TransactionSpendingLimitResponse,
+} from './backend-api.service';
+import { MetamaskService } from './metamask.service';
 import * as bs58check from 'bs58check';
-import {Transaction, TransactionMetadataAuthorizeDerivedKey} from '../lib/deso/transaction';
+import {
+  Transaction,
+  TransactionMetadataAuthorizeDerivedKey,
+} from '../lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +48,7 @@ export class AccountService {
     private entropyService: EntropyService,
     private signingService: SigningService,
     private backendApi: BackendAPIService,
-    private metamaskService: MetamaskService,
+    private metamaskService: MetamaskService
   ) {}
 
   // Public Getters
@@ -145,11 +152,19 @@ export class AccountService {
     if (!derivedPublicKeyBase58CheckInput) {
       const derivedKeyData = this.generateDerivedKey(network);
       derivedPublicKeyBase58Check = derivedKeyData.derivedPublicKeyBase58Check;
-      derivedSeedHex = this.cryptoService.keychainToSeedHex(derivedKeyData.keychain);
-      derivedPublicKeyBuffer = derivedKeyData.derivedKeyPair.getPublic().encode('array', true);
+      derivedSeedHex = this.cryptoService.keychainToSeedHex(
+        derivedKeyData.keychain
+      );
+      derivedPublicKeyBuffer = derivedKeyData.derivedKeyPair
+        .getPublic()
+        .encode('array', true);
 
       // Derived keys JWT with the same expiration as the derived key. This is needed for some backend endpoints.
-      derivedJwt = this.signingService.signJWT(derivedSeedHex, true, `${numDaysBeforeExpiration} days`);
+      derivedJwt = this.signingService.signJWT(
+        derivedSeedHex,
+        true,
+        `${numDaysBeforeExpiration} days`
+      );
     } else {
       // If the user has passed in a derived public key, use that instead.
       // Don't define the derived seed hex (a private key presumably already exists).
@@ -161,7 +176,11 @@ export class AccountService {
     }
     // Compute the owner-signed JWT with the same expiration as the derived key. This is needed for some backend endpoints.
     // In case of the metamask log-in, jwt will be signed by a derived key.
-    jwt = this.signingService.signJWT(privateUser.seedHex, isDerived, `${numDaysBeforeExpiration} days`);
+    jwt = this.signingService.signJWT(
+      privateUser.seedHex,
+      isDerived,
+      `${numDaysBeforeExpiration} days`
+    );
 
     // Generate new btc and eth deposit addresses for the derived key.
     // const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
@@ -185,18 +204,23 @@ export class AccountService {
     // here, and do the conversion in Identity rather than forcing the devs to do it.
     let actualTransactionSpendingLimit: TransactionSpendingLimitResponse;
     if (!transactionSpendingLimit) {
-      actualTransactionSpendingLimit = { GlobalDESOLimit: 0 } as TransactionSpendingLimitResponse;
+      actualTransactionSpendingLimit = {
+        GlobalDESOLimit: 0,
+      } as TransactionSpendingLimitResponse;
     } else {
-      actualTransactionSpendingLimit = transactionSpendingLimit as TransactionSpendingLimitResponse;
+      actualTransactionSpendingLimit =
+        transactionSpendingLimit as TransactionSpendingLimitResponse;
     }
 
     let response: GetAccessBytesResponse;
     try {
-      response = await this.backendApi.GetAccessBytes(
-        derivedPublicKeyBase58Check,
-        expirationBlock,
-        actualTransactionSpendingLimit
-      ).toPromise();
+      response = await this.backendApi
+        .GetAccessBytes(
+          derivedPublicKeyBase58Check,
+          expirationBlock,
+          actualTransactionSpendingLimit
+        )
+        .toPromise();
     } catch (e) {
       throw new Error('problem getting spending limit');
     }
@@ -204,7 +228,7 @@ export class AccountService {
     const transactionSpendingLimitHex = response.SpendingLimitHex;
     let accessBytes: number[] = [
       ...derivedPublicKeyBuffer,
-      ...expirationBlockBuffer
+      ...expirationBlockBuffer,
     ];
     if (isDerived) {
       accessBytes = [...Buffer.from(response.AccessBytesHex, 'hex')];
@@ -222,21 +246,28 @@ export class AccountService {
       // FIXME: if we want to allow generic log-in with derived keys, we should error because a derived key can't produce a
       //  valid access signature. For now, we ignore this because the only derived key log-in is coming through Metamask signup.
       try {
-        const {signature} = await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(accessBytesHex);
+        const { signature } =
+          await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
+            accessBytesHex
+          );
         // Slice the '0x' prefix from the signature.
         accessSignature = signature.slice(2);
       } catch (e) {
-        throw new Error('Something went wrong while producing Metamask signature. Please try again.');
+        throw new Error(
+          'Something went wrong while producing Metamask signature. Please try again.'
+        );
       }
     } else {
-      accessSignature = this.signingService.signHashes(
-        privateUser.seedHex,
-        [accessHash]
-      )[0];
+      accessSignature = this.signingService.signHashes(privateUser.seedHex, [
+        accessHash,
+      ])[0];
     }
 
     // tslint:disable-next-line:one-variable-per-declaration
-    let messagingPublicKeyBase58Check, messagingPrivateKey, messagingKeyName, messagingKeySignature: string;
+    let messagingPublicKeyBase58Check,
+      messagingPrivateKey,
+      messagingKeyName,
+      messagingKeySignature: string;
     if (!isDerived) {
       // Set the default messaging key name
       messagingKeyName = this.globalVars.defaultMessageKeyName;
@@ -291,6 +322,7 @@ export class AccountService {
       messagingKeyName,
       messagingKeySignature,
       transactionSpendingLimitHex,
+      signedUp: this.globalVars.signedUp,
     };
   }
 
@@ -528,7 +560,10 @@ export class AccountService {
       privateKey,
       userInfo.network
     );
-    if (userInfo.loginMethod === LoginMethod.METAMASK && userInfo.publicKeyHex) {
+    if (
+      userInfo.loginMethod === LoginMethod.METAMASK &&
+      userInfo.publicKeyHex
+    ) {
       publicKey = this.cryptoService.publicKeyHexToDeSoPublicKey(
         userInfo.publicKeyHex,
         userInfo.network
@@ -542,7 +577,9 @@ export class AccountService {
     return publicKey;
   }
 
-  getLoginMethodWithPublicKeyBase58Check(publicKeyBase58Check: string): LoginMethod {
+  getLoginMethodWithPublicKeyBase58Check(
+    publicKeyBase58Check: string
+  ): LoginMethod {
     const account = this.getPrivateUsers()[publicKeyBase58Check];
     return account.loginMethod || LoginMethod.DESO;
   }

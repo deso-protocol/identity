@@ -1,5 +1,15 @@
 import { BinaryRecord, Transcode } from '../bindata';
-import { ArrayOf, Boolean, ChunkBuffer, Enum, FixedBuffer, Record, Uint8, Uvarint64, VarBuffer } from '../bindata/transcoders';
+import {
+  ArrayOf,
+  Boolean,
+  ChunkBuffer,
+  Enum,
+  FixedBuffer,
+  Record,
+  Uint8,
+  Uvarint64,
+  VarBuffer,
+} from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {
   @Transcode(FixedBuffer(32))
@@ -9,7 +19,7 @@ export class TransactionInput extends BinaryRecord {
   index: number = 0;
 }
 
-export class TransactionOutput extends BinaryRecord  {
+export class TransactionOutput extends BinaryRecord {
   @Transcode(FixedBuffer(33))
   publicKey: Buffer = Buffer.alloc(0);
 
@@ -394,7 +404,6 @@ export class TransactionDAOCoinLimitOrderLimitMapItem extends BinaryRecord {
   @Transcode(Uvarint64)
   value: number = 0;
 }
-
 
 export class TransactionSpendingLimit extends BinaryRecord {
   @Transcode(Uvarint64)

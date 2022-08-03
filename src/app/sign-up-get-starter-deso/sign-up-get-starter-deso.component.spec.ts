@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SignUpGetStarterDESOComponent } from "./sign-up-get-starter-deso.component";
+import { SignUpGetStarterDESOComponent } from './sign-up-get-starter-deso.component';
 
-describe("SignUpGetStarterDESOComponent", () => {
+describe('SignUpGetStarterDESOComponent', () => {
   let component: SignUpGetStarterDESOComponent;
   let fixture: ComponentFixture<SignUpGetStarterDESOComponent>;
 
@@ -18,7 +18,7 @@ describe("SignUpGetStarterDESOComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

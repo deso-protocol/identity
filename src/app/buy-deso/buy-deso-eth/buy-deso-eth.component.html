@@ -12,9 +12,7 @@
         #tooltip1="matTooltip"
       ></i>
     </div>
-    <div
-      class="d-flex justify-content-between fs-17px fc-secondary"
-    >
+    <div class="d-flex justify-content-between fs-17px fc-secondary">
       <div>
         Send ETH to this address
         <i
@@ -25,12 +23,12 @@
           #tooltip2="matTooltip"
         ></i>
       </div>
-      <div
-        class="d-flex justify-content-end"
-      >
+      <div class="d-flex justify-content-end">
         <div class="d-flex">
           <i-feather name="key" class="feather-large mr-5px"></i-feather>
-          <span class="mr-8px creator-profile__ellipsis-restriction">{{ ethDepositAddress() }}</span>
+          <span class="mr-8px creator-profile__ellipsis-restriction">{{
+            ethDepositAddress()
+          }}</span>
         </div>
         <div>
           <i-feather
@@ -44,7 +42,8 @@
             (click)="_copyPublicKey()"
             class="fs-16px fc-blue cursor-pointer"
             style="cursor: pointer"
-          >Copy</a>
+            >Copy</a
+          >
         </div>
       </div>
     </div>
@@ -54,21 +53,23 @@
     <div class="buy-deso__sub-title">Amount deposited</div>
     <div class="d-flex">
       <div class="d-flex w-100">
-        <div
-          class="d-flex"
-          container="body"
-          style="align-items: center"
-        >
-          <div class="buy-deso__dropdown-btn">
-            ETH
-          </div>
+        <div class="d-flex" container="body" style="align-items: center">
+          <div class="buy-deso__dropdown-btn">ETH</div>
         </div>
         <div class="position-relative w-100">
           <div class="buy-deso__input" style="border-radius: 0px 6px 6px 0px">
-            {{ loadingBalance ? "Loading..." : ethBalance.toFixed(8) }}
+            {{ loadingBalance ? 'Loading...' : ethBalance.toFixed(8) }}
           </div>
-          <span class="buy-deso__floating-span fc-muted" *ngIf="!loadingBalance">
-            {{ globalVars.formatUSD(ethBalance * parentComponent.usdPerETHExchangeRate, 2) }}
+          <span
+            class="buy-deso__floating-span fc-muted"
+            *ngIf="!loadingBalance"
+          >
+            {{
+              globalVars.formatUSD(
+                ethBalance * parentComponent.usdPerETHExchangeRate,
+                2
+              )
+            }}
             USD
           </span>
         </div>
@@ -78,12 +79,20 @@
         class="fc-blue fs-15px cursor-pointer d-flex align-items-center mx-16px"
         (click)="refreshBalance()"
       >
-        <i-feather name="rotate-cw" class="feather-small position-relative mr-5px" style="top: -5px"></i-feather>
+        <i-feather
+          name="rotate-cw"
+          class="feather-small position-relative mr-5px"
+          style="top: -5px"
+        ></i-feather>
         <span>Refresh</span>
       </a>
     </div>
     <div class="mt-16px fc-muted">
-      <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
+      <i-feather
+        name="info"
+        class="feather-small position-relative"
+        style="margin-top: -2px"
+      ></i-feather>
       <span class="buy-deso__sub-text">
         Minimum deposit is currently
         {{ (ethFeeEstimate * 2).toFixed(4) }} ETH
@@ -104,9 +113,14 @@
       class="light-button fc-default font-weight-bold fs-17px"
       style="width: 200px"
     >
-    Go to the next step
+      Go to the next step
     </button>
-    <a class="fc-muted ml-25px cursor-pointer" style="cursor: pointer" (click)="parentComponent.cancelButtonClicked()">Cancel</a>
+    <a
+      class="fc-muted ml-25px cursor-pointer"
+      style="cursor: pointer"
+      (click)="parentComponent.cancelButtonClicked()"
+      >Cancel</a
+    >
   </div>
 </div>
 
@@ -120,14 +134,8 @@
   <div class="p-16px">
     <div class="buy-deso__sub-title">Ethereum Balance</div>
     <div class="d-flex">
-      <div
-        class="d-flex"
-        container="body"
-        style="align-items: center"
-      >
-        <div class="buy-deso__dropdown-btn">
-          ETH
-        </div>
+      <div class="d-flex" container="body" style="align-items: center">
+        <div class="buy-deso__dropdown-btn">ETH</div>
       </div>
       <div class="position-relative w-100">
         <div class="buy-deso__input" style="border-radius: 0px 6px 6px 0px">
@@ -137,14 +145,8 @@
     </div>
     <div class="buy-deso__sub-title">$DESO to buy</div>
     <div class="d-flex">
-      <div
-        class="d-flex"
-        container="body"
-        style="align-items: center"
-      >
-        <div class="buy-deso__dropdown-btn">
-          $DESO
-        </div>
+      <div class="d-flex" container="body" style="align-items: center">
+        <div class="buy-deso__dropdown-btn">$DESO</div>
       </div>
       <div class="position-relative w-100">
         <input
@@ -158,20 +160,19 @@
           placeholder="0"
         />
         <span class="buy-deso__floating-span">
-          <a class="fc-blue cursor-pointer" style="cursor: pointer" (click)="clickMaxDESO()">Max</a>
+          <a
+            class="fc-blue cursor-pointer"
+            style="cursor: pointer"
+            (click)="clickMaxDESO()"
+            >Max</a
+          >
         </span>
       </div>
     </div>
     <div class="buy-deso__sub-title">Ethereum to swap</div>
     <div class="d-flex">
-      <div
-        class="d-flex"
-        container="body"
-        style="align-items: center"
-      >
-        <div class="buy-deso__dropdown-btn">
-          ETH
-        </div>
+      <div class="d-flex" container="body" style="align-items: center">
+        <div class="buy-deso__dropdown-btn">ETH</div>
       </div>
       <div class="position-relative w-100">
         <input
@@ -187,7 +188,11 @@
       </div>
     </div>
     <div class="mt-16px fc-muted">
-      <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
+      <i-feather
+        name="info"
+        class="feather-small position-relative"
+        style="margin-top: -2px"
+      ></i-feather>
       <span class="buy-deso__sub-text"> Ethereum network fee </span>
       <i
         (click)="tooltip4.toggle()"
@@ -200,7 +205,12 @@
         <span *ngIf="error == null || error === ''">
           {{ ethFeeEstimate.toFixed(8) }}
           ETH ≈
-          {{ globalVars.formatUSD(ethFeeEstimate * parentComponent.usdPerETHExchangeRate, 2) }}
+          {{
+            globalVars.formatUSD(
+              ethFeeEstimate * parentComponent.usdPerETHExchangeRate,
+              2
+            )
+          }}
           USD
         </span>
         <span *ngIf="error != null && error !== ''" style="margin-top: 0">
@@ -209,16 +219,21 @@
       </span>
     </div>
     <div class="mt-16px fc-muted">
-      <i-feather name="info" class="feather-small position-relative" style="margin-top: -2px"></i-feather>
+      <i-feather
+        name="info"
+        class="feather-small position-relative"
+        style="margin-top: -2px"
+      ></i-feather>
       <span class="buy-deso__sub-text"> Total ETH to swap </span>
       <span class="mt-1 w-100 fs-15px">
         <span *ngIf="!error">
-          {{
-          ethToExchange.toFixed(8)
-          }}
+          {{ ethToExchange.toFixed(8) }}
           ETH ≈
           {{
-          globalVars.formatUSD(ethToExchange * parentComponent.usdPerETHExchangeRate, 2)
+            globalVars.formatUSD(
+              ethToExchange * parentComponent.usdPerETHExchangeRate,
+              2
+            )
           }}
           USD
         </span>
@@ -227,14 +242,20 @@
         </span>
       </span>
     </div>
-    <div *ngIf="error != null && error !== ''" class="error-container" style="white-space: pre-line;">
+    <div
+      *ngIf="error != null && error !== ''"
+      class="error-container"
+      style="white-space: pre-line"
+    >
       <i-feather name="alert-circle" class="feather-large"></i-feather>
       {{ error }}
     </div>
   </div>
   <div class="border-bottom w-100"></div>
   <div class="m-16px">
-    <button class="primary-button" (click)="clickBuyDESO()"> Buy $DESO </button>
-    <a class="fc-muted ml-25px cursor-pointer" (click)="buyWithEthStep = 1"> Back </a>
+    <button class="primary-button" (click)="clickBuyDESO()">Buy $DESO</button>
+    <a class="fc-muted ml-25px cursor-pointer" (click)="buyWithEthStep = 1">
+      Back
+    </a>
   </div>
 </div>

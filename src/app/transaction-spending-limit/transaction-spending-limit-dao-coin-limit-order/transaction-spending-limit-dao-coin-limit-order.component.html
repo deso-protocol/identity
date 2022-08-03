@@ -11,8 +11,8 @@
       ></div>
       <div class="d-block" style="display: block; max-width: 100px">
         {{
-          daoCoinLimitOrderLimitItem?.BuyingPublicKey === "DESO"
-            ? "$DESO"
+          daoCoinLimitOrderLimitItem?.BuyingPublicKey === 'DESO'
+            ? '$DESO'
             : buyingUser?.ProfileEntryResponse?.Username ||
               truncatePublicKey(daoCoinLimitOrderLimitItem?.BuyingPublicKey)
         }}
@@ -30,8 +30,8 @@
       ></div>
       <div class="d-block" style="display: block; max-width: 100px">
         {{
-          daoCoinLimitOrderLimitItem?.SellingPublicKey === "DESO"
-            ? "$DESO"
+          daoCoinLimitOrderLimitItem?.SellingPublicKey === 'DESO'
+            ? '$DESO'
             : sellingUser?.ProfileEntryResponse?.Username ||
               truncatePublicKey(daoCoinLimitOrderLimitItem?.SellingPublicKey)
         }}

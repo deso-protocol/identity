@@ -48,7 +48,6 @@ import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.com
 import { MetamaskService } from './metamask.service';
 import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -99,12 +98,7 @@ import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
   ],
-  providers: [
-    IdentityService,
-    EntropyService,
-    AccountService,
-    MetamaskService,
-  ],
-  bootstrap: [AppComponent]
+  providers: [IdentityService, EntropyService, AccountService, MetamaskService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

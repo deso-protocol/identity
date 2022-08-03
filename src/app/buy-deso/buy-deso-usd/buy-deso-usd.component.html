@@ -12,11 +12,18 @@
           container="body"
           style="align-items: center"
         >
-          <button class="buy-deso__dropdown-btn d-flex align-content-between" role="button" dropdownToggle>
+          <button
+            class="buy-deso__dropdown-btn d-flex align-content-between"
+            role="button"
+            dropdownToggle
+          >
             <span>{{ selectedFiatCurrency }}</span>
             <i-feather name="chevron-down" class="feather-small"></i-feather>
           </button>
-          <div class="dropdown-menu dropdown-menu-right p-0 bc-dropdown-menu place-bid-dropdown buy-deso__currency-dropdown" *dropdownMenu>
+          <div
+            class="dropdown-menu dropdown-menu-right p-0 bc-dropdown-menu place-bid-dropdown buy-deso__currency-dropdown"
+            *dropdownMenu
+          >
             <div>
               <a
                 *ngFor="let fiat of supportedFiatCurrencies | keyvalue"
@@ -47,14 +54,8 @@
       </div>
 
       <div class="d-flex">
-        <div
-          class="d-flex"
-          container="body"
-          style="align-items: center"
-        >
-          <div class="buy-deso__dropdown-btn">
-            $DESO
-          </div>
+        <div class="d-flex" container="body" style="align-items: center">
+          <div class="buy-deso__dropdown-btn">$DESO</div>
         </div>
         <div class="position-relative w-100">
           <div class="buy-deso__input" style="border-radius: 0px 6px 6px 0px">
@@ -63,21 +64,21 @@
         </div>
       </div>
 
-      <div class="buy-deso__sub-title" style="margin-top: 30px">
-        Country
-      </div>
+      <div class="buy-deso__sub-title" style="margin-top: 30px">Country</div>
 
-      <div
-        class="d-flex"
-        style="align-items: center"
-      >
+      <div class="d-flex" style="align-items: center">
         <div dropdown (click)="$event.stopPropagation()" container="body">
-          <button class="d-flex justify-content-between buy-deso__country-selector" role="button" dropdownToggle>
+          <button
+            class="d-flex justify-content-between buy-deso__country-selector"
+            role="button"
+            dropdownToggle
+          >
             <span>{{ selectedCountry }}</span>
             <i-feather name="chevron-down" class="feather-small"></i-feather>
           </button>
           <div
-            class="dropdown-menu dropdown-menu-right p-0 bc-dropdown-menu buy-deso__country-dropdown" *dropdownMenu
+            class="dropdown-menu dropdown-menu-right p-0 bc-dropdown-menu buy-deso__country-dropdown"
+            *dropdownMenu
           >
             <div>
               <a
@@ -105,7 +106,11 @@
       >
         Buy $DESO
       </button>
-      <a class="fc-muted ml-25px cursor-pointer" (click)="parentComponent.cancelButtonClicked()">Cancel</a>
+      <a
+        class="fc-muted ml-25px cursor-pointer"
+        (click)="parentComponent.cancelButtonClicked()"
+        >Cancel</a
+      >
     </div>
   </div>
 </div>

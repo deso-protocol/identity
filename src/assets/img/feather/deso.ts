@@ -16,4 +16,4 @@ export const Deso = `<svg viewBox="0 0 133 154" fill="none" xmlns="http://www.w3
 <stop offset="1" stop-color="#00FFFF"/>
 </linearGradient>
 </defs>
-</svg>`
+</svg>`;

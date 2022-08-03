@@ -6,7 +6,8 @@ export class BinaryRecord {
     let result = new this();
     let buffer = bytes;
 
-    const transcoders: TranscoderMetadata[] = Reflect.getMetadata("transcoders", result) || [];
+    const transcoders: TranscoderMetadata[] =
+      Reflect.getMetadata('transcoders', result) || [];
 
     transcoders.forEach(({ name, transcoder }) => {
       let value;
@@ -18,11 +19,15 @@ export class BinaryRecord {
   }
 
   toBytes(): Buffer {
-    const transcoders: TranscoderMetadata[] = (Reflect.getMetadata("transcoders", this) || []);
+    const transcoders: TranscoderMetadata[] =
+      Reflect.getMetadata('transcoders', this) || [];
 
     let buffer = Buffer.alloc(0);
     transcoders.forEach(({ name, transcoder }) => {
-      buffer = Buffer.concat([buffer, transcoder.write.call(this, (this as any)[name])]);
+      buffer = Buffer.concat([
+        buffer,
+        transcoder.write.call(this, (this as any)[name]),
+      ]);
     });
 
     return buffer;
@@ -30,15 +35,15 @@ export class BinaryRecord {
 }
 
 export interface TranscoderMetadata<T = any> {
-  name: string,
-  transcoder: Transcoder<T>,
+  name: string;
+  transcoder: Transcoder<T>;
 }
 
 export function Transcode<T>(transcoder: Transcoder<T>) {
   return (target: any, name: string | symbol) => {
-    const transcoders = Reflect.getMetadata("transcoders", target) || [];
+    const transcoders = Reflect.getMetadata('transcoders', target) || [];
     transcoders.push({ name, transcoder });
-    Reflect.defineMetadata("transcoders", transcoders, target);
+    Reflect.defineMetadata('transcoders', transcoders, target);
   };
 }
 

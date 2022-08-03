@@ -2,24 +2,29 @@ import { Injectable } from '@angular/core';
 import HDNode from 'hdkey';
 import * as bip39 from 'bip39';
 import HDKey from 'hdkey';
-import {ec as EC} from 'elliptic';
+import { ec as EC } from 'elliptic';
 import bs58check from 'bs58check';
-import {CookieService} from 'ngx-cookie';
-import {createHmac, createCipher, createDecipher, randomBytes, createHash} from 'crypto';
-import {AccessLevel, Network} from '../types/identity';
+import { CookieService } from 'ngx-cookie';
+import {
+  createHmac,
+  createCipher,
+  createDecipher,
+  randomBytes,
+  createHash,
+} from 'crypto';
+import { AccessLevel, Network } from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
 import * as sha256 from 'sha256';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CryptoService {
-
   constructor(
     private cookieService: CookieService,
     private globalVars: GlobalVarsService
-    ) {}
+  ) {}
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -29,7 +34,7 @@ export class CryptoService {
     testnet: {
       bitcoin: [0x6f],
       deso: [0x11, 0xc2, 0x0],
-    }
+    },
   };
 
   // Safari only lets us store things in cookies
@@ -39,7 +44,8 @@ export class CryptoService {
       return false;
     }
 
-    const supportsStorageAccess = typeof document.hasStorageAccess === 'function';
+    const supportsStorageAccess =
+      typeof document.hasStorageAccess === 'function';
     const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
     const isSafari = !isChrome && navigator.userAgent.indexOf('Safari') > -1;
 
@@ -94,7 +100,9 @@ export class CryptoService {
     // If the encryption key is unset or malformed we need to stop
     // everything to avoid returning unencrypted information.
     if (!encryptionKey || encryptionKey.length !== 64) {
-      throw new Error('Failed to load or generate encryption key; this should never happen');
+      throw new Error(
+        'Failed to load or generate encryption key; this should never happen'
+      );
     }
 
     return encryptionKey;
@@ -117,7 +125,11 @@ export class CryptoService {
     return hmac.update(accessLevel.toString()).digest().toString('hex');
   }
 
-  validAccessLevelHmac(accessLevel: AccessLevel, seedHex: string, hmac: string): boolean {
+  validAccessLevelHmac(
+    accessLevel: AccessLevel,
+    seedHex: string,
+    hmac: string
+  ): boolean {
     if (!hmac || !seedHex) {
       return false;
     }
@@ -125,10 +137,14 @@ export class CryptoService {
     return hmac === this.accessLevelHmac(accessLevel, seedHex);
   }
 
-  mnemonicToKeychain(mnemonic: string, extraText?: string, nonStandard?: boolean): HDNode {
+  mnemonicToKeychain(
+    mnemonic: string,
+    extraText?: string,
+    nonStandard?: boolean
+  ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0', nonStandard);
+    return HDKey.fromMasterSeed(seed).derive("m/44'/0'/0'/0/0", nonStandard);
   }
 
   keychainToSeedHex(keychain: HDNode): string {
@@ -162,7 +178,7 @@ export class CryptoService {
 
   publicKeyToECKeyPair(publicKey: string): EC.KeyPair {
     // Sanity check similar to Base58CheckDecodePrefix from core/lib/base58.go
-    if (publicKey.length < 5){
+    if (publicKey.length < 5) {
       throw new Error('Failed to decode public key');
     }
     const decoded = bs58check.decode(publicKey);
@@ -212,9 +228,15 @@ export class CryptoService {
 
   // Compute messaging private key as sha256x2( sha256x2(seed hex) || sha256x2(key name) )
   deriveMessagingKey(seedHex: string, keyName: string): Buffer {
-    const secretHash = new Buffer(sha256.x2( [... new Buffer(seedHex, 'hex')]), 'hex');
-    const keyNameHash = new Buffer(sha256.x2([... new Buffer(keyName, 'utf8')]), 'hex');
-    return new Buffer(sha256.x2( [... secretHash, ... keyNameHash ]), 'hex');
+    const secretHash = new Buffer(
+      sha256.x2([...new Buffer(seedHex, 'hex')]),
+      'hex'
+    );
+    const keyNameHash = new Buffer(
+      sha256.x2([...new Buffer(keyName, 'utf8')]),
+      'hex'
+    );
+    return new Buffer(sha256.x2([...secretHash, ...keyNameHash]), 'hex');
   }
 
   // NOTE: Our ETH address uses the bitcoin/bitclout derivation path, not the ETH path.
@@ -228,8 +250,13 @@ export class CryptoService {
   //
   // Reference implementation: https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L249
   publicKeyToEthAddress(keyPair: EC.KeyPair): string {
-    const uncompressedKey = Buffer.from(keyPair.getPublic(false, 'array').slice(1));
-    const ethAddress = new Keccak(256).update(uncompressedKey).digest('hex').slice(24);
+    const uncompressedKey = Buffer.from(
+      keyPair.getPublic(false, 'array').slice(1)
+    );
+    const ethAddress = new Keccak(256)
+      .update(uncompressedKey)
+      .digest('hex')
+      .slice(24);
 
     // EIP-55 requires a checksum. Reference implementation: https://eips.ethereum.org/EIPS/eip-55
     const checksumHash = new Keccak(256).update(ethAddress).digest('hex');

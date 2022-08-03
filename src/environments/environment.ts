@@ -11,7 +11,7 @@ export const environment = {
     'bitclout.green',
     'bitclout.blue',
     'localhost',
-    'node.deso.org'
+    'node.deso.org',
   ],
   noAccessHostnames: [''],
   jumioSupported: false,
