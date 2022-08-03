@@ -137,9 +137,8 @@ export class GoogleComponent implements OnInit {
     this.accountService.setAccessLevel(this.publicKey, this.globalVars.hostname, this.globalVars.accessLevelRequest);
 
     if (this.globalVars.derive) {
-      this.identityService.derive({
-        publicKey: this.publicKey,
-      });
+      this.router.navigate(['/', RouteNames.DERIVE],
+        { queryParams: { publicKey: this.publicKey }, queryParamsHandling: 'merge'});
     } else {
       if (!this.globalVars.getFreeDeso) {
         this.login(signedUp);

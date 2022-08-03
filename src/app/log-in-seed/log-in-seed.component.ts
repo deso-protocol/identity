@@ -64,7 +64,6 @@ export class LogInSeedComponent implements OnInit {
 
     // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
     if (keychain.publicKey !== keychainNonStandard.publicKey) {
-      const network = this.globalVars.network;
       const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
       const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
       const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, network);
@@ -87,9 +86,8 @@ export class LogInSeedComponent implements OnInit {
     this.extraText = '';
 
     if (this.globalVars.derive) {
-      this.identityService.derive({
-        publicKey: userPublicKey,
-      });
+      this.router.navigate(['/', RouteNames.DERIVE],
+        { queryParams: { publicKey: userPublicKey }, queryParamsHandling: 'merge'});
     } else {
       this.router.navigate(['/', RouteNames.LOG_IN], {queryParamsHandling: 'merge'});
     }

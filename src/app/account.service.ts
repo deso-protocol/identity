@@ -174,7 +174,8 @@ export class AccountService {
       messagingPrivateKey,
       messagingKeyName,
       messagingKeySignature,
-      transactionSpendingLimitHex
+      transactionSpendingLimitHex,
+      signedUp: this.globalVars.signedUp,
     };
   }
 

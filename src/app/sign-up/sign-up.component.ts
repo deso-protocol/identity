@@ -118,6 +118,11 @@ export class SignUpComponent implements OnInit, OnDestroy {
       this.router.navigate(['/', RouteNames.GET_DESO], {
         queryParams: {publicKey: this.publicKeyAdded, signedUp: true },
         queryParamsHandling: 'merge'});
+    } else if (this.globalVars.derive) {
+      this.globalVars.signedUp = true;
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {publicKey: this.publicKeyAdded, signedUp: true},
+        queryParamsHandling: 'merge'});
     } else {
       this.identityService.login({
         users: this.accountService.getEncryptedUsers(),
