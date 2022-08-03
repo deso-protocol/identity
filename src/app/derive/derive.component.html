@@ -33,7 +33,7 @@
                   class="avatar mr-15px"
                   src="assets/placeholder-account-image.png"
                 />
-                {{ truncatePublicKey(item.key) }}
+                {{ item.key | truncateAddress }}
               </div>
             </div>
             <div *ngIf="item.value.username" class="d-flex align-items-center">
@@ -52,13 +52,13 @@
       <div class="pl-20px text-left d-flex justify-content-between">
         Public Key
         <span class="font-weight-normal pr-20px pb-15px text-left">{{
-          truncatePublicKey(publicKeyBase58Check)
+          publicKeyBase58Check | truncateAddress
         }}</span>
       </div>
       <div class="pl-20px text-left d-flex justify-content-between">
         Derived Public Key
         <span class="font-weight-normal pr-20px">{{
-          truncatePublicKey(derivedPublicKeyBase58Check)
+          derivedPublicKeyBase58Check | truncateAddress
         }}</span>
       </div>
     </div>

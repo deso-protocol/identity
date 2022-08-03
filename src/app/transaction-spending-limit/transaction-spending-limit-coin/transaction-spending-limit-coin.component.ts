@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { truncatePublicKey } from 'src/app/utils';
 import {
   CreatorCoinLimitOperationString,
   DAOCoinLimitOperationString,
@@ -42,9 +41,5 @@ export class TransactionSpendingLimitCoinComponent implements OnInit {
       .sort()
       .map((op) => this.globalVars.cleanSpendingLimitOperationName(op))
       .join(', ');
-  }
-
-  truncatePublicKey(key: string) {
-    return truncatePublicKey(key);
   }
 }

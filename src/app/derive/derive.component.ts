@@ -6,11 +6,8 @@ import {
   TransactionSpendingLimitResponse,
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { GoogleDriveService } from '../google-drive.service';
 import { UserProfile } from '../../types/identity';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { RouteNames } from '../app-routing.module';
-import { truncatePublicKey } from '../utils';
 import { map, switchMap } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 
@@ -121,11 +118,6 @@ export class DeriveComponent implements OnInit {
       transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
     });
-  }
-
-  public truncatePublicKey(key: string | undefined): string {
-    if (!key) return '';
-    return truncatePublicKey(key);
   }
 
   private getParameterValidationErrors(params: Params): boolean {

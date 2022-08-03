@@ -7,7 +7,6 @@ import { LoginMethod, UserProfile } from '../../types/identity';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
-import { truncatePublicKey } from '../utils';
 
 @Component({
   selector: 'app-log-in',
@@ -93,10 +92,6 @@ export class LogInComponent implements OnInit {
       publicKeyAdded: publicKey,
       signedUp: false,
     });
-  }
-
-  public truncatePublicKey(key: string): string {
-    return truncatePublicKey(key);
   }
 
   public getLoginIcon(loginMethod: LoginMethod): any {

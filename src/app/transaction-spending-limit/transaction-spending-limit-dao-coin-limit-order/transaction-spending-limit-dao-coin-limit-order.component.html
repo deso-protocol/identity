@@ -14,7 +14,7 @@
           daoCoinLimitOrderLimitItem?.BuyingPublicKey === 'DESO'
             ? '$DESO'
             : buyingUser?.ProfileEntryResponse?.Username ||
-              truncatePublicKey(daoCoinLimitOrderLimitItem?.BuyingPublicKey)
+              (daoCoinLimitOrderLimitItem?.BuyingPublicKey | truncateAddress)
         }}
       </div>
     </div>
@@ -33,7 +33,7 @@
           daoCoinLimitOrderLimitItem?.SellingPublicKey === 'DESO'
             ? '$DESO'
             : sellingUser?.ProfileEntryResponse?.Username ||
-              truncatePublicKey(daoCoinLimitOrderLimitItem?.SellingPublicKey)
+              (daoCoinLimitOrderLimitItem?.SellingPublicKey | truncateAddress)
         }}
       </div>
     </div>

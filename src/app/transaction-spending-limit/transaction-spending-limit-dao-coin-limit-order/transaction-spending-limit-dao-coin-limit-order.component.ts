@@ -1,14 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {
-  CreatorCoinLimitOperationString,
-  DAOCoinLimitOperationString,
-  DAOCoinLimitOrderLimitItem,
-  OperationToCountMap,
-  User,
-} from '../../backend-api.service';
+import { DAOCoinLimitOrderLimitItem, User } from '../../backend-api.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
-import { truncatePublicKey } from '../../utils';
 @Component({
   selector: 'app-transaction-spending-limit-dao-coin-limit-order',
   templateUrl:
@@ -25,10 +18,5 @@ export class TransactionSpendingLimitDaoCoinLimitOrderComponent
   @Input() sellingUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
-  constructor() {}
-
   ngOnInit(): void {}
-  truncatePublicKey(key: string | undefined): string {
-    return key ? truncatePublicKey(key) : '';
-  }
 }
