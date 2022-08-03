@@ -13,7 +13,7 @@
           coinPublicKey === ''
             ? 'All Creators'
             : user?.ProfileEntryResponse?.Username ||
-              truncatePublicKey(coinPublicKey)
+              (coinPublicKey | truncateAddress)
         }}
       </div>
       <!-- TODO: Add verified check -->

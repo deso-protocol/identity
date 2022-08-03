@@ -16,8 +16,6 @@ import { EntropyService } from './entropy.service';
 import { SigningService } from './signing.service';
 import sha256 from 'sha256';
 import { uint64ToBufBigEndian } from '../lib/bindata/util';
-import KeyEncoder from 'key-encoder';
-import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
 import { ec as EC } from 'elliptic';
 import {

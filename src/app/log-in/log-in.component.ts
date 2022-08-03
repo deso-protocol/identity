@@ -7,7 +7,7 @@ import { LoginMethod, UserProfile } from '../../types/identity';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
-import { truncatePublicKey } from '../utils';
+import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
 
 @Component({
   selector: 'app-log-in',
@@ -28,7 +28,8 @@ export class LogInComponent implements OnInit {
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
-    private router: Router
+    private router: Router,
+    public truncateAddress: TruncateAddress
   ) {}
 
   ngOnInit(): void {
@@ -93,10 +94,6 @@ export class LogInComponent implements OnInit {
       publicKeyAdded: publicKey,
       signedUp: false,
     });
-  }
-
-  public truncatePublicKey(key: string): string {
-    return truncatePublicKey(key);
   }
 
   public getLoginIcon(loginMethod: LoginMethod): any {

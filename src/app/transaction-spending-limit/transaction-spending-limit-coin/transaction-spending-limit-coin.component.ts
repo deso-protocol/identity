@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { truncatePublicKey } from 'src/app/utils';
+import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
 import {
   CreatorCoinLimitOperationString,
   DAOCoinLimitOperationString,
@@ -25,7 +25,10 @@ export class TransactionSpendingLimitCoinComponent implements OnInit {
   expandCreator: boolean = false;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
-  constructor(public globalVars: GlobalVarsService) {}
+  constructor(
+    public globalVars: GlobalVarsService,
+    public truncateAddress: TruncateAddress
+  ) {}
 
   ngOnInit(): void {}
 
@@ -42,9 +45,5 @@ export class TransactionSpendingLimitCoinComponent implements OnInit {
       .sort()
       .map((op) => this.globalVars.cleanSpendingLimitOperationName(op))
       .join(', ');
-  }
-
-  truncatePublicKey(key: string) {
-    return truncatePublicKey(key);
   }
 }

@@ -30,7 +30,7 @@
                   class="avatar mr-15px"
                   src="assets/placeholder-account-image.png"
                 />
-                {{ truncatePublicKey(item.key) }}
+                {{ item.key | truncateAddress }}
               </div>
             </div>
             <div *ngIf="item.value.username" class="d-flex align-items-center">

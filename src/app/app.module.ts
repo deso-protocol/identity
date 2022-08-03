@@ -47,6 +47,7 @@ import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.comp
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
 import { MetamaskService } from './metamask.service';
 import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
+import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
     BuyOrSendDesoComponent,
     SignUpMetamaskComponent,
     ArrowToggleComponent,
+    TruncateAddress,
   ],
   imports: [
     BrowserModule,
@@ -98,7 +100,14 @@ import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
   ],
-  providers: [IdentityService, EntropyService, AccountService, MetamaskService],
+  providers: [
+    IdentityService,
+    EntropyService,
+    AccountService,
+    MetamaskService,
+    TruncateAddress,
+  ],
+
   bootstrap: [AppComponent],
 })
 export class AppModule {}
