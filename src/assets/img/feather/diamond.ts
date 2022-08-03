@@ -4,4 +4,4 @@ export const Diamond = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w
 <path d="M15.5005 11.9L12.0044 20.7081" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M2 8.93246H21.9984" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M7.84863 8.93716L12.0015 3.39999L16.1544 8.93716" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`
+</svg>`;

@@ -1,15 +1,15 @@
-import {Component, OnInit} from '@angular/core';
-import {GlobalVarsService} from './global-vars.service';
-import {IdentityService} from './identity.service';
-import {AccessLevel, Network} from '../types/identity';
-import {getStateParamsFromGoogle} from './auth/google/google.component';
-import {BackendAPIService} from './backend-api.service';
+import { Component, OnInit } from '@angular/core';
+import { GlobalVarsService } from './global-vars.service';
+import { IdentityService } from './identity.service';
+import { AccessLevel, Network } from '../types/identity';
+import { getStateParamsFromGoogle } from './auth/google/google.component';
+import { BackendAPIService } from './backend-api.service';
 import { AccountService } from './account.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   title = 'identity';
@@ -20,8 +20,8 @@ export class AppComponent implements OnInit {
     private accountService: AccountService,
     private globalVars: GlobalVarsService,
     private identityService: IdentityService,
-    private backendApiService: BackendAPIService,
-  ) { }
+    private backendApiService: BackendAPIService
+  ) {}
 
   ngOnInit(): void {
     // load params
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
 
     // grab hash parameters from window and not activatedRoute because init is run before detecting fragment
     let hashParams;
-    if (window.location.hash && window.location.hash.length > 1){
+    if (window.location.hash && window.location.hash.length > 1) {
       // hash includes the hashtag symbol so use substring to remove it
       hashParams = new URLSearchParams(window.location.hash.substring(1));
     }
@@ -56,7 +56,10 @@ export class AppComponent implements OnInit {
       this.globalVars.signedUp = params.get('signedUp') === 'true';
     }
 
-    if (params.get('getFreeDeso') === 'true' || stateParamsFromGoogle.getFreeDeso) {
+    if (
+      params.get('getFreeDeso') === 'true' ||
+      stateParamsFromGoogle.getFreeDeso
+    ) {
       this.globalVars.getFreeDeso = true;
     }
 
@@ -86,20 +89,26 @@ export class AppComponent implements OnInit {
       if (referralCode) {
         localStorage.setItem(referralCodeKey, referralCode);
         this.globalVars.referralHashBase58 = referralCode;
-        this.backendApiService.GetReferralInfoForReferralHash(referralCode).subscribe((res) => {
-          const referralInfo = res.ReferralInfoResponse.Info;
-          const countrySignUpBonus = res.CountrySignUpBonus;
-          if (!countrySignUpBonus.AllowCustomReferralAmount) {
-            this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
-          } else if (
-            res.ReferralInfoResponse.IsActive &&
-            (referralInfo.TotalReferrals < referralInfo.MaxReferrals || referralInfo.MaxReferrals === 0)
-          ) {
-            this.globalVars.referralUSDCents = referralInfo.RefereeAmountUSDCents;
-          } else {
-            this.globalVars.referralUSDCents = countrySignUpBonus.ReferralAmountOverrideUSDCents;
-          }
-        });
+        this.backendApiService
+          .GetReferralInfoForReferralHash(referralCode)
+          .subscribe((res) => {
+            const referralInfo = res.ReferralInfoResponse.Info;
+            const countrySignUpBonus = res.CountrySignUpBonus;
+            if (!countrySignUpBonus.AllowCustomReferralAmount) {
+              this.globalVars.referralUSDCents =
+                countrySignUpBonus.ReferralAmountOverrideUSDCents;
+            } else if (
+              res.ReferralInfoResponse.IsActive &&
+              (referralInfo.TotalReferrals < referralInfo.MaxReferrals ||
+                referralInfo.MaxReferrals === 0)
+            ) {
+              this.globalVars.referralUSDCents =
+                referralInfo.RefereeAmountUSDCents;
+            } else {
+              this.globalVars.referralUSDCents =
+                countrySignUpBonus.ReferralAmountOverrideUSDCents;
+            }
+          });
       }
     } catch (e) {
       console.error(e);
@@ -109,9 +118,13 @@ export class AppComponent implements OnInit {
       // If callback is set, we won't be sending the initialize message.
       this.globalVars.hostname = 'localhost';
       this.finishInit();
-    } else if (this.globalVars.webview || this.globalVars.inTab || this.globalVars.inFrame()) {
+    } else if (
+      this.globalVars.webview ||
+      this.globalVars.inTab ||
+      this.globalVars.inFrame()
+    ) {
       // We must be running in a webview OR opened with window.open OR in an iframe to initialize
-      this.identityService.initialize().subscribe(res => {
+      this.identityService.initialize().subscribe((res) => {
         this.globalVars.hostname = res.hostname;
         if (this.globalVars.isFullAccessHostname()) {
           this.globalVars.accessLevelRequest = AccessLevel.Full;
@@ -126,7 +139,8 @@ export class AppComponent implements OnInit {
 
     this.backendApiService.GetAppState().subscribe((res) => {
       this.globalVars.jumioUSDCents = res.JumioUSDCents;
-      this.globalVars.nanosPerUSDExchangeRate = 1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
+      this.globalVars.nanosPerUSDExchangeRate =
+        1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
     });
   }
 

@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TextService {
-
-  constructor() { }
+  constructor() {}
 
   copyText(val: string): void {
     const selBox = document.createElement('textarea');
@@ -34,7 +33,11 @@ export class TextService {
   }
 
   // Assemble a URL to hit the BE with.
-  makeRequestURL(endpoint: string, routeName: string, adminPublicKey?: string): string {
+  makeRequestURL(
+    endpoint: string,
+    routeName: string,
+    adminPublicKey?: string
+  ): string {
     let queryURL = location.protocol + '//' + endpoint + routeName;
     // If the protocol is specified within the endpoint then use that.
     if (endpoint.startsWith('http')) {

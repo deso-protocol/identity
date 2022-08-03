@@ -10,8 +10,8 @@
       ></div>
       <div class="d-block ml-15px" style="display: block; max-width: 200px">
         {{
-          coinPublicKey === ""
-            ? "All Creators"
+          coinPublicKey === ''
+            ? 'All Creators'
             : user?.ProfileEntryResponse?.Username ||
               truncatePublicKey(coinPublicKey)
         }}

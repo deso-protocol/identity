@@ -8,9 +8,8 @@ describe('ArrowToggleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ArrowToggleComponent ]
-    })
-    .compileComponents();
+      declarations: [ArrowToggleComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

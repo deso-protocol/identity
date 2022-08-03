@@ -22,20 +22,20 @@ $red-font-color: #ff3434;
 $green-font-color: #19b028;
 
 @font-face {
-  font-family: "Eina01";
-  src: url("./assets/fonts/Eina01-Bold.ttf") format("truetype");
+  font-family: 'Eina01';
+  src: url('./assets/fonts/Eina01-Bold.ttf') format('truetype');
   font-weight: bold;
 }
 
 @font-face {
-  font-family: "Eina01";
-  src: url("./assets/fonts/Eina01-SemiBold.ttf") format("truetype");
+  font-family: 'Eina01';
+  src: url('./assets/fonts/Eina01-SemiBold.ttf') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
-  font-family: "Eina01";
-  src: url("./assets/fonts/Eina01-Regular.ttf") format("truetype");
+  font-family: 'Eina01';
+  src: url('./assets/fonts/Eina01-Regular.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -74,13 +74,13 @@ p {
 }
 
 @font-face {
-  font-family: "color-emoji";
-  src: local("Apple Color Emoji"), local("Segoe UI Emoji"),
-    local("Segoe UI Symbol"), local("Noto Color Emoji");
+  font-family: 'color-emoji';
+  src: local('Apple Color Emoji'), local('Segoe UI Emoji'),
+    local('Segoe UI Symbol'), local('Noto Color Emoji');
 }
 
 .font-emoji {
-  font-family: "color-emoji";
+  font-family: 'color-emoji';
 }
 
 $text: #000000;
@@ -219,10 +219,10 @@ $error: #ff6939;
   line-height: 12px;
 }
 .roboto-regular {
-  font-family: "Roboto";
+  font-family: 'Roboto';
 }
 .roboto-mono {
-  font-family: "Roboto Mono";
+  font-family: 'Roboto Mono';
 }
 .font-weight-semibold {
   font-weight: 500;
@@ -741,11 +741,11 @@ $error: #ff6939;
   background-color: white;
 }
 
-i-feather[name="check-circle"] {
+i-feather[name='check-circle'] {
   svg {
     display: none;
   }
-  background-image: url("/assets/img/verified-badge.svg");
+  background-image: url('/assets/img/verified-badge.svg');
   background-size: contain;
   position: relative;
   top: 3px;
@@ -1195,7 +1195,7 @@ i-feather[name="check-circle"] {
   background-repeat: no-repeat;
   background-position: center;
   background-size: auto 40%, auto;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjBmMGYwIj4KICA8cGF0aCBvcGFjaXR5PSIuMjUiIGQ9Ik0xNiAwIEExNiAxNiAwIDAgMCAxNiAzMiBBMTYgMTYgMCAwIDAgMTYgMCBNMTYgNCBBMTIgMTIgMCAwIDEgMTYgMjggQTEyIDEyIDAgMCAxIDE2IDQiLz4KICA8cGF0aCBkPSJNMTYgMCBBMTYgMTYgMCAwIDEgMzIgMTYgTDI4IDE2IEExMiAxMiAwIDAgMCAxNiA0eiI+CiAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCAxNiAxNiIgdG89IjM2MCAxNiAxNiIgZHVyPSIwLjhzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICA8L3BhdGg+Cjwvc3ZnPgo=");
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjBmMGYwIj4KICA8cGF0aCBvcGFjaXR5PSIuMjUiIGQ9Ik0xNiAwIEExNiAxNiAwIDAgMCAxNiAzMiBBMTYgMTYgMCAwIDAgMTYgMCBNMTYgNCBBMTIgMTIgMCAwIDEgMTYgMjggQTEyIDEyIDAgMCAxIDE2IDQiLz4KICA8cGF0aCBkPSJNMTYgMCBBMTYgMTYgMCAwIDEgMzIgMTYgTDI4IDE2IEExMiAxMiAwIDAgMCAxNiA0eiI+CiAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCAxNiAxNiIgdG89IjM2MCAxNiAxNiIgZHVyPSIwLjhzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICA8L3BhdGg+Cjwvc3ZnPgo=');
   opacity: 0.4;
 }
 

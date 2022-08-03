@@ -1,8 +1,5 @@
 <!-- Top Bar -->
-<div
-  class="buy-deso__container p-16px"
-  style="padding-top: 0px"
->
+<div class="buy-deso__container p-16px" style="padding-top: 0px">
   <span class="buy-deso__title mb-5px">Buy Complete</span>
   <div class="w-100 border-bottom"></div>
   <div class="fs-15px pt-16px pb-30px">
@@ -14,8 +11,11 @@
 
     <div class="d-flex align-items-center mt-15px">
       <button class="primary-button" (click)="close()">Done</button>
-      <span class="fs-15px ml-30px cursor-pointer fc-secondary" (click)="buyMoreDeSoClicked.emit()">Buy more DESO</span>
+      <span
+        class="fs-15px ml-30px cursor-pointer fc-secondary"
+        (click)="buyMoreDeSoClicked.emit()"
+        >Buy more DESO</span
+      >
     </div>
-
   </div>
 </div>

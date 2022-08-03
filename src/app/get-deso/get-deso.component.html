@@ -1,21 +1,34 @@
 <app-banner></app-banner>
 
-<div class="page-container" *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback">
+<div
+  class="page-container"
+  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback"
+>
   <!-- Step 3 -->
   <!-- Get Starter $DESO. -->
   <div *ngIf="stepScreen === GetDesoComponent.STEP_GET_STARTER_DESO">
-    <div class="w-100 text-center fs-32px font-weight-bold">Get Starter $DESO</div>
+    <div class="w-100 text-center fs-32px font-weight-bold">
+      Get Starter $DESO
+    </div>
     <div class="w-100 text-center mt-20px fs-20px font-weight-bold">
       Enter your phone number or buy your first $DESO.
     </div>
     <div class="w-100 d-flex align-items-center flex-column">
-      <div style="max-width: 500px" class="w-100 text-center fs-18px mt-5px mb-30px text-muted fc-secondary">
-        This is the cryptocurrency that fuels the DeSo blockchain and allows you to post to the decentralized social network.
+      <div
+        style="max-width: 500px"
+        class="w-100 text-center fs-18px mt-5px mb-30px text-muted fc-secondary"
+      >
+        This is the cryptocurrency that fuels the DeSo blockchain and allows you
+        to post to the decentralized social network.
       </div>
-      <div class="w-100 text-center fs-18px mt-20px mb-10px font-weight-bold mb-10px">Choose an option</div>
+      <div
+        class="w-100 text-center fs-18px mt-20px mb-10px font-weight-bold mb-10px"
+      >
+        Choose an option
+      </div>
       <button
         (click)="stepThreeNextPhone()"
-        [ngStyle]="{ 'width': '40%', 'min-width': '300px' }"
+        [ngStyle]="{ width: '40%', 'min-width': '300px' }"
         class="styled-primary-button mb-10px"
       >
         Get $DESO with Phone Number
@@ -23,20 +36,26 @@
       <div class="fs-16px fc-muted">Get $DESO for free</div>
       <button
         (click)="stepThreeNextBuy()"
-        [ngStyle]="{ 'width': '40%', 'min-width': '300px' }"
+        [ngStyle]="{ width: '40%', 'min-width': '300px' }"
         class="styled-secondary-button mt-30px mb-10px"
       >
         Buy or Send $DESO Anonymously
       </button>
-      <div class="fs-16px fc-muted">Transfer from an exchange or a DeSo account</div>
+      <div class="fs-16px fc-muted">
+        Transfer from an exchange or a DeSo account
+      </div>
       <button
         (click)="finishFlow()"
-        [ngStyle]="{ 'width': '40%', 'min-width': '300px', 'border-color': 'gray', 'color': 'gray' }"
+        [ngStyle]="{
+          width: '40%',
+          'min-width': '300px',
+          'border-color': 'gray',
+          color: 'gray'
+        }"
         class="styled-secondary-button mt-30px mb-10px"
       >
         Skip
       </button>
     </div>
   </div>
-
 </div>

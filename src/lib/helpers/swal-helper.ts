@@ -49,7 +49,9 @@ export class SwalHelper {
       cancelButton: _.escape(options?.customClass?.cancelButton),
     };
 
-    const escapedIcon = _.escape(options.icon as string) as sweetalert2.SweetAlertIcon;
+    const escapedIcon = _.escape(
+      options.icon as string
+    ) as sweetalert2.SweetAlertIcon;
 
     const escapedOptions = {
       icon: escapedIcon,

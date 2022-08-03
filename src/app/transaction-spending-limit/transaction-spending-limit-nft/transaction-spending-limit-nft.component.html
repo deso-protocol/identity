@@ -39,7 +39,7 @@
                 post
                   ? post?.ProfileEntryResponse?.Username ||
                     post.PosterPublicKeyBase58Check
-                  : "All NFTs:"
+                  : 'All NFTs:'
               }}
             </div>
           </div>
@@ -84,9 +84,9 @@
     >
       <div class="fs-18px">
         {{
-          serialNumToOpMap.key === "0"
-            ? "All Serial Numbers"
-            : "#" + serialNumToOpMap.key
+          serialNumToOpMap.key === '0'
+            ? 'All Serial Numbers'
+            : '#' + serialNumToOpMap.key
         }}
       </div>
       <div class="d-flex flex-column pt-15px pl-15px">
@@ -127,7 +127,7 @@
       "
       (click)="showAll = !showAll; expandNFT = showAll"
     >
-      {{ showAll ? "Hide" : "Show all" }}
+      {{ showAll ? 'Hide' : 'Show all' }}
       {{ globalVars.ObjectKeyLength(nftSerialNumToOperationMap) }} serial
       numbers
     </div>

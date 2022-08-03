@@ -37,7 +37,6 @@ export class LogInComponent implements OnInit {
     this.hasUsers = publicKeys.length > 0;
     this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
       this.allUsers = profiles;
-      console.log(profiles);
     });
 
     // Set showAccessLevels

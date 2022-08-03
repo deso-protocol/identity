@@ -1,31 +1,36 @@
 <app-banner></app-banner>
 
 <div class="page-container">
-  <div class="title-text">
-    Approve a transaction
-  </div>
+  <div class="title-text">Approve a transaction</div>
   <div class="main-text">
     <p class="pb-15px">
       {{ globalVars.hostname }} wants to {{ transactionDescription }}
     </p>
-    <div
-      *ngIf="derivedKeyMemo">
-      Memo: {{ derivedKeyMemo }}
-    </div>
+    <div *ngIf="derivedKeyMemo">Memo: {{ derivedKeyMemo }}</div>
     <div *ngIf="transactionSpendingLimitResponse">
       <app-transaction-spending-limit
         [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       ></app-transaction-spending-limit>
     </div>
-    <br/>
+    <br />
     <div *ngIf="transactionDeSoSpent">
-      <p class="pb-15px">
-        Total Cost: {{ transactionDeSoSpent }} $DESO
-      </p>
+      <p class="pb-15px">Total Cost: {{ transactionDeSoSpent }} $DESO</p>
     </div>
     <div class="d-flex align-items-end justify-content-between">
-      <button type="button" class="button button-small button-secondary" (click)="onCancel()">Deny</button>
-      <button type="button" class="button button-small button-primary" (click)="onSubmit()">Allow</button>
+      <button
+        type="button"
+        class="button button-small button-secondary"
+        (click)="onCancel()"
+      >
+        Deny
+      </button>
+      <button
+        type="button"
+        class="button button-small button-primary"
+        (click)="onSubmit()"
+      >
+        Allow
+      </button>
     </div>
   </div>
 </div>

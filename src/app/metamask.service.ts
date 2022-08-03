@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MetamaskService {
-
-  constructor() { }
+  constructor() {}
 
   public async connectMetamaskMiddleware(): Promise<boolean> {
     const accounts = await this.getProvider().listAccounts();
@@ -35,9 +34,12 @@ export class MetamaskService {
    * generates a spending limits message and signature for authorizing a derived key
    */
   public async signMessageWithMetamaskAndGetEthAddress(
-    accessBytesHex: string,
-  ): Promise<{ message: number[]; signature: string, publicEthAddress: string }> {
-
+    accessBytesHex: string
+  ): Promise<{
+    message: number[];
+    signature: string;
+    publicEthAddress: string;
+  }> {
     try {
       await this.connectMetamaskMiddleware();
     } catch (e) {
@@ -46,27 +48,27 @@ export class MetamaskService {
 
     // Access Bytes Encoding 2.0
     const message = [...Buffer.from(accessBytesHex, 'hex')];
-    return new Promise<{ message: number[]; signature: string, publicEthAddress: string }>(
-      (resolve, reject) => {
-        this.getProvider()
-          .getSigner()
-          .signMessage(message)
-          .then(async (signature) => {
-            try {
-              const publicEthAddress = await this.verifySignatureAndRecoverAddress(
-                message,
-                signature
-              );
-              resolve({ message, signature, publicEthAddress });
-            } catch (e) {
-              reject(`signature error: ${e}`);
-            }
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      }
-    );
+    return new Promise<{
+      message: number[];
+      signature: string;
+      publicEthAddress: string;
+    }>((resolve, reject) => {
+      this.getProvider()
+        .getSigner()
+        .signMessage(message)
+        .then(async (signature) => {
+          try {
+            const publicEthAddress =
+              await this.verifySignatureAndRecoverAddress(message, signature);
+            resolve({ message, signature, publicEthAddress });
+          } catch (e) {
+            reject(`signature error: ${e}`);
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
   }
 
   private getProvider = (): ethers.providers.Web3Provider => {
@@ -74,7 +76,7 @@ export class MetamaskService {
       (window as any).ethereum
     );
     return provider;
-  }
+  };
 
   public async verifySignatureAndRecoverAddress(
     message: number[],
@@ -94,7 +96,9 @@ export class MetamaskService {
     );
     const publicEthAddress = await this.getProvider().getSigner().getAddress();
     if (recoveredAddress !== publicEthAddress) {
-      throw new Error('Public key recovered from signature doesn\'t match the signer\'s public key!');
+      throw new Error(
+        "Public key recovered from signature doesn't match the signer's public key!"
+      );
     }
     return recoveredAddress;
   }
