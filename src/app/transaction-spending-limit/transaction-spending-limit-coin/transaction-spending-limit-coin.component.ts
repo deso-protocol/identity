@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
 import {
   CreatorCoinLimitOperationString,
   DAOCoinLimitOperationString,
@@ -25,10 +24,7 @@ export class TransactionSpendingLimitCoinComponent implements OnInit {
   expandCreator: boolean = false;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
-  constructor(
-    public globalVars: GlobalVarsService,
-    public truncateAddress: TruncateAddress
-  ) {}
+  constructor(public globalVars: GlobalVarsService) {}
 
   ngOnInit(): void {}
 

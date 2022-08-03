@@ -47,7 +47,7 @@ import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.comp
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
 import { MetamaskService } from './metamask.service';
 import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
-import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
+import { TruncateAddressPipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 
 @NgModule({
   declarations: [
@@ -84,7 +84,7 @@ import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
     BuyOrSendDesoComponent,
     SignUpMetamaskComponent,
     ArrowToggleComponent,
-    TruncateAddress,
+    TruncateAddressPipe,
   ],
   imports: [
     BrowserModule,
@@ -105,7 +105,7 @@ import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
     EntropyService,
     AccountService,
     MetamaskService,
-    TruncateAddress,
+    TruncateAddressPipe,
   ],
 
   bootstrap: [AppComponent],

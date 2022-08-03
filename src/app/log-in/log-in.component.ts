@@ -7,7 +7,6 @@ import { LoginMethod, UserProfile } from '../../types/identity';
 import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
-import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
 
 @Component({
   selector: 'app-log-in',
@@ -28,8 +27,7 @@ export class LogInComponent implements OnInit {
     private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
-    private router: Router,
-    public truncateAddress: TruncateAddress
+    private router: Router
   ) {}
 
   ngOnInit(): void {

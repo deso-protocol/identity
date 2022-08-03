@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
+import { TruncateAddressPipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 import { DAOCoinLimitOrderLimitItem, User } from '../../backend-api.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
@@ -18,8 +18,6 @@ export class TransactionSpendingLimitDaoCoinLimitOrderComponent
   @Input() buyingUser: User | undefined;
   @Input() sellingUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
-
-  constructor(public truncateAddress: TruncateAddress) {}
 
   ngOnInit(): void {}
 }
