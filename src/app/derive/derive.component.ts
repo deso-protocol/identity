@@ -10,7 +10,6 @@ import { UserProfile } from '../../types/identity';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
-import { TruncateAddress } from 'src/lib/pipes/truncate-deso-address';
 
 @Component({
   selector: 'app-derive',
@@ -35,8 +34,7 @@ export class DeriveComponent implements OnInit {
     private identityService: IdentityService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
-    private activatedRoute: ActivatedRoute,
-    public truncateAddress: TruncateAddress
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {

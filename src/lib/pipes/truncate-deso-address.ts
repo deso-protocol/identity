@@ -9,6 +9,12 @@ export class TruncateAddress implements PipeTransform {
 
   transform(publicAddress: string | undefined) {
     if (publicAddress === undefined) return '';
-    return this.globalVars.truncateAddress(publicAddress);
+    if (publicAddress.length <= 12) {
+      return key;
+    }
+    return `${publicAddress.substring(0, 7)}....${publicAddress.substring(
+      publicAddress.length - 4,
+      publicAddress.length
+    )}`;
   }
 }
