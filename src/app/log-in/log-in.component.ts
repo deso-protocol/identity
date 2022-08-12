@@ -94,7 +94,7 @@ export class LogInComponent implements OnInit {
     });
   }
 
-  public getLoginIcon(loginMethod: LoginMethod): any {
+  public getLoginIcon(loginMethod: LoginMethod) {
     return {
       [LoginMethod.DESO]: 'assets/deso-logo.png',
       [LoginMethod.GOOGLE]: 'assets/google_logo.svg',
@@ -103,7 +103,7 @@ export class LogInComponent implements OnInit {
   }
 }
 
-export const getSpendingLimitsForMetamask = (): any => {
+export const getSpendingLimitsForMetamask = () => {
   return {
     IsUnlimited: true,
   };

@@ -30,7 +30,7 @@ enum METAMASK {
   templateUrl: './sign-up-metamask.component.html',
   styleUrls: ['./sign-up-metamask.component.scss'],
 })
-export class SignUpMetamaskComponent implements OnInit {
+export class SignUpMetamaskComponent {
   private static UNLIMITED_DERIVED_KEY_EXPIRATION: Readonly<number> = 100000000000;
   metamaskState: METAMASK = METAMASK.START;
   currentScreen: SCREEN = SCREEN.CREATE_ACCOUNT;
@@ -49,8 +49,6 @@ export class SignUpMetamaskComponent implements OnInit {
     private signingService: SigningService,
     private metamaskService: MetamaskService
   ) {}
-
-  ngOnInit(): void {}
 
   nextStep(): void {
     this.currentScreen += 1;
@@ -151,7 +149,7 @@ export class SignUpMetamaskComponent implements OnInit {
       const err = (e as any)?.error?.error;
       this.errorMessage =
         err ||
-        'Unable to send starter Deso, this is not an issue if you already have a Deso balance';
+        'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
       this.metamaskState = METAMASK.ERROR;
       return;
     }

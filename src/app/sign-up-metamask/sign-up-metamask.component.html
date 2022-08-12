@@ -59,12 +59,6 @@
       Congratulations, you created a DeSo account! Click below to login into
       your account.
     </div>
-    <!-- <p> Click next to continue the account setup process and register your
-      messaging keys. This step is optional, if you're not planning on using
-      messaging apps on the DeSo blockchain, feel free to skip or wait for the
-      timer to hit zero.
-    </p> -->
-    <!-- <p class="font-weight-bold">Time: {{ timeoutTimer }}s</p> -->
     <div class="d-flex justify-content-center">
       <button
         (click)="login()"
@@ -83,16 +77,5 @@
       After signing this message your account will be generated with full
       permissions to post, comment, tip, and message.
     </p>
-  </div>
-  <div *ngIf="this.currentScreen === SCREEN.MESSAGES_SUCCESS">
-    <span class="title-text">Success!</span>
-    <div class="main-text mb-2">
-      you can now start using any app on the Deso blockchain
-    </div>
-
-    <img height="200px" width="200px" src="assets/check.png" class="mr-10px" />
-    <div>
-      <a href="http://google.com" class="h5">Finish</a>
-    </div>
   </div>
 </div>

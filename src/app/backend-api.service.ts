@@ -8,7 +8,6 @@ import { AccountService } from './account.service';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import { DerivedKey, Network, UserProfile } from '../types/identity';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export interface MetamaskSignInRequest {
   AmountNanos: number;
@@ -334,22 +333,9 @@ export class BackendAPIService {
     PublicKey: string,
     JumioInternalReference: string
   ): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[PublicKey];
-    if (!publicUserInfo) {
-      return of(null);
-    }
-    const isDerived = this.accountService.isDerivedKeyAccount(publicUserInfo);
-
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
-    );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
-
-    return this.post('jumio-flow-finished', {
+    return this.jwtPost('jumio-flow-finished', PublicKey, {
       PublicKey,
       JumioInternalReference,
-      JWT: jwt,
     });
   }
 
@@ -462,7 +448,6 @@ export class BackendAPIService {
   GetAccessBytes(
     DerivedPublicKeyBase58Check: string,
     ExpirationBlock: number,
-    // tslint:disable-next-line:no-shadowed-variable
     TransactionSpendingLimit: TransactionSpendingLimitResponse
   ): Observable<GetAccessBytesResponse> {
     return this.post('get-access-bytes', {

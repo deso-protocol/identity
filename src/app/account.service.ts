@@ -93,7 +93,7 @@ export class AccountService {
   }
 
   // Check if the account is signed in via a derived key.
-  isDerivedKeyAccount(userInfo: PublicUserInfo): boolean {
+  isDerivedKeyAccount(userInfo: PublicUserInfo | PrivateUserInfo): boolean {
     return userInfo.loginMethod === LoginMethod.METAMASK;
   }
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
@@ -138,7 +138,7 @@ export class AccountService {
   ): Promise<DerivedPrivateUserInfo | undefined> {
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
-    const isDerived = privateUser.loginMethod === LoginMethod.METAMASK;
+    const isDerived = this.isDerivedKeyAccount(privateUser);
 
     let derivedSeedHex = '';
     let derivedPublicKeyBuffer: number[];
@@ -261,7 +261,6 @@ export class AccountService {
       ])[0];
     }
 
-    // tslint:disable-next-line:one-variable-per-declaration
     let messagingPublicKeyBase58Check,
       messagingPrivateKey,
       messagingKeyName,

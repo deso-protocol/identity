@@ -35,7 +35,7 @@
             </div>
             <div *ngIf="item.value.username" class="d-flex align-items-center">
               <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-              <div class="">{{ item.value.username }}</div>
+              <div>{{ item.value.username }}</div>
             </div>
             <!-- replace the boolean with item.<ismetamask or isdesoaccount> -->
             <img
@@ -84,7 +84,6 @@
       <span class="font-weight-bold">Sign up / log in with Google</span>
     </button>
     <button
-      class="mb-40px"
       class="button button-large button-secondary mb-20px"
       [routerLink]="['/sign-up']"
       queryParamsHandling="merge"
