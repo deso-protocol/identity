@@ -302,20 +302,7 @@ export class BackendAPIService {
     SuccessURL: string,
     ErrorURL: string
   ): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[PublicKey];
-    if (!publicUserInfo) {
-      return of(null);
-    }
-    const isDerived = this.accountService.isDerivedKeyAccount(publicUserInfo);
-
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
-    );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
-
-    return this.post('jumio-begin', {
-      JWT: jwt,
+    return this.jwtPost('jumio-begin', PublicKey, {
       PublicKey,
       ReferralHashBase58,
       SuccessURL,
