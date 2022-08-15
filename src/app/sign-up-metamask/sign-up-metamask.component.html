@@ -53,21 +53,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="this.currentScreen === SCREEN.ACCOUNT_SUCCESS">
-    <span class="title-text">Success!</span>
-    <div class="main-text mb-2">
-      Congratulations, you created a DeSo account! Click below to login into
-      your account.
-    </div>
-    <div class="d-flex justify-content-center">
-      <button
-        (click)="login()"
-        class="button button-small mb-20px bg-dark text-white mt-20px"
-      >
-        login
-      </button>
-    </div>
-  </div>
+
   <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
     <span class="title-text">Authorize Derived Key</span>
     <div class="main-text mb-2">

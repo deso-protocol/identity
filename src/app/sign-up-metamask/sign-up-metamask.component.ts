@@ -16,9 +16,7 @@ import { MetamaskService } from '../metamask.service';
 enum SCREEN {
   CREATE_ACCOUNT = 0,
   LOADING = 1,
-  ACCOUNT_SUCCESS = 2,
   AUTHORIZE_MESSAGES = 3,
-  MESSAGES_SUCCESS = 4,
 }
 enum METAMASK {
   START = 0,
@@ -207,7 +205,6 @@ export class SignUpMetamaskComponent {
           LoginMethod.METAMASK,
           metamaskPublicKeyHex
         );
-        this.currentScreen = this.SCREEN.ACCOUNT_SUCCESS;
         this.metamaskState = this.METAMASK.START;
         // this.startTimer();
       })
