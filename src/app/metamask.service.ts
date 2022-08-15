@@ -102,4 +102,20 @@ export class MetamaskService {
     }
     return recoveredAddress;
   }
+  public async getSignerAddress(): Promise<string> {
+    const publicEthAddress = await this.getProvider().getSigner().getAddress();
+    return publicEthAddress;
+  }
+  /**
+   * Event listener for when a user switches their connected account
+   * @param addressToDisplay address in template to update when the signer changes
+   */
+  public onSignerChange(callback: (updatedAccount: string) => void): void {
+    (window as any).ethereum.on(
+      'accountsChanged',
+      function (accounts: string[]) {
+        callback(accounts[0]);
+      }
+    );
+  }
 }

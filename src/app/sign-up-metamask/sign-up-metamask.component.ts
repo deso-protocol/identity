@@ -28,7 +28,7 @@ enum METAMASK {
   templateUrl: './sign-up-metamask.component.html',
   styleUrls: ['./sign-up-metamask.component.scss'],
 })
-export class SignUpMetamaskComponent {
+export class SignUpMetamaskComponent implements OnInit {
   private static UNLIMITED_DERIVED_KEY_EXPIRATION: Readonly<number> = 100000000000;
   metamaskState: METAMASK = METAMASK.START;
   currentScreen: SCREEN = SCREEN.CREATE_ACCOUNT;
@@ -37,7 +37,7 @@ export class SignUpMetamaskComponent {
   METAMASK = METAMASK;
   publicKey = '';
   errorMessage = '';
-
+  existingConnectedWallet = '';
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -47,6 +47,15 @@ export class SignUpMetamaskComponent {
     private signingService: SigningService,
     private metamaskService: MetamaskService
   ) {}
+  async ngOnInit(): Promise<void> {
+    // grab the currently connected wallet if there is one
+    this.existingConnectedWallet =
+      await this.metamaskService.getSignerAddress();
+    // if they change wallets then update the display
+    this.metamaskService.onSignerChange((updatedAccount: string) => {
+      this.existingConnectedWallet = updatedAccount;
+    });
+  }
 
   nextStep(): void {
     this.currentScreen += 1;

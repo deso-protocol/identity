@@ -52,6 +52,14 @@
         <div class="text-danger">{{ errorMessage }}</div>
       </div>
     </div>
+
+    <ng-container *ngIf="existingConnectedWallet">
+      <div>{{ existingConnectedWallet | truncateAddress }}</div>
+      <div>
+        If this is not the account you want to connect please open metamask,
+        pick the correct account and click connect.
+      </div>
+    </ng-container>
   </div>
 
   <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
