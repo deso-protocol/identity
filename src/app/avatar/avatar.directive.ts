@@ -24,7 +24,8 @@ export class AvatarDirective implements OnChanges {
     // calling fetch here to see if an page has a 404
     fetch(this.backendApi.GetSingleProfilePictureURL(this.appAvatar)).then(
       (res) => {
-        if (res.status !== 404) {
+        console.log(res);
+        if (res.status === 200) {
           element.style.backgroundImage = `url(${this.backendApi.GetSingleProfilePictureURL(
             appAvatar
           )})`;
