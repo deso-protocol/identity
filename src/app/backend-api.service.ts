@@ -226,7 +226,7 @@ export class BackendAPIService {
     if (!publicUserInfo) {
       return of(null);
     }
-    const isDerived = this.accountService.isDerivedKeyAccount(publicUserInfo);
+    const isDerived = this.accountService.isMetamaskAccount(publicUserInfo);
 
     const seedHex = this.cryptoService.decryptSeedHex(
       publicUserInfo.encryptedSeedHex,

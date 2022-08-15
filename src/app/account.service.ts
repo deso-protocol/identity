@@ -93,7 +93,7 @@ export class AccountService {
   }
 
   // Check if the account is signed in via a derived key.
-  isDerivedKeyAccount(userInfo: PublicUserInfo | PrivateUserInfo): boolean {
+  isMetamaskAccount(userInfo: PublicUserInfo | PrivateUserInfo): boolean {
     return userInfo.loginMethod === LoginMethod.METAMASK;
   }
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
@@ -103,7 +103,7 @@ export class AccountService {
     for (const publicKey of Object.keys(publicUsers)) {
       const user = publicUsers[publicKey];
       if (user.encryptedSeedHex === encryptedSeedHex) {
-        return this.isDerivedKeyAccount(user);
+        return this.isMetamaskAccount(user);
       }
     }
     return false;
@@ -138,7 +138,7 @@ export class AccountService {
   ): Promise<DerivedPrivateUserInfo | undefined> {
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
-    const isDerived = this.isDerivedKeyAccount(privateUser);
+    const isDerived = this.isMetamaskAccount(privateUser);
 
     let derivedSeedHex = '';
     let derivedPublicKeyBuffer: number[];
