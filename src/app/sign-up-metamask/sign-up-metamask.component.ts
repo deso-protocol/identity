@@ -132,6 +132,7 @@ export class SignUpMetamaskComponent {
       this.cryptoService.publicKeyToEthAddress(metamaskKeyPair);
     const metamaskPublicKeyBase58Check =
       this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
+
     try {
       await this.backendApi
         .SendStarterDeSoForMetamaskAccount({
@@ -144,12 +145,23 @@ export class SignUpMetamaskComponent {
         })
         .toPromise();
     } catch (e) {
+      // if they received the account, or if they have funds don't error out of the flow,
+      //  just move on to the next step
       const err = (e as any)?.error?.error;
-      this.errorMessage =
-        err ||
-        'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
-      this.metamaskState = METAMASK.ERROR;
-      return;
+      if (
+        ![
+          'MetamaskSignin:  Account already has a balance',
+          'MetamaskSignin: Account has already received airdrop',
+        ].includes(err)
+      ) {
+        {
+          this.errorMessage =
+            err ||
+            'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
+          this.metamaskState = METAMASK.ERROR;
+          return;
+        }
+      }
     }
     // Slice the '0x' prefix from the signature.
     const accessSignature = signature.slice(2);
