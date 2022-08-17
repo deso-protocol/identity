@@ -138,7 +138,7 @@ export class AccountService {
   ): Promise<DerivedPrivateUserInfo | undefined> {
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
-    const isDerived = this.isMetamaskAccount(privateUser);
+    const isMetamask = this.isMetamaskAccount(privateUser);
 
     let derivedSeedHex = '';
     let derivedPublicKeyBuffer: number[];
@@ -176,7 +176,7 @@ export class AccountService {
     // In case of the metamask log-in, jwt will be signed by a derived key.
     jwt = this.signingService.signJWT(
       privateUser.seedHex,
-      isDerived,
+      isMetamask,
       `${numDaysBeforeExpiration} days`
     );
 
@@ -228,7 +228,7 @@ export class AccountService {
       ...derivedPublicKeyBuffer,
       ...expirationBlockBuffer,
     ];
-    if (isDerived) {
+    if (isMetamask) {
       accessBytes = [...Buffer.from(response.AccessBytesHex, 'hex')];
     } else {
       const transactionSpendingLimitBytes = response.SpendingLimitHex
@@ -240,7 +240,7 @@ export class AccountService {
     const accessHash = sha256.x2(accessBytes);
 
     let accessSignature: string;
-    if (isDerived) {
+    if (isMetamask) {
       // FIXME: if we want to allow generic log-in with derived keys, we should error because a derived key can't produce a
       //  valid access signature. For now, we ignore this because the only derived key log-in is coming through Metamask signup.
       try {
@@ -265,7 +265,7 @@ export class AccountService {
       messagingPrivateKey,
       messagingKeyName,
       messagingKeySignature: string;
-    if (!isDerived) {
+    if (!isMetamask) {
       // Set the default messaging key name
       messagingKeyName = this.globalVars.defaultMessageKeyName;
       // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )

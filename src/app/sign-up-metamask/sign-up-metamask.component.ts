@@ -161,6 +161,7 @@ export class SignUpMetamaskComponent implements OnInit {
         ![
           'MetamaskSignin:  Account already has a balance',
           'MetamaskSignin: Account has already received airdrop',
+          'MetamaskSignin: To be eligible for airdrop your account needs to have more than .001 eth',
         ].includes(err)
       ) {
         {
