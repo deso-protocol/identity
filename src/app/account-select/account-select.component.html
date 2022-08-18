@@ -16,12 +16,12 @@
                 class="avatar mr-15px"
                 src="assets/placeholder-account-image.png"
               />
-              {{ item.key | truncateAddress }}
+              {{ item.key | truncateAddressOrUsername }}
             </div>
           </div>
           <div *ngIf="item.value.username" class="d-flex align-items-center">
             <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-            <div>{{ item.value.username }}</div>
+            <div>{{ item.value.username | truncateAddressOrUsername }}</div>
           </div>
           <img
             [src]="

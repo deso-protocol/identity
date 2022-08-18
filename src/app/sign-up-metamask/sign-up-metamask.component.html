@@ -54,7 +54,7 @@
     </div>
 
     <ng-container *ngIf="existingConnectedWallet">
-      <div>{{ existingConnectedWallet | truncateAddress }}</div>
+      <div>{{ existingConnectedWallet | truncateAddressOrUsername }}</div>
       <div>
         If this is not the account you want to connect please open metamask,
         pick the correct account and click connect.

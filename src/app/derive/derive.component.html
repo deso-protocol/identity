@@ -11,11 +11,14 @@
       Grant signing access
       <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
     </div>
-    <app-account-select
-      [allUsers$]="allUsers$"
-      (onAccountSelect)="publicKeyBase58Check = $event"
-      *ngIf="!publicKeyBase58Check"
-    ></app-account-select>
+    <ng-container *ngIf="!publicKeyBase58Check">
+      <app-account-select
+        [allUsers$]="allUsers$"
+        (onAccountSelect)="publicKeyBase58Check = $event"
+      ></app-account-select>
+      <div class="mb-2">or</div>
+      <app-log-in-options></app-log-in-options>
+    </ng-container>
     <div
       class="fs-18px pt-15px pb-5px"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
@@ -24,13 +27,13 @@
       <div class="pl-20px text-left d-flex justify-content-between">
         Public Key
         <span class="font-weight-normal pr-20px pb-15px text-left">{{
-          publicKeyBase58Check | truncateAddress
+          publicKeyBase58Check | truncateAddressOrUsername
         }}</span>
       </div>
       <div class="pl-20px text-left d-flex justify-content-between">
         Derived Public Key
         <span class="font-weight-normal pr-20px">{{
-          derivedPublicKeyBase58Check | truncateAddress
+          derivedPublicKeyBase58Check | truncateAddressOrUsername
         }}</span>
       </div>
     </div>

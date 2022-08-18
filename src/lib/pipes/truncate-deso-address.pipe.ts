@@ -1,9 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'truncateAddress',
+  name: 'truncateAddressOrUsername',
 })
-export class TruncateAddressPipe implements PipeTransform {
+export class TruncateAddressOrUsernamePipe implements PipeTransform {
   transform(key: string | undefined) {
     if (!key) return '';
     if (key.length <= 12) {

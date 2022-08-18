@@ -47,7 +47,7 @@ import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.comp
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
 import { MetamaskService } from './metamask.service';
 import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
-import { TruncateAddressPipe } from 'src/lib/pipes/truncate-deso-address.pipe';
+import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 import { LogInOptionsComponent } from './log-in-options/log-in-options.component';
 import { AccountSelectComponent } from './account-select/account-select.component';
 
@@ -86,7 +86,7 @@ import { AccountSelectComponent } from './account-select/account-select.componen
     BuyOrSendDesoComponent,
     SignUpMetamaskComponent,
     ArrowToggleComponent,
-    TruncateAddressPipe,
+    TruncateAddressOrUsernamePipe,
     LogInOptionsComponent,
     AccountSelectComponent,
   ],
@@ -109,7 +109,7 @@ import { AccountSelectComponent } from './account-select/account-select.componen
     EntropyService,
     AccountService,
     MetamaskService,
-    TruncateAddressPipe,
+    TruncateAddressOrUsernamePipe,
   ],
 
   bootstrap: [AppComponent],

@@ -41,6 +41,7 @@ export class LogInComponent implements OnInit {
       queryParams: { publicKey },
     });
   }
+
   onAccountSelect(publicKey: string): void {
     this.accountService.setAccessLevel(
       publicKey,

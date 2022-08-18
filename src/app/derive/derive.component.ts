@@ -7,9 +7,8 @@ import {
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { UserProfile } from '../../types/identity';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { map, switchMap } from 'rxjs/operators';
-import { Observable, of, throwError } from 'rxjs';
+import { ActivatedRoute, Params } from '@angular/router';
+import { Observable } from 'rxjs';
 type Accounts = { [key: string]: UserProfile } | {};
 type DeriveParams = {
   publicKey?: string;

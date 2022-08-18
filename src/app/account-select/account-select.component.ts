@@ -1,13 +1,10 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { LoginMethod, UserProfile } from 'src/types/identity';
 import { EventEmitter } from '@angular/core';
 import { AccountService } from '../account.service';
-import { RouteNames } from '../app-routing.module';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { IdentityService } from '../identity.service';
 
 @Component({
   selector: 'app-account-select',
