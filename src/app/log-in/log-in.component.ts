@@ -24,7 +24,6 @@ export class LogInComponent implements OnInit {
   constructor(
     public accountService: AccountService,
     private identityService: IdentityService,
-    private googleDrive: GoogleDriveService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
     private router: Router
@@ -40,10 +39,6 @@ export class LogInComponent implements OnInit {
 
     // Set showAccessLevels
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
-  }
-
-  launchGoogle(): void {
-    this.googleDrive.launchGoogle();
   }
 
   selectAccount(publicKey: string): void {
@@ -77,12 +72,6 @@ export class LogInComponent implements OnInit {
     this.router.navigate(['/', RouteNames.GET_DESO], {
       queryParamsHandling: 'merge',
       queryParams: { publicKey },
-    });
-  }
-
-  navigateToMetamaskSignup(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP_METAMASK], {
-      queryParamsHandling: 'merge',
     });
   }
 
