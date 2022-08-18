@@ -7,12 +7,17 @@ import {
 import { LoginMethod, Network } from '../../types/identity';
 import { ec } from 'elliptic';
 import { CryptoService } from '../crypto.service';
-import { getSpendingLimitsForMetamask } from '../log-in/log-in.component';
 import { AccountService } from '../account.service';
 import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { SigningService } from '../signing.service';
 import { MetamaskService } from '../metamask.service';
+
+export const getSpendingLimitsForMetamask = () => {
+  return {
+    IsUnlimited: true,
+  };
+};
 enum SCREEN {
   CREATE_ACCOUNT = 0,
   LOADING = 1,

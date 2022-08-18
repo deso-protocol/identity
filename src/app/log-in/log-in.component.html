@@ -11,49 +11,9 @@
       or DeSo seed phrase!
     </div>
   </div>
-
-  <div class="d-flex flex-column" *ngIf="hasUsers">
-    <ul class="list-group mt-7px mb-30px saved-seeds-list">
-      <span class="saved-seeds-header d-flex align-items-center"
-        ><span>Select an account</span></span
-      >
-      <div class="saved-seeds-scroll">
-        <li
-          *ngFor="let item of allUsers | keyvalue; let i = index"
-          class="list-group-item list-group-item-action cursor-pointer saved-seed"
-          (click)="selectAccount(item.key)"
-        >
-          <div class="w-100 d-flex justify-content-between">
-            <div *ngIf="!item.value.username" class="text-left">
-              <div class="my-1">
-                <img
-                  class="avatar mr-15px"
-                  src="assets/placeholder-account-image.png"
-                />
-                {{ item.key | truncateAddress }}
-              </div>
-            </div>
-            <div *ngIf="item.value.username" class="d-flex align-items-center">
-              <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-              <div>{{ item.value.username }}</div>
-            </div>
-            <img
-              [src]="
-                getLoginIcon(
-                  accountService.getLoginMethodWithPublicKeyBase58Check(
-                    item.key
-                  )
-                )
-              "
-              height="32px"
-              width="32px"
-              class="mr-10px"
-            />
-          </div>
-        </li>
-      </div>
-    </ul>
-  </div>
+  <app-account-select
+    (onAccountSelect)="onAccountSelect($event)"
+  ></app-account-select>
   <app-log-in-options></app-log-in-options>
 
   <div *ngIf="showAccessLevels">

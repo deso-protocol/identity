@@ -3,8 +3,6 @@ import { AccountService } from '../account.service';
 import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
-import { LoginMethod, UserProfile } from '../../types/identity';
-import { GoogleDriveService } from '../google-drive.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
 
@@ -14,34 +12,36 @@ import { Router } from '@angular/router';
   styleUrls: ['./log-in.component.scss'],
 })
 export class LogInComponent implements OnInit {
-  loading = false;
   showAccessLevels = true;
-  finishedSignup = false;
-
-  allUsers: { [key: string]: UserProfile } = {};
-  hasUsers = false;
 
   constructor(
     public accountService: AccountService,
     private identityService: IdentityService,
-    public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
+    public globalVars: GlobalVarsService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    // Load profile pictures and usernames
-    const publicKeys = this.accountService.getPublicKeys();
-    this.hasUsers = publicKeys.length > 0;
-    this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
-      this.allUsers = profiles;
-    });
-
     // Set showAccessLevels
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
   }
 
-  selectAccount(publicKey: string): void {
+  login(publicKey: string): void {
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded: publicKey,
+      signedUp: false,
+    });
+  }
+
+  navigateToGetDeso(publicKey: string): void {
+    this.router.navigate(['/', RouteNames.GET_DESO], {
+      queryParamsHandling: 'merge',
+      queryParams: { publicKey },
+    });
+  }
+  onAccountSelect(publicKey: string): void {
     this.accountService.setAccessLevel(
       publicKey,
       this.globalVars.hostname,
@@ -67,33 +67,4 @@ export class LogInComponent implements OnInit {
         );
     }
   }
-
-  navigateToGetDeso(publicKey: string): void {
-    this.router.navigate(['/', RouteNames.GET_DESO], {
-      queryParamsHandling: 'merge',
-      queryParams: { publicKey },
-    });
-  }
-
-  login(publicKey: string): void {
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: publicKey,
-      signedUp: false,
-    });
-  }
-
-  public getLoginIcon(loginMethod: LoginMethod) {
-    return {
-      [LoginMethod.DESO]: 'assets/deso-logo.png',
-      [LoginMethod.GOOGLE]: 'assets/google_logo.svg',
-      [LoginMethod.METAMASK]: 'assets/metamask.png',
-    }[loginMethod];
-  }
 }
-
-export const getSpendingLimitsForMetamask = () => {
-  return {
-    IsUnlimited: true,
-  };
-};

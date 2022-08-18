@@ -49,6 +49,7 @@ import { MetamaskService } from './metamask.service';
 import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
 import { TruncateAddressPipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 import { LogInOptionsComponent } from './log-in-options/log-in-options.component';
+import { AccountSelectComponent } from './account-select/account-select.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +88,7 @@ import { LogInOptionsComponent } from './log-in-options/log-in-options.component
     ArrowToggleComponent,
     TruncateAddressPipe,
     LogInOptionsComponent,
+    AccountSelectComponent,
   ],
   imports: [
     BrowserModule,

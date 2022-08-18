@@ -11,39 +11,11 @@
       Grant signing access
       <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
     </div>
-
-    <div class="d-flex flex-column" *ngIf="hasUsers && !isSingleAccount">
-      <ul
-        class="list-group mt-7px mb-30px saved-seeds-list saved-seeds-scroll"
-        style="max-height: 700px"
-      >
-        <span class="saved-seeds-header d-flex align-items-center"
-          ><span>Select an account</span></span
-        >
-        <li
-          *ngFor="let item of allUsers | keyvalue; let i = index"
-          class="list-group-item list-group-item-action cursor-pointer saved-seed"
-          [ngClass]="{ selectedKey: publicKeyBase58Check === item.key }"
-          (click)="publicKeyBase58Check = item.key"
-        >
-          <div class="w-100 d-flex justify-content-between">
-            <div *ngIf="!item.value.username" class="text-left">
-              <div class="my-1">
-                <img
-                  class="avatar mr-15px"
-                  src="assets/placeholder-account-image.png"
-                />
-                {{ item.key | truncateAddress }}
-              </div>
-            </div>
-            <div *ngIf="item.value.username" class="d-flex align-items-center">
-              <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-              <div class="">{{ item.value.username }}</div>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <app-account-select
+      [allUsers$]="allUsers$"
+      (onAccountSelect)="publicKeyBase58Check = $event"
+      *ngIf="!publicKeyBase58Check"
+    ></app-account-select>
     <div
       class="fs-18px pt-15px pb-5px"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
