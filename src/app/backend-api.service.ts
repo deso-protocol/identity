@@ -183,7 +183,7 @@ export interface TransactionSpendingLimitResponse {
 }
 
 export interface GetAccessBytesResponse {
-  SpendingLimitHex: string;
+  TransactionSpendingLimitHex: string;
   AccessBytesHex: string;
 }
 
@@ -444,7 +444,7 @@ export class BackendAPIService {
     }).pipe(
       map((res) => {
         return {
-          SpendingLimitHex: res.SpendingLimitHex,
+          TransactionSpendingLimitHex: res.TransactionSpendingLimitHex,
           AccessBytesHex: res.AccessBytesHex,
         };
       }),

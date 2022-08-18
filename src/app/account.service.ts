@@ -223,7 +223,7 @@ export class AccountService {
       throw new Error('problem getting spending limit');
     }
 
-    const transactionSpendingLimitHex = response.SpendingLimitHex;
+    const transactionSpendingLimitHex = response.TransactionSpendingLimitHex;
     let accessBytes: number[] = [
       ...derivedPublicKeyBuffer,
       ...expirationBlockBuffer,
@@ -231,8 +231,8 @@ export class AccountService {
     if (isMetamask) {
       accessBytes = [...Buffer.from(response.AccessBytesHex, 'hex')];
     } else {
-      const transactionSpendingLimitBytes = response.SpendingLimitHex
-        ? [...new Buffer(response.SpendingLimitHex, 'hex')]
+      const transactionSpendingLimitBytes = response.TransactionSpendingLimitHex
+        ? [...new Buffer(response.TransactionSpendingLimitHex, 'hex')]
         : [];
       accessBytes.push(...transactionSpendingLimitBytes);
     }

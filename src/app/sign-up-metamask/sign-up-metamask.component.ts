@@ -164,13 +164,11 @@ export class SignUpMetamaskComponent implements OnInit {
           'MetamaskSignin: To be eligible for airdrop your account needs to have more than .001 eth',
         ].includes(err)
       ) {
-        {
-          this.errorMessage =
-            err ||
-            'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
-          this.metamaskState = METAMASK.ERROR;
-          return;
-        }
+        this.errorMessage =
+          err ||
+          'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
+        this.metamaskState = METAMASK.ERROR;
+        return;
       }
     }
     // Slice the '0x' prefix from the signature.
@@ -184,7 +182,7 @@ export class SignUpMetamaskComponent implements OnInit {
           derivedPublicKeyBase58Check,
           expirationBlock,
           accessSignature,
-          getAccessBytesResponse.SpendingLimitHex
+          getAccessBytesResponse.TransactionSpendingLimitHex
         )
         .toPromise();
     } catch (e) {
