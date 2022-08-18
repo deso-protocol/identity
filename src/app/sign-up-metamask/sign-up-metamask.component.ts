@@ -226,7 +226,7 @@ export class SignUpMetamaskComponent implements OnInit {
           metamaskPublicKeyHex
         );
         this.metamaskState = this.METAMASK.START;
-        // this.startTimer();
+        this.login();
       })
       .catch((e) => {
         this.errorMessage =
