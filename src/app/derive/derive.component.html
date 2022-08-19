@@ -22,7 +22,6 @@
     <div
       class="fs-18px pt-15px pb-5px"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
-      *ngIf="derivedPublicKeyBase58Check"
     >
       <div class="pl-20px text-left d-flex justify-content-between">
         Public Key
@@ -51,20 +50,25 @@
   >
     Approve
   </button>
-
-  <div class="container home-container" *ngIf="deleteKey">
-    <div>
-      <div class="fs-18px mt-30px">
-        <span class="fs-underline"
-          ><b
-            >You're about to revoke signing access for a Derived Public Key</b
-          ></span
-        ><br />
-        This means <b>{{ derivedPublicKeyBase58Check }}</b> will no longer be
-        able to make transactions on your behalf.
-      </div>
-    </div>
+</div>
+<div class="container home-container" *ngIf="deleteKey">
+  <div class="fs-18px mt-30px">
+    <span class="fs-underline mb-2"
+      ><b
+        >You're about to revoke signing access for a Derived Public Key</b
+      ></span
+    ><br />
+    This means
+    <b>{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</b> will no
+    longer be able to make transactions on your behalf.
   </div>
+  <button
+    [disabled]="!publicKeyBase58Check"
+    class="button button-large btn-warning mb-20px text-black font-weight-bold mt-2"
+    (click)="approveDerivedKey(publicKeyBase58Check)"
+  >
+    Revoke
+  </button>
 </div>
 <div *ngIf="globalVars.callbackInvalid">
   <app-error-callback></app-error-callback>

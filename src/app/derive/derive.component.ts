@@ -114,18 +114,18 @@ export class DeriveComponent implements OnInit {
     // listed out the different flows that can happen on the derive page
     // if the params do not match these permutations return false and display the error page
     const pkAndSpendingLimits =
-      params.publicKeyBase58Check && params.transactionSpendingLimitResponse;
+      params.publicKey && params.transactionSpendingLimitResponse;
 
     const dkAndSpendingLimits =
       params.derivedPublicKey && params.transactionSpendingLimitResponse;
 
     const pkDkAndSpendingLimits =
-      params.publicKeyBase58Check &&
+      params.publicKey &&
       params.transactionSpendingLimitResponse &&
       params.derivedPublicKey;
 
     const deleteDerivedKey =
-      params.publicKeyBase58Check &&
+      params.publicKey &&
       params.deleteKey === 'true' &&
       params.derivedPublicKey;
     return !(
