@@ -6,24 +6,20 @@
 >
   <div *ngIf="this.currentScreen === SCREEN.CREATE_ACCOUNT">
     <div class="mb-20px">
-      <span class="title-text">Sign up / Log in using MetaMask</span>
+      <span class="title-text">Sign up / log in using MetaMask</span>
       <div class="main-text mb-2">
-        Enter the Decentralized Social using your MetaMask wallet.
+        Create an account using your Metamask wallet
       </div>
       <p class="txtalj mt-20px">
-        DeSo is a novel blockchain built for web3 social networks. It enables a
-        new category of apps that combine the innovations of decentralized
-        finance and social. To get started, let's set you up with an account.
-        This Metamask integration will allow you to create a DeSo wallet derived
-        off of your ETH wallet. When you click the button below, you will be
-        asked to
-        <a
-          target="_blank"
-          href="https://docs.metamask.io/guide/signing-data.html#signing-data-with-metamask"
-          >sign</a
-        >
-        a message that will tell the DeSo blockchain validators that you're
-        creating a new wallet
+        DeSo is a new blockchain built to power web3 social networks.
+        <br>
+        <br>
+        With DeSo, your Metamask keys control your content the same way
+        they control your funds. <b>Your keys = your content.</b>
+        <br>
+        <br>
+        When you click the button below, you will be asked to sign
+        a transaction to create an account on the DeSo blockchain.
       </p>
       <button
         class="button button-large mb-20px bg-dark text-white mt-20px"
@@ -62,7 +58,6 @@
       </div>
     </ng-container>
   </div>
-
   <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
     <span class="title-text">Authorize Derived Key</span>
     <div class="main-text mb-2">

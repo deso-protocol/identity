@@ -11,7 +11,7 @@ export interface PrivateUserInfo {
   loginMethod?: LoginMethod;
   version: PrivateUserVersion;
 
-  /** DEPRECATED */
+  /** DEPRECATED in favor of loginMethod */
   google?: boolean;
 }
 
