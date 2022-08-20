@@ -6,7 +6,21 @@ import { ethers } from 'ethers';
 })
 export class MetamaskService {
   constructor() {}
-
+  public async connectWallet(): Promise<void> {
+    await this.getProvider()
+      .send('wallet_requestPermissions', [
+        {
+          eth_accounts: {},
+        },
+      ])
+      .catch((err) => {
+        if (err.code === 4001) {
+          throw new Error('user rejected the eth_requestPermissions');
+        } else {
+          throw new Error(`error while sending eth_requestPermissions: ${err}`);
+        }
+      });
+  }
   public async connectMetamaskMiddleware(): Promise<boolean> {
     const accounts = await this.getProvider().listAccounts();
 

@@ -85,7 +85,7 @@ export class SignUpMetamaskComponent implements OnInit {
 
     this.metamaskState = METAMASK.CONNECT;
     try {
-      await this.metamaskService.connectMetamaskMiddleware();
+      await this.metamaskService.connectWallet();
     } catch (e) {
       this.errorMessage = `Can\'t connect to the Metamask API. Error: ${e}. Please try again.`;
       this.metamaskState = METAMASK.ERROR;
