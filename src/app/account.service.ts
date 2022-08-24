@@ -45,7 +45,6 @@ export class AccountService {
     private cookieService: CookieService,
     private entropyService: EntropyService,
     private signingService: SigningService,
-    private backendApi: BackendAPIService,
     private metamaskService: MetamaskService
   ) {}
 
@@ -130,11 +129,12 @@ export class AccountService {
   }
 
   public async getDerivedPrivateUser(
+    backendApiService: BackendAPIService,
     publicKeyBase58Check: string,
     blockHeight: number,
     transactionSpendingLimit?: TransactionSpendingLimitResponse,
     derivedPublicKeyBase58CheckInput?: string,
-    expirationDays?: number
+    expirationDays?: number,
   ): Promise<DerivedPrivateUserInfo | undefined> {
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
@@ -212,7 +212,7 @@ export class AccountService {
 
     let response: GetAccessBytesResponse;
     try {
-      response = await this.backendApi
+      response = await backendApiService
         .GetAccessBytes(
           derivedPublicKeyBase58Check,
           expirationBlock,
