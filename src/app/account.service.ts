@@ -85,6 +85,7 @@ export class AccountService {
         loginMethod: privateUser.loginMethod || LoginMethod.DESO,
         accessLevel,
         accessLevelHmac,
+        derivedPublicKeyBase58Check: privateUser.derivedPublicKeyBase58Check,
       };
     }
 
@@ -443,7 +444,8 @@ export class AccountService {
     btcDepositAddress: string,
     ethDepositAddress: string,
     loginMethod: LoginMethod,
-    publicKeyHex: string
+    publicKeyHex: string,
+    derivedPublicKeyBase58Check: string,
   ): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     return this.addPrivateUser({
@@ -455,6 +457,7 @@ export class AccountService {
       network,
       loginMethod,
       publicKeyHex,
+      derivedPublicKeyBase58Check,
       version: PrivateUserVersion.V2,
     });
   }
