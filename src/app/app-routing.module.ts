@@ -15,6 +15,7 @@ import {GetDesoComponent} from './get-deso/get-deso.component';
 import {BuyDesoPageComponent} from './buy-deso/buy-deso-page/buy-deso-page.component';
 import {BuyDeSoCompletePageComponent} from './buy-deso/buy-deso-complete-page/buy-deso-complete-page.component';
 import {BuyOrSendDesoComponent} from './buy-or-send-deso/buy-or-send-deso.component';
+import {DefaultKeyComponent} from "./default-key/default-key.component";
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -36,6 +37,7 @@ export class RouteNames {
   public static GET_DESO = 'get-deso';
   public static BUY_DESO = 'buy-deso';
   public static BUY_OR_SEND_DESO = 'buy-or-send-deso';
+  public static DEFAULT_KEY = 'default-key'
 }
 
 const routes: Routes = [
@@ -54,6 +56,7 @@ const routes: Routes = [
   { path: RouteNames.GET_DESO, component: GetDesoComponent, pathMatch: 'full' },
   { path: RouteNames.BUY_DESO, component: BuyDesoPageComponent, pathMatch: 'full' },
   { path: RouteNames.BUY_OR_SEND_DESO, component: BuyOrSendDesoComponent, pathMatch: 'full'},
+  { path: RouteNames.DEFAULT_KEY, component: DefaultKeyComponent, pathMatch: 'full'}
 ];
 
 @NgModule({

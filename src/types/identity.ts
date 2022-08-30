@@ -48,6 +48,13 @@ export interface DerivedPrivateUserInfo {
   transactionSpendingLimitHex: string | undefined;
 }
 
+export interface DefaultKeyPrivateUserInfo {
+  publicKey: string;
+  appPublicKey: string;
+  network: Network;
+  jwt: string;
+}
+
 export interface UserProfile {
   username: string;
   profilePic: any;
@@ -62,15 +69,15 @@ export interface DerivedKey {
 }
 
 export interface EncryptedMessage {
-  EncryptedHex: string,
-  PublicKey: string,
-  IsSender: boolean,
-  Legacy: boolean,
-  Version?: number,
-  SenderMessagingPublicKey?: string,
-  SenderMessagingGroupKeyName?: string,
-  RecipientMessagingPublicKey?: string,
-  RecipientMessagingGroupKeyName?: string
+  EncryptedHex: string;
+  PublicKey: string;
+  IsSender: boolean;
+  Legacy: boolean;
+  Version?: number;
+  SenderMessagingPublicKey?: string;
+  SenderMessagingGroupKeyName?: string;
+  RecipientMessagingPublicKey?: string;
+  RecipientMessagingGroupKeyName?: string;
 }
 
 export enum Network {
