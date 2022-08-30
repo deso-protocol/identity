@@ -267,10 +267,15 @@ export class SignUpMetamaskComponent implements OnInit {
   }
 
   public login(): void {
+    this.accountService.setAccessLevel(
+      this.publicKey,
+      this.globalVars.hostname,
+      this.globalVars.accessLevelRequest
+    );
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
-      signedUp: false,
+      signedUp: true,
     });
   }
 }
