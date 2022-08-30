@@ -36,6 +36,7 @@ export class RouteNames {
   public static GET_DESO = 'get-deso';
   public static BUY_DESO = 'buy-deso';
   public static BUY_OR_SEND_DESO = 'buy-or-send-deso';
+  public static DEFAULT_KEY = 'default-key'
 }
 
 const routes: Routes = [

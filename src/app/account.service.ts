@@ -20,6 +20,8 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import * as ecies from '../lib/ecies';
 import { ec as EC } from 'elliptic';
 import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
+import {DefaultKeyPayload} from './identity.service';
+import * as net from 'net';
 
 @Injectable({
   providedIn: 'root',
@@ -241,6 +243,21 @@ export class AccountService {
       messagingKeySignature,
       transactionSpendingLimitHex,
       signedUp: this.globalVars.signedUp,
+    };
+  }
+
+  getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): DefaultKeyPrivateUserInfo {
+    const privateUser = this.getPrivateUsers()[publicKey];
+    const network = privateUser.network;
+    // create jwt with private key and app public key
+    const keyEncoder = new KeyEncoder('secp256k1');
+    const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
+    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 minutes' });
+    return {
+      publicKey,
+      appPublicKey,
+      network,
+      jwt,
     };
   }
 

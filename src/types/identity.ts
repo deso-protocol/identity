@@ -49,6 +49,13 @@ export interface DerivedPrivateUserInfo {
   signedUp: boolean;
 }
 
+export interface DefaultKeyPrivateUserInfo {
+  publicKey: string;
+  appPublicKey: string;
+  network: Network;
+  jwt: string;
+}
+
 export interface UserProfile {
   username: string;
   profilePic: any;

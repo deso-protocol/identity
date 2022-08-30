@@ -46,6 +46,11 @@ export type DerivePayload = {
   expirationDays?: number;
 };
 
+export type DefaultKeyPayload = {
+  publicKey: string;
+  appPublicKey: string;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -128,6 +133,27 @@ export class IdentityService {
           this.globalVars.callback + `?${httpParams.toString()}`;
       } else {
         this.cast('derive', derivedPrivateUserInfo);
+      }
+    });
+  }
+
+  approveDefaultKey(payload: DefaultKeyPayload): void {
+    this.backendApi.GetAppState().subscribe((res) => {
+      const defaultKeyPrivateUserInfo = this.accountService.getDefaultKeyPrivateUser(payload.publicKey, payload.appPublicKey);
+      if (this.globalVars.callback) {
+        // If callback is passed, we redirect to it with payload as URL parameters.
+        let httpParams = new HttpParams();
+        for (const key in defaultKeyPrivateUserInfo) {
+          if (defaultKeyPrivateUserInfo.hasOwnProperty(key)) {
+            const paramVal = (defaultKeyPrivateUserInfo as any)[key];
+            if (paramVal !== null && paramVal !== undefined) {
+              httpParams = httpParams.append(key, paramVal.toString());
+            }
+          }
+        }
+        window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+      } else {
+        this.cast('approveDefaultKey', defaultKeyPrivateUserInfo);
       }
     });
   }
