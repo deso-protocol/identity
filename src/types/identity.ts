@@ -1,4 +1,4 @@
-import { TransactionSpendingLimit } from "src/lib/deso/transaction";
+import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
 export interface PrivateUserInfo {
   seedHex: string;
@@ -46,6 +46,7 @@ export interface DerivedPrivateUserInfo {
   messagingKeyName: string;
   messagingKeySignature: string;
   transactionSpendingLimitHex: string | undefined;
+  signedUp: boolean;
 }
 
 export interface DefaultKeyPrivateUserInfo {

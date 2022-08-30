@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GlobalVarsService } from '../../global-vars.service';
-import {BackendAPIService} from '../../backend-api.service';
-import {IdentityService} from '../../identity.service';
-import {AccountService} from '../../account.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {RouteNames} from '../../app-routing.module';
+import { BackendAPIService } from '../../backend-api.service';
+import { IdentityService } from '../../identity.service';
+import { AccountService } from '../../account.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { RouteNames } from '../../app-routing.module';
 
 @Component({
   selector: 'buy-deso-complete-page',
@@ -20,18 +20,19 @@ export class BuyDeSoCompletePageComponent implements OnInit {
     private identityService: IdentityService,
     private accountService: AccountService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       this.publicKey = queryParams.publicKey;
     });
   }
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void {}
 
   onBuyMoreDeSoClicked(): void {
-    this.router.navigate(['/', RouteNames.BUY_DESO], { queryParams: { publicKey: this.publicKey }, queryParamsHandling: 'merge'});
+    this.router.navigate(['/', RouteNames.BUY_DESO], {
+      queryParams: { publicKey: this.publicKey },
+      queryParamsHandling: 'merge',
+    });
   }
 }

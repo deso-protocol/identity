@@ -52,18 +52,27 @@ export class WyreService {
     sourceAmount: number,
     country: string,
     fiatCurrency: string,
-    redirectURL: string = ''): Observable<any> {
+    redirectURL: string = ''
+  ): Observable<any> {
     return this.backendAPIService.GetWyreWalletOrderReservation(
       publicKeyBase58Check,
       sourceAmount,
       country,
       fiatCurrency,
-      redirectURL,
+      redirectURL
     );
   }
 
-  makeWalletOrderQuotation(sourceAmount: number, country: string, fiatCurrency: string): Observable<any> {
-    return this.backendAPIService.GetWyreWalletOrderQuotation(sourceAmount, country, fiatCurrency);
+  makeWalletOrderQuotation(
+    sourceAmount: number,
+    country: string,
+    fiatCurrency: string
+  ): Observable<any> {
+    return this.backendAPIService.GetWyreWalletOrderQuotation(
+      sourceAmount,
+      country,
+      fiatCurrency
+    );
   }
 
   getSupportedFiatCurrencies(): { [k: string]: string } {
@@ -71,6 +80,8 @@ export class WyreService {
   }
 
   getSupportedCountries(): Observable<any> {
-    return this.httpClient.get('https://api.sendwyre.com/v3/widget/supportedCountries');
+    return this.httpClient.get(
+      'https://api.sendwyre.com/v3/widget/supportedCountries'
+    );
   }
 }

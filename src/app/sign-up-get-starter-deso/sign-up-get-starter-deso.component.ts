@@ -3,10 +3,10 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CountryISO } from 'ngx-intl-tel-input';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService, User } from '../backend-api.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IdentityService } from '../identity.service';
 import { AccountService } from '../account.service';
-import {RouteNames} from '../app-routing.module';
+import { RouteNames } from '../app-routing.module';
 
 @Component({
   selector: 'sign-up-get-starter-deso',
@@ -14,9 +14,12 @@ import {RouteNames} from '../app-routing.module';
   styleUrls: ['./sign-up-get-starter-deso.component.scss'],
 })
 export class SignUpGetStarterDESOComponent implements OnInit {
-  static CREATE_PHONE_NUMBER_VERIFICATION_SCREEN = 'create_phone_number_verification_screen';
-  static SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN = 'submit_phone_number_verification_screen';
-  static COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN = 'completed_phone_number_verification_screen';
+  static CREATE_PHONE_NUMBER_VERIFICATION_SCREEN =
+    'create_phone_number_verification_screen';
+  static SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN =
+    'submit_phone_number_verification_screen';
+  static COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN =
+    'completed_phone_number_verification_screen';
 
   @Input() displayForSignupFlow = false;
   @Input() publicKey = '';
@@ -45,8 +48,10 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   resentVerificationCode = false;
   resentVerificationCodeTimeout = 0;
   resentVerificationInterval: any;
-  sendPhoneNumberVerificationTextServerErrors = new SendPhoneNumberVerificationTextServerErrors();
-  submitPhoneNumberVerificationCodeServerErrors = new SubmitPhoneNumberVerificationCodeServerErrors();
+  sendPhoneNumberVerificationTextServerErrors =
+    new SendPhoneNumberVerificationTextServerErrors();
+  submitPhoneNumberVerificationCodeServerErrors =
+    new SubmitPhoneNumberVerificationCodeServerErrors();
   user: User | null = null;
   loading = true;
   isPhoneNumberSuccess = false;
@@ -57,11 +62,11 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private identityService: IdentityService,
     private accountService: AccountService,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       if (params.getFreeDeso) {
         this.displayForSignupFlow = params.getFreeDeso === 'true';
       }
@@ -69,18 +74,26 @@ export class SignUpGetStarterDESOComponent implements OnInit {
         this.publicKey = params.public_key;
       }
       if (this.publicKey !== '') {
-        this.backendApi.GetUsersStateless([this.publicKey]).subscribe((res) => {
-          if (res.UserList?.length) {
-            this.user = res.UserList[0];
-            if (this.user?.HasPhoneNumber) {
-              this.screenToShow = SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
-            } else {
-              this.screenToShow = SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
+        this.backendApi
+          .GetUsersStateless([this.publicKey])
+          .subscribe(
+            (res) => {
+              if (res.UserList?.length) {
+                this.user = res.UserList[0];
+                if (this.user?.HasPhoneNumber) {
+                  this.screenToShow =
+                    SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
+                } else {
+                  this.screenToShow =
+                    SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
+                }
+              }
+            },
+            (err) => {
+              console.error(err);
             }
-          }
-        }, (err) => {
-          console.error(err);
-        }).add(() => this.loading = false);
+          )
+          .add(() => (this.loading = false));
       } else {
         this.loading = false;
       }
@@ -92,7 +105,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   }
 
   backButtonClickedOnSubmitVerificationScreen(): void {
-    this.screenToShow = SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
+    this.screenToShow =
+      SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
   }
 
   sendVerificationText(): void {
@@ -113,7 +127,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     }
 
     // Clear any existing resend-related errors
-    this.sendPhoneNumberVerificationTextServerErrors = new SendPhoneNumberVerificationTextServerErrors();
+    this.sendPhoneNumberVerificationTextServerErrors =
+      new SendPhoneNumberVerificationTextServerErrors();
 
     this._sendPhoneNumberVerificationText();
 
@@ -145,11 +160,13 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   }
 
   onPhoneNumberInputChanged(): void {
-    this.sendPhoneNumberVerificationTextServerErrors = new SendPhoneNumberVerificationTextServerErrors();
+    this.sendPhoneNumberVerificationTextServerErrors =
+      new SendPhoneNumberVerificationTextServerErrors();
   }
 
   onVerificationCodeInputChanged(): void {
-    this.submitPhoneNumberVerificationCodeServerErrors = new SubmitPhoneNumberVerificationCodeServerErrors();
+    this.submitPhoneNumberVerificationCodeServerErrors =
+      new SubmitPhoneNumberVerificationCodeServerErrors();
   }
 
   _sendPhoneNumberVerificationText(): void {
@@ -168,7 +185,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          this.screenToShow = SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN;
+          this.screenToShow =
+            SignUpGetStarterDESOComponent.SUBMIT_PHONE_NUMBER_VERIFICATION_SCREEN;
         },
         (err) => {
           this._parseSendPhoneNumberVerificationTextServerErrors(err);
@@ -181,18 +199,25 @@ export class SignUpGetStarterDESOComponent implements OnInit {
 
   _parseSendPhoneNumberVerificationTextServerErrors(err: any): void {
     if (err?.error?.error.includes('Phone number already in use')) {
-      this.sendPhoneNumberVerificationTextServerErrors.phoneNumberAlreadyInUse = true;
+      this.sendPhoneNumberVerificationTextServerErrors.phoneNumberAlreadyInUse =
+        true;
     } else if (err?.error?.error.includes('Max send attempts reached')) {
       // https://www.twilio.com/docs/api/errors/60203
-      this.sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached = true;
+      this.sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached =
+        true;
     } else if (err?.error?.error.includes('VOIP number not allowed')) {
-      this.sendPhoneNumberVerificationTextServerErrors.voipNumberNotAllowed = true;
-    } else if (err?.error?.error.includes('Messages to China require use case vetting')) {
+      this.sendPhoneNumberVerificationTextServerErrors.voipNumberNotAllowed =
+        true;
+    } else if (
+      err?.error?.error.includes('Messages to China require use case vetting')
+    ) {
       // https://www.twilio.com/docs/api/errors/60220
-      this.sendPhoneNumberVerificationTextServerErrors.chineseNumberNotAllowed = true;
+      this.sendPhoneNumberVerificationTextServerErrors.chineseNumberNotAllowed =
+        true;
     } else {
-      this.sendPhoneNumberVerificationTextServerErrors.unknownError =
-        `Error sending phone number verification text: ${this.backendApi.stringifyError(err)}`;
+      this.sendPhoneNumberVerificationTextServerErrors.unknownError = `Error sending phone number verification text: ${this.backendApi.stringifyError(
+        err
+      )}`;
     }
   }
 
@@ -207,10 +232,12 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       this.submitPhoneNumberVerificationCodeServerErrors.invalidCode = true;
     } else if (err?.error?.error.includes('Max check attempts reached')) {
       // https://www.twilio.com/docs/api/errors/60202
-      this.submitPhoneNumberVerificationCodeServerErrors.maxCheckAttemptsReached = true;
+      this.submitPhoneNumberVerificationCodeServerErrors.maxCheckAttemptsReached =
+        true;
     } else {
-      this.submitPhoneNumberVerificationCodeServerErrors.unknownError =
-        `Error submitting phone number verification code: ${this.backendApi.stringifyError(err)}`;
+      this.submitPhoneNumberVerificationCodeServerErrors.unknownError = `Error submitting phone number verification code: ${this.backendApi.stringifyError(
+        err
+      )}`;
     }
   }
 
@@ -228,14 +255,16 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          this.screenToShow = SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
+          this.screenToShow =
+            SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
           this.phoneNumberVerified.emit();
           this.isPhoneNumberSuccess = true;
         },
         (err) => {
           this._parseSubmitPhoneNumberVerificationCodeServerErrors(err);
         }
-      ).add(() => this.submittingPhoneNumberVerificationCode = false);
+      )
+      .add(() => (this.submittingPhoneNumberVerificationCode = false));
   }
 
   finishFlow(): void {
@@ -251,7 +280,9 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   }
 
   cancelButtonClicked(): void {
-    this.router.navigate(['/', RouteNames.GET_DESO], { queryParamsHandling: 'merge'});
+    this.router.navigate(['/', RouteNames.GET_DESO], {
+      queryParamsHandling: 'merge',
+    });
   }
 }
 

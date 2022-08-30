@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import {AccessLevel, Network} from '../types/identity';
-import {environment} from '../environments/environment';
+import { AccessLevel, Network } from '../types/identity';
+import { environment } from '../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GlobalVarsService {
-
-  constructor() { }
+  constructor() {}
 
   get environment(): { [k: string]: any } {
     return environment;
@@ -113,16 +112,25 @@ export class GlobalVarsService {
   }
 
   getFreeDESOMessage(): string {
-    return this.formatUSD((this.referralUSDCents ? this.referralUSDCents : this.jumioUSDCents) / 100, 0);
+    return this.formatUSD(
+      (this.referralUSDCents ? this.referralUSDCents : this.jumioUSDCents) /
+        100,
+      0
+    );
   }
 
-  ObjectKeyLength(obj: { [k: string]: any} | undefined): number {
+  ObjectKeyLength(obj: { [k: string]: any } | undefined): number {
     return obj ? Object.keys(obj).length : 0;
   }
 
   cleanSpendingLimitOperationName(opName: string): string {
-    return opName.split('_').map((token) =>
-      token.toLocaleLowerCase() === 'nft' ? 'NFT' : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
-    ).join(' ');
+    return opName
+      .split('_')
+      .map((token) =>
+        token.toLocaleLowerCase() === 'nft'
+          ? 'NFT'
+          : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
+      )
+      .join(' ');
   }
 }

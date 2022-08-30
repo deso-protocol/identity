@@ -1,14 +1,15 @@
-<div
-  class="d-flex flex-column"
->
+<div class="d-flex flex-column">
   <div class="d-flex">
     <div class="d-flex w-50">
       <ng-container *ngIf="post">
         <!-- Media -->
         <div
-          *ngIf="loaded && !!(this.post?.ImageURLs?.length || this.post?.VideoURLs?.length)"
+          *ngIf="
+            loaded &&
+            !!(this.post?.ImageURLs?.length || this.post?.VideoURLs?.length)
+          "
           class="d-flex position-relative justify-content-start align-items-center mt-5px mb-5px pr-10px"
-          style="overflow:hidden; max-height: 100px; max-width: 100px;"
+          style="overflow: hidden; max-height: 100px; max-width: 100px"
         >
           <img
             style="max-width: 100%; max-height: 100%"
@@ -23,57 +24,79 @@
             *ngIf="!post?.ImageURLs?.length && post?.VideoURLs?.length"
             class="br-12px"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-            style="width: 100%; max-height: 100%;"
+            style="width: 100%; max-height: 100%"
           ></iframe>
         </div>
         <div class="d-flex flex-column" *ngIf="loaded">
           <div class="d-flex justify-content-start align-items-center py-10px">
-            <div class="avatar mr-15px" [appAvatar]="post.PosterPublicKeyBase58Check" *ngIf="post"></div>
-            <div>{{ post ? post?.ProfileEntryResponse?.Username || post.PosterPublicKeyBase58Check : "All NFTs:" }}</div>
+            <div
+              class="avatar mr-15px"
+              [appAvatar]="post.PosterPublicKeyBase58Check"
+              *ngIf="post"
+            ></div>
+            <div>
+              {{
+                post
+                  ? post?.ProfileEntryResponse?.Username ||
+                    post.PosterPublicKeyBase58Check
+                  : 'All NFTs:'
+              }}
+            </div>
           </div>
           <!--TODO: Truncate post body -->
           <div
             class="d-flex justify-content-start fs-14px py-10px"
             *ngIf="post?.Body"
-            [innerHTML]="(post?.Body || '') | sanitizePostBody"
-          >
-          </div>
+            [innerHTML]="post?.Body || '' | sanitizePostBody"
+          ></div>
         </div>
       </ng-container>
-      <ng-container
-        *ngIf="!post && loaded">
+      <ng-container *ngIf="!post && loaded">
         <div *ngIf="nftPostHashHex === ''">All NFTs</div>
         <div *ngIf="nftPostHashHex !== ''">NFT Post not found</div>
       </ng-container>
     </div>
     <div
       class="d-flex fs-14px w-50 justify-content-end"
-      style="margin-left: auto;"
+      style="margin-left: auto"
     >
-      <div class="pr-5px">{{ getOperationsString(nftSerialNumToOperationMap) }}</div>
-      <div (click)="expandNFT = !expandNFT" class="link" style="font-size: 14px !important;">
-        {{ expandNFT ? "Hide" : "Show" }}
+      <div class="pr-5px">
+        {{ getOperationsString(nftSerialNumToOperationMap) }}
+      </div>
+      <div
+        (click)="expandNFT = !expandNFT"
+        class="link"
+        style="font-size: 14px !important"
+      >
+        {{ expandNFT ? 'Hide' : 'Show' }}
       </div>
     </div>
-
   </div>
 
-  <ng-container
-    *ngIf="expandNFT"
-  >
+  <ng-container *ngIf="expandNFT">
     <div
       class="d-flex flex-column m-15px"
       *ngFor="
-      let serialNumToOpMap of nftSerialNumToOperationMap |
-        keyvalue |
-        slice:0:(showAll ? globalVars.ObjectKeyLength(nftSerialNumToOperationMap) : defaultNumShown)
-      ; let ii = index"
+        let serialNumToOpMap of nftSerialNumToOperationMap
+          | keyvalue
+          | slice
+            : 0
+            : (showAll
+                ? globalVars.ObjectKeyLength(nftSerialNumToOperationMap)
+                : defaultNumShown);
+        let ii = index
+      "
     >
-      <div class="fs-18px">{{ serialNumToOpMap.key === "0" ? "All Serial Numbers" : "#"+serialNumToOpMap.key }}</div>
+      <div class="fs-18px">
+        {{
+          serialNumToOpMap.key === '0'
+            ? 'All Serial Numbers'
+            : '#' + serialNumToOpMap.key
+        }}
+      </div>
       <div
         class="d-flex flex-column p-15px"
-        style="border: 1px solid gray;
-        background: lightgray;"
+        style="border: 1px solid gray; background: lightgray"
       >
         <div class="d-flex fs-14px justify-content-between">
           <div>Operation Type</div>
@@ -81,25 +104,40 @@
         </div>
         <div
           class="d-flex fs-18px justify-content-between py-10px"
-          *ngFor="let opLimit of serialNumToOpMap.value | keyvalue; let ii = index"
+          *ngFor="
+            let opLimit of serialNumToOpMap.value | keyvalue;
+            let ii = index
+          "
           [ngStyle]="{
-          'border-bottom': ii < globalVars.ObjectKeyLength(serialNumToOpMap.value) - 1 ? '3px dotted darkgray' : 'none'
+            'border-bottom':
+              ii < globalVars.ObjectKeyLength(serialNumToOpMap.value) - 1
+                ? '3px dotted darkgray'
+                : 'none'
           }"
         >
-          <div>{{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}</div>
+          <div>
+            {{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}
+          </div>
           <div>{{ opLimit.value }}</div>
         </div>
       </div>
     </div>
 
     <div
-      *ngIf="globalVars.ObjectKeyLength(nftSerialNumToOperationMap) > defaultNumShown"
+      *ngIf="
+        globalVars.ObjectKeyLength(nftSerialNumToOperationMap) > defaultNumShown
+      "
       class="d-flex justify-content-center mr-15px ml-15px"
-      style="background: lightgray; border: 1px solid darkgray; border-radius: 2px"
+      style="
+        background: lightgray;
+        border: 1px solid darkgray;
+        border-radius: 2px;
+      "
       (click)="showAll = !showAll; expandNFT = showAll"
     >
-      {{ showAll ? "Hide" : "Show all" }} {{ globalVars.ObjectKeyLength(nftSerialNumToOperationMap) }} serial numbers
+      {{ showAll ? 'Hide' : 'Show all' }}
+      {{ globalVars.ObjectKeyLength(nftSerialNumToOperationMap) }} serial
+      numbers
     </div>
-
   </ng-container>
 </div>

@@ -1,4 +1,10 @@
-import {Component, CUSTOM_ELEMENTS_SCHEMA, Input, NgModule, OnInit} from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  Input,
+  NgModule,
+  OnInit,
+} from '@angular/core';
 import { GlobalVarsService } from '../../global-vars.service';
 import { HttpClient } from '@angular/common/http';
 import { WyreService } from '../../../lib/services/wyre/wyre';
@@ -9,11 +15,11 @@ import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SwalHelper } from '../../../lib/helpers/swal-helper';
 import { BuyDeSoComponent } from '../buy-deso/buy-deso.component';
-import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
-import {environment} from '../../../environments/environment';
-import {RouteNames} from '../../app-routing.module';
-import {Network} from '../../../types/identity';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { environment } from '../../../environments/environment';
+import { RouteNames } from '../../app-routing.module';
+import { Network } from '../../../types/identity';
 const currencyToSymbolMap = require('currency-symbol-map/map');
 
 @Component({
@@ -54,12 +60,20 @@ export class BuyDeSoUSDComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.wyreService = new WyreService(this.httpClient, this.globalVars, this.backendApi);
-    this.supportedFiatCurrencies = this.wyreService.getSupportedFiatCurrencies();
+    this.wyreService = new WyreService(
+      this.httpClient,
+      this.globalVars,
+      this.backendApi
+    );
+    this.supportedFiatCurrencies =
+      this.wyreService.getSupportedFiatCurrencies();
     this.wyreService.getSupportedCountries().subscribe((res) => {
       this.supportedCountries = res;
     });
-    this.debouncedGetQuotation = _.debounce(this._refreshQuotation.bind(this), 300);
+    this.debouncedGetQuotation = _.debounce(
+      this._refreshQuotation.bind(this),
+      300
+    );
     this.route.queryParams.subscribe((queryParams) => {
       if (queryParams.destAmount) {
         const btcPurchased = queryParams.destAmount;
@@ -67,7 +81,9 @@ export class BuyDeSoUSDComponent implements OnInit {
           target: 'buy-deso-usd',
           icon: 'success',
           title: `Purchase Completed`,
-          html: `Your purchase of approximately ${this.getDeSoReceived(btcPurchased).toFixed(
+          html: `Your purchase of approximately ${this.getDeSoReceived(
+            btcPurchased
+          ).toFixed(
             4
           )} DeSo was successful. It may take a few minutes to appear in your wallet.`,
           showConfirmButton: true,
@@ -95,37 +111,48 @@ export class BuyDeSoUSDComponent implements OnInit {
     if (this.quotationError) {
       return;
     }
-    this.wyreService.makeWalletOrderReservation(this.parentComponent.publicKey, this.amount,
-      this.selectedCountry, this.selectedFiatCurrency, `${environment.hostname}/${RouteNames.BUY_COMPLETE}?publicKey=${this.parentComponent.publicKey}&signedUp=${this.globalVars.signedUp}${this.globalVars.network === Network.testnet ? '&testnet=true' : ''}` ).subscribe(
-      (res) => {
-        const wyreUrl = res.url;
-        if (res.url) {
-          Swal.fire({
-            target: 'buy-deso-usd',
-            title: 'Purchase $DESO',
-            html: `You will complete your purchase through Wyre. Your ${this.selectedFiatCurrency} will be converted to <b>Bitcoin</b> and then into <b>$DESO</b> automatically.`,
-            showCancelButton: true,
-            showConfirmButton: true,
-            confirmButtonText: 'Buy',
-            customClass: {
-              confirmButton: 'btn btn-light',
-              cancelButton: 'btn btn-light no',
-            },
-            reverseButtons: true,
-          }).then((res: any) => {
-            if (res.isConfirmed) {
-              window.location.href = wyreUrl;
-            }
-          });
-        } else {
-          this.reservationError = res.message;
-          this.parentComponent._alertError(res.message);
+    this.wyreService
+      .makeWalletOrderReservation(
+        this.parentComponent.publicKey,
+        this.amount,
+        this.selectedCountry,
+        this.selectedFiatCurrency,
+        `${environment.hostname}/${RouteNames.BUY_COMPLETE}?publicKey=${
+          this.parentComponent.publicKey
+        }&signedUp=${this.globalVars.signedUp}${
+          this.globalVars.network === Network.testnet ? '&testnet=true' : ''
+        }`
+      )
+      .subscribe(
+        (res) => {
+          const wyreUrl = res.url;
+          if (res.url) {
+            Swal.fire({
+              target: 'buy-deso-usd',
+              title: 'Purchase $DESO',
+              html: `You will complete your purchase through Wyre. Your ${this.selectedFiatCurrency} will be converted to <b>Bitcoin</b> and then into <b>$DESO</b> automatically.`,
+              showCancelButton: true,
+              showConfirmButton: true,
+              confirmButtonText: 'Buy',
+              customClass: {
+                confirmButton: 'btn btn-light',
+                cancelButton: 'btn btn-light no',
+              },
+              reverseButtons: true,
+            }).then((res: any) => {
+              if (res.isConfirmed) {
+                window.location.href = wyreUrl;
+              }
+            });
+          } else {
+            this.reservationError = res.message;
+            this.parentComponent._alertError(res.message);
+          }
+        },
+        (err) => {
+          this.parentComponent._alertError(err.error.message);
         }
-      },
-      (err) => {
-        this.parentComponent._alertError(err.error.message);
-      }
-    );
+      );
   }
 
   updateQuotation(): void {
@@ -138,14 +165,20 @@ export class BuyDeSoUSDComponent implements OnInit {
     this.quotation = null;
     this.usdEquivalent = 0;
     this.quotationError = '';
-    this.wyreService.makeWalletOrderQuotation(this.amount, this.selectedCountry, this.selectedFiatCurrency).subscribe(
-      (res) => {
-        this.parseQuotation(res);
-      },
-      (err) => {
-        this.quotationError = err.error.message;
-      }
-    );
+    this.wyreService
+      .makeWalletOrderQuotation(
+        this.amount,
+        this.selectedCountry,
+        this.selectedFiatCurrency
+      )
+      .subscribe(
+        (res) => {
+          this.parseQuotation(res);
+        },
+        (err) => {
+          this.quotationError = err.error.message;
+        }
+      );
   }
 
   parseQuotation(quotation: any): void {
@@ -167,7 +200,8 @@ export class BuyDeSoUSDComponent implements OnInit {
   getDeSoReceived(btcReceived: number): number {
     return (
       (btcReceived * 1e8) /
-      (this.parentComponent.satoshisPerDeSoExchangeRate * (1 + this.parentComponent.BuyDeSoFeeBasisPoints / (100 * 100)))
+      (this.parentComponent.satoshisPerDeSoExchangeRate *
+        (1 + this.parentComponent.BuyDeSoFeeBasisPoints / (100 * 100)))
     );
   }
 

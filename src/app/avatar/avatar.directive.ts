@@ -8,7 +8,11 @@ import { BackendAPIService } from '../backend-api.service';
 export class AvatarDirective implements OnChanges {
   @Input() appAvatar: string | undefined = '';
 
-  constructor(private globalVars: GlobalVarsService, private backendApi: BackendAPIService, private el: ElementRef) {}
+  constructor(
+    private globalVars: GlobalVarsService,
+    private backendApi: BackendAPIService,
+    private el: ElementRef
+  ) {}
 
   setAvatar(): void {
     if (!this.appAvatar) {

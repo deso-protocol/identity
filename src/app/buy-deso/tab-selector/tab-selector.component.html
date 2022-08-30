@@ -1,4 +1,8 @@
-<div class="d-flex w-100 tab-selector__container" style="cursor: pointer; height: 50px" [ngClass]="{ 'tab-selector-links': !buttonSelector }">
+<div
+  class="d-flex w-100 tab-selector__container"
+  style="cursor: pointer; height: 50px"
+  [ngClass]="{ 'tab-selector-links': !buttonSelector }"
+>
   <div
     *ngFor="let tab of tabs"
     (click)="_tabClicked(tab)"
@@ -8,20 +12,27 @@
       <div
         class="d-flex h-100 align-items-center fs-15px"
         *ngIf="tab !== activeTab || !buttonSelector"
-        [ngClass]="{ 'active-tab': tab === activeTab, 'fc-secondary': tab !== activeTab }"
+        [ngClass]="{
+          'active-tab': tab === activeTab,
+          'fc-secondary': tab !== activeTab
+        }"
       >
         {{ tab }}
       </div>
-      <button
-        *ngIf="tab === activeTab && buttonSelector"
-      >
+      <button *ngIf="tab === activeTab && buttonSelector">
         <span>{{ tab }}</span>
       </button>
-      <div class="new-tab-indicator" *ngIf="newTabs.includes(tab) && tab !== activeTab">
+      <div
+        class="new-tab-indicator"
+        *ngIf="newTabs.includes(tab) && tab !== activeTab"
+      >
         <span>{{ 'tab_selector.new' }}</span>
       </div>
       <div *ngIf="isLink(tab)" class="d-flex align-items-center ml-5px">
-        <i-feather class="feather-small fs-0px" name="external-link"></i-feather>
+        <i-feather
+          class="feather-small fs-0px"
+          name="external-link"
+        ></i-feather>
       </div>
     </div>
   </div>

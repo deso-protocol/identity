@@ -6,7 +6,7 @@ import {
   Input,
   NgModule,
   OnInit,
-  Output
+  Output,
 } from '@angular/core';
 import { GlobalVarsService } from '../../global-vars.service';
 import { BackendAPIService } from '../../backend-api.service';
@@ -18,24 +18,24 @@ import Swal from 'sweetalert2';
 import { IdentityService } from '../../identity.service';
 import { WyreService } from '../../../lib/services/wyre/wyre';
 import { isNil } from 'lodash';
-import {AccountService} from '../../account.service';
-import {TextService} from '../../text.service';
-import {SigningService} from '../../signing.service';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {FormsModule} from '@angular/forms';
-import {CommonModule} from '@angular/common';
-import {TabSelectorComponent} from '../tab-selector/tab-selector.component';
-import {BuyDeSoCompleteComponent} from '../buy-deso-complete/buy-deso-complete.component';
-import {BuyDeSoEthComponent} from '../buy-deso-eth/buy-deso-eth.component';
-import {BuyDeSoUSDComponent} from '../buy-deso-usd/buy-deso-usd.component';
-import {IconsModule} from '../../icons/icons.module';
+import { AccountService } from '../../account.service';
+import { TextService } from '../../text.service';
+import { SigningService } from '../../signing.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { TabSelectorComponent } from '../tab-selector/tab-selector.component';
+import { BuyDeSoCompleteComponent } from '../buy-deso-complete/buy-deso-complete.component';
+import { BuyDeSoEthComponent } from '../buy-deso-eth/buy-deso-eth.component';
+import { BuyDeSoUSDComponent } from '../buy-deso-usd/buy-deso-usd.component';
+import { IconsModule } from '../../icons/icons.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import {CryptoService} from '../../crypto.service';
-import {SignUpBuyDesoComponent} from '../sign-up-buy-deso.component';
+import { CryptoService } from '../../crypto.service';
+import { SignUpBuyDesoComponent } from '../sign-up-buy-deso.component';
 import { RouteNames } from 'src/app/app-routing.module';
-import {Network} from '../../../types/identity';
-import {BuyDeSoCompletePageComponent} from '../buy-deso-complete-page/buy-deso-complete-page.component';
-import {BuyDesoPageComponent} from '../buy-deso-page/buy-deso-page.component';
+import { Network } from '../../../types/identity';
+import { BuyDeSoCompletePageComponent } from '../buy-deso-complete-page/buy-deso-complete-page.component';
+import { BuyDesoPageComponent } from '../buy-deso-page/buy-deso-page.component';
 
 class Messages {
   static INCORRECT_PASSWORD = `The password you entered was incorrect.`;
@@ -115,13 +115,13 @@ export class BuyDeSoComponent implements OnInit {
     public router: Router,
     private httpClient: HttpClient,
     private cryptoService: CryptoService,
-    public wyreService: WyreService,
+    public wyreService: WyreService
   ) {
     this.appData = globalVars;
     this.route.queryParams.subscribe((params: Params) => {
       if (params.btc) {
         this.activeTab = BuyDeSoComponent.BUY_WITH_BTC;
-        this.router.navigate([], { queryParamsHandling: 'merge'} );
+        this.router.navigate([], { queryParamsHandling: 'merge' });
       }
       if (params.publicKey) {
         this.publicKey = params.publicKey;
@@ -148,7 +148,7 @@ export class BuyDeSoComponent implements OnInit {
       'To get started, simply send Bitcoin to your deposit address below. Note that deposits should show up ' +
       'within thirty seconds or so but sometimes, for various technical reasons, it can take up to an hour ' +
       '(though this should be extremely rare).\n\n' +
-      'Once you\'ve deposited Bitcoin, you can swap it for DESO in step two below. If it\'s your first ' +
+      "Once you've deposited Bitcoin, you can swap it for DESO in step two below. If it's your first " +
       'time doing this, we recommend starting with a small test amount of Bitcoin to get comfortable with the flow.'
     );
   }
@@ -169,8 +169,8 @@ export class BuyDeSoComponent implements OnInit {
     return (
       'If you send too much Bitcoin to your deposit address and need to get it back, you ' +
       'can access the Bitcoin in this address by importing your DeSo seed phrase into most standard Bitcoin wallets ' +
-      'like Electrum and choosing m/44\'/0\'/0\'/0/0 as your derivation path. This works because your DeSo seed phrase is ' +
-      'what\'s used to generate your Bitcoin deposit address.'
+      "like Electrum and choosing m/44'/0'/0'/0/0 as your derivation path. This works because your DeSo seed phrase is " +
+      "what's used to generate your Bitcoin deposit address."
     );
   }
 
@@ -236,8 +236,6 @@ export class BuyDeSoComponent implements OnInit {
     return sprintf(Messages.UNKOWN_PROBLEM, JSON.stringify(err));
   }
 
-
-
   _updateBitcoinFee(bitcoinToExchange: number): Promise<any> | null {
     if (this.latestBitcoinAPIResponse == null) {
       SwalHelper.fire({
@@ -277,7 +275,8 @@ export class BuyDeSoComponent implements OnInit {
             return null;
           }
           this.buyDeSoFields.error = '';
-          this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis = res.FeeSatoshis;
+          this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis =
+            res.FeeSatoshis;
           return res;
         },
         (err) => {
@@ -297,7 +296,11 @@ export class BuyDeSoComponent implements OnInit {
     return Object.keys(txnObj).length;
   }
 
-  _alertError(err: any, showBuyDeSo: boolean = false, showBuyCreatorCoin: boolean = false): void {
+  _alertError(
+    err: any,
+    showBuyDeSo: boolean = false,
+    showBuyCreatorCoin: boolean = false
+  ): void {
     if (err === 'Your balance is insufficient.') {
       showBuyDeSo = true;
     }
@@ -314,7 +317,11 @@ export class BuyDeSoComponent implements OnInit {
         confirmButton: 'btn btn-light',
         cancelButton: 'btn btn-light no',
       },
-      confirmButtonText: showBuyDeSo ? 'Buy DeSo' : showBuyCreatorCoin ? 'Buy Creator Coin' : 'Ok',
+      confirmButtonText: showBuyDeSo
+        ? 'Buy DeSo'
+        : showBuyCreatorCoin
+        ? 'Buy Creator Coin'
+        : 'Ok',
       reverseButtons: true,
     });
   }
@@ -324,7 +331,10 @@ export class BuyDeSoComponent implements OnInit {
       return;
     }
 
-    if (this.buyDeSoFields.desoToBuy === '' || parseFloat(this.buyDeSoFields.desoToBuy) === 0) {
+    if (
+      this.buyDeSoFields.desoToBuy === '' ||
+      parseFloat(this.buyDeSoFields.desoToBuy) === 0
+    ) {
       this._alertError(Messages.ZERO_DESO_ERROR);
       return;
     }
@@ -341,7 +351,9 @@ export class BuyDeSoComponent implements OnInit {
     const confirmBuyDeSoString = sprintf(
       Messages.CONFIRM_BUY_DESO,
       this.buyDeSoFields.bitcoinToExchange,
-      (parseFloat(this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis) / 1e8).toFixed(8),
+      (
+        parseFloat(this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis) / 1e8
+      ).toFixed(8),
       this.buyDeSoFields.desoToBuy
     );
 
@@ -367,7 +379,9 @@ export class BuyDeSoComponent implements OnInit {
             this.btcDepositAddress(),
             this.publicKey,
             Math.floor(parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8),
-            Math.floor(this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB),
+            Math.floor(
+              this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB
+            ),
             [],
             false
           )
@@ -377,23 +391,32 @@ export class BuyDeSoComponent implements OnInit {
             (res: any) => {
               // I think it is okay to sign this hash without additional validation, considering this flow only happens on
               // signup. Even if somehow this hash we're signing is mallicious, the user has no funds yet.
-              const hashes = this.signingService.signHashes(this.seedHex, res.UnsignedHashes);
+              const hashes = this.signingService.signHashes(
+                this.seedHex,
+                res.UnsignedHashes
+              );
               if (hashes.length) {
-                this.backendAPIService.ExchangeBitcoin(
-                  this.latestBitcoinAPIResponse,
-                  this.btcDepositAddress(),
-                  this.publicKey,
-                  Math.floor(parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8),
-                  Math.floor(this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB),
-                  hashes,
-                  true
-                )
+                this.backendAPIService
+                  .ExchangeBitcoin(
+                    this.latestBitcoinAPIResponse,
+                    this.btcDepositAddress(),
+                    this.publicKey,
+                    Math.floor(
+                      parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8
+                    ),
+                    Math.floor(
+                      this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB
+                    ),
+                    hashes,
+                    true
+                  )
                   .toPromise()
                   .then(
                     // tslint:disable-next-line:no-shadowed-variable
                     (res: any) => {
                       if (res == null || res.FeeSatoshis == null) {
-                        this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis = '0';
+                        this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis =
+                          '0';
                         this.buyDeSoFields.error = Messages.UNKOWN_PROBLEM;
                         this.showCloseButton.emit(true);
                         return null;
@@ -403,7 +426,8 @@ export class BuyDeSoComponent implements OnInit {
                       this.buyDeSoFields.error = '';
                       this.buyDeSoFields.desoToBuy = '';
                       this.buyDeSoFields.bitcoinToExchange = '';
-                      this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis = '0';
+                      this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis =
+                        '0';
                       // Update the BitcoinAPIResponse
                       this.latestBitcoinAPIResponse = null;
 
@@ -412,8 +436,12 @@ export class BuyDeSoComponent implements OnInit {
                       return res;
                     },
                     (err) => {
-                      console.error('Problem updating Bitcoin fee Satoshis Per KB', err);
-                      this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis = '0';
+                      console.error(
+                        'Problem updating Bitcoin fee Satoshis Per KB',
+                        err
+                      );
+                      this.buyDeSoFields.bitcoinTotalTransactionFeeSatoshis =
+                        '0';
                       this.buyDeSoFields.error = this._extractBurnError(err);
                       this.waitingOnTxnConfirmation = false;
                       return null;
@@ -422,7 +450,10 @@ export class BuyDeSoComponent implements OnInit {
               }
             },
             (err) => {
-              console.error('Problem updating Bitcoin fee Satoshis Per KB', err);
+              console.error(
+                'Problem updating Bitcoin fee Satoshis Per KB',
+                err
+              );
             }
           );
       }
@@ -489,7 +520,9 @@ export class BuyDeSoComponent implements OnInit {
   _clickBuyDeSoSuccess(comp: BuyDeSoComponent): void {
     comp.waitingOnTxnConfirmation = false;
     comp.showCloseButton.emit(true);
-    comp.router.navigate(['/', RouteNames.BUY_COMPLETE], { queryParamsHandling: 'merge' });
+    comp.router.navigate(['/', RouteNames.BUY_COMPLETE], {
+      queryParamsHandling: 'merge',
+    });
     comp.ref.detectChanges();
 
     console.log('NOW SHOULD CLOSE IDENTITY');
@@ -501,7 +534,7 @@ export class BuyDeSoComponent implements OnInit {
     const errString =
       'Your DeSo purchase was successfully broadcast. Due to high load' +
       ' your balance may take up to half an hour to show up in your wallet. Please ' +
-      ' check back and hit the \'help\' button if you have any problems.';
+      " check back and hit the 'help' button if you have any problems.";
     comp._alertSuccess(errString);
   }
 
@@ -542,7 +575,9 @@ export class BuyDeSoComponent implements OnInit {
 
           // The fee should have been updated by the time we get here so
           // just update the Bitcoin and DeSo amounts.
-          this.buyDeSoFields.bitcoinToExchange = (res.BurnAmountSatoshis / 1e8).toFixed(8);
+          this.buyDeSoFields.bitcoinToExchange = (
+            res.BurnAmountSatoshis / 1e8
+          ).toFixed(8);
           this._updateBitcoinToExchange(this.buyDeSoFields.bitcoinToExchange);
         },
         (err) => {
@@ -575,7 +610,8 @@ export class BuyDeSoComponent implements OnInit {
 
     return (
       amountDESO *
-      (this.satoshisPerDeSoExchangeRate * (1 + this.BuyDeSoFeeBasisPoints / (100 * 100)))
+      (this.satoshisPerDeSoExchangeRate *
+        (1 + this.BuyDeSoFeeBasisPoints / (100 * 100)))
     );
   }
 
@@ -601,7 +637,8 @@ export class BuyDeSoComponent implements OnInit {
     }
     return (
       (satoshisToBurn /
-        (this.satoshisPerDeSoExchangeRate * (1 + this.BuyDeSoFeeBasisPoints / (100 * 100)))) *
+        (this.satoshisPerDeSoExchangeRate *
+          (1 + this.BuyDeSoFeeBasisPoints / (100 * 100)))) *
       1e9
     );
   }
@@ -613,7 +650,9 @@ export class BuyDeSoComponent implements OnInit {
     } else {
       // The .999 factor comes in due to having to consider BitcoinExchangeFeeBasisPoints
       // that goes to pay the miner.
-      this.buyDeSoFields.bitcoinToExchange = (this._computeSatoshisToBurnGivenDeSoNanos(newVal * 1e9) / 1e8).toFixed(8);
+      this.buyDeSoFields.bitcoinToExchange = (
+        this._computeSatoshisToBurnGivenDeSoNanos(newVal * 1e9) / 1e8
+      ).toFixed(8);
     }
 
     // Update the Bitcoin fee.
@@ -631,7 +670,9 @@ export class BuyDeSoComponent implements OnInit {
       // The .999 factor comes in due to having to consider BitcoinExchangeFeeBasisPoints
       // that goes to pay the miner.
       this.buyDeSoFields.desoToBuy = (
-        this._computeNanosToCreateGivenSatoshisToBurn(parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8) / 1e9
+        this._computeNanosToCreateGivenSatoshisToBurn(
+          parseFloat(this.buyDeSoFields.bitcoinToExchange) * 1e8
+        ) / 1e9
       ).toFixed(9);
     }
 
@@ -656,23 +697,28 @@ export class BuyDeSoComponent implements OnInit {
     this.latestBitcoinAPIResponse = null;
     this.queryingBitcoinAPI = true;
 
-    this.backendAPIService.GetBitcoinAPIInfo(this.btcDepositAddress(), this.globalVars.network === Network.testnet).subscribe(
-      (resProm: any) => {
-        resProm
-          .then((res: any) => {
-            this.latestBitcoinAPIResponse = res;
+    this.backendAPIService
+      .GetBitcoinAPIInfo(
+        this.btcDepositAddress(),
+        this.globalVars.network === Network.testnet
+      )
+      .subscribe(
+        (resProm: any) => {
+          resProm
+            .then((res: any) => {
+              this.latestBitcoinAPIResponse = res;
 
-            this.queryingBitcoinAPI = false;
-          })
-          .catch(() => {
-            this.queryingBitcoinAPI = false;
-          });
-      },
-      (error) => {
-        this.queryingBitcoinAPI = false;
-        console.error('Error getting BitcoinAPI data: ', error);
-      }
-    );
+              this.queryingBitcoinAPI = false;
+            })
+            .catch(() => {
+              this.queryingBitcoinAPI = false;
+            });
+        },
+        (error) => {
+          this.queryingBitcoinAPI = false;
+          console.error('Error getting BitcoinAPI data: ', error);
+        }
+      );
   }
 
   _updateDeSoExchangeRate(): void {
@@ -680,8 +726,10 @@ export class BuyDeSoComponent implements OnInit {
       (res: any) => {
         // BTC
         this.satoshisPerDeSoExchangeRate = res.SatoshisPerDeSoExchangeRate;
-        this.ProtocolUSDCentsPerBitcoinExchangeRate = res.USDCentsPerBitcoinExchangeRate;
-        this.usdPerBitcoinExchangeRate = res.USDCentsPerBitcoinExchangeRate / 100;
+        this.ProtocolUSDCentsPerBitcoinExchangeRate =
+          res.USDCentsPerBitcoinExchangeRate;
+        this.usdPerBitcoinExchangeRate =
+          res.USDCentsPerBitcoinExchangeRate / 100;
 
         // ETH
         this.usdPerETHExchangeRate = res.USDCentsPerETHExchangeRate / 100;
@@ -690,13 +738,21 @@ export class BuyDeSoComponent implements OnInit {
         // DESO
         this.NanosSold = res.NanosSold;
         this.ExchangeUSDCentsPerDeSo = res.USDCentsPerDeSoExchangeRate;
-        this.USDCentsPerDeSoReservePrice = res.USDCentsPerDeSoReserveExchangeRate;
+        this.USDCentsPerDeSoReservePrice =
+          res.USDCentsPerDeSoReserveExchangeRate;
         this.BuyDeSoFeeBasisPoints = res.BuyDeSoFeeBasisPoints;
 
         const nanosPerUnit = GlobalVarsService.NANOS_PER_UNIT;
-        this.nanosPerUSDExchangeRate = nanosPerUnit / (this.ExchangeUSDCentsPerDeSo / 100);
-        this.desoToUSDExchangeRateToDisplay = this.globalVars.nanosToUSD(nanosPerUnit, null);
-        this.desoToUSDExchangeRateToDisplay = this.globalVars.nanosToUSD(nanosPerUnit, 2);
+        this.nanosPerUSDExchangeRate =
+          nanosPerUnit / (this.ExchangeUSDCentsPerDeSo / 100);
+        this.desoToUSDExchangeRateToDisplay = this.globalVars.nanosToUSD(
+          nanosPerUnit,
+          null
+        );
+        this.desoToUSDExchangeRateToDisplay = this.globalVars.nanosToUSD(
+          nanosPerUnit,
+          2
+        );
       },
       (error) => {
         console.error(error);
@@ -705,14 +761,18 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const encryptedUser = this.accountService.getEncryptedUsers()[this.publicKey];
+    const encryptedUser =
+      this.accountService.getEncryptedUsers()[this.publicKey];
     // TODO: need some sort of UI for when we can't get encrypted user.
     if (!encryptedUser) {
       console.error('Encrypted User not found: Buying DESO will not work.');
       this.publicKeyNotInIdentity = true;
       return;
     } else {
-      this.seedHex = this.cryptoService.decryptSeedHex(encryptedUser.encryptedSeedHex, this.globalVars.hostname);
+      this.seedHex = this.cryptoService.decryptSeedHex(
+        encryptedUser.encryptedSeedHex,
+        this.globalVars.hostname
+      );
     }
     window.scroll(0, 0);
 
@@ -730,10 +790,14 @@ export class BuyDeSoComponent implements OnInit {
     this.backendAPIService.GetBitcoinFeeRateSatoshisPerKB().subscribe(
       (res: any) => {
         if (res.priority != null) {
-          this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB = 2.0 * res.priority * 1000;
+          this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB =
+            2.0 * res.priority * 1000;
           // console.log('Using Bitcoin sats/KB fee: ', this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB)
         } else {
-          console.error('res.priority was null so didn\'t set default fee: ', res);
+          console.error(
+            "res.priority was null so didn't set default fee: ",
+            res
+          );
         }
       },
       (error) => {
@@ -752,7 +816,9 @@ export class BuyDeSoComponent implements OnInit {
   }
 
   goToLogin(): void {
-    this.router.navigate(['/', RouteNames.LOG_IN], { queryParamsHandling: 'merge' });
+    this.router.navigate(['/', RouteNames.LOG_IN], {
+      queryParamsHandling: 'merge',
+    });
   }
 }
 
@@ -774,6 +840,6 @@ export class BuyDeSoComponent implements OnInit {
     BsDropdownModule.forRoot(),
   ],
   exports: [BuyDeSoComponent, BuyDeSoCompleteComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class BuyDeSoComponentWrapper {}
