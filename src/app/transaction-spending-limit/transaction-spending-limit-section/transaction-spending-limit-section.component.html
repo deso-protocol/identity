@@ -1,21 +1,22 @@
-<ng-container *ngIf="getSectionMapLength() || anyCreatorItem || anyNFTItem">
-  <div class="flex-grow-1 transaction-spending-limit-separator pt-15px"></div>
+<div
+  *ngIf="getSectionMapLength() || anyCreatorItem || anyNFTItem"
+  class="px-20px transaction-spending-limit-separator"
+>
+  <div class="flex-grow-1 pt-15px"></div>
   <div class="py-15px">
     <div class="d-flex justify-content-between">
       <div class="d-flex flex-column">
-        <div class="fs-18px">{{ sectionTitle }}</div>
-        <div class="fs-14px">
+        <div class="fs-18px text-left">
+          <app-arrow-toggle
+            (click)="showDetails = !showDetails"
+          ></app-arrow-toggle>
+          {{ sectionTitle }}
+        </div>
+        <div class="fs-14px text-left">
           {{ sectionSummary() }}
         </div>
       </div>
-      <div class="d-flex justify-content-end">
-        <a
-          (click)="showDetails = !showDetails"
-          class="link"
-          style="font-size: 18px !important"
-          >{{ showDetails ? 'Hide' : 'Show' }}
-        </a>
-      </div>
+      <div class="d-flex justify-content-end"></div>
     </div>
 
     <div class="d-flex flex-column pt-15px" *ngIf="showDetails">
@@ -56,11 +57,7 @@
             TransactionSpendingLimitComponent.DAOCoinLimitsSection
         "
       >
-        <div
-          *ngIf="anyCreatorItem"
-          style="border: 2px solid goldenrod; border-radius: 5px"
-          class="mb-15px px-5px py-15px"
-        >
+        <div *ngIf="anyCreatorItem" class="mb-15px px-5px py-15px">
           <app-transaction-spending-limit-coin
             coinPublicKey=""
             [coinOperationMap]="anyCreatorItem"
@@ -91,11 +88,7 @@
           sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection
         "
       >
-        <div
-          *ngIf="anyNFTItem"
-          style="border: 2px solid goldenrod; border-radius: 5px"
-          class="mb-15px px-5px py-15px"
-        >
+        <div *ngIf="anyNFTItem" class="mb-15px px-5px py-15px">
           <app-transaction-spending-limit-nft
             nftPostHashHex=""
             [nftSerialNumToOperationMap]="anyNFTItem"
@@ -166,17 +159,9 @@
   <div
     *ngIf="showDetails"
     class="d-flex justify-content-center mr-15px ml-15px"
-    style="
-      background: lightgray;
-      border: 1px solid darkgray;
-      border-radius: 2px;
-    "
     (click)="
       showDetails = !showAll;
       showAll = !showAll || getSectionMapLength() <= defaultNumShown
     "
-  >
-    {{ showAll ? 'Hide' : 'Show all' }} {{ getSectionMapLength() }}
-    {{ sectionItemType() }}s
-  </div>
-</ng-container>
+  ></div>
+</div>

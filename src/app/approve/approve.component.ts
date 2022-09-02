@@ -94,9 +94,12 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
+    const user = this.accountService.getEncryptedUsers()[this.publicKey];
+    const isDerived = this.accountService.isMetamaskAccount(user);
     const signedTransactionHex = this.signingService.signTransaction(
       this.seedHex(),
-      this.transactionHex
+      this.transactionHex,
+      isDerived
     );
     this.finishFlow(signedTransactionHex);
   }

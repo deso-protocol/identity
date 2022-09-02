@@ -42,6 +42,7 @@ export class GlobalVarsService {
   referralHashBase58 = '';
 
   defaultMessageKeyName = 'default-key';
+  claimJwtDerivedPublicKey = 'derivedPublicKeyBase58Check';
 
   nanosPerUSDExchangeRate = 0;
   nanosToDeSoMemo = {};

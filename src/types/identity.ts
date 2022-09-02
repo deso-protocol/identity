@@ -3,12 +3,16 @@ import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 export interface PrivateUserInfo {
   seedHex: string;
   mnemonic: string;
+  publicKeyHex?: string;
   extraText: string;
   btcDepositAddress: string;
   ethDepositAddress: string;
   network: Network;
-  google?: boolean;
+  loginMethod?: LoginMethod;
   version: PrivateUserVersion;
+
+  /** DEPRECATED in favor of loginMethod */
+  google?: boolean;
 }
 
 export enum PrivateUserVersion {
@@ -17,6 +21,15 @@ export enum PrivateUserVersion {
 
   // Adds "ethDepositAddress"
   V1 = 1,
+
+  // Adds "loginMethod"
+  V2 = 2,
+}
+
+export enum LoginMethod {
+  DESO = 'DESO',
+  GOOGLE = 'GOOGLE',
+  METAMASK = 'METAMASK',
 }
 
 export interface PublicUserInfo {
@@ -27,6 +40,7 @@ export interface PublicUserInfo {
   network: Network;
   accessLevel: AccessLevel;
   accessLevelHmac: string;
+  loginMethod?: LoginMethod;
   version: PrivateUserVersion;
 }
 

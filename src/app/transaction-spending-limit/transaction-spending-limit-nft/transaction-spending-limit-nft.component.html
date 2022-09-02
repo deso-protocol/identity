@@ -52,6 +52,8 @@
         </div>
       </ng-container>
       <ng-container *ngIf="!post && loaded">
+        <app-arrow-toggle (click)="expandNFT = !expandNFT"></app-arrow-toggle>
+
         <div *ngIf="nftPostHashHex === ''">All NFTs</div>
         <div *ngIf="nftPostHashHex !== ''">NFT Post not found</div>
       </ng-container>
@@ -62,13 +64,6 @@
     >
       <div class="pr-5px">
         {{ getOperationsString(nftSerialNumToOperationMap) }}
-      </div>
-      <div
-        (click)="expandNFT = !expandNFT"
-        class="link"
-        style="font-size: 14px !important"
-      >
-        {{ expandNFT ? 'Hide' : 'Show' }}
       </div>
     </div>
   </div>
@@ -94,10 +89,7 @@
             : '#' + serialNumToOpMap.key
         }}
       </div>
-      <div
-        class="d-flex flex-column p-15px"
-        style="border: 1px solid gray; background: lightgray"
-      >
+      <div class="d-flex flex-column pt-15px pl-15px">
         <div class="d-flex fs-14px justify-content-between">
           <div>Operation Type</div>
           <div>Operation Limit</div>

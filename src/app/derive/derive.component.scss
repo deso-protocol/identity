@@ -1,0 +1,13 @@
+.selectedKey {
+  background-color: rgba(128, 128, 128, 0.452);
+}
+a.link {
+  font-size: 18px;
+}
+.container {
+  min-height: calc(100% - 150px);
+}
+// used multiple classes to increase selection priority
+.button.btn-primary.button-large:disabled {
+  opacity: 0.4;
+}

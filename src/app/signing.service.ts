@@ -18,13 +18,35 @@ export class SigningService {
     private globalVars: GlobalVarsService
   ) {}
 
-  signJWT(seedHex: string): string {
+  signJWT(
+    seedHex: string,
+    isDerived: boolean,
+    expiration: string | number = 60 * 10
+  ): string {
     const keyEncoder = new KeyEncoder('secp256k1');
     const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
-    return jsonwebtoken.sign({}, encodedPrivateKey, {
-      algorithm: 'ES256',
-      expiresIn: 60 * 10,
-    });
+    if (isDerived) {
+      const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+      const derivedPublicKeyBase58Check =
+        this.cryptoService.privateKeyToDeSoPublicKey(
+          derivedPrivateKey,
+          this.globalVars.network
+        );
+
+      return jsonwebtoken.sign(
+        {
+          [this.globalVars.claimJwtDerivedPublicKey]:
+            derivedPublicKeyBase58Check,
+        },
+        encodedPrivateKey,
+        { algorithm: 'ES256', expiresIn: expiration }
+      );
+    } else {
+      return jsonwebtoken.sign({}, encodedPrivateKey, {
+        algorithm: 'ES256',
+        expiresIn: expiration,
+      });
+    }
   }
 
   encryptMessage(
@@ -118,7 +140,7 @@ export class SigningService {
         } catch (e) {
           console.error(e);
         }
-      } else if (!encryptedMessage.Version || encryptedMessage.Version == 2) {
+      } else if (!encryptedMessage.Version || encryptedMessage.Version === 2) {
         try {
           decryptedHexes[encryptedMessage.EncryptedHex] = ecies
             .decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes)
@@ -186,7 +208,11 @@ export class SigningService {
     return decryptedHexes;
   }
 
-  signTransaction(seedHex: string, transactionHex: string): string {
+  signTransaction(
+    seedHex: string,
+    transactionHex: string,
+    isDerivedKey: boolean
+  ): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
@@ -194,6 +220,11 @@ export class SigningService {
     const signature = privateKey.sign(transactionHash, { canonical: true });
     const signatureBytes = new Buffer(signature.toDER());
     const signatureLength = uvarint64ToBuf(signatureBytes.length);
+
+    // If transaction is signed with a derived key, use DeSo-DER recoverable signature encoding.
+    if (isDerivedKey) {
+      signatureBytes[0] += 1 + (signature.recoveryParam as number);
+    }
 
     const signedTransactionBytes = Buffer.concat([
       // This slice is bad. We need to remove the existing signature length field prior to appending the new one.

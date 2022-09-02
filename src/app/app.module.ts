@@ -45,6 +45,12 @@ import { BuyDeSoCompletePageComponent } from './buy-deso/buy-deso-complete-page/
 import { BuyDesoPageComponent } from './buy-deso/buy-deso-page/buy-deso-page.component';
 import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.component';
 import { DefaultKeyComponent } from './default-key/default-key.component';
+import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
+import { MetamaskService } from './metamask.service';
+import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
+import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
+import { LogInOptionsComponent } from './log-in-options/log-in-options.component';
+import { AccountSelectComponent } from './account-select/account-select.component';
 
 @NgModule({
   declarations: [
@@ -79,6 +85,11 @@ import { DefaultKeyComponent } from './default-key/default-key.component';
     BuyDeSoCompletePageComponent,
     BuyDesoPageComponent,
     BuyOrSendDesoComponent,
+    SignUpMetamaskComponent,
+    ArrowToggleComponent,
+    TruncateAddressOrUsernamePipe,
+    LogInOptionsComponent,
+    AccountSelectComponent,
     DefaultKeyComponent,
   ],
   imports: [
@@ -95,7 +106,14 @@ import { DefaultKeyComponent } from './default-key/default-key.component';
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
   ],
-  providers: [IdentityService, EntropyService, AccountService],
+  providers: [
+    IdentityService,
+    EntropyService,
+    AccountService,
+    MetamaskService,
+    TruncateAddressOrUsernamePipe,
+  ],
+
   bootstrap: [AppComponent],
 })
 export class AppModule {}
