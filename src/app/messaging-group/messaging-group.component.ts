@@ -72,7 +72,7 @@ export class MessagingGroupComponent implements OnInit {
         }
       }
       // Get the application public key from the query params.
-      if (params.applicationPublicKeyBase58Check) {
+      if (params.applicationMessagingPublicKeyBase58Check) {
         // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
         this.cryptoService.publicKeyToBuffer(params.applicationMessagingPublicKeyBase58Check);
         this.applicationMessagingPublicKeyBase58Check = params.applicationMessagingPublicKeyBase58Check;
@@ -117,6 +117,9 @@ export class MessagingGroupComponent implements OnInit {
           }
         }
       }
+      if (!this.validateMessagingGroupOperation()) {
+        throw new Error('Invalid messaging group operation');
+      }
     });
   }
 
@@ -131,7 +134,6 @@ export class MessagingGroupComponent implements OnInit {
     const membersSetNonEmpty = this.updatedMembersPublicKeysBase58Check.length > 0 &&
       this.updatedMembersPublicKeysBase58Check.length === this.updatedMembersKeyNames.length;
 
-    const condition = groupSet && applicationSet;
     let membershipCondition = false;
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
@@ -158,7 +160,17 @@ export class MessagingGroupComponent implements OnInit {
         membershipCondition = membersSetNonEmpty;
         break;
     }
-    return condition && membershipCondition;
+
+    if (!groupSet) {
+      throw new Error('Group is not set properly');
+    }
+    if (!applicationSet) {
+      throw new Error('Application is not set properly');
+    }
+    if (!membershipCondition) {
+      throw new Error('Membership is not set properly');
+    }
+    return true;
   }
 
   getOperationString(): string {
@@ -191,10 +203,10 @@ export class MessagingGroupComponent implements OnInit {
     const encryptedToApplicationGroupMessagingPrivateKey = this.signingService.encryptGroupMessagingPrivateKeyToMember(
       this.applicationMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
     switch (this.operation) {
-      case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
+      case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
         this.respondToClient(messagingKeySignature, encryptedToApplicationGroupMessagingPrivateKey, []);
         break;
-      case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
+      case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
         this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey, []);
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:

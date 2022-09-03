@@ -521,6 +521,10 @@ export class IdentityService {
     };
 
     const req = this.outboundRequests[id];
+    if (!req) {
+      console.error('No matching outbound request');
+      return;
+    }
     req.next(result);
     req.complete();
     delete this.outboundRequests[id];
