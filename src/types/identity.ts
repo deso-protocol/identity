@@ -63,6 +63,13 @@ export interface DerivedPrivateUserInfo {
   signedUp: boolean;
 }
 
+export interface DefaultKeyPrivateInfo {
+  messagingPublicKeyBase58Check: string;
+  messagingPrivateKeyHex: string;
+  messagingKeyName: string;
+  messagingKeySignature: string;
+}
+
 export interface DefaultKeyPrivateUserInfo {
   publicKey: string;
   appPublicKey: string;

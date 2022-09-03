@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import {
-  AccessLevel,
+  AccessLevel, DefaultKeyPrivateInfo,
   DerivedPrivateUserInfo,
   LoginMethod,
   Network,
@@ -29,9 +29,8 @@ import {
   Transaction,
   TransactionMetadataAuthorizeDerivedKey,
 } from '../lib/deso/transaction';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
-import {DefaultKeyPayload} from './identity.service';
-import * as net from 'net';
+import KeyEncoder from 'key-encoder';
+import * as jsonwebtoken from 'jsonwebtoken';
 
 @Injectable({
   providedIn: 'root',
@@ -139,6 +138,10 @@ export class AccountService {
     derivedPublicKeyBase58CheckInput?: string,
     expirationDays?: number
   ): Promise<DerivedPrivateUserInfo | undefined> {
+    if (!(publicKeyBase58Check in this.getPrivateUsers())) {
+      return undefined;
+    }
+
     const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
     const network = privateUser.network;
     const isMetamask = this.isMetamaskAccount(privateUser);
@@ -264,47 +267,9 @@ export class AccountService {
       ])[0];
     }
 
-    let messagingPublicKeyBase58Check,
-      messagingPrivateKey,
-      messagingKeyName,
-      messagingKeySignature: string;
-    if (!isMetamask) {
-      // Set the default messaging key name
-      messagingKeyName = this.globalVars.defaultMessageKeyName;
-      // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
-      const messagingPrivateKeyBuff = this.cryptoService.deriveMessagingKey(
-        privateUser.seedHex,
-        messagingKeyName
-      );
-      messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
-      const ec = new EC('secp256k1');
-
-      // We do this to compress the messaging public key from 65 bytes to 33 bytes.
-      const messagingPublicKey = ec
-        .keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array')
-        .getPublic(true, 'hex');
-      messagingPublicKeyBase58Check =
-        this.cryptoService.privateKeyToDeSoPublicKey(
-          ec.keyFromPrivate(messagingPrivateKeyBuff),
-          this.globalVars.network
-        );
-
-      // Messaging key signature is needed so if derived key submits the messaging public key,
-      // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )
-      const messagingKeyHash = sha256.x2([
-        ...new Buffer(messagingPublicKey, 'hex'),
-        ...new Buffer(messagingKeyName, 'utf8'),
-      ]);
-      messagingKeySignature = this.signingService.signHashes(
-        privateUser.seedHex,
-        [messagingKeyHash]
-      )[0];
-    } else {
-      messagingPublicKeyBase58Check = 'Not implemented yet';
-      messagingPrivateKey = 'Not implemented yet';
-      messagingKeyName = 'Not implemented yet';
-      messagingKeySignature = 'Not implemented yet';
-    }
+    const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeyName, messagingKeySignature} =
+      this.getMessagingGroupStandardDerivation(
+        publicKeyBase58Check, this.globalVars.defaultMessageKeyName);
 
     return {
       derivedSeedHex,
@@ -318,7 +283,7 @@ export class AccountService {
       jwt,
       derivedJwt,
       messagingPublicKeyBase58Check,
-      messagingPrivateKey,
+      messagingPrivateKeyHex,
       messagingKeyName,
       messagingKeySignature,
       transactionSpendingLimitHex,
@@ -326,7 +291,7 @@ export class AccountService {
     };
   }
 
-  getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): DefaultKeyPrivateUserInfo {
+  getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): any {
     const privateUser = this.getPrivateUsers()[publicKey];
     const network = privateUser.network;
     // create jwt with private key and app public key
@@ -549,18 +514,67 @@ export class AccountService {
     this.setPrivateUsersRaw(privateUsers);
   }
 
-  getPrivateSharedSecret(ownerPublicKey: string, publicKey: string): string {
+  getPrivateSharedSecret(ownerPublicKeyBase58Check: string, publicKey: string): string {
     const privateUsers = this.getPrivateUsers();
-    if (!(ownerPublicKey in privateUsers)) {
+    if (!(ownerPublicKeyBase58Check in privateUsers)) {
       return '';
     }
-    const seedHex = privateUsers[ownerPublicKey].seedHex;
+    const seedHex = privateUsers[ownerPublicKeyBase58Check].seedHex;
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBytes = privateKey.getPrivate().toBuffer(undefined, 32);
     const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
     const sharedPx = ecies.derive(privateKeyBytes, publicKeyBytes);
     const sharedPrivateKey = ecies.kdf(sharedPx, 32);
     return sharedPrivateKey.toString('hex');
+  }
+
+  getMessagingGroupStandardDerivation(ownerPublicKeyBase58Check: string, messagingKeyName: string): DefaultKeyPrivateInfo {
+    const privateUsers = this.getPrivateUsers();
+    if (!(ownerPublicKeyBase58Check in privateUsers)) {
+      throw new Error('User not found');
+    }
+    const privateUser = privateUsers[ownerPublicKeyBase58Check];
+    const isMetamask = this.isMetamaskAccount(privateUser);
+    const seedHex = privateUser.seedHex;
+    // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
+    const messagingPrivateKeyBuff = this.cryptoService.deriveMessagingKey(
+      seedHex,
+      messagingKeyName
+    );
+    const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
+    const ec = new EC('secp256k1');
+
+    // We do this to compress the messaging public key from 65 bytes to 33 bytes.
+    const messagingPublicKey = ec
+      .keyFromPublic(ecies.getPublic(messagingPrivateKeyBuff), 'array')
+      .getPublic(true, 'hex');
+    const messagingPublicKeyBase58Check =
+      this.cryptoService.privateKeyToDeSoPublicKey(
+        ec.keyFromPrivate(messagingPrivateKeyBuff),
+        this.globalVars.network
+      );
+
+    // Messaging key signature is needed so if derived key submits the messaging public key,
+    // consensus can verify integrity of that public key. We compute ecdsa( sha256x2( messagingPublicKey || messagingKeyName ) )
+    const messagingKeyHash = sha256.x2([
+      ...new Buffer(messagingPublicKey, 'hex'),
+      ...new Buffer(messagingKeyName, 'utf8'),
+    ]);
+
+    let messagingKeySignature = '';
+    if (messagingKeyName === this.globalVars.defaultMessageKeyName) {
+      messagingKeySignature = this.signingService.signHashes(
+        seedHex,
+        [messagingKeyHash]
+      )[0];
+    }
+
+    return {
+      messagingPublicKeyBase58Check,
+      messagingPrivateKeyHex: messagingPrivateKey,
+      messagingKeyName,
+      messagingKeySignature,
+    };
   }
 
   // Private Getters and Modifiers

@@ -16,6 +16,7 @@ import { BuyDesoPageComponent } from './buy-deso/buy-deso-page/buy-deso-page.com
 import { BuyDeSoCompletePageComponent } from './buy-deso/buy-deso-complete-page/buy-deso-complete-page.component';
 import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.component';
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
+import { MessagingGroupComponent } from './messaging-group/messaging-group.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -38,7 +39,7 @@ export class RouteNames {
   public static GET_DESO = 'get-deso';
   public static BUY_DESO = 'buy-deso';
   public static BUY_OR_SEND_DESO = 'buy-or-send-deso';
-  public static DEFAULT_KEY = 'default-key'
+  public static MESSAGING_GROUP = 'messaging-group';
 }
 
 const routes: Routes = [
@@ -90,6 +91,11 @@ const routes: Routes = [
     component: BuyOrSendDesoComponent,
     pathMatch: 'full',
   },
+  {
+    path: RouteNames.MESSAGING_GROUP,
+    component: MessagingGroupComponent,
+    pathMatch: 'full',
+  }
 ];
 
 @NgModule({

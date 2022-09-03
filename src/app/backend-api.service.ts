@@ -740,6 +740,23 @@ export class BackendAPIService {
     );
   }
 
+  GetBulkMessagingPublicKeys(
+    GroupOwnerPublicKeysBase58Check: string[],
+    MessagingGroupKeyNamesHex: string[],
+  ): Observable<any> {
+    const req = this.post('get-bulk-messaging-public-keys', {
+      GroupOwnerPublicKeysBase58Check,
+      MessagingGroupKeyNamesHex,
+    });
+
+    return req.pipe(
+    catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
+  }
+
   SubmitTransaction(TransactionHex: string): Observable<any> {
     const req = this.post('submit-transaction', {
       TransactionHex,

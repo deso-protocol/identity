@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DefaultKeyComponent } from './default-key.component';
+import { MessagingGroupComponent } from './messaging-group.component';
 
-describe('DefaultKeyComponent', () => {
-  let component: DefaultKeyComponent;
-  let fixture: ComponentFixture<DefaultKeyComponent>;
+describe('MessagingGroupComponent', () => {
+  let component: MessagingGroupComponent;
+  let fixture: ComponentFixture<MessagingGroupComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DefaultKeyComponent ]
+      declarations: [ MessagingGroupComponent ]
     })
       .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DefaultKeyComponent);
+    fixture = TestBed.createComponent(MessagingGroupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

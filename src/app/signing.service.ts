@@ -6,8 +6,8 @@ import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
-import { decryptShared } from '../lib/ecies';
 import { EncryptedMessage } from '../types/identity';
+import { ec } from 'elliptic';
 
 @Injectable({
   providedIn: 'root',
@@ -268,5 +268,15 @@ export class SigningService {
     }
 
     return signedHashes;
+  }
+
+  encryptGroupMessagingPrivateKeyToMember(memberMessagingPublicKeyBase58Check: string, privateKeyHex: string): string {
+    const memberMessagingPkBuffer = this.cryptoService.publicKeyToECBuffer(memberMessagingPublicKeyBase58Check);
+    return ecies.encrypt(memberMessagingPkBuffer, privateKeyHex, {}).toString('hex');
+  }
+  decryptGroupMessagingPrivateKeyToMember(privateKeyBuffer: Buffer, encryptedPrivateKeyBuffer: Buffer): ec.KeyPair {
+    const memberMessagingPriv = ecies.decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, {});
+    const EC = new ec('secp256k1');
+    return EC.keyFromPrivate(memberMessagingPriv);
   }
 }

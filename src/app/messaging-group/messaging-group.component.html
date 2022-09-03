@@ -1,0 +1,73 @@
+<app-banner></app-banner>
+
+<div *ngIf="!globalVars.callbackInvalid">
+  <div class="container home-container">
+    <div class="font-weight-bold fs-24px mb-24px">
+      <span class="fs-underline">Operation: {{getOperationString()}}</span>
+    </div>
+    <div class="font-weight-bold fs-30px mb-20px" *ngIf="!globalVars.callback">
+      Share message access with: {{ globalVars.hostname }}
+    </div>
+
+    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.DEFAULT_KEY">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
+        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        This permission can be revoked in the future.
+      </div>
+    </div>
+    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.CREATE_GROUP">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
+        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        This permission can be revoked in the future.
+      </div>
+    </div>
+    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant messaging access:</b></span><br/>
+        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        This permission can be revoked in the future.
+      </div>
+    </div>
+    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.MUTE_MEMBERS">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
+        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        This permission can be revoked in the future.
+      </div>
+    </div>
+    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.UNMUTE_MEMBERS">
+      <div class="fs-18px mt-30px">
+        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
+        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        This permission can be revoked in the future.
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">
+        <ul class="list-group mt-7px mb-30px">
+          <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccountAndApproveDefaultKey(item.key)">
+            <div class="w-100">
+              <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>
+              <div *ngIf="item.value.username" class="d-flex align-items-center">
+                <div class="avatar mr-15px" [appAvatar]="item.key"></div>
+                <div class="text-truncate">{{ item.value.username }}</div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+  <div class="container home-container flx-center">
+    <div class="pt-15px">
+      <button type="button" class="button button-small button-primary" (click)="approveOperation()">Approve</button>
+    </div>
+  </div>
+</div>
+<div *ngIf="globalVars.callbackInvalid">
+  <app-error-callback></app-error-callback>
+</div>
