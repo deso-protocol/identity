@@ -174,22 +174,28 @@ export class MessagingGroupComponent implements OnInit {
   }
 
   approveOperation(): void {
-
+    this.asyncApproveOperation()
+      .then(() => {
+        console.log('approve operation finished!');
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   public async asyncApproveOperation(): Promise<void> {
-    const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeyName, messagingKeySignature} =
+    const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeySignature} =
       this.accountService.getMessagingGroupStandardDerivation(
         this.updatedGroupOwnerPublicKeyBase58Check, this.globalVars.defaultMessageKeyName);
 
+    const encryptedToApplicationGroupMessagingPrivateKey = this.signingService.encryptGroupMessagingPrivateKeyToMember(
+      this.applicationMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
     switch (this.operation) {
-      case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
-
-          this.respondToClient();
-          break;
       case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
-
-        this.respondToClient();
+        this.respondToClient(messagingKeySignature, encryptedToApplicationGroupMessagingPrivateKey, []);
+        break;
+      case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
+        this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey, []);
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:
         try {
@@ -202,21 +208,31 @@ export class MessagingGroupComponent implements OnInit {
             throw new Error('Error can\'t perform AddMembers operation on a group with non-standard key derivation');
           }
           const memberMessagingPublicKeys = messagingPublicKeys.slice(1);
-          const groupMessagingPublicKeyEncryptedToMembers = [];
+          const encryptedToMembersGroupMessagingPrivateKey: string[] = [];
           for (const memberMessagingPublicKeyBase58Check of memberMessagingPublicKeys) {
-            const encryptedGroupMessagingPk = this.signingService.encryptGroupMessagingPrivateKeyToMember(
+            const encryptedGroupMessagingPriv = this.signingService.encryptGroupMessagingPrivateKeyToMember(
               memberMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
-            groupMessagingPublicKeyEncryptedToMembers.push(encryptedGroupMessagingPk);
+            encryptedToMembersGroupMessagingPrivateKey.push(encryptedGroupMessagingPriv);
           }
+          this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey,
+            encryptedToMembersGroupMessagingPrivateKey);
         } catch (e) {
           throw new Error('Error getting bulk messaging public keys');
         }
-        // return groupMessagingPublicKeyEncryptedToMembers
-        this.respondToClient();
         break;
+      default:
+        throw new Error('Error invalid operation');
     }
   }
-  respondToClient(): void {
-
+  respondToClient(messagingKeySignature: string, encryptedToApplicationGroupMessagingPrivateKey: string,
+                  encryptedToMembersGroupMessagingPrivateKey: string[]): void {
+    console.log(`calling respondToClient with messagingKeySignature: ${messagingKeySignature}` +
+      `encryptedToApplicationGroupMessagingPrivateKey: ${encryptedToApplicationGroupMessagingPrivateKey}` +
+      `encryptedToMembersGroupMessagingPrivateKey: ${encryptedToMembersGroupMessagingPrivateKey}`);
+    this.identityService.messagingGroup({
+      messagingKeySignature,
+      encryptedToApplicationGroupMessagingPrivateKey,
+      encryptedToMembersGroupMessagingPrivateKey,
+    });
   }
 }

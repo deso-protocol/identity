@@ -46,9 +46,10 @@ export type DerivePayload = {
   expirationDays?: number;
 };
 
-export type DefaultKeyPayload = {
-  publicKey: string;
-  appPublicKey: string;
+export type MessagingGroupPayload = {
+  messagingKeySignature: string;
+  encryptedToApplicationGroupMessagingPrivateKey: string;
+  encryptedToMembersGroupMessagingPrivateKey: string[];
 };
 
 @Injectable({
@@ -122,17 +123,8 @@ export class IdentityService {
         .then((derivedPrivateUserInfo) => {
           if (this.globalVars.callback) {
             // If callback is passed, we redirect to it with payload as URL parameters.
-            let httpParams = new HttpParams();
-            for (const key in derivedPrivateUserInfo) {
-              if (derivedPrivateUserInfo.hasOwnProperty(key)) {
-                const paramVal = (derivedPrivateUserInfo as any)[key];
-                if (paramVal !== null && paramVal !== undefined) {
-                  httpParams = httpParams.append(key, paramVal.toString());
-                }
-              }
-            }
-            window.location.href =
-              this.globalVars.callback + `?${httpParams.toString()}`;
+            const httpParams = this.parseTypeToHttpParams(derivedPrivateUserInfo);
+            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
           } else {
             this.cast('derive', derivedPrivateUserInfo);
           }
@@ -143,25 +135,27 @@ export class IdentityService {
     });
   }
 
-  approveDefaultKey(payload: DefaultKeyPayload): void {
-    this.backendApi.GetAppState().subscribe((res) => {
-      const defaultKeyPrivateUserInfo = this.accountService.getDefaultKeyPrivateUser(payload.publicKey, payload.appPublicKey);
-      if (this.globalVars.callback) {
-        // If callback is passed, we redirect to it with payload as URL parameters.
-        let httpParams = new HttpParams();
-        for (const key in defaultKeyPrivateUserInfo) {
-          if (defaultKeyPrivateUserInfo.hasOwnProperty(key)) {
-            const paramVal = (defaultKeyPrivateUserInfo as any)[key];
-            if (paramVal !== null && paramVal !== undefined) {
-              httpParams = httpParams.append(key, paramVal.toString());
-            }
-          }
+  messagingGroup(payload: MessagingGroupPayload): void {
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      const httpParams = this.parseTypeToHttpParams(payload);
+      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+    } else {
+      this.cast('messagingGroup', payload);
+    }
+  }
+
+  parseTypeToHttpParams(payload: any): HttpParams {
+    let httpParams = new HttpParams();
+    for (const key in payload) {
+      if (payload.hasOwnProperty(key)) {
+        const paramVal = (payload as any)[key];
+        if (paramVal !== null && paramVal !== undefined) {
+          httpParams = httpParams.append(key, paramVal.toString());
         }
-        window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
-      } else {
-        this.cast('approveDefaultKey', defaultKeyPrivateUserInfo);
       }
-    });
+    }
+    return httpParams;
   }
 
   // Incoming Messages

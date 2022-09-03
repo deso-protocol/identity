@@ -30,36 +30,22 @@
         This permission can be revoked in the future.
       </div>
     </div>
-    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.MUTE_MEMBERS">
-      <div class="fs-18px mt-30px">
-        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
-        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
-        This permission can be revoked in the future.
-      </div>
-    </div>
-    <div *ngIf="operation === MESSAGING_GROUP_OPERATION.UNMUTE_MEMBERS">
-      <div class="fs-18px mt-30px">
-        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
-        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
-        This permission can be revoked in the future.
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">
-        <ul class="list-group mt-7px mb-30px">
-          <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccountAndApproveDefaultKey(item.key)">
-            <div class="w-100">
-              <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>
-              <div *ngIf="item.value.username" class="d-flex align-items-center">
-                <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-                <div class="text-truncate">{{ item.value.username }}</div>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
+<!--    <div class="row">-->
+<!--      <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">-->
+<!--        <ul class="list-group mt-7px mb-30px">-->
+<!--          <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccountAndApproveDefaultKey(item.key)">-->
+<!--            <div class="w-100">-->
+<!--              <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>-->
+<!--              <div *ngIf="item.value.username" class="d-flex align-items-center">-->
+<!--                <div class="avatar mr-15px" [appAvatar]="item.key"></div>-->
+<!--                <div class="text-truncate">{{ item.value.username }}</div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--    </div>-->
 
   </div>
   <div class="container home-container flx-center">

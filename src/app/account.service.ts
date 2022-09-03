@@ -270,7 +270,7 @@ export class AccountService {
     const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeyName, messagingKeySignature} =
       this.getMessagingGroupStandardDerivation(
         publicKeyBase58Check, this.globalVars.defaultMessageKeyName);
-
+    const messagingPrivateKey = messagingPrivateKeyHex;
     return {
       derivedSeedHex,
       derivedPublicKeyBase58Check,
@@ -283,7 +283,7 @@ export class AccountService {
       jwt,
       derivedJwt,
       messagingPublicKeyBase58Check,
-      messagingPrivateKeyHex,
+      messagingPrivateKey,
       messagingKeyName,
       messagingKeySignature,
       transactionSpendingLimitHex,
