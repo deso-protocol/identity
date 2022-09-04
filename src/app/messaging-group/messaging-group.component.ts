@@ -8,6 +8,8 @@ import {UserProfile} from '../../types/identity';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CryptoService} from '../crypto.service';
 import {SigningService} from '../signing.service';
+import {Observable} from 'rxjs';
+import {group} from "@angular/animations";
 
 export enum MESSAGING_GROUP_OPERATION {
   DEFAULT_KEY = 'DefaultKey',
@@ -31,6 +33,7 @@ export class MessagingGroupComponent implements OnInit {
   updatedGroupKeyName = '';
   updatedMembersPublicKeysBase58Check: string[] = [];
   updatedMembersKeyNames: string[] = [];
+  updatedMembersProfiles = {} as Observable<{[publicKeyBase58Check: string]: UserProfile}>;
   MESSAGING_GROUP_OPERATION = MESSAGING_GROUP_OPERATION;
 
   constructor(
@@ -120,6 +123,10 @@ export class MessagingGroupComponent implements OnInit {
       if (!this.validateMessagingGroupOperation()) {
         throw new Error('Invalid messaging group operation');
       }
+
+      if (this.operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS) {
+        this.updatedMembersProfiles = this.backendApi.GetUserProfiles(this.updatedMembersPublicKeysBase58Check);
+      }
     });
   }
 
@@ -134,7 +141,7 @@ export class MessagingGroupComponent implements OnInit {
     const membersSetNonEmpty = this.updatedMembersPublicKeysBase58Check.length > 0 &&
       this.updatedMembersPublicKeysBase58Check.length === this.updatedMembersKeyNames.length;
 
-    let membershipCondition = false;
+    let validityCondition = groupSet;
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
         // In this operation, we need to set the group to be the default key. We also set the application
@@ -142,7 +149,7 @@ export class MessagingGroupComponent implements OnInit {
         if (this.updatedGroupKeyName !== this.globalVars.defaultMessageKeyName) {
           return false;
         }
-        membershipCondition = membersSetEmpty;
+        validityCondition &&= applicationSet && membersSetEmpty;
         break;
       case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
         // This operation is identical to the default key operation, except that here the group key cannot be equal
@@ -152,23 +159,19 @@ export class MessagingGroupComponent implements OnInit {
         if (this.updatedGroupKeyName === this.globalVars.defaultMessageKeyName) {
           return false;
         }
-        membershipCondition = membersSetEmpty;
+        validityCondition &&= applicationSet && membersSetEmpty;
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:
-        // In this operation, we need to add members to the group. The group must be set, we also set
-        // the application key, and the members of the group need to be set to non-empty.
-        membershipCondition = membersSetNonEmpty;
+        // In this operation, we need to add members to the group. The group must be set, we optionally allow for
+        // the application key (an app can add members without requesting private key access to the group), and
+        // the members of the group need to be set to non-empty.
+        validityCondition &&= membersSetNonEmpty;
         break;
     }
 
-    if (!groupSet) {
-      throw new Error('Group is not set properly');
-    }
-    if (!applicationSet) {
-      throw new Error('Application is not set properly');
-    }
-    if (!membershipCondition) {
-      throw new Error('Membership is not set properly');
+    if (!validityCondition) {
+      throw new Error(`Invalid messaging group operation operation: ${this.operation} groupSet: ${groupSet}, applicationSet:
+      ${applicationSet}, membersSetEmpty: ${membersSetEmpty}, membersSetNonEmpty: ${membersSetNonEmpty}`);
     }
     return true;
   }
@@ -247,4 +250,6 @@ export class MessagingGroupComponent implements OnInit {
       encryptedToMembersGroupMessagingPrivateKey,
     });
   }
+
+  onAccountSelect(event: any): void {}
 }

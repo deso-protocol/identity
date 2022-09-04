@@ -13,7 +13,7 @@
     </div>
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
-        [allUsers$]="allUsers$"
+        [allUsers]="allUsers"
         (onAccountSelect)="publicKeyBase58Check = $event"
       ></app-account-select>
       <div class="mb-2">or</div>

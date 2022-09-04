@@ -742,11 +742,11 @@ export class BackendAPIService {
 
   GetBulkMessagingPublicKeys(
     GroupOwnerPublicKeysBase58Check: string[],
-    MessagingGroupKeyNamesHex: string[],
+    MessagingGroupKeyNames: string[],
   ): Observable<any> {
     const req = this.post('get-bulk-messaging-public-keys', {
       GroupOwnerPublicKeysBase58Check,
-      MessagingGroupKeyNamesHex,
+      MessagingGroupKeyNames,
     });
 
     return req.pipe(

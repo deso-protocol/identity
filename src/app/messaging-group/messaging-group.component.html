@@ -2,55 +2,53 @@
 
 <div *ngIf="!globalVars.callbackInvalid">
   <div class="container home-container">
-    <div class="font-weight-bold fs-24px mb-24px">
-      <span class="fs-underline">Operation: {{getOperationString()}}</span>
+    <div class="font-weight-bold fs-24px mb-10px" *ngIf="!globalVars.callback">
+      <span *ngIf="!globalVars.callback">{{ globalVars.hostname }} requests: </span>
+      <span *ngIf="globalVars.callback">Request for:</span>
+      <span class="fc-blue">{{getOperationString()}}</span>
     </div>
-    <div class="font-weight-bold fs-30px mb-20px" *ngIf="!globalVars.callback">
-      Share message access with: {{ globalVars.hostname }}
+    <div class="fs-18px mb-10px">
+      <b>Group name: <span class="fc-blue">{{updatedGroupKeyName}}</span></b>
     </div>
 
     <div *ngIf="operation === MESSAGING_GROUP_OPERATION.DEFAULT_KEY">
       <div class="fs-18px mt-30px">
-        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
-        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        Click approve to share your default key
+        <span *ngIf="!globalVars.callback">with <b>{{ globalVars.hostname }}</b></span>.
+        Make sure you trust this app as it will be able to read your DeSo messages.
         This permission can be revoked in the future.
       </div>
     </div>
     <div *ngIf="operation === MESSAGING_GROUP_OPERATION.CREATE_GROUP">
       <div class="fs-18px mt-30px">
-        <span class="fs-underline"><b>You're about to grant {{ globalVars.hostname }} with messaging access:</b></span><br/>
-        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
+        Click approve to create a group and share it
+        <span *ngIf="!globalVars.callback">with <b>{{ globalVars.hostname }}</b></span>.
+        Make sure you trust this app as it will be able to read messages sent within the group.
         This permission can be revoked in the future.
       </div>
     </div>
     <div *ngIf="operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS">
-      <div class="fs-18px mt-30px">
-        <span class="fs-underline"><b>You're about to grant messaging access:</b></span><br/>
-        This means <b>{{ globalVars.hostname }}</b> will be able to see your DeSo messages.
-        This permission can be revoked in the future.
+      <div class="fs-18px mt-10px mb-40px">
+        Click approve to add new users to your group. Members can read and write messages to the group. Only you can
+        add new members, and you can also mute or unmute existing members at any time.
       </div>
+
+      <app-account-select
+        (onAccountSelect)="onAccountSelect($event)"
+        [allUsers]="updatedMembersProfiles"
+        [componentTitle]="'Add users to group'"
+        [hideLoginMethod]="true"
+      ></app-account-select>
+
+      <span *ngIf="applicationMessagingPublicKeyBase58Check" class="fc-muted fs-15px mt-20px">
+          🔐 <span *ngIf="!globalVars.callback"><b>{{ globalVars.hostname }}</b></span>
+          requested access to this group. Make sure you trust this app as it will be able to read messages sent within the group.
+      </span>
     </div>
-
-<!--    <div class="row">-->
-<!--      <div class="d-flex flex-column col-sm-6" *ngIf="hasUsers">-->
-<!--        <ul class="list-group mt-7px mb-30px">-->
-<!--          <li *ngFor="let item of allUsers | keyvalue" class="list-group-item list-group-item-action cursor-pointer" (click)="selectAccountAndApproveDefaultKey(item.key)">-->
-<!--            <div class="w-100">-->
-<!--              <div *ngIf="!item.value.username" class="text-truncate">{{ item.key }}&hellip;</div>-->
-<!--              <div *ngIf="item.value.username" class="d-flex align-items-center">-->
-<!--                <div class="avatar mr-15px" [appAvatar]="item.key"></div>-->
-<!--                <div class="text-truncate">{{ item.value.username }}</div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </li>-->
-<!--        </ul>-->
-<!--      </div>-->
-<!--    </div>-->
-
-  </div>
-  <div class="container home-container flx-center">
-    <div class="pt-15px">
-      <button type="button" class="button button-small button-primary" (click)="approveOperation()">Approve</button>
+    <div class="flx-center">
+      <div class="mt-20px">
+        <button type="button" class="button button-small button-primary" (click)="approveOperation()">Approve</button>
+      </div>
     </div>
   </div>
 </div>

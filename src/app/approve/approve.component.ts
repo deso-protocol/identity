@@ -7,8 +7,6 @@ import { GlobalVarsService } from '../global-vars.service';
 import { SigningService } from '../signing.service';
 import {
   BackendAPIService,
-  CreatorCoinLimitOperationString,
-  ProfileEntryResponse,
   TransactionSpendingLimitResponse,
   User,
 } from '../backend-api.service';
@@ -16,33 +14,34 @@ import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Transaction,
+  TransactionMetadataAcceptNFTBid,
+  TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataAuthorizeDerivedKey,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
+  TransactionMetadataBurnNFT,
+  TransactionMetadataCreateNFT,
   TransactionMetadataCreatorCoin,
   TransactionMetadataCreatorCoinTransfer,
+  TransactionMetadataDAOCoin,
+  TransactionMetadataDAOCoinLimitOrder,
   TransactionMetadataFollow,
   TransactionMetadataLike,
+  TransactionMetadataMessagingGroup,
+  TransactionMetadataNFTBid,
+  TransactionMetadataNFTTransfer,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
+  TransactionMetadataTransferDAOCoin,
   TransactionMetadataUpdateBitcoinUSDExchangeRate,
   TransactionMetadataUpdateGlobalParams,
-  TransactionMetadataUpdateProfile,
-  TransactionMetadataCreateNFT,
   TransactionMetadataUpdateNFT,
-  TransactionMetadataNFTBid,
-  TransactionMetadataAcceptNFTBid,
-  TransactionMetadataNFTTransfer,
-  TransactionMetadataAcceptNFTTransfer,
-  TransactionMetadataBurnNFT,
-  TransactionMetadataAuthorizeDerivedKey,
-  TransactionMetadataMessagingGroup,
-  TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin,
+  TransactionMetadataUpdateProfile,
   TransactionSpendingLimit,
-  TransactionMetadataDAOCoinLimitOrder,
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
+import {MessagingGroupOperation, UserProfile} from '../../types/identity';
 
 @Component({
   selector: 'app-approve',
@@ -57,8 +56,9 @@ export class ApproveComponent implements OnInit {
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
   tsl: TransactionSpendingLimit | null = null;
+  messagingGroupMembers = {} as Observable<{[publicKeyBase58Check: string]: UserProfile}>;
 
-  derivedKeyMemo: string = '';
+  derivedKeyMemo = '';
   transactionSpendingLimitResponse:
     | TransactionSpendingLimitResponse
     | undefined = undefined;
@@ -275,7 +275,7 @@ export class ApproveComponent implements OnInit {
 
         // Parse the transaction spending limit and memo from the extra data
         for (const kv of this.transaction.extraData?.kvs || []) {
-          if (kv.key.toString() === 'TransactionSpendingLimit') {
+          if (kv.key.toString() === this.globalVars.extraDataTransactionSpendingLimit) {
             // Hit the backend to get the TransactionSpendingLimit response from the bytes we have in the value.
             //
             // TODO: There is a small attack surface here. If someone gains control of the
@@ -291,7 +291,7 @@ export class ApproveComponent implements OnInit {
                 this.transactionSpendingLimitResponse = res;
               });
           }
-          if (kv.key.toString() === 'DerivedKeyMemo') {
+          if (kv.key.toString() === this.globalVars.extraDataDerivedKeyMemo) {
             this.derivedKeyMemo = new Buffer(
               kv.value.toString(),
               'hex'
@@ -341,6 +341,35 @@ export class ApproveComponent implements OnInit {
         const messagingGroupMetadata = this.transaction
           .metadata as TransactionMetadataMessagingGroup;
         const groupKeyName = messagingGroupMetadata.messagingGroupKeyName;
+        let groupOperation = MessagingGroupOperation.MessagingGroupOperationAddMembers;
+        for (const kv of this.transaction.extraData?.kvs || []) {
+          if (kv.key.toString() === this.globalVars.extraDataMessagingGroupOperationType) {
+            const operationBytes = kv.value;
+            if (operationBytes.length !== 1) {
+              throw new Error('Invalid operation type length on a messaging group transaction');
+            }
+            groupOperation = operationBytes[0];
+            switch (groupOperation) {
+              case MessagingGroupOperation.MessagingGroupOperationAddMembers:
+                description = `add members to a messaging group: ${groupKeyName}`;
+                break;
+              case MessagingGroupOperation.MessagingGroupOperationMuteMembers:
+                description = `mute members in a messaging group: ${groupKeyName}`;
+                break;
+              case MessagingGroupOperation.MessagingGroupOperationUnmuteMembers:
+                description = `unmute members in a messaging group: ${groupKeyName}`;
+                break;
+              default:
+                throw new Error('Invalid operation type on a messaging group transaction');
+            }
+          }
+        }
+
+        const groupMembers = [];
+        for (const member of messagingGroupMetadata.messagingGroupMembers) {
+           groupMembers.push(this.base58KeyCheck(member.groupMemberPublicKey));
+        }
+        this.messagingGroupMembers = this.backendApi.GetUserProfiles(groupMembers);
         description = `register group key with name "${groupKeyName}"`;
         break;
       case TransactionMetadataDAOCoinLimitOrder:
@@ -348,7 +377,7 @@ export class ApproveComponent implements OnInit {
           .metadata as TransactionMetadataDAOCoinLimitOrder;
         if (
           daoCoinLimitOrderMetadata.cancelOrderID != null &&
-          daoCoinLimitOrderMetadata.cancelOrderID.length != 0
+          daoCoinLimitOrderMetadata.cancelOrderID.length !== 0
         ) {
           // The transaction is cancelling an existing limit order
           const orderId =

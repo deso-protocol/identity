@@ -70,11 +70,11 @@ export interface DefaultKeyPrivateInfo {
   messagingKeySignature: string;
 }
 
-export interface DefaultKeyPrivateUserInfo {
-  publicKey: string;
-  appPublicKey: string;
-  network: Network;
-  jwt: string;
+export enum MessagingGroupOperation {
+  MessagingGroupOperationAddMembers = 0,
+  MessagingGroupOperationRemoveMembers = 1,
+  MessagingGroupOperationMuteMembers = 2,
+  MessagingGroupOperationUnmuteMembers = 3,
 }
 
 export interface UserProfile {
