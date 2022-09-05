@@ -10,6 +10,7 @@ export interface PrivateUserInfo {
   network: Network;
   loginMethod?: LoginMethod;
   version: PrivateUserVersion;
+  messagingKeyRandomness?: string;
 
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;

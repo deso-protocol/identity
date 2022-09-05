@@ -275,7 +275,7 @@ export class IdentityService {
     // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
     // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
     // senderGroupKeyName parameter.
-    const encryptedMessage = this.signingService.encryptMessage(
+    const encryptedMessage = this.accountService.encryptMessage(
       seedHex,
       senderGroupKeyName,
       recipientPublicKey,
@@ -299,19 +299,18 @@ export class IdentityService {
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      decryptedHexes = this.signingService.decryptMessagesLegacy(
+      decryptedHexes = this.accountService.decryptMessagesLegacy(
         seedHex,
         encryptedHexes
       );
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      decryptedHexes = this.signingService.decryptMessages(
+      decryptedHexes = this.accountService.decryptMessages(
         seedHex,
         encryptedMessages
       );
     }
-
     this.respond(id, {
       decryptedHexes,
     });

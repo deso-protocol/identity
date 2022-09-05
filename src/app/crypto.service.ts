@@ -12,7 +12,7 @@ import {
   randomBytes,
   createHash,
 } from 'crypto';
-import { AccessLevel, Network } from '../types/identity';
+import {AccessLevel, Network} from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
 import * as sha256 from 'sha256';
@@ -144,7 +144,7 @@ export class CryptoService {
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive("m/44'/0'/0'/0/0", nonStandard);
+    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0', nonStandard);
   }
 
   keychainToSeedHex(keychain: HDNode): string {

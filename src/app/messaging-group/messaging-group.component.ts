@@ -200,8 +200,8 @@ export class MessagingGroupComponent implements OnInit {
 
   public async asyncApproveOperation(): Promise<void> {
     const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeySignature} =
-      this.accountService.getMessagingGroupStandardDerivation(
-        this.updatedGroupOwnerPublicKeyBase58Check, this.globalVars.defaultMessageKeyName);
+     await this.accountService.getMessagingGroupStandardDerivation(
+        this.updatedGroupOwnerPublicKeyBase58Check, this.updatedGroupKeyName);
 
     const encryptedToApplicationGroupMessagingPrivateKey = this.signingService.encryptGroupMessagingPrivateKeyToMember(
       this.applicationMessagingPublicKeyBase58Check, messagingPrivateKeyHex);

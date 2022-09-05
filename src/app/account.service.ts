@@ -3,7 +3,7 @@ import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import {
   AccessLevel, DefaultKeyPrivateInfo,
-  DerivedPrivateUserInfo,
+  DerivedPrivateUserInfo, EncryptedMessage,
   LoginMethod,
   Network,
   PrivateUserInfo,
@@ -31,6 +31,7 @@ import {
 } from '../lib/deso/transaction';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
+import assert from 'assert';
 
 @Injectable({
   providedIn: 'root',
@@ -268,8 +269,7 @@ export class AccountService {
     }
 
     const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeyName, messagingKeySignature} =
-      this.getMessagingGroupStandardDerivation(
-        publicKeyBase58Check, this.globalVars.defaultMessageKeyName);
+      await this.getMessagingGroupStandardDerivation(publicKeyBase58Check, this.globalVars.defaultMessageKeyName);
     const messagingPrivateKey = messagingPrivateKeyHex;
     return {
       derivedSeedHex,
@@ -528,17 +528,16 @@ export class AccountService {
     return sharedPrivateKey.toString('hex');
   }
 
-  getMessagingGroupStandardDerivation(ownerPublicKeyBase58Check: string, messagingKeyName: string): DefaultKeyPrivateInfo {
+  async getMessagingGroupStandardDerivation(ownerPublicKeyBase58Check: string, messagingKeyName: string): Promise<DefaultKeyPrivateInfo> {
     const privateUsers = this.getPrivateUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       throw new Error('User not found');
     }
     const privateUser = privateUsers[ownerPublicKeyBase58Check];
-    const isMetamask = this.isMetamaskAccount(privateUser);
     const seedHex = privateUser.seedHex;
     // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
-    const messagingPrivateKeyBuff = this.cryptoService.deriveMessagingKey(
-      seedHex,
+    const messagingPrivateKeyBuff = await this.getMessagingKey(
+      privateUser,
       messagingKeyName
     );
     const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
@@ -575,6 +574,217 @@ export class AccountService {
       messagingKeyName,
       messagingKeySignature,
     };
+  }
+
+  getMetamaskMessagingKeyRandomness(): string {
+    return `Don't mind me, I'm just some randomness needed to create a DeSo messaging group.`;
+  }
+
+  getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
+    const privateUsers = this.getPrivateUsers();
+    for (const user of Object.values(privateUsers)) {
+      if (user.seedHex === seedHex && user.loginMethod === LoginMethod.METAMASK) {
+        if (user.messagingKeyRandomness) {
+          return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+        } else {
+          throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+        }
+      }
+    }
+    throw new Error('User not found');
+  }
+
+  // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
+  async getMessagingKey(privateUser: PrivateUserInfo, keyName: string): Promise<Buffer> {
+    let userSecret = privateUser.seedHex;
+    if (privateUser.loginMethod === LoginMethod.METAMASK) {
+      if (privateUser.messagingKeyRandomness) {
+        userSecret = privateUser.messagingKeyRandomness;
+      } else {
+        const randomnessString = this.getMetamaskMessagingKeyRandomness();
+        try {
+          const {
+            message,
+            signature,
+            publicEthAddress
+          } = await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(randomnessString);
+          assert(signature && publicEthAddress, 'Failed to get randomness with Metamask');
+          const metamaskKeyPair = this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(signature, message);
+          const metamaskPublicKey = Buffer.from(
+            metamaskKeyPair.getPublic().encode('array', true)
+          );
+          const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
+          const ec = new EC('secp256k1');
+          const privateUserPkHex = ec.keyFromPublic(privateUser.publicKeyHex as string, 'hex');
+          const properPublicKey = this.cryptoService.publicKeyToEthAddress(privateUserPkHex);
+          assert(metamaskPublicKeyHex === privateUser.publicKeyHex, `Wrong account selected in MetaMask,
+            requested account: ${properPublicKey}`);
+          userSecret = sha256.x2([...new Buffer(signature, 'hex')]);
+          this.addPrivateUser({
+            ...privateUser,
+            messagingKeyRandomness: userSecret,
+          });
+        } catch (e) {
+          throw e;
+        }
+      }
+    }
+    return this.cryptoService.deriveMessagingKey(userSecret, keyName);
+  }
+
+  encryptMessage(
+    seedHex: string,
+    senderGroupKeyName: string,
+    recipientPublicKey: string,
+    message: string
+  ): any {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
+
+    const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
+    try {
+      // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
+      // encrypting the message.
+      let privateEncryptionKey = privateKeyBuffer;
+      if (senderGroupKeyName) {
+        privateEncryptionKey = this.getMessagingKeyForSeed(seedHex, senderGroupKeyName);
+      }
+
+      // Encrypt the message using keys we determined above.
+      const encryptedMessage = ecies.encryptShared(
+        privateEncryptionKey,
+        publicKeyBuffer,
+        message
+      );
+      return {
+        encryptedMessage: encryptedMessage.toString('hex'),
+      };
+    } catch (e) {
+      console.error(e);
+      return {
+        encryptedMessage: '',
+      };
+    }
+  }
+
+  // Legacy decryption for older clients
+  // @param encryptedHexes : string[]
+  decryptMessagesLegacy(
+    seedHex: string,
+    encryptedHexes: any
+  ): { [key: string]: any } {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
+
+    const decryptedHexes: { [key: string]: any } = {};
+    for (const encryptedHex of encryptedHexes) {
+      const encryptedBytes = new Buffer(encryptedHex, 'hex');
+      const opts = { legacy: true };
+      try {
+        decryptedHexes[encryptedHex] = ecies
+          .decrypt(privateKeyBuffer, encryptedBytes, opts)
+          .toString();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return decryptedHexes;
+  }
+
+  // Decrypt messages encrypted with shared secret
+  async decryptMessages(
+    seedHex: string,
+    encryptedMessages: EncryptedMessage[]
+  ): Promise<{ [key: string]: any }> {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
+
+    const decryptedHexes: { [key: string]: any } = {};
+    for (const encryptedMessage of encryptedMessages) {
+      const publicKey = encryptedMessage.PublicKey;
+      const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
+      const encryptedBytes = new Buffer(encryptedMessage.EncryptedHex, 'hex');
+      // Check if message was encrypted using shared secret or public key method
+      if (encryptedMessage.Legacy) {
+        // If message was encrypted using public key, check the sender to determine if message is decryptable.
+        try {
+          if (!encryptedMessage.IsSender) {
+            const opts = { legacy: true };
+            decryptedHexes[encryptedMessage.EncryptedHex] = ecies
+              .decrypt(privateKeyBuffer, encryptedBytes, opts)
+              .toString();
+          } else {
+            decryptedHexes[encryptedMessage.EncryptedHex] = '';
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else if (!encryptedMessage.Version || encryptedMessage.Version === 2) {
+        try {
+          decryptedHexes[encryptedMessage.EncryptedHex] = ecies
+            .decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes)
+            .toString();
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        // DeSo V3 Messages
+        try {
+          // V3 messages will have Legacy=false and Version=3.
+          if (encryptedMessage.Version && encryptedMessage.Version === 3) {
+            let privateEncryptionKey = privateKeyBuffer;
+            let publicEncryptionKey = publicKeyBytes;
+            let defaultKey = false;
+
+            // The DeSo V3 Messages rotating public keys are computed using trapdoor key derivation. To find the
+            // private key of a messaging public key, we just need the trapdoor = user's seedHex and the key name.
+            // Setting IsSender tells Identity if it should invert sender or recipient public key.
+            if (encryptedMessage.IsSender) {
+              if (
+                encryptedMessage.SenderMessagingGroupKeyName ===
+                this.globalVars.defaultMessageKeyName
+              ) {
+                defaultKey = true;
+              }
+              publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(
+                encryptedMessage.RecipientMessagingPublicKey as string
+              );
+            } else {
+              if (
+                encryptedMessage.RecipientMessagingGroupKeyName ===
+                this.globalVars.defaultMessageKeyName
+              ) {
+                defaultKey = true;
+              }
+              publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(
+                encryptedMessage.SenderMessagingPublicKey as string
+              );
+            }
+
+            // Currently, Identity only computes trapdoor public key with name "default-key".
+            // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(key name) )
+            if (defaultKey) {
+              privateEncryptionKey = await this.getMessagingKeyForSeed(
+                seedHex,
+                this.globalVars.defaultMessageKeyName
+              );
+            }
+
+            // Now decrypt the message based on computed keys.
+            decryptedHexes[encryptedMessage.EncryptedHex] = ecies
+              .decryptShared(
+                privateEncryptionKey,
+                publicEncryptionKey,
+                encryptedBytes
+              )
+              .toString();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    return decryptedHexes;
   }
 
   // Private Getters and Modifiers

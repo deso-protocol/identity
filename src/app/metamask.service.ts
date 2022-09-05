@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
+import {ec} from 'elliptic';
 
 @Injectable({
   providedIn: 'root',
@@ -138,5 +139,30 @@ export class MetamaskService {
         callback(accounts[0]);
       }
     );
+  }
+
+  /**
+   *
+   * @param signature a signature from the metamask account that we can extract the public key from
+   * @param message the raw message that's included in the signature, needed to pull out the public key
+   * @returns
+   * extracts the public key from a signature and then encodes it to base58 aka a deso public key
+   */
+  public getMetaMaskMasterPublicKeyFromSignature(
+    signature: string,
+    message: number[]
+  ): ec.KeyPair {
+    const e = new ec('secp256k1');
+    const arrayify = ethers.utils.arrayify;
+    const messageHash = arrayify(ethers.utils.hashMessage(message));
+    const publicKeyUncompressedHexWith0x = ethers.utils.recoverPublicKey(
+      messageHash,
+      signature
+    );
+    const metamaskPublicKey = e.keyFromPublic(
+      publicKeyUncompressedHexWith0x.slice(2),
+      'hex'
+    );
+    return metamaskPublicKey;
   }
 }

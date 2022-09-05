@@ -127,7 +127,7 @@ export class SignUpMetamaskComponent implements OnInit {
     }
 
     // once we have the signature we can fetch the public key from it
-    const metamaskKeyPair = this.getMetaMaskMasterPublicKeyFromSignature(
+    const metamaskKeyPair = this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(
       signature,
       message
     );
@@ -238,31 +238,6 @@ export class SignUpMetamaskComponent implements OnInit {
           'Problem communicating with the blockchain. Please Try again.';
         this.metamaskState = METAMASK.ERROR;
       });
-  }
-
-  /**
-   *
-   * @param signature a signature from the metamask account that we can extract the public key from
-   * @param message the raw message that's included in the signature, needed to pull out the public key
-   * @returns
-   * extracts the public key from a signature and then encodes it to base58 aka a deso public key
-   */
-  public getMetaMaskMasterPublicKeyFromSignature(
-    signature: string,
-    message: number[]
-  ): ec.KeyPair {
-    const e = new ec('secp256k1');
-    const arrayify = ethers.utils.arrayify;
-    const messageHash = arrayify(ethers.utils.hashMessage(message));
-    const publicKeyUncompressedHexWith0x = ethers.utils.recoverPublicKey(
-      messageHash,
-      signature
-    );
-    const metamaskPublicKey = e.keyFromPublic(
-      publicKeyUncompressedHexWith0x.slice(2),
-      'hex'
-    );
-    return metamaskPublicKey;
   }
 
   public login(): void {
