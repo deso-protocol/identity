@@ -614,8 +614,14 @@ export class BackendAPIService {
     SignedHashes: string[],
     Broadcast: boolean
   ): Observable<any> {
+    // Check if the user is logged in with a derived key and operating as the owner key.
+    const DerivedPublicKeyBase58Check =
+      this.accountService.getEncryptedUsers()[PublicKeyBase58Check]
+        ?.derivedPublicKeyBase58Check;
+
     const req = this.post('exchange-bitcoin', {
       PublicKeyBase58Check,
+      DerivedPublicKeyBase58Check,
       BurnAmountSatoshis,
       LatestBitcionAPIResponse,
       BTCDepositAddress,
