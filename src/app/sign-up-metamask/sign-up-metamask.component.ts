@@ -139,7 +139,7 @@ export class SignUpMetamaskComponent implements OnInit {
     const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
     const metamaskBtcAddress = this.cryptoService.publicKeyToBtcAddress(
       metamaskPublicKey,
-      Network.mainnet
+      this.globalVars.network,
     );
 
     const metamaskEthAddress =
