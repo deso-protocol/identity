@@ -41,7 +41,7 @@ import {
   TransactionSpendingLimit,
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
-import {MessagingGroupOperation, UserProfile} from '../../types/identity';
+import {ExtraData, MessagingGroupOperation, UserProfile} from '../../types/identity';
 
 @Component({
   selector: 'app-approve',
@@ -275,7 +275,7 @@ export class ApproveComponent implements OnInit {
 
         // Parse the transaction spending limit and memo from the extra data
         for (const kv of this.transaction.extraData?.kvs || []) {
-          if (kv.key.toString() === this.globalVars.extraDataTransactionSpendingLimit) {
+          if (kv.key.toString() === ExtraData.TransactionSpendingLimit) {
             // Hit the backend to get the TransactionSpendingLimit response from the bytes we have in the value.
             //
             // TODO: There is a small attack surface here. If someone gains control of the
@@ -291,7 +291,7 @@ export class ApproveComponent implements OnInit {
                 this.transactionSpendingLimitResponse = res;
               });
           }
-          if (kv.key.toString() === this.globalVars.extraDataDerivedKeyMemo) {
+          if (kv.key.toString() === ExtraData.DerivedKeyMemo) {
             this.derivedKeyMemo = new Buffer(
               kv.value.toString(),
               'hex'
@@ -343,7 +343,7 @@ export class ApproveComponent implements OnInit {
         const groupKeyName = messagingGroupMetadata.messagingGroupKeyName;
         let groupOperation = MessagingGroupOperation.MessagingGroupOperationAddMembers;
         for (const kv of this.transaction.extraData?.kvs || []) {
-          if (kv.key.toString() === this.globalVars.extraDataMessagingGroupOperationType) {
+          if (kv.key.toString() === ExtraData.MessagingGroupOperationType) {
             const operationBytes = kv.value;
             if (operationBytes.length !== 1) {
               throw new Error('Invalid operation type length on a messaging group transaction');

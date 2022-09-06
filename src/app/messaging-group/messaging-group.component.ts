@@ -9,7 +9,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {CryptoService} from '../crypto.service';
 import {SigningService} from '../signing.service';
 import {Observable} from 'rxjs';
-import {group} from "@angular/animations";
 
 export enum MESSAGING_GROUP_OPERATION {
   DEFAULT_KEY = 'DefaultKey',
@@ -24,6 +23,7 @@ export enum MESSAGING_GROUP_OPERATION {
 })
 export class MessagingGroupComponent implements OnInit {
 
+  error: any = '';
   allUsers: {[key: string]: UserProfile} = {};
   hasUsers = false;
 
@@ -49,6 +49,14 @@ export class MessagingGroupComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    try {
+      this.initializeMessagingGroupComponent();
+    } catch (e) {
+      this.error = e;
+    }
+  }
+
+  initializeMessagingGroupComponent(): void {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
@@ -58,76 +66,83 @@ export class MessagingGroupComponent implements OnInit {
       });
 
     this.activatedRoute.queryParams.subscribe(params => {
-      // Get the intended group chat operation.
-      if (params.operation) {
-        this.operation = params.operation;
-        let operationExists = false;
-        for (const op of Object.values(MESSAGING_GROUP_OPERATION)) {
-          if (op === params.operation) {
-            operationExists = true;
-            this.operation = op;
-            break;
-          }
-        }
-        if (!operationExists) {
-          console.error('Invalid operation', params.operation);
-          return;
-        }
-      }
-      // Get the application public key from the query params.
-      if (params.applicationMessagingPublicKeyBase58Check) {
-        // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
-        this.cryptoService.publicKeyToBuffer(params.applicationMessagingPublicKeyBase58Check);
-        this.applicationMessagingPublicKeyBase58Check = params.applicationMessagingPublicKeyBase58Check;
-      }
-      // Get the group chat owner public key.
-      if (params.updatedGroupOwnerPublicKeyBase58Check) {
-        // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
-        this.cryptoService.publicKeyToBuffer(params.updatedGroupOwnerPublicKeyBase58Check);
-        let userExists = false;
-        for (const pk of this.accountService.getPublicKeys()) {
-          if (pk === params.updatedGroupOwnerPublicKeyBase58Check) {
-            userExists = true;
-            break;
-          }
-        }
-        if (!userExists) {
-          throw new Error('Invalid group chat owner, doesn\'t exist in the signed-in user\'s account');
-        }
-        this.updatedGroupOwnerPublicKeyBase58Check = params.updatedGroupOwnerPublicKeyBase58Check;
-      }
-      // Get the group chat name.
-      if (params.updatedGroupKeyName) {
-        if (!this.validateMessagingGroupKeyName(params.updatedGroupKeyName)) {
-          throw new Error('Group name is too long');
-        }
-        this.updatedGroupKeyName = params.updatedGroupKeyName;
-      }
-      // Get the group chat members.
-      if (params.updatedMembersPublicKeysBase58Check) {
-        this.updatedMembersPublicKeysBase58Check = params.updatedMembersPublicKeysBase58Check.split(',');
-        for (const pk of this.updatedMembersPublicKeysBase58Check) {
-          // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
-          this.cryptoService.publicKeyToBuffer(pk);
-        }
-      }
-      // Get the group chat members' key names.
-      if (params.updatedMembersKeyNames) {
-        this.updatedMembersKeyNames = params.updatedMembersKeyNames.split(',');
-        for (const keyName of this.updatedMembersKeyNames) {
-          if (!this.validateMessagingGroupKeyName(keyName)) {
-            throw new Error('Member key name is too long');
-          }
-        }
-      }
-      if (!this.validateMessagingGroupOperation()) {
-        throw new Error('Invalid messaging group operation');
-      }
-
-      if (this.operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS) {
-        this.updatedMembersProfiles = this.backendApi.GetUserProfiles(this.updatedMembersPublicKeysBase58Check);
+      try {
+        this.processURLParams(params);
+      } catch (e) {
+        this.error = e;
       }
     });
+  }
+
+  processURLParams(params: any): void {
+    // Get the intended group chat operation.
+    if (params.operation) {
+      this.operation = params.operation;
+      let operationExists = false;
+      for (const op of Object.values(MESSAGING_GROUP_OPERATION)) {
+        if (op === params.operation) {
+          operationExists = true;
+          this.operation = op;
+          break;
+        }
+      }
+      if (!operationExists) {
+        throw new Error(`Invalid operation ${params.operation}`);
+      }
+    }
+    // Get the application public key from the query params.
+    if (params.applicationMessagingPublicKeyBase58Check) {
+      // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
+      this.cryptoService.publicKeyToBuffer(params.applicationMessagingPublicKeyBase58Check);
+      this.applicationMessagingPublicKeyBase58Check = params.applicationMessagingPublicKeyBase58Check;
+    }
+    // Get the group chat owner public key.
+    if (params.updatedGroupOwnerPublicKeyBase58Check) {
+      // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
+      this.cryptoService.publicKeyToBuffer(params.updatedGroupOwnerPublicKeyBase58Check);
+      let userExists = false;
+      for (const pk of this.accountService.getPublicKeys()) {
+        if (pk === params.updatedGroupOwnerPublicKeyBase58Check) {
+          userExists = true;
+          break;
+        }
+      }
+      if (!userExists) {
+        throw new Error('Invalid group chat owner, doesn\'t exist in the signed-in user\'s account');
+      }
+      this.updatedGroupOwnerPublicKeyBase58Check = params.updatedGroupOwnerPublicKeyBase58Check;
+    }
+    // Get the group chat name.
+    if (params.updatedGroupKeyName) {
+      if (!this.validateMessagingGroupKeyName(params.updatedGroupKeyName)) {
+        throw new Error('Group name is too long');
+      }
+      this.updatedGroupKeyName = params.updatedGroupKeyName;
+    }
+    // Get the group chat members.
+    if (params.updatedMembersPublicKeysBase58Check) {
+      this.updatedMembersPublicKeysBase58Check = params.updatedMembersPublicKeysBase58Check.split(',');
+      for (const pk of this.updatedMembersPublicKeysBase58Check) {
+        // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
+        this.cryptoService.publicKeyToBuffer(pk);
+      }
+    }
+    // Get the group chat members' key names.
+    if (params.updatedMembersKeyNames) {
+      this.updatedMembersKeyNames = params.updatedMembersKeyNames.split(',');
+      for (const keyName of this.updatedMembersKeyNames) {
+        if (!this.validateMessagingGroupKeyName(keyName)) {
+          throw new Error('Member key name is too long');
+        }
+      }
+    }
+    if (!this.validateMessagingGroupOperation()) {
+      throw new Error('Invalid messaging group operation');
+    }
+
+    if (this.operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS) {
+      this.updatedMembersProfiles = this.backendApi.GetUserProfiles(this.updatedMembersPublicKeysBase58Check);
+    }
   }
 
   validateMessagingGroupKeyName(keyName: string): boolean{

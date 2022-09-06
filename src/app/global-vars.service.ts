@@ -45,10 +45,6 @@ export class GlobalVarsService {
   defaultMessageKeyName = 'default-key';
   claimJwtDerivedPublicKey = 'derivedPublicKeyBase58Check';
 
-  extraDataMessagingGroupOperationType = 'MessagingGroupOperationType';
-  extraDataTransactionSpendingLimit = 'TransactionSpendingLimit';
-  extraDataDerivedKeyMemo = 'DerivedKeyMemo';
-
   nanosPerUSDExchangeRate = 0;
   nanosToDeSoMemo = {};
 

@@ -16,6 +16,12 @@ export interface PrivateUserInfo {
   google?: boolean;
 }
 
+export enum ExtraData {
+  MessagingGroupOperationType = 'MessagingGroupOperationType',
+  TransactionSpendingLimit = 'TransactionSpendingLimit',
+  DerivedKeyMemo = 'DerivedKeyMemo',
+}
+
 export enum PrivateUserVersion {
   // Adds "version"
   V0 = 0,
