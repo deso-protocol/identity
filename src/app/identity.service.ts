@@ -114,6 +114,7 @@ export class IdentityService {
       const blockHeight = res.BlockHeight;
       this.accountService
         .getDerivedPrivateUser(
+          this.backendApi,
           payload.publicKey,
           blockHeight,
           payload.transactionSpendingLimit,
