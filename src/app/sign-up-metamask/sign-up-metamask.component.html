@@ -44,10 +44,6 @@
           ></span
         >
       </button>
-
-      <div *ngIf="metamaskState === METAMASK.ERROR">
-        <div class="text-danger">{{ errorMessage }}</div>
-      </div>
     </div>
 
     <ng-container *ngIf="existingConnectedWallet">
@@ -57,6 +53,15 @@
         pick the correct account and click connect.
       </div>
     </ng-container>
+
+    <div *ngIf="metamaskState === METAMASK.ERROR" class="mt-20px">
+      <div class="text-danger">
+        {{ errorMessage }}
+        <span *ngIf="showAlternative" class="fc-blue cursor-pointer fs-underline-hover">
+          <a (click)="redirectToLogIn()">Alternatively, you can sign up with other methods.</a>
+        </span>
+      </div>
+    </div>
   </div>
   <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
     <span class="title-text">Authorize Derived Key</span>

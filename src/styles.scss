@@ -157,6 +157,12 @@ $error: #ff6939;
   text-decoration: underline;
 }
 
+.fs-underline-hover {
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .fs-30px {
   font-size: 30px;
 }

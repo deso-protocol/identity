@@ -576,8 +576,9 @@ export class AccountService {
     };
   }
 
-  getMetamaskMessagingKeyRandomness(): string {
-    return `Don't mind me, I'm just some randomness needed to create a DeSo messaging group.`;
+  getMetamaskMessagingKeyRandomnessHex(): string {
+    const randomnessString = `Don't mind me, I'm just some randomness needed to create a DeSo messaging group.`;
+    return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
 
   getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
@@ -601,7 +602,7 @@ export class AccountService {
       if (privateUser.messagingKeyRandomness) {
         userSecret = privateUser.messagingKeyRandomness;
       } else {
-        const randomnessString = this.getMetamaskMessagingKeyRandomness();
+        const randomnessString = this.getMetamaskMessagingKeyRandomnessHex();
         try {
           const {
             message,

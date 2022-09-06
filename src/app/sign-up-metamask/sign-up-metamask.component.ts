@@ -12,6 +12,8 @@ import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { SigningService } from '../signing.service';
 import { MetamaskService } from '../metamask.service';
+import {RouteNames} from '../app-routing.module';
+import { Router } from '@angular/router';
 
 export const getSpendingLimitsForMetamask = () => {
   return {
@@ -43,6 +45,7 @@ export class SignUpMetamaskComponent implements OnInit {
   publicKey = '';
   errorMessage = '';
   existingConnectedWallet = '';
+  showAlternative = false;
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -50,7 +53,8 @@ export class SignUpMetamaskComponent implements OnInit {
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
     private signingService: SigningService,
-    private metamaskService: MetamaskService
+    private metamaskService: MetamaskService,
+    private router: Router
   ) {}
   async ngOnInit(): Promise<void> {
     // grab the currently connected wallet if there is one
@@ -161,17 +165,22 @@ export class SignUpMetamaskComponent implements OnInit {
     } catch (e) {
       // if they received the account, or if they have funds don't error out of the flow,
       //  just move on to the next step
-      const err = (e as any)?.error?.error;
+      let errorMessage = (e as any)?.error?.error;
       if (
         ![
           'MetamaskSignin:  Account already has a balance',
           'MetamaskSignin: Account has already received airdrop',
-          'MetamaskSignin: To be eligible for airdrop your account needs to have more than .001 eth',
-        ].includes(err)
+        ].includes(errorMessage)
       ) {
-        this.errorMessage =
-          err ||
-          'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
+        if (errorMessage.match('MetamaskSignin: To be eligible for airdrop your account needs to have more than')){
+          this.showAlternative = true;
+          this.errorMessage = 'Bummer! We send airdrops to cover the MetaMask gas fees on DeSo, and you need at least ' +
+            '0.001 ETH in your MetaMask wallet to be eligible. We do this to prevent bots.';
+        } else {
+          errorMessage =
+            errorMessage ||
+            'Unable to send starter Deso, this is not an issue if you already have a DESO balance';
+        }
         this.metamaskState = METAMASK.ERROR;
         return;
       }
@@ -238,6 +247,12 @@ export class SignUpMetamaskComponent implements OnInit {
           'Problem communicating with the blockchain. Please Try again.';
         this.metamaskState = METAMASK.ERROR;
       });
+  }
+
+  public redirectToLogIn(): void {
+    this.router.navigate(['/', RouteNames.LOG_IN], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   public login(): void {
