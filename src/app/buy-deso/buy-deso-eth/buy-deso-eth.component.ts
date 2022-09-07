@@ -783,12 +783,12 @@ export class BuyDeSoEthComponent implements OnInit {
 
   getChain(): Chain {
     return this.globalVars.network === Network.testnet
-      ? Chain.Ropsten
+      ? Chain.Goerli
       : Chain.Mainnet;
   }
 
   getChainString(): string {
-    return this.globalVars.network === Network.testnet ? 'ropsten' : 'mainnet';
+    return this.globalVars.network === Network.testnet ? 'goerli' : 'mainnet';
   }
 
   getHardfork(): Hardfork {
