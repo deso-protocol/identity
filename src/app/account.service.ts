@@ -584,11 +584,15 @@ export class AccountService {
   getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
     const privateUsers = this.getPrivateUsers();
     for (const user of Object.values(privateUsers)) {
-      if (user.seedHex === seedHex && user.loginMethod === LoginMethod.METAMASK) {
-        if (user.messagingKeyRandomness) {
-          return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+      if (user.seedHex === seedHex) {
+        if (user.loginMethod === LoginMethod.METAMASK) {
+          if (user.messagingKeyRandomness) {
+            return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+          } else {
+            throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+          }
         } else {
-          throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+          return this.cryptoService.deriveMessagingKey(seedHex, keyName);
         }
       }
     }
