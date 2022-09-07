@@ -48,7 +48,6 @@ export class AccountService {
     private cookieService: CookieService,
     private entropyService: EntropyService,
     private signingService: SigningService,
-    private backendApi: BackendAPIService,
     private metamaskService: MetamaskService
   ) {}
 
@@ -89,6 +88,7 @@ export class AccountService {
         loginMethod: privateUser.loginMethod || LoginMethod.DESO,
         accessLevel,
         accessLevelHmac,
+        derivedPublicKeyBase58Check: privateUser.derivedPublicKeyBase58Check,
       };
     }
 
@@ -133,11 +133,12 @@ export class AccountService {
   }
 
   public async getDerivedPrivateUser(
+    backendApiService: BackendAPIService,
     publicKeyBase58Check: string,
     blockHeight: number,
     transactionSpendingLimit?: TransactionSpendingLimitResponse,
     derivedPublicKeyBase58CheckInput?: string,
-    expirationDays?: number
+    expirationDays?: number,
   ): Promise<DerivedPrivateUserInfo | undefined> {
     if (!(publicKeyBase58Check in this.getPrivateUsers())) {
       return undefined;
@@ -219,7 +220,7 @@ export class AccountService {
 
     let response: GetAccessBytesResponse;
     try {
-      response = await this.backendApi
+      response = await backendApiService
         .GetAccessBytes(
           derivedPublicKeyBase58Check,
           expirationBlock,
@@ -426,7 +427,8 @@ export class AccountService {
     btcDepositAddress: string,
     ethDepositAddress: string,
     loginMethod: LoginMethod,
-    publicKeyHex: string
+    publicKeyHex: string,
+    derivedPublicKeyBase58Check: string,
   ): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     return this.addPrivateUser({
@@ -438,6 +440,7 @@ export class AccountService {
       network,
       loginMethod,
       publicKeyHex,
+      derivedPublicKeyBase58Check,
       version: PrivateUserVersion.V2,
     });
   }
