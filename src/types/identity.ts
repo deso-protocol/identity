@@ -11,6 +11,7 @@ export interface PrivateUserInfo {
   loginMethod?: LoginMethod;
   version: PrivateUserVersion;
   messagingKeyRandomness?: string;
+  derivedPublicKeyBase58Check?: string;
 
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;
@@ -49,6 +50,7 @@ export interface PublicUserInfo {
   accessLevelHmac: string;
   loginMethod?: LoginMethod;
   version: PrivateUserVersion;
+  derivedPublicKeyBase58Check?: string;
 }
 
 export interface DerivedPrivateUserInfo {
