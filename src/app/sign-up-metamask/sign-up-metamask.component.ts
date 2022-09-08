@@ -174,7 +174,7 @@ export class SignUpMetamaskComponent implements OnInit {
       ) {
         if (errorMessage.match('MetamaskSignin: To be eligible for airdrop your account needs to have more than')){
           this.showAlternative = true;
-          this.errorMessage = 'Bummer! We send airdrops to cover the MetaMask gas fees on DeSo, and you need at least ' +
+          this.errorMessage = 'Bummer! We send airdrops to cover the tiny account creation fees on DeSo, and you need at least ' +
             '0.001 ETH in your MetaMask wallet to be eligible. We do this to prevent bots.';
         } else {
           errorMessage =
