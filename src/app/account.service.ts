@@ -32,6 +32,7 @@ import {
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
+import { MessagingGroup } from './identity.service';
 
 @Injectable({
   providedIn: 'root',
@@ -702,7 +703,8 @@ export class AccountService {
   // Decrypt messages encrypted with shared secret
   async decryptMessages(
     seedHex: string,
-    encryptedMessages: EncryptedMessage[]
+    encryptedMessages: EncryptedMessage[],
+    messagingGroups: MessagingGroup[],
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
@@ -740,6 +742,7 @@ export class AccountService {
         try {
           // V3 messages will have Legacy=false and Version=3.
           if (encryptedMessage.Version && encryptedMessage.Version === 3) {
+            debugger;
             let privateEncryptionKey = privateKeyBuffer;
             let publicEncryptionKey = publicKeyBytes;
             let defaultKey = false;

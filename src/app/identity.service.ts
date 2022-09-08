@@ -53,6 +53,21 @@ export type MessagingGroupPayload = {
   messagingPublicKeyBase58Check: string;
 };
 
+export type MessagingGroup = {
+  EncryptedKey: string;
+  ExtraData: null | { [k: string]: string };
+  GroupOwnerPublicKeyBase58Check: string,
+  MessagingGroupKeyName: string;
+  MessagingGroupMembers: MessagingGroupMember[];
+  MessagingPublicKeyBase58Check: string;
+};
+
+export type MessagingGroupMember = {
+  EncryptedKey: string;
+  GroupMemberKeyName: string;
+  GroupMemberPublicKeyBase58Check: string;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -309,7 +324,8 @@ export class IdentityService {
       const encryptedMessages = data.payload.encryptedMessages;
       this.accountService.decryptMessages(
         seedHex,
-        encryptedMessages
+        encryptedMessages,
+        data.payload.messagingGroups || [],
       ).then((res) => this.respond(id, { decryptedHexes: res }));
     }
   }
