@@ -16,10 +16,10 @@
         <br>
         With DeSo, your MetaMask keys control your content the same way
         they control your funds. <b>Your keys = your content.</b>
-        <br>
-        <br>
         When you click the button below, you will be asked to sign
-        a transaction to create an account on the DeSo blockchain.
+        a transaction to create an account on the DeSo blockchain. Using
+        DeSo doesn't cost Eth gas fees so creating an account only
+        requires proof of identity.
       </p>
       <button
         class="button button-large mb-20px bg-dark text-white mt-20px"
@@ -47,8 +47,8 @@
     </div>
 
     <ng-container *ngIf="existingConnectedWallet">
-      <div>{{ existingConnectedWallet | truncateAddressOrUsername }}</div>
-      <div>
+      <div class="fc-secondary">Detected account: {{ existingConnectedWallet | truncateAddressOrUsername }}</div>
+      <div class="fc-muted fs-14px">
         If this is not the account you want to connect please open MetaMask,
         pick the correct account and click connect.
       </div>
