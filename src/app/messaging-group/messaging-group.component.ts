@@ -29,6 +29,7 @@ export class MessagingGroupComponent implements OnInit {
 
   operation: MESSAGING_GROUP_OPERATION = MESSAGING_GROUP_OPERATION.DEFAULT_KEY;
   applicationMessagingPublicKeyBase58Check = '';
+  updatedGroupOwnerUsername = '';
   updatedGroupOwnerPublicKeyBase58Check = '';
   updatedGroupKeyName = '';
   updatedMembersPublicKeysBase58Check: string[] = [];
@@ -51,6 +52,13 @@ export class MessagingGroupComponent implements OnInit {
   ngOnInit(): void {
     try {
       this.initializeMessagingGroupComponent();
+      this.backendApi.GetUserProfiles([this.updatedGroupOwnerPublicKeyBase58Check]).toPromise()
+        .then(profiles => {
+          this.updatedGroupOwnerUsername = profiles[this.updatedGroupOwnerPublicKeyBase58Check].username;
+        })
+        .catch(e => {
+          this.error = e;
+        });
     } catch (e) {
       this.error = e;
     }
@@ -159,12 +167,12 @@ export class MessagingGroupComponent implements OnInit {
     let validityCondition = groupSet;
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
-        // In this operation, we need to set the group to be the default key. We also set the application
+        // In this operation, we need to set the group to be the default key. We also optionally set the application
         // key, and the members of the group need to be set to empty.
         if (this.updatedGroupKeyName !== this.globalVars.defaultMessageKeyName) {
           return false;
         }
-        validityCondition &&= applicationSet && membersSetEmpty;
+        validityCondition &&= membersSetEmpty;
         break;
       case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
         // This operation is identical to the default key operation, except that here the group key cannot be equal
@@ -174,7 +182,7 @@ export class MessagingGroupComponent implements OnInit {
         if (this.updatedGroupKeyName === this.globalVars.defaultMessageKeyName) {
           return false;
         }
-        validityCondition &&= applicationSet && membersSetEmpty;
+        validityCondition &&= membersSetEmpty;
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:
         // In this operation, we need to add members to the group. The group must be set, we optionally allow for

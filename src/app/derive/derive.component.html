@@ -29,7 +29,7 @@
           publicKeyBase58Check | truncateAddressOrUsername
         }}</span>
       </div>
-      <div class="pl-20px text-left d-flex justify-content-between">
+      <div class="pl-20px text-left d-flex justify-content-between" *ngIf="derivedPublicKeyBase58Check">
         Derived Public Key
         <span class="font-weight-normal pr-20px">{{
           derivedPublicKeyBase58Check | truncateAddressOrUsername
