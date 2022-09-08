@@ -213,10 +213,8 @@ export class MessagingGroupComponent implements OnInit {
 
   approveOperation(): void {
     this.asyncApproveOperation()
-      .then(() => {
-        console.log('approve operation finished!');
-      })
       .catch((err) => {
+        this.error = err;
         console.error(err);
       });
   }
