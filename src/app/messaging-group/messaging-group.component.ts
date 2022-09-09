@@ -262,9 +262,6 @@ export class MessagingGroupComponent implements OnInit {
   }
   respondToClient(messagingKeySignature: string, encryptedToApplicationGroupMessagingPrivateKey: string,
                   encryptedToMembersGroupMessagingPrivateKey: string[], messagingPublicKeyBase58Check: string): void {
-    console.log(`calling respondToClient with messagingKeySignature: ${messagingKeySignature}` +
-      `encryptedToApplicationGroupMessagingPrivateKey: ${encryptedToApplicationGroupMessagingPrivateKey}` +
-      `encryptedToMembersGroupMessagingPrivateKey: ${encryptedToMembersGroupMessagingPrivateKey}`);
     this.identityService.messagingGroup({
       messagingKeySignature,
       encryptedToApplicationGroupMessagingPrivateKey,
