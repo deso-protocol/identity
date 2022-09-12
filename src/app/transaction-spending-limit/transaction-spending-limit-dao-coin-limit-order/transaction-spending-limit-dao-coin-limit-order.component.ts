@@ -1,11 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {
-  CreatorCoinLimitOperationString,
-  DAOCoinLimitOperationString,
-  DAOCoinLimitOrderLimitItem,
-  OperationToCountMap,
-  User,
-} from '../../backend-api.service';
+import { DAOCoinLimitOrderLimitItem, User } from '../../backend-api.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
 @Component({
@@ -23,8 +17,6 @@ export class TransactionSpendingLimitDaoCoinLimitOrderComponent
   @Input() buyingUser: User | undefined;
   @Input() sellingUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
-
-  constructor() {}
 
   ngOnInit(): void {}
 }

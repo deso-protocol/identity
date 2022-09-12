@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ArrowToggleComponent } from 'src/app/arrow-toggle/arrow-toggle.component';
 import {
   CreatorCoinLimitOperationString,
   CreatorCoinOperationLimitMap,

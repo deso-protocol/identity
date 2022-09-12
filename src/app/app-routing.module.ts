@@ -15,11 +15,14 @@ import { GetDesoComponent } from './get-deso/get-deso.component';
 import { BuyDesoPageComponent } from './buy-deso/buy-deso-page/buy-deso-page.component';
 import { BuyDeSoCompletePageComponent } from './buy-deso/buy-deso-complete-page/buy-deso-complete-page.component';
 import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.component';
+import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
+import { MessagingGroupComponent } from './messaging-group/messaging-group.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
   public static LOGOUT = 'logout';
   public static SIGN_UP = 'sign-up';
+  public static SIGN_UP_METAMASK = 'sign-up-metamask';
   public static LOG_IN = 'log-in';
   public static LOAD_SEED = 'load-seed';
   public static APPROVE = 'approve';
@@ -36,6 +39,7 @@ export class RouteNames {
   public static GET_DESO = 'get-deso';
   public static BUY_DESO = 'buy-deso';
   public static BUY_OR_SEND_DESO = 'buy-or-send-deso';
+  public static MESSAGING_GROUP = 'messaging-group';
 }
 
 const routes: Routes = [
@@ -43,6 +47,11 @@ const routes: Routes = [
   { path: RouteNames.EMBED, component: EmbedComponent, pathMatch: 'full' },
   { path: RouteNames.LOGOUT, component: LogoutComponent, pathMatch: 'full' },
   { path: RouteNames.SIGN_UP, component: SignUpComponent, pathMatch: 'full' },
+  {
+    path: RouteNames.SIGN_UP_METAMASK,
+    component: SignUpMetamaskComponent,
+    pathMatch: 'full',
+  },
   { path: RouteNames.LOG_IN, component: LogInComponent, pathMatch: 'full' },
   {
     path: RouteNames.LOAD_SEED,
@@ -82,6 +91,11 @@ const routes: Routes = [
     component: BuyOrSendDesoComponent,
     pathMatch: 'full',
   },
+  {
+    path: RouteNames.MESSAGING_GROUP,
+    component: MessagingGroupComponent,
+    pathMatch: 'full',
+  }
 ];
 
 @NgModule({

@@ -45,6 +45,7 @@
     "elliptic": "^6.5.4",
     "ethereumjs-tx": "^2.1.2",
     "ethereumjs-util": "^7.1.4",
+    "ethers": "^5.6.9",
     "feather-icons": "^4.29.0",
     "google-libphonenumber": "^3.2.27",
     "hdkey": "github:deso-protocol/hdkey",

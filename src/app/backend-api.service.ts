@@ -8,8 +8,16 @@ import { AccountService } from './account.service';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import { DerivedKey, Network, UserProfile } from '../types/identity';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
+export interface MetamaskSignInRequest {
+  AmountNanos: number;
+  Signer: number[];
+  Message: number[];
+  Signature: number[];
+}
+export interface MetamaskSignInResponse {
+  TxnHash: string;
+}
 export class ProfileEntryResponse {
   Username: string | null = null;
   Description: string | null = null;
@@ -89,9 +97,9 @@ export type PostEntryResponse = {
 
 export class User {
   ProfileEntryResponse: ProfileEntryResponse | null = null;
-  PublicKeyBase58Check: string = '';
+  PublicKeyBase58Check = '';
   HasPhoneNumber: boolean | null = null;
-  BalanceNanos: number = 0;
+  BalanceNanos = 0;
   UsersYouHODL: any[] = [];
 }
 
@@ -170,7 +178,13 @@ export interface TransactionSpendingLimitResponse {
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
   DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
+  IsUnlimited?: boolean;
   DerivedKeyMemo?: string;
+}
+
+export interface GetAccessBytesResponse {
+  TransactionSpendingLimitHex: string;
+  AccessBytesHex: string;
 }
 
 @Injectable({
@@ -212,12 +226,13 @@ export class BackendAPIService {
     if (!publicUserInfo) {
       return of(null);
     }
+    const isDerived = this.accountService.isMetamaskAccount(publicUserInfo);
 
     const seedHex = this.cryptoService.decryptSeedHex(
       publicUserInfo.encryptedSeedHex,
       this.globalVars.hostname
     );
-    const jwt = this.signingService.signJWT(seedHex);
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
     return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 
@@ -287,19 +302,7 @@ export class BackendAPIService {
     SuccessURL: string,
     ErrorURL: string
   ): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[PublicKey];
-    if (!publicUserInfo) {
-      return of(null);
-    }
-
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
-    );
-    const jwt = this.signingService.signJWT(seedHex);
-
-    return this.post('jumio-begin', {
-      JWT: jwt,
+    return this.jwtPost('jumio-begin', PublicKey, {
       PublicKey,
       ReferralHashBase58,
       SuccessURL,
@@ -317,27 +320,13 @@ export class BackendAPIService {
     PublicKey: string,
     JumioInternalReference: string
   ): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[PublicKey];
-    if (!publicUserInfo) {
-      return of(null);
-    }
-
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
-    );
-    const jwt = this.signingService.signJWT(seedHex);
-
-    return this.post('jumio-flow-finished', {
+    return this.jwtPost('jumio-flow-finished', PublicKey, {
       PublicKey,
       JumioInternalReference,
-      JWT: jwt,
     });
   }
 
-  GetReferralInfoForReferralHash(
-    ReferralHash: string
-  ): Observable<{
+  GetReferralInfoForReferralHash(ReferralHash: string): Observable<{
     ReferralInfoResponse: any;
     CountrySignUpBonus: CountryLevelSignUpBonus;
   }> {
@@ -443,10 +432,44 @@ export class BackendAPIService {
     );
   }
 
+  GetAccessBytes(
+    DerivedPublicKeyBase58Check: string,
+    ExpirationBlock: number,
+    TransactionSpendingLimit: TransactionSpendingLimitResponse
+  ): Observable<GetAccessBytesResponse> {
+    return this.post('get-access-bytes', {
+      DerivedPublicKeyBase58Check,
+      ExpirationBlock,
+      TransactionSpendingLimit,
+    }).pipe(
+      map((res) => {
+        return {
+          TransactionSpendingLimitHex: res.TransactionSpendingLimitHex,
+          AccessBytesHex: res.AccessBytesHex,
+        };
+      }),
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
+  }
+
   GetTransactionSpendingLimitResponseFromHex(
     hex: string
   ): Observable<TransactionSpendingLimitResponse> {
     return this.get(`get-transaction-spending-limit-response-from-hex/${hex}`);
+  }
+
+  SendStarterDeSoForMetamaskAccount(
+    request: MetamaskSignInRequest
+  ): Observable<any> {
+    return this.post('send-starter-deso-for-metamask-account', request).pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
   }
 
   GetSinglePost(
@@ -591,8 +614,14 @@ export class BackendAPIService {
     SignedHashes: string[],
     Broadcast: boolean
   ): Observable<any> {
+    // Check if the user is logged in with a derived key and operating as the owner key.
+    const DerivedPublicKeyBase58Check =
+      this.accountService.getEncryptedUsers()[PublicKeyBase58Check]
+        ?.derivedPublicKeyBase58Check;
+
     const req = this.post('exchange-bitcoin', {
       PublicKeyBase58Check,
+      DerivedPublicKeyBase58Check,
       BurnAmountSatoshis,
       LatestBitcionAPIResponse,
       BTCDepositAddress,
@@ -630,17 +659,10 @@ export class BackendAPIService {
     );
   }
 
-  QueryETHRPC(
-    method: string,
-    params: string[],
-    publicKeyBase58Check: string,
-    jwt: string
-  ): Observable<any> {
+  QueryETHRPC(method: string, params: string[]): Observable<any> {
     const req = this.post('query-eth-rpc', {
       Method: method,
       Params: params,
-      PublicKeyBase58Check: publicKeyBase58Check,
-      JWT: jwt,
     });
 
     return req.pipe(
@@ -697,5 +719,60 @@ export class BackendAPIService {
     return this.post('get-txn', {
       TxnHashHex,
     });
+  }
+
+  AuthorizeDerivedKey(
+    OwnerPublicKeyBase58Check: string,
+    DerivedPublicKeyBase58Check: string,
+    ExpirationBlock: number,
+    AccessSignature: string,
+    TransactionSpendingLimitHex: string
+  ): Observable<any> {
+    const req = this.post('authorize-derived-key', {
+      OwnerPublicKeyBase58Check,
+      DerivedPublicKeyBase58Check,
+      DerivedKeySignature: false,
+      ExpirationBlock,
+      MinFeeRateNanosPerKB: 1000,
+      AccessSignature,
+      TransactionSpendingLimitHex,
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
+  }
+
+  GetBulkMessagingPublicKeys(
+    GroupOwnerPublicKeysBase58Check: string[],
+    MessagingGroupKeyNames: string[],
+  ): Observable<any> {
+    const req = this.post('get-bulk-messaging-public-keys', {
+      GroupOwnerPublicKeysBase58Check,
+      MessagingGroupKeyNames,
+    });
+
+    return req.pipe(
+    catchError((err) => {
+        console.error(err);
+        return throwError(err);
+      })
+    );
+  }
+
+  SubmitTransaction(TransactionHex: string): Observable<any> {
+    const req = this.post('submit-transaction', {
+      TransactionHex,
+    });
+
+    return req.pipe(
+      catchError((err) => {
+        console.log(err);
+        return throwError(err);
+      })
+    );
   }
 }

@@ -8,7 +8,6 @@ import {
   User,
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
-
 @Component({
   selector: 'app-transaction-spending-limit',
   templateUrl: './transaction-spending-limit.component.html',

@@ -1,45 +1,47 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../account.service';
-import { DerivePayload, IdentityService } from '../identity.service';
+import { IdentityService } from '../identity.service';
 import {
   BackendAPIService,
-  CoinLimitOperationString,
-  CoinOperationLimitMap,
   TransactionSpendingLimitResponse,
-  User,
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { GoogleDriveService } from '../google-drive.service';
 import { UserProfile } from '../../types/identity';
-import { ActivatedRoute, Router } from '@angular/router';
-import { RouteNames } from '../app-routing.module';
-import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
-
+import { ActivatedRoute, Params } from '@angular/router';
+import { Observable } from 'rxjs';
+type Accounts = { [key: string]: UserProfile } | {};
+type DeriveParams = {
+  publicKey?: string;
+  derivedPublicKey?: string;
+  deleteKey?: string;
+  transactionSpendingLimitResponse?: any;
+  expirationDays?: string;
+};
 @Component({
   selector: 'app-derive',
   templateUrl: './derive.component.html',
   styleUrls: ['./derive.component.scss'],
 })
 export class DeriveComponent implements OnInit {
-  allUsers: { [key: string]: UserProfile } = {};
-  transactionSpendingLimitHex: string | undefined;
+  allUsers: Observable<Accounts> = this.backendApi.GetUserProfiles(
+    this.accountService.getPublicKeys()
+  );
   transactionSpendingLimitResponse:
     | TransactionSpendingLimitResponse
     | undefined;
   hasUsers = false;
-
+  hoveredAccount = -1;
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
   expirationDays = 30;
   deleteKey = false;
-
+  isSingleAccount = false;
+  validationErrors = false;
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
     public globalVars: GlobalVarsService,
-    private googleDrive: GoogleDriveService,
     private backendApi: BackendAPIService,
-    private router: Router,
     private activatedRoute: ActivatedRoute
   ) {}
 
@@ -47,13 +49,16 @@ export class DeriveComponent implements OnInit {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
-    this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
-      this.allUsers = profiles;
-    });
-
-    this.activatedRoute.queryParams.subscribe((params) => {
+    // first grab the query params
+    this.activatedRoute.queryParams.subscribe((params: DeriveParams) => {
+      // verify they sent the correct parameter permutation
+      this.validationErrors = this.getParameterValidationErrors(params);
+      if (this.validationErrors) {
+        throw Error('invalid query parameter permutation');
+      }
       if (params.publicKey) {
         this.publicKeyBase58Check = params.publicKey;
+        this.isSingleAccount = true;
       }
       if (params.derivedPublicKey) {
         this.derivedPublicKeyBase58Check = params.derivedPublicKey;
@@ -66,37 +71,15 @@ export class DeriveComponent implements OnInit {
       ) {
         this.deleteKey = params.deleteKey === 'true';
         // We don't want or need to parse transaction spending limit when revoking derived key,
-        // so we initialize a spending limit object with no permissions
+        // so we initialize a spending limit object with no permissions.
         this.transactionSpendingLimitResponse = { GlobalDESOLimit: 0 };
-        this.backendApi
-          .GetTransactionSpendingLimitHexString(
-            this.transactionSpendingLimitResponse
-          )
-          .subscribe((res) => {
-            this.transactionSpendingLimitHex = res;
-          });
         // Setting expiration days to 0 forces us to have a minimum transaction size that is still valid.
         this.expirationDays = 0;
-        return;
       }
       if (params.transactionSpendingLimitResponse) {
         this.transactionSpendingLimitResponse = JSON.parse(
           decodeURIComponent(params.transactionSpendingLimitResponse)
         );
-        // TODO: There is a small attack surface here. If someone gains control of the
-        // backendApi node, they can swap a fake value into here, and trick the user
-        // into giving up control of their key. The solution is to force users to pass
-        // the transactionSpendingLimitHex directly, but this is a worse developer
-        // experience. So we trade a little bit of security for developer convenience
-        // here, and do the conversion in Identity rather than forcing the devs to do it.
-        this.backendApi
-          .GetTransactionSpendingLimitHexString(
-            this
-              .transactionSpendingLimitResponse as TransactionSpendingLimitResponse
-          )
-          .subscribe((res) => {
-            this.transactionSpendingLimitHex = res;
-          });
       }
       if (params.expirationDays) {
         const numDays = parseInt(params.expirationDays, 10);
@@ -104,44 +87,52 @@ export class DeriveComponent implements OnInit {
           this.expirationDays = numDays;
         }
       }
+      this.globalVars.derive = true;
     });
     // Set derive to true
-    this.globalVars.derive = true;
-  }
-
-  redirectLoadSeed(): void {
-    this.router.navigate(['/', RouteNames.LOAD_SEED], {
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  redirectSignUp(): void {
-    this.router.navigate(['/', RouteNames.SIGN_UP], {
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  launchGoogle(): void {
-    this.googleDrive.launchGoogle();
   }
 
   selectAccountAndDeriveKey(publicKey: string): void {
-    this.derive(publicKey);
+    this.identityService.derive({
+      publicKey,
+      transactionSpendingLimit: this.transactionSpendingLimitResponse,
+      expirationDays: this.expirationDays,
+    });
   }
 
-  approveDerivedKey(): void {
-    if (!this.publicKeyBase58Check) {
-      return;
-    }
-    this.derive(this.publicKeyBase58Check);
-  }
-
-  derive(publicKey: string): void {
+  approveDerivedKey(publicKey: string | undefined): void {
+    if (!publicKey) return;
     this.identityService.derive({
       publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
-      transactionSpendingLimitHex: this.transactionSpendingLimitHex,
+      transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
     });
+  }
+
+  private getParameterValidationErrors(params: Params): boolean {
+    // listed out the different flows that can happen on the derive page
+    // if the params do not match these permutations return false and display the error page
+    const pkAndSpendingLimits =
+      params.publicKey && params.transactionSpendingLimitResponse;
+
+    const dkAndSpendingLimits =
+      params.derivedPublicKey && params.transactionSpendingLimitResponse;
+
+    const pkDkAndSpendingLimits =
+      params.publicKey &&
+      params.transactionSpendingLimitResponse &&
+      params.derivedPublicKey;
+
+    const deleteDerivedKey =
+      params.publicKey &&
+      params.deleteKey === 'true' &&
+      params.derivedPublicKey;
+    return !(
+      pkAndSpendingLimits ||
+      dkAndSpendingLimits ||
+      pkDkAndSpendingLimits ||
+      deleteDerivedKey
+    );
   }
 }

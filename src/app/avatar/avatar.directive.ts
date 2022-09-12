@@ -18,9 +18,21 @@ export class AvatarDirective implements OnChanges {
     if (!this.appAvatar) {
       return;
     }
-    this.el.nativeElement.style.backgroundImage = `url(${this.backendApi.GetSingleProfilePictureURL(
-      this.appAvatar
-    )})`;
+    // cast the this object to a normal var since binding get out of wack in the arrow function
+    const appAvatar = this.appAvatar;
+    const element = this.el.nativeElement;
+    // calling fetch here to see if an page has a 404
+    fetch(this.backendApi.GetSingleProfilePictureURL(this.appAvatar)).then(
+      (res) => {
+        if (res.status === 200) {
+          element.style.backgroundImage = `url(${this.backendApi.GetSingleProfilePictureURL(
+            appAvatar
+          )})`;
+        } else {
+          element.style.backgroundImage = `url( assets/placeholder-account-image.png)`;
+        }
+      }
+    );
   }
 
   ngOnChanges(changes: any): void {

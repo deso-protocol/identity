@@ -1,48 +1,60 @@
 <div *ngIf="transactionSpendingLimitResponse">
-  <div class="d-flex justify-content-between py-15px">
-    <div class="fs-18px">Cumulative Spending DESO Limit</div>
-    <div>
-      {{
+  <div *ngIf="!transactionSpendingLimitResponse.IsUnlimited">
+    <div class="d-flex justify-content-between px-20px fs-18px">
+      <div class="text-left">Cumulative Spending Limit</div>
+      <div>
+        {{
         globalVars.nanosToDeSo(
-          transactionSpendingLimitResponse.GlobalDESOLimit || 0,
-          4
+        transactionSpendingLimitResponse.GlobalDESOLimit || 0,
+        4
         )
-      }}
-      DESO
+        }}
+        DESO
+      </div>
     </div>
-  </div>
-  <app-transaction-spending-limit-section
-    [sectionMap]="transactionSpendingLimitResponse.TransactionCountLimitMap"
-    [sectionTitle]="TransactionSpendingLimitComponent.TransactionLimitsSection"
-    *ngIf="transactionSpendingLimitResponse.TransactionCountLimitMap"
-  ></app-transaction-spending-limit-section>
-  <app-transaction-spending-limit-section
-    [sectionMap]="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
-    [sectionTitle]="TransactionSpendingLimitComponent.CreatorCoinLimitsSection"
-    [userMap]="userMap"
-    *ngIf="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
-  ></app-transaction-spending-limit-section>
-  <app-transaction-spending-limit-section
-    [sectionMap]="transactionSpendingLimitResponse.DAOCoinOperationLimitMap"
-    [sectionTitle]="TransactionSpendingLimitComponent.DAOCoinLimitsSection"
-    [userMap]="userMap"
-    *ngIf="transactionSpendingLimitResponse.DAOCoinOperationLimitMap"
-  ></app-transaction-spending-limit-section>
-  <app-transaction-spending-limit-section
-    [sectionMap]="transactionSpendingLimitResponse.NFTOperationLimitMap"
-    [sectionTitle]="TransactionSpendingLimitComponent.NFTLimitsSection"
-    *ngIf="transactionSpendingLimitResponse.NFTOperationLimitMap"
-  >
-  </app-transaction-spending-limit-section>
-  <app-transaction-spending-limit-section
-    [sectionMap]="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
-    [sectionTitle]="
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.TransactionCountLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.TransactionLimitsSection"
+      *ngIf="transactionSpendingLimitResponse.TransactionCountLimitMap"
+    ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.CreatorCoinLimitsSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
+    ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.DAOCoinOperationLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.DAOCoinLimitsSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.DAOCoinOperationLimitMap"
+    ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.NFTOperationLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.NFTLimitsSection"
+      *ngIf="transactionSpendingLimitResponse.NFTOperationLimitMap"
+    >
+    </app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
+      [sectionTitle]="
       TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
     "
-    [userMap]="userMap"
-    *ngIf="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
-  >
-  </app-transaction-spending-limit-section>
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
+    >
+    </app-transaction-spending-limit-section>
+  </div>
+
+  <div *ngIf="transactionSpendingLimitResponse.IsUnlimited">
+    <div class="d-flex flex-column">
+      <div class="d-flex">
+        <div class="d-flex justify-content-start align-items-center col-5">
+          This key is unlimited.
+        </div>
+      </div>
+    </div>
+  </div>
   <div *ngIf="transactionSpendingLimitResponse.DerivedKeyMemo">
     <div class="flex-grow-1 transaction-spending-limit-separator pt-15px"></div>
     <div class="py-15px mb-2">

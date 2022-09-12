@@ -7,59 +7,14 @@
   <div class="mb-20px">
     <span class="title-text">Log in to {{ globalVars.hostname }}</span>
     <div class="main-text">
-      Sign up with a new Google account<br />or DeSo seed phrase!
+      Sign up with MetaMask, Google,<br />
+      or DeSo seed phrase!
     </div>
   </div>
-
-  <div class="d-flex flex-column" *ngIf="hasUsers">
-    <ul class="list-group mt-7px mb-30px saved-seeds-list">
-      <span class="saved-seeds-header d-flex align-items-center"
-        ><span>Select an account</span></span
-      >
-      <div class="saved-seeds-scroll">
-        <li
-          *ngFor="let item of allUsers | keyvalue"
-          class="list-group-item list-group-item-action cursor-pointer saved-seed"
-          (click)="selectAccount(item.key)"
-        >
-          <div class="w-100">
-            <div *ngIf="!item.value.username" class="text-truncate">
-              {{ item.key }}&hellip;
-            </div>
-            <div *ngIf="item.value.username" class="d-flex align-items-center">
-              <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-              <div class="text-truncate">{{ item.value.username }}</div>
-            </div>
-          </div>
-        </li>
-      </div>
-    </ul>
-  </div>
-  <div class="d-flex align-items-center flex-column">
-    <button
-      class="button button-large button-primary mb-20px"
-      (click)="launchGoogle()"
-      *ngIf="!globalVars.hideGoogle"
-    >
-      <img
-        src="assets/google_logo.svg"
-        height="32px"
-        width="32px"
-        class="mr-10px"
-      />
-      <span class="font-weight-bold">Sign up / log in with Google</span>
-    </button>
-    <button
-      class="button button-large button-secondary mb-40px"
-      [routerLink]="['/sign-up']"
-      queryParamsHandling="merge"
-    >
-      <span class="font-weight-normal">Sign up with DeSo seed</span>
-    </button>
-    <a class="link" [routerLink]="['/load-seed']" queryParamsHandling="merge"
-      ><u>Log in with DeSo seed</u></a
-    >
-  </div>
+  <app-account-select
+    (onAccountSelect)="onAccountSelect($event)"
+  ></app-account-select>
+  <app-log-in-options></app-log-in-options>
 
   <div *ngIf="showAccessLevels">
     <div class="fs-18px mt-30px">

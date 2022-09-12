@@ -1,57 +1,41 @@
 <div class="d-flex flex-column">
   <div class="d-flex justify-content-between flex-grow-1">
     <div class="d-flex justify-content-start align-items-center">
+      <app-arrow-toggle (click)="expandCreator = !expandCreator">
+      </app-arrow-toggle>
       <div
-        class="avatar mr-15px"
+        class="avatar ml-5px mr-5px"
         [appAvatar]="coinPublicKey"
         *ngIf="coinPublicKey"
       ></div>
-      <div
-        class="d-block"
-        style="
-          text-overflow: ellipsis;
-          display: block;
-          max-width: 200px;
-          overflow: hidden;
-        "
-      >
+      <div class="d-block ml-15px" style="display: block; max-width: 200px">
         {{
           coinPublicKey === ''
             ? 'All Creators'
-            : user?.ProfileEntryResponse?.Username || coinPublicKey
+            : user?.ProfileEntryResponse?.Username ||
+              (coinPublicKey | truncateAddressOrUsername)
         }}
       </div>
       <!-- TODO: Add verified check -->
     </div>
     <div class="d-flex justify-content-end fs-14px">
-      <div class="px-10px">
+      <div class="d-flex align-items-center justify-content-center">
         {{ getOperationsString(coinOperationMap) }}
-      </div>
-      <div
-        (click)="expandCreator = !expandCreator"
-        class="link"
-        style="font-size: 14px !important"
-      >
-        {{ expandCreator ? 'Hide' : 'Show' }}
       </div>
     </div>
   </div>
-  <div
-    class="d-flex flex-column p-15px m-15px"
-    style="background-color: lightgray; border: 1px solid gray"
-    *ngIf="expandCreator"
-  >
+  <div class="d-flex flex-column pt-15px mt-15px" *ngIf="expandCreator">
     <div class="d-flex fs-14px justify-content-between">
       <div>Operation Type</div>
       <div>Operation Limit</div>
     </div>
     <div
-      class="d-flex fs-18px justify-content-between py-10px"
+      class="d-flex fs-16px justify-content-between py-10px"
       *ngFor="let opLimit of coinOperationMap | keyvalue; let ii = index"
       [ngStyle]="{
         'border-bottom':
           ii < globalVars.ObjectKeyLength(coinOperationMap) - 1
-            ? '3px dotted darkgray'
+            ? '1px dotted darkgray'
             : 'none'
       }"
     >

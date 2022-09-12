@@ -6,8 +6,8 @@ import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
-import { decryptShared } from '../lib/ecies';
 import { EncryptedMessage } from '../types/identity';
+import { ec } from 'elliptic';
 
 @Injectable({
   providedIn: 'root',
@@ -18,175 +18,42 @@ export class SigningService {
     private globalVars: GlobalVarsService
   ) {}
 
-  signJWT(seedHex: string): string {
+  signJWT(
+    seedHex: string,
+    isDerived: boolean,
+    expiration: string | number = 60 * 10
+  ): string {
     const keyEncoder = new KeyEncoder('secp256k1');
     const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
-    return jsonwebtoken.sign({}, encodedPrivateKey, {
-      algorithm: 'ES256',
-      expiresIn: 60 * 10,
-    });
-  }
-
-  encryptMessage(
-    seedHex: string,
-    senderGroupKeyName: string,
-    recipientPublicKey: string,
-    message: string
-  ): any {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
-
-    const publicKeyBuffer =
-      this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
-    try {
-      // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
-      // encrypting the message.
-      let privateEncryptionKey = privateKeyBuffer;
-      if (senderGroupKeyName) {
-        privateEncryptionKey = this.cryptoService.deriveMessagingKey(
-          seedHex,
-          senderGroupKeyName
+    if (isDerived) {
+      const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+      const derivedPublicKeyBase58Check =
+        this.cryptoService.privateKeyToDeSoPublicKey(
+          derivedPrivateKey,
+          this.globalVars.network
         );
-      }
 
-      // Encrypt the message using keys we determined above.
-      const encryptedMessage = ecies.encryptShared(
-        privateEncryptionKey,
-        publicKeyBuffer,
-        message
+      return jsonwebtoken.sign(
+        {
+          [this.globalVars.claimJwtDerivedPublicKey]:
+            derivedPublicKeyBase58Check,
+        },
+        encodedPrivateKey,
+        { algorithm: 'ES256', expiresIn: expiration }
       );
-      return {
-        encryptedMessage: encryptedMessage.toString('hex'),
-      };
-    } catch (e) {
-      console.error(e);
-      return {
-        encryptedMessage: '',
-      };
+    } else {
+      return jsonwebtoken.sign({}, encodedPrivateKey, {
+        algorithm: 'ES256',
+        expiresIn: expiration,
+      });
     }
   }
 
-  // Legacy decryption for older clients
-  // @param encryptedHexes : string[]
-  decryptMessagesLegacy(
+  signTransaction(
     seedHex: string,
-    encryptedHexes: any
-  ): { [key: string]: any } {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
-
-    const decryptedHexes: { [key: string]: any } = {};
-    for (const encryptedHex of encryptedHexes) {
-      const encryptedBytes = new Buffer(encryptedHex, 'hex');
-      const opts = { legacy: true };
-      try {
-        decryptedHexes[encryptedHex] = ecies
-          .decrypt(privateKeyBuffer, encryptedBytes, opts)
-          .toString();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return decryptedHexes;
-  }
-
-  // Decrypt messages encrypted with shared secret
-  decryptMessages(
-    seedHex: string,
-    encryptedMessages: EncryptedMessage[]
-  ): { [key: string]: any } {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
-
-    const decryptedHexes: { [key: string]: any } = {};
-    for (const encryptedMessage of encryptedMessages) {
-      const publicKey = encryptedMessage.PublicKey;
-      const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
-      const encryptedBytes = new Buffer(encryptedMessage.EncryptedHex, 'hex');
-      // Check if message was encrypted using shared secret or public key method
-      if (encryptedMessage.Legacy) {
-        // If message was encrypted using public key, check the sender to determine if message is decryptable.
-        try {
-          if (!encryptedMessage.IsSender) {
-            const opts = { legacy: true };
-            decryptedHexes[encryptedMessage.EncryptedHex] = ecies
-              .decrypt(privateKeyBuffer, encryptedBytes, opts)
-              .toString();
-          } else {
-            decryptedHexes[encryptedMessage.EncryptedHex] = '';
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      } else if (!encryptedMessage.Version || encryptedMessage.Version == 2) {
-        try {
-          decryptedHexes[encryptedMessage.EncryptedHex] = ecies
-            .decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes)
-            .toString();
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        // DeSo V3 Messages
-        try {
-          // V3 messages will have Legacy=false and Version=3.
-          if (encryptedMessage.Version && encryptedMessage.Version === 3) {
-            let privateEncryptionKey = privateKeyBuffer;
-            let publicEncryptionKey = publicKeyBytes;
-            let defaultKey = false;
-
-            // The DeSo V3 Messages rotating public keys are computed using trapdoor key derivation. To find the
-            // private key of a messaging public key, we just need the trapdoor = user's seedHex and the key name.
-            // Setting IsSender tells Identity if it should invert sender or recipient public key.
-            if (encryptedMessage.IsSender) {
-              if (
-                encryptedMessage.SenderMessagingGroupKeyName ===
-                this.globalVars.defaultMessageKeyName
-              ) {
-                defaultKey = true;
-              }
-              publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(
-                encryptedMessage.RecipientMessagingPublicKey as string
-              );
-            } else {
-              if (
-                encryptedMessage.RecipientMessagingGroupKeyName ===
-                this.globalVars.defaultMessageKeyName
-              ) {
-                defaultKey = true;
-              }
-              publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(
-                encryptedMessage.SenderMessagingPublicKey as string
-              );
-            }
-
-            // Currently, Identity only computes trapdoor public key with name "default-key".
-            // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(key name) )
-            if (defaultKey) {
-              privateEncryptionKey = this.cryptoService.deriveMessagingKey(
-                seedHex,
-                this.globalVars.defaultMessageKeyName
-              );
-            }
-
-            // Now decrypt the message based on computed keys.
-            decryptedHexes[encryptedMessage.EncryptedHex] = ecies
-              .decryptShared(
-                privateEncryptionKey,
-                publicEncryptionKey,
-                encryptedBytes
-              )
-              .toString();
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-    return decryptedHexes;
-  }
-
-  signTransaction(seedHex: string, transactionHex: string): string {
+    transactionHex: string,
+    isDerivedKey: boolean
+  ): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
@@ -194,6 +61,11 @@ export class SigningService {
     const signature = privateKey.sign(transactionHash, { canonical: true });
     const signatureBytes = new Buffer(signature.toDER());
     const signatureLength = uvarint64ToBuf(signatureBytes.length);
+
+    // If transaction is signed with a derived key, use DeSo-DER recoverable signature encoding.
+    if (isDerivedKey) {
+      signatureBytes[0] += 1 + (signature.recoveryParam as number);
+    }
 
     const signedTransactionBytes = Buffer.concat([
       // This slice is bad. We need to remove the existing signature length field prior to appending the new one.
@@ -237,5 +109,17 @@ export class SigningService {
     }
 
     return signedHashes;
+  }
+
+  encryptGroupMessagingPrivateKeyToMember(memberMessagingPublicKeyBase58Check: string, privateKeyHex: string): string {
+    const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(memberMessagingPublicKeyBase58Check);
+    // @ts-ignore
+    const messagingPkBuffer = new Buffer(memberMessagingPkKeyPair.getPublic('arr'));
+    return ecies.encrypt(messagingPkBuffer, privateKeyHex, { legacy: false }).toString('hex');
+  }
+  decryptGroupMessagingPrivateKeyToMember(privateKeyBuffer: Buffer, encryptedPrivateKeyBuffer: Buffer): ec.KeyPair {
+    const memberMessagingPriv = ecies.decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, { legacy: false }).toString();
+    const EC = new ec('secp256k1');
+    return EC.keyFromPrivate(memberMessagingPriv);
   }
 }

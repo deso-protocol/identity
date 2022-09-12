@@ -390,7 +390,7 @@ export class BuyDeSoComponent implements OnInit {
             // tslint:disable-next-line:no-shadowed-variable
             (res: any) => {
               // I think it is okay to sign this hash without additional validation, considering this flow only happens on
-              // signup. Even if somehow this hash we're signing is mallicious, the user has no funds yet.
+              // signup. Even if somehow this hash we're signing is malicious, the user has no funds yet.
               const hashes = this.signingService.signHashes(
                 this.seedHex,
                 res.UnsignedHashes

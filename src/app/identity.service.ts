@@ -42,8 +42,30 @@ import {
 export type DerivePayload = {
   publicKey: string;
   derivedPublicKey?: string;
-  transactionSpendingLimitHex?: string;
+  transactionSpendingLimit?: TransactionSpendingLimitResponse;
   expirationDays?: number;
+};
+
+export type MessagingGroupPayload = {
+  messagingKeySignature: string;
+  encryptedToApplicationGroupMessagingPrivateKey: string;
+  encryptedToMembersGroupMessagingPrivateKey: string[];
+  messagingPublicKeyBase58Check: string;
+};
+
+export type MessagingGroup = {
+  EncryptedKey: string;
+  ExtraData: null | { [k: string]: string };
+  GroupOwnerPublicKeyBase58Check: string,
+  MessagingGroupKeyName: string;
+  MessagingGroupMembers: MessagingGroupMember[];
+  MessagingPublicKeyBase58Check: string;
+};
+
+export type MessagingGroupMember = {
+  EncryptedKey: string;
+  GroupMemberKeyName: string;
+  GroupMemberPublicKeyBase58Check: string;
 };
 
 @Injectable({
@@ -106,30 +128,51 @@ export class IdentityService {
   derive(payload: DerivePayload): void {
     this.backendApi.GetAppState().subscribe((res) => {
       const blockHeight = res.BlockHeight;
-      const derivedPrivateUserInfo = this.accountService.getDerivedPrivateUser(
-        payload.publicKey,
-        blockHeight,
-        payload.transactionSpendingLimitHex,
-        payload.derivedPublicKey,
-        payload.expirationDays
-      );
-      if (this.globalVars.callback) {
-        // If callback is passed, we redirect to it with payload as URL parameters.
-        let httpParams = new HttpParams();
-        for (const key in derivedPrivateUserInfo) {
-          if (derivedPrivateUserInfo.hasOwnProperty(key)) {
-            const paramVal = (derivedPrivateUserInfo as any)[key];
-            if (paramVal !== null && paramVal !== undefined) {
-              httpParams = httpParams.append(key, paramVal.toString());
-            }
+      this.accountService
+        .getDerivedPrivateUser(
+          this.backendApi,
+          payload.publicKey,
+          blockHeight,
+          payload.transactionSpendingLimit,
+          payload.derivedPublicKey,
+          payload.expirationDays
+        )
+        .then((derivedPrivateUserInfo) => {
+          if (this.globalVars.callback) {
+            // If callback is passed, we redirect to it with payload as URL parameters.
+            const httpParams = this.parseTypeToHttpParams(derivedPrivateUserInfo);
+            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+          } else {
+            this.cast('derive', derivedPrivateUserInfo);
           }
-        }
-        window.location.href =
-          this.globalVars.callback + `?${httpParams.toString()}`;
-      } else {
-        this.cast('derive', derivedPrivateUserInfo);
-      }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     });
+  }
+
+  messagingGroup(payload: MessagingGroupPayload): void {
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      const httpParams = this.parseTypeToHttpParams(payload);
+      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+    } else {
+      this.cast('messagingGroup', payload);
+    }
+  }
+
+  parseTypeToHttpParams(payload: any): HttpParams {
+    let httpParams = new HttpParams();
+    for (const key in payload) {
+      if (payload.hasOwnProperty(key)) {
+        const paramVal = (payload as any)[key];
+        if (paramVal !== null && paramVal !== undefined) {
+          httpParams = httpParams.append(key, paramVal.toString());
+        }
+      }
+    }
+    return httpParams;
   }
 
   // Incoming Messages
@@ -210,9 +253,14 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
+    const isDerived =
+      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+        encryptedSeedHex
+      );
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
-      transactionHex
+      transactionHex,
+      isDerived
     );
 
     this.respond(id, {
@@ -244,7 +292,7 @@ export class IdentityService {
     // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
     // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
     // senderGroupKeyName parameter.
-    const encryptedMessage = this.signingService.encryptMessage(
+    const encryptedMessage = this.accountService.encryptMessage(
       seedHex,
       senderGroupKeyName,
       recipientPublicKey,
@@ -264,26 +312,22 @@ export class IdentityService {
     );
     const id = data.id;
 
-    let decryptedHexes;
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      decryptedHexes = this.signingService.decryptMessagesLegacy(
+      this.respond(id, {decryptedHexes: this.accountService.decryptMessagesLegacy(
         seedHex,
         encryptedHexes
-      );
+      )});
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      decryptedHexes = this.signingService.decryptMessages(
+      this.accountService.decryptMessages(
         seedHex,
-        encryptedMessages
-      );
+        encryptedMessages,
+        data.payload.messagingGroups || [],
+      ).then((res) => this.respond(id, { decryptedHexes: res }));
     }
-
-    this.respond(id, {
-      decryptedHexes,
-    });
   }
 
   private handleJwt(data: any): void {
@@ -299,7 +343,11 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const jwt = this.signingService.signJWT(seedHex);
+    const isDerived =
+      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+        encryptedSeedHex
+      );
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
 
     this.respond(id, {
       jwt,
@@ -486,6 +534,10 @@ export class IdentityService {
     };
 
     const req = this.outboundRequests[id];
+    if (!req) {
+      console.error('No matching outbound request');
+      return;
+    }
     req.next(result);
     req.complete();
     delete this.outboundRequests[id];

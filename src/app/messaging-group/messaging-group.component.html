@@ -1,0 +1,73 @@
+<app-banner></app-banner>
+
+<div *ngIf="error" class="container home-container">
+  Problem verifying input data. Please contact the developer of the app you're using and provide them with the following
+  error message: <span class="fc-error">{{error}}</span>
+</div>
+<div *ngIf="!error">
+  <div *ngIf="!globalVars.callbackInvalid">
+    <div class="container home-container">
+      <div class="font-weight-bold fs-24px mb-10px" *ngIf="!globalVars.callback">
+        <span *ngIf="!globalVars.callback">{{ globalVars.hostname }} requests: </span>
+        <span *ngIf="globalVars.callback">Request for:</span>
+        <span class="fc-blue">{{getOperationString()}}</span>
+      </div>
+      <div class="fs-18px mb-10px">
+        <span *ngIf="!updatedGroupOwnerUsername">
+          <b>Public key: <span class="fc-blue">{{updatedGroupOwnerPublicKeyBase58Check | truncateAddressOrUsername}}</span></b>
+        </span>
+        <span *ngIf="updatedGroupOwnerUsername">
+          <b>Username: <span class="fc-blue">{{updatedGroupOwnerUsername | truncateAddressOrUsername}}</span></b>
+        </span>
+        <br/>
+        <b>Group name: <span class="fc-blue">{{updatedGroupKeyName}}</span></b>
+      </div>
+
+      <div *ngIf="operation === MESSAGING_GROUP_OPERATION.DEFAULT_KEY">
+        <div class="fs-17px mt-30px">
+          DeSo is the first and only blockchain that supports fully decentralized,
+          censorship-resistant, and end-to-end encrypted group chats.
+        </div>
+        <br/>
+        <div class="fs-17px">
+          Click approve to register the default messaging key. This is usually a one-time setup used to enable
+          group chats on the DeSo blockchain. This additional setup allows for interoperability of group chats
+          across desktop and mobile applications.
+        </div>
+      </div>
+      <div *ngIf="operation === MESSAGING_GROUP_OPERATION.CREATE_GROUP">
+        <div class="fs-17px mt-30px">
+          Click approve to create a new group chat on the DeSo blockchain. We will perform some magic to make sure
+          all messages sent in the chat are securely encrypted 💫
+        </div>
+      </div>
+      <div *ngIf="operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS">
+        <div class="fs-17px mt-10px mb-40px">
+          Click approve to add new users to your group. Members can read and write messages to the group. Only you can
+          add new members, and you can also mute or unmute existing members at any time.
+        </div>
+
+        <app-account-select
+          (onAccountSelect)="onAccountSelect($event)"
+          [allUsers]="updatedMembersProfiles"
+          [componentTitle]="'Add users to group'"
+          [hideLoginMethod]="true"
+        ></app-account-select>
+      </div>
+      <div class="mt-30px">
+        <span *ngIf="applicationMessagingPublicKeyBase58Check" class="fc-muted fs-15px">
+          🔐 <span *ngIf="!globalVars.callback"><b>{{ globalVars.hostname }}</b></span>
+          requested access to this group. Make sure you trust this app as it will be able to read messages sent within the group.
+        </span>
+      </div>
+      <div class="flx-center">
+        <div class="mt-20px">
+          <button type="button" class="button button-small button-primary" (click)="approveOperation()">Approve</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="globalVars.callbackInvalid">
+    <app-error-callback></app-error-callback>
+  </div>
+</div>

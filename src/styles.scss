@@ -109,6 +109,9 @@ $error: #ff6939;
 .fc-muted {
   color: $light-font-color;
 }
+.fc-info {
+  color: $info;
+}
 .fc-blue {
   color: $blue;
 }
@@ -152,6 +155,12 @@ $error: #ff6939;
 
 .fs-underline {
   text-decoration: underline;
+}
+
+.fs-underline-hover {
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .fs-30px {
@@ -715,6 +724,11 @@ $error: #ff6939;
 }
 .br-12px {
   border-radius: $feed-border-radius;
+}
+
+// Text align
+.txtalj {
+  text-align: justify;
 }
 
 // custom float classes
@@ -1380,4 +1394,13 @@ i-feather[name='check-circle'] {
 
 bs-dropdown-container {
   z-index: 3000 !important;
+}
+
+.flx-center {
+  display: flex;
+  justify-content: center;
+}
+
+.txt-center {
+  text-align: center;
 }

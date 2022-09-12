@@ -673,9 +673,8 @@ export class BuyDeSoEthComponent implements OnInit {
 
   queryETHRPC<Type>(method: string, params: any[]): Promise<Type> {
     return new Promise<Type>((resolve, reject) => {
-      const jwt = this.signingService.signJWT(this.seedHex);
       this.backendAPIService
-        .QueryETHRPC(method, params, this.publicKey, jwt)
+        .QueryETHRPC(method, params)
         .toPromise()
         .then(
           (res: any) => {
@@ -784,12 +783,12 @@ export class BuyDeSoEthComponent implements OnInit {
 
   getChain(): Chain {
     return this.globalVars.network === Network.testnet
-      ? Chain.Ropsten
+      ? Chain.Goerli
       : Chain.Mainnet;
   }
 
   getChainString(): string {
-    return this.globalVars.network === Network.testnet ? 'ropsten' : 'mainnet';
+    return this.globalVars.network === Network.testnet ? 'goerli' : 'mainnet';
   }
 
   getHardfork(): Hardfork {

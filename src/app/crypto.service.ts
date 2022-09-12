@@ -5,8 +5,14 @@ import HDKey from 'hdkey';
 import { ec as EC } from 'elliptic';
 import bs58check from 'bs58check';
 import { CookieService } from 'ngx-cookie';
-import { createHmac, createCipher, createDecipher, randomBytes } from 'crypto';
-import { AccessLevel, Network } from '../types/identity';
+import {
+  createHmac,
+  createCipher,
+  createDecipher,
+  randomBytes,
+  createHash,
+} from 'crypto';
+import {AccessLevel, Network} from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
 import * as sha256 from 'sha256';
@@ -131,14 +137,6 @@ export class CryptoService {
     return hmac === this.accessLevelHmac(accessLevel, seedHex);
   }
 
-  encryptedSeedHexToPrivateKey(
-    encryptedSeedHex: string,
-    domain: string
-  ): EC.KeyPair {
-    const seedHex = this.decryptSeedHex(encryptedSeedHex, domain);
-    return this.seedHexToPrivateKey(seedHex);
-  }
-
   mnemonicToKeychain(
     mnemonic: string,
     extraText?: string,
@@ -146,7 +144,7 @@ export class CryptoService {
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive("m/44'/0'/0'/0/0", nonStandard);
+    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0', nonStandard);
   }
 
   keychainToSeedHex(keychain: HDNode): string {
@@ -170,6 +168,12 @@ export class CryptoService {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
     const key = publicKey.getPublic().encode('array', true);
     return bs58check.encode(Buffer.from([...prefix, ...key]));
+  }
+
+  publicKeyHexToDeSoPublicKey(publicKeyHex: string, network: Network): string {
+    const ec = new EC('secp256k1');
+    const publicKey = ec.keyFromPublic(publicKeyHex, 'hex');
+    return this.publicKeyToDeSoPublicKey(publicKey, network);
   }
 
   publicKeyToECKeyPair(publicKey: string): EC.KeyPair {
@@ -207,6 +211,21 @@ export class CryptoService {
     return bs58check.encode(prefixAndKey);
   }
 
+  // Taken from https://github.com/cryptocoinjs/hdkey/blob/62c25cc655c9b554b3f9169d69809893408a877d/lib/hdkey.js#L39
+  // to compute the HDKey.identifier.
+  hash160(buf: Buffer): Buffer {
+    const sha = createHash('sha256').update(buf).digest();
+    return createHash('ripemd160').update(sha).digest();
+  }
+
+  publicKeyToBtcAddress(publicKey: Buffer, network: Network): string {
+    const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitcoin;
+    const identifier = this.hash160(publicKey);
+    const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
+
+    return bs58check.encode(prefixAndKey);
+  }
+
   // Compute messaging private key as sha256x2( sha256x2(seed hex) || sha256x2(key name) )
   deriveMessagingKey(seedHex: string, keyName: string): Buffer {
     const secretHash = new Buffer(
@@ -220,7 +239,7 @@ export class CryptoService {
     return new Buffer(sha256.x2([...secretHash, ...keyNameHash]), 'hex');
   }
 
-  // NOTE: Our ETH address uses the bitcion/bitclout derivation path, not the ETH path.
+  // NOTE: Our ETH address uses the bitcoin/bitclout derivation path, not the ETH path.
   // This is ugly but we only do it because they're just deposit addresses and we couldn't
   // backfill this data for existing users because we store the derived private key.
   // A user can still easily import their account to an ETH client to recover any ETH
@@ -230,12 +249,9 @@ export class CryptoService {
   // until LavaMoat is ready
   //
   // Reference implementation: https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L249
-  seedHexToEthAddress(seedHex: string): string {
-    const privateKey = this.seedHexToPrivateKey(seedHex);
-
-    // ETH uses the last 40 characters of the 64 byte SHA3 Keccak 256
+  publicKeyToEthAddress(keyPair: EC.KeyPair): string {
     const uncompressedKey = Buffer.from(
-      privateKey.getPublic(false, 'array').slice(1)
+      keyPair.getPublic(false, 'array').slice(1)
     );
     const ethAddress = new Keccak(256)
       .update(uncompressedKey)

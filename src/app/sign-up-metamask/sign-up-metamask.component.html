@@ -1,0 +1,76 @@
+<app-banner></app-banner>
+
+<div
+  class="container home-container text-center"
+  *ngIf="globalVars.inTab || globalVars.webview"
+>
+  <div *ngIf="this.currentScreen === SCREEN.CREATE_ACCOUNT">
+    <div class="mb-20px">
+      <span class="title-text">Sign up / log in using MetaMask</span>
+      <div class="main-text mb-2">
+        Create an account using your MetaMask wallet
+      </div>
+      <p class="txtalj mt-20px">
+        DeSo is a new blockchain built to power web3 social networks.
+        <br>
+        <br>
+        With DeSo, your MetaMask keys control your content the same way
+        they control your funds. <b>Your keys = your content.</b>
+        When you click the button below, you will be asked to sign
+        a transaction to create an account on the DeSo blockchain. Using
+        DeSo doesn't cost Eth gas fees so creating an account only
+        requires proof of identity.
+      </p>
+      <button
+        class="button button-large mb-20px bg-dark text-white mt-20px"
+        (click)="launchMetamask()"
+      >
+        <img
+          *ngIf="metamaskState !== METAMASK.CONNECT"
+          src="assets/metamask.png"
+          height="32px"
+          width="32px"
+          class="mr-10px"
+        />
+
+        <div
+          class="spinner-border mr-3"
+          style="width: 25px; height: 25px"
+          *ngIf="metamaskState === METAMASK.CONNECT"
+        ></div>
+        <span class="font-weight-bold"
+          >Connect<span *ngIf="metamaskState === METAMASK.CONNECT"
+            >ing</span
+          ></span
+        >
+      </button>
+    </div>
+
+    <ng-container *ngIf="existingConnectedWallet">
+      <div class="fc-secondary">Detected account: {{ existingConnectedWallet | truncateAddressOrUsername }}</div>
+      <div class="fc-muted fs-14px">
+        If this is not the account you want to connect please open MetaMask,
+        pick the correct account and click connect.
+      </div>
+    </ng-container>
+
+    <div *ngIf="metamaskState === METAMASK.ERROR" class="mt-20px">
+      <div class="text-danger">
+        {{ errorMessage }}
+        <span *ngIf="showAlternative" class="fc-blue cursor-pointer fs-underline-hover">
+          <a (click)="redirectToLogIn()">Alternatively, you can sign up with other methods.</a>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
+    <span class="title-text">Authorize Derived Key</span>
+    <div class="main-text mb-2">
+      Ask metamask for permission to generate your account
+    </div>
+    <p>
+      After signing this message your account will be generated with full
+      permissions to post, comment, tip, and message.
+    </p>
+  </div>
+</div>
