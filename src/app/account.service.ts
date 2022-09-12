@@ -775,6 +775,7 @@ export class AccountService {
               publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(
                 encryptedMessage.SenderMessagingPublicKey as string
               );
+
               // 1. get the right messaging group for this message
               // 2. get our member entry in this group
               // 3. get encrypted key from member entry.
@@ -801,8 +802,6 @@ export class AccountService {
                   }
                 }
               }
-
-
             }
 
             // Currently, Identity only computes trapdoor public key with name "default-key".
@@ -813,6 +812,7 @@ export class AccountService {
                 this.globalVars.defaultMessageKeyName
               );
             }
+
             // Now decrypt the message based on computed keys.
             decryptedHexes[encryptedMessage.EncryptedHex] = ecies
               .decryptShared(
