@@ -50,6 +50,22 @@ export type MessagingGroupPayload = {
   messagingKeySignature: string;
   encryptedToApplicationGroupMessagingPrivateKey: string;
   encryptedToMembersGroupMessagingPrivateKey: string[];
+  messagingPublicKeyBase58Check: string;
+};
+
+export type MessagingGroup = {
+  EncryptedKey: string;
+  ExtraData: null | { [k: string]: string };
+  GroupOwnerPublicKeyBase58Check: string,
+  MessagingGroupKeyName: string;
+  MessagingGroupMembers: MessagingGroupMember[];
+  MessagingPublicKeyBase58Check: string;
+};
+
+export type MessagingGroupMember = {
+  EncryptedKey: string;
+  GroupMemberKeyName: string;
+  GroupMemberPublicKeyBase58Check: string;
 };
 
 @Injectable({
@@ -296,25 +312,22 @@ export class IdentityService {
     );
     const id = data.id;
 
-    let decryptedHexes;
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      decryptedHexes = this.accountService.decryptMessagesLegacy(
+      this.respond(id, {decryptedHexes: this.accountService.decryptMessagesLegacy(
         seedHex,
         encryptedHexes
-      );
+      )});
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      decryptedHexes = this.accountService.decryptMessages(
+      this.accountService.decryptMessages(
         seedHex,
-        encryptedMessages
-      );
+        encryptedMessages,
+        data.payload.messagingGroups || [],
+      ).then((res) => this.respond(id, { decryptedHexes: res }));
     }
-    this.respond(id, {
-      decryptedHexes,
-    });
   }
 
   private handleJwt(data: any): void {
