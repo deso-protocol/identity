@@ -79,13 +79,6 @@ export interface DefaultKeyPrivateInfo {
   messagingKeySignature: string;
 }
 
-export enum MessagingGroupOperation {
-  MessagingGroupOperationAddMembers = 0,
-  MessagingGroupOperationRemoveMembers = 1,
-  MessagingGroupOperationMuteMembers = 2,
-  MessagingGroupOperationUnmuteMembers = 3,
-}
-
 export interface UserProfile {
   username: string;
   profilePic: any;
