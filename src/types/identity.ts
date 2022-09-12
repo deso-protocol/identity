@@ -18,7 +18,6 @@ export interface PrivateUserInfo {
 }
 
 export enum ExtraData {
-  MessagingGroupOperationType = 'MessagingGroupOperationType',
   TransactionSpendingLimit = 'TransactionSpendingLimit',
   DerivedKeyMemo = 'DerivedKeyMemo',
 }
