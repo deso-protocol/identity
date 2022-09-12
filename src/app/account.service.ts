@@ -24,7 +24,6 @@ import {
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
 import { MetamaskService } from './metamask.service';
-import * as bs58check from 'bs58check';
 import {
   Transaction,
   TransactionMetadataAuthorizeDerivedKey,
@@ -32,6 +31,9 @@ import {
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
+import { MessagingGroup } from './identity.service';
+import { base58 } from 'ethers/lib/utils';
+import bs58check from 'bs58check';
 
 @Injectable({
   providedIn: 'root',
@@ -587,11 +589,15 @@ export class AccountService {
   getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
     const privateUsers = this.getPrivateUsers();
     for (const user of Object.values(privateUsers)) {
-      if (user.seedHex === seedHex && user.loginMethod === LoginMethod.METAMASK) {
-        if (user.messagingKeyRandomness) {
-          return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+      if (user.seedHex === seedHex) {
+        if (user.loginMethod === LoginMethod.METAMASK) {
+          if (user.messagingKeyRandomness) {
+            return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+          } else {
+            throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+          }
         } else {
-          throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+          return this.cryptoService.deriveMessagingKey(seedHex, keyName);
         }
       }
     }
@@ -698,9 +704,11 @@ export class AccountService {
   // Decrypt messages encrypted with shared secret
   async decryptMessages(
     seedHex: string,
-    encryptedMessages: EncryptedMessage[]
+    encryptedMessages: EncryptedMessage[],
+    messagingGroups: MessagingGroup[],
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const myPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
     const decryptedHexes: { [key: string]: any } = {};
@@ -740,6 +748,10 @@ export class AccountService {
             let publicEncryptionKey = publicKeyBytes;
             let defaultKey = false;
 
+            // public keys of the group - group messaging public keys.
+            // assumption is that we've been added to a group with default key
+            // for now. we will fix this later.
+
             // The DeSo V3 Messages rotating public keys are computed using trapdoor key derivation. To find the
             // private key of a messaging public key, we just need the trapdoor = user's seedHex and the key name.
             // Setting IsSender tells Identity if it should invert sender or recipient public key.
@@ -763,6 +775,34 @@ export class AccountService {
               publicEncryptionKey = this.cryptoService.publicKeyToECBuffer(
                 encryptedMessage.SenderMessagingPublicKey as string
               );
+              // 1. get the right messaging group for this message
+              // 2. get our member entry in this group
+              // 3. get encrypted key from member entry.
+              // 4. decrypt this encrypted key with default key -> this is private encryption key
+              if (encryptedMessage.RecipientMessagingGroupKeyName !== 'default-key') {
+                const messagingGroup = messagingGroups.filter((mg) => {
+                  return mg.MessagingGroupKeyName === encryptedMessage.RecipientMessagingGroupKeyName;
+                });
+                if (messagingGroup.length === 1 && messagingGroup[0].MessagingGroupMembers) {
+                  const myMessagingGroupMemberEntries = messagingGroup[0].MessagingGroupMembers.filter((mgm) => {
+                    return mgm.GroupMemberPublicKeyBase58Check === myPublicKey;
+                  });
+                  if (myMessagingGroupMemberEntries.length === 1) {
+                    const myMessagingGroupMemberEntry = myMessagingGroupMemberEntries[0];
+                    const defaultPrivateEncryptionKey = await this.getMessagingKeyForSeed(
+                      seedHex,
+                      this.globalVars.defaultMessageKeyName
+                    );
+                    privateEncryptionKey = this.signingService.
+                    decryptGroupMessagingPrivateKeyToMember(
+                      defaultPrivateEncryptionKey,
+                      Buffer.from(myMessagingGroupMemberEntry.EncryptedKey, 'hex')
+                    ).getPrivate().toBuffer(undefined, 32);
+                  }
+                }
+              }
+
+
             }
 
             // Currently, Identity only computes trapdoor public key with name "default-key".
@@ -773,7 +813,6 @@ export class AccountService {
                 this.globalVars.defaultMessageKeyName
               );
             }
-
             // Now decrypt the message based on computed keys.
             decryptedHexes[encryptedMessage.EncryptedHex] = ecies
               .decryptShared(

@@ -112,11 +112,13 @@ export class SigningService {
   }
 
   encryptGroupMessagingPrivateKeyToMember(memberMessagingPublicKeyBase58Check: string, privateKeyHex: string): string {
-    const memberMessagingPkBuffer = this.cryptoService.publicKeyToECBuffer(memberMessagingPublicKeyBase58Check);
-    return ecies.encrypt(memberMessagingPkBuffer, privateKeyHex, {}).toString('hex');
+    const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(memberMessagingPublicKeyBase58Check);
+    // @ts-ignore
+    const messagingPkBuffer = new Buffer(memberMessagingPkKeyPair.getPublic('arr'));
+    return ecies.encrypt(messagingPkBuffer, privateKeyHex, { legacy: false }).toString('hex');
   }
   decryptGroupMessagingPrivateKeyToMember(privateKeyBuffer: Buffer, encryptedPrivateKeyBuffer: Buffer): ec.KeyPair {
-    const memberMessagingPriv = ecies.decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, {});
+    const memberMessagingPriv = ecies.decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, { legacy: false }).toString();
     const EC = new ec('secp256k1');
     return EC.keyFromPrivate(memberMessagingPriv);
   }

@@ -228,10 +228,10 @@ export class MessagingGroupComponent implements OnInit {
       this.applicationMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
-        this.respondToClient(messagingKeySignature, encryptedToApplicationGroupMessagingPrivateKey, []);
+        this.respondToClient(messagingKeySignature, encryptedToApplicationGroupMessagingPrivateKey, [], messagingPublicKeyBase58Check);
         break;
       case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
-        this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey, []);
+        this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey, [], messagingPublicKeyBase58Check);
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:
         try {
@@ -251,7 +251,7 @@ export class MessagingGroupComponent implements OnInit {
             encryptedToMembersGroupMessagingPrivateKey.push(encryptedGroupMessagingPriv);
           }
           this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey,
-            encryptedToMembersGroupMessagingPrivateKey);
+            encryptedToMembersGroupMessagingPrivateKey, messagingPublicKeyBase58Check);
         } catch (e) {
           throw new Error('Error getting bulk messaging public keys');
         }
@@ -261,14 +261,12 @@ export class MessagingGroupComponent implements OnInit {
     }
   }
   respondToClient(messagingKeySignature: string, encryptedToApplicationGroupMessagingPrivateKey: string,
-                  encryptedToMembersGroupMessagingPrivateKey: string[]): void {
-    console.log(`calling respondToClient with messagingKeySignature: ${messagingKeySignature}` +
-      `encryptedToApplicationGroupMessagingPrivateKey: ${encryptedToApplicationGroupMessagingPrivateKey}` +
-      `encryptedToMembersGroupMessagingPrivateKey: ${encryptedToMembersGroupMessagingPrivateKey}`);
+                  encryptedToMembersGroupMessagingPrivateKey: string[], messagingPublicKeyBase58Check: string): void {
     this.identityService.messagingGroup({
       messagingKeySignature,
       encryptedToApplicationGroupMessagingPrivateKey,
       encryptedToMembersGroupMessagingPrivateKey,
+      messagingPublicKeyBase58Check,
     });
   }
 
