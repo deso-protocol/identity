@@ -41,6 +41,7 @@ export class GlobalVarsService {
 
   referralHashBase58 = '';
 
+  messagingGroupNameMaxLength = 32;
   defaultMessageKeyName = 'default-key';
   claimJwtDerivedPublicKey = 'derivedPublicKeyBase58Check';
 

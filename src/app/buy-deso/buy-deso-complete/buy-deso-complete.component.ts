@@ -34,6 +34,7 @@ export class BuyDeSoCompleteComponent implements OnInit {
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });
+    window.close();
   }
 
   ngOnInit(): void {

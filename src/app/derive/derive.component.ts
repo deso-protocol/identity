@@ -23,7 +23,7 @@ type DeriveParams = {
   styleUrls: ['./derive.component.scss'],
 })
 export class DeriveComponent implements OnInit {
-  allUsers$: Observable<Accounts> = this.backendApi.GetUserProfiles(
+  allUsers: Observable<Accounts> = this.backendApi.GetUserProfiles(
     this.accountService.getPublicKeys()
   );
   transactionSpendingLimitResponse:

@@ -10,10 +10,16 @@ export interface PrivateUserInfo {
   network: Network;
   loginMethod?: LoginMethod;
   version: PrivateUserVersion;
+  messagingKeyRandomness?: string;
   derivedPublicKeyBase58Check?: string;
 
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;
+}
+
+export enum ExtraData {
+  TransactionSpendingLimit = 'TransactionSpendingLimit',
+  DerivedKeyMemo = 'DerivedKeyMemo',
 }
 
 export enum PrivateUserVersion {
@@ -63,6 +69,13 @@ export interface DerivedPrivateUserInfo {
   messagingKeySignature: string;
   transactionSpendingLimitHex: string | undefined;
   signedUp: boolean;
+}
+
+export interface DefaultKeyPrivateInfo {
+  messagingPublicKeyBase58Check: string;
+  messagingPrivateKeyHex: string;
+  messagingKeyName: string;
+  messagingKeySignature: string;
 }
 
 export interface UserProfile {
