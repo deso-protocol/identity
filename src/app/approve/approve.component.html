@@ -12,13 +12,6 @@
         [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       ></app-transaction-spending-limit>
     </div>
-    <div *ngIf="messagingGroupMembers">
-      <app-account-select
-        [allUsers]="messagingGroupMembers"
-        [componentTitle]="'Affected users'"
-        [hideLoginMethod]="true"
-      ></app-account-select>
-    </div>
     <br />
     <div *ngIf="transactionDeSoSpent">
       <p class="pb-15px">Total Cost: {{ transactionDeSoSpent }} $DESO</p>

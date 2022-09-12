@@ -18,7 +18,6 @@ export interface PrivateUserInfo {
 }
 
 export enum ExtraData {
-  MessagingGroupOperationType = 'MessagingGroupOperationType',
   TransactionSpendingLimit = 'TransactionSpendingLimit',
   DerivedKeyMemo = 'DerivedKeyMemo',
 }
@@ -77,13 +76,6 @@ export interface DefaultKeyPrivateInfo {
   messagingPrivateKeyHex: string;
   messagingKeyName: string;
   messagingKeySignature: string;
-}
-
-export enum MessagingGroupOperation {
-  MessagingGroupOperationAddMembers = 0,
-  MessagingGroupOperationRemoveMembers = 1,
-  MessagingGroupOperationMuteMembers = 2,
-  MessagingGroupOperationUnmuteMembers = 3,
 }
 
 export interface UserProfile {

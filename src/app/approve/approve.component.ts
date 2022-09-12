@@ -41,7 +41,7 @@ import {
   TransactionSpendingLimit,
 } from '../../lib/deso/transaction';
 import bs58check from 'bs58check';
-import {ExtraData, MessagingGroupOperation, UserProfile} from '../../types/identity';
+import { ExtraData } from '../../types/identity';
 
 @Component({
   selector: 'app-approve',
@@ -56,7 +56,6 @@ export class ApproveComponent implements OnInit {
   transactionDescription: any;
   transactionDeSoSpent: string | boolean = false;
   tsl: TransactionSpendingLimit | null = null;
-  messagingGroupMembers = {} as Observable<{[publicKeyBase58Check: string]: UserProfile}>;
 
   derivedKeyMemo = '';
   transactionSpendingLimitResponse:
@@ -341,35 +340,6 @@ export class ApproveComponent implements OnInit {
         const messagingGroupMetadata = this.transaction
           .metadata as TransactionMetadataMessagingGroup;
         const groupKeyName = messagingGroupMetadata.messagingGroupKeyName;
-        let groupOperation = MessagingGroupOperation.MessagingGroupOperationAddMembers;
-        for (const kv of this.transaction.extraData?.kvs || []) {
-          if (kv.key.toString() === ExtraData.MessagingGroupOperationType) {
-            const operationBytes = kv.value;
-            if (operationBytes.length !== 1) {
-              throw new Error('Invalid operation type length on a messaging group transaction');
-            }
-            groupOperation = operationBytes[0];
-            switch (groupOperation) {
-              case MessagingGroupOperation.MessagingGroupOperationAddMembers:
-                description = `add members to a messaging group: ${groupKeyName}`;
-                break;
-              case MessagingGroupOperation.MessagingGroupOperationMuteMembers:
-                description = `mute members in a messaging group: ${groupKeyName}`;
-                break;
-              case MessagingGroupOperation.MessagingGroupOperationUnmuteMembers:
-                description = `unmute members in a messaging group: ${groupKeyName}`;
-                break;
-              default:
-                throw new Error('Invalid operation type on a messaging group transaction');
-            }
-          }
-        }
-
-        const groupMembers = [];
-        for (const member of messagingGroupMetadata.messagingGroupMembers) {
-           groupMembers.push(this.base58KeyCheck(member.groupMemberPublicKey));
-        }
-        this.messagingGroupMembers = this.backendApi.GetUserProfiles(groupMembers);
         description = `register group key with name "${groupKeyName}"`;
         break;
       case TransactionMetadataDAOCoinLimitOrder:
