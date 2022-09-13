@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import {
-  AccessLevel, DefaultKeyPrivateInfo,
-  DerivedPrivateUserInfo, EncryptedMessage,
+  AccessLevel,
+  DefaultKeyPrivateInfo,
+  DerivedPrivateUserInfo,
+  EncryptedMessage,
   LoginMethod,
   Network,
   PrivateUserInfo,
   PrivateUserVersion,
-  PublicUserInfo,
+  PublicUserInfo
 } from '../types/identity';
 import { CookieService } from 'ngx-cookie';
 import HDKey from 'hdkey';
@@ -18,21 +20,13 @@ import sha256 from 'sha256';
 import { uint64ToBufBigEndian } from '../lib/bindata/util';
 import * as ecies from '../lib/ecies';
 import { ec as EC } from 'elliptic';
-import {
-  BackendAPIService,
-  GetAccessBytesResponse,
-  TransactionSpendingLimitResponse,
-} from './backend-api.service';
+import { BackendAPIService, GetAccessBytesResponse, TransactionSpendingLimitResponse } from './backend-api.service';
 import { MetamaskService } from './metamask.service';
-import {
-  Transaction,
-  TransactionMetadataAuthorizeDerivedKey,
-} from '../lib/deso/transaction';
+import { Transaction, TransactionMetadataAuthorizeDerivedKey } from '../lib/deso/transaction';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
 import { MessagingGroup } from './identity.service';
-import { base58 } from 'ethers/lib/utils';
 import bs58check from 'bs58check';
 
 @Injectable({
@@ -585,6 +579,17 @@ export class AccountService {
     const randomnessString = `Don't mind me, I'm just some randomness needed to create a DeSo messaging group.`;
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
+  getOwnerPublicKeyBase58CheckForSeed(seedHex: string): string {
+    const privateUsers = this.getPrivateUsers();
+    for (const user of Object.values(privateUsers)) {
+      if (user.seedHex === seedHex) {
+        return user.loginMethod === LoginMethod.METAMASK ? this.cryptoService.publicKeyHexToDeSoPublicKey(
+          user.publicKeyHex as string, this.globalVars.network) :
+          this.cryptoService.privateKeyToDeSoPublicKey(this.cryptoService.seedHexToPrivateKey(seedHex), this.globalVars.network);
+      }
+    }
+    return '';
+  }
 
   getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
     const privateUsers = this.getPrivateUsers();
@@ -708,9 +713,12 @@ export class AccountService {
     messagingGroups: MessagingGroup[],
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const myPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
-    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
+    const myPublicKey = this.getOwnerPublicKeyBase58CheckForSeed(seedHex);
+    if (myPublicKey === '') {
+      return Promise.reject('Public key not found in private users');
+    }
+    const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {
       const publicKey = encryptedMessage.PublicKey;
@@ -790,13 +798,13 @@ export class AccountService {
                   });
                   if (myMessagingGroupMemberEntries.length === 1) {
                     const myMessagingGroupMemberEntry = myMessagingGroupMemberEntries[0];
-                    const defaultPrivateEncryptionKey = await this.getMessagingKeyForSeed(
+                    const groupPrivateEncryptionKey = await this.getMessagingKeyForSeed(
                       seedHex,
-                      this.globalVars.defaultMessageKeyName
+                      myMessagingGroupMemberEntry.GroupMemberKeyName,
                     );
                     privateEncryptionKey = this.signingService.
                     decryptGroupMessagingPrivateKeyToMember(
-                      defaultPrivateEncryptionKey,
+                      groupPrivateEncryptionKey,
                       Buffer.from(myMessagingGroupMemberEntry.EncryptedKey, 'hex')
                     ).getPrivate().toBuffer(undefined, 32);
                   }

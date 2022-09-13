@@ -326,7 +326,9 @@ export class IdentityService {
         seedHex,
         encryptedMessages,
         data.payload.messagingGroups || [],
-      ).then((res) => this.respond(id, { decryptedHexes: res }));
+      ).then((res) => this.respond(id, { decryptedHexes: res }), (err) => {
+        this.respond(id, { decryptedHexes: {}, error: err });
+      });
     }
   }
 
