@@ -131,7 +131,7 @@ export type CoinLimitOperationString =
   | CreatorCoinLimitOperationString;
 
 export type CoinOperationLimitMap<T extends CoinLimitOperationString> = {
-  [public_key: string]: OperationToCountMap<T>;
+  [publicKey: string]: OperationToCountMap<T>;
 };
 
 export type OperationToCountMap<T extends LimitOperationString> = {
@@ -147,7 +147,7 @@ export type CreatorCoinOperationLimitMap =
 export type DAOCoinOperationLimitMap =
   CoinOperationLimitMap<DAOCoinLimitOperationString>;
 export type DAOCoinLimitOrderLimitMap = {
-  [buying_public_key: string]: { [selling_public_key: string]: number };
+  [buyingPublicKey: string]: { [sellingPublicKey: string]: number };
 };
 export type DAOCoinLimitOrderLimitItem = {
   BuyingPublicKey: string;
@@ -165,8 +165,8 @@ export enum NFTLimitOperationString {
   ACCEPT_TRANSFER = 'accept_nft_transfer',
 }
 export type NFTOperationLimitMap = {
-  [post_hash_hex: string]: {
-    [serial_number: number]: OperationToCountMap<NFTLimitOperationString>;
+  [postHashHex: string]: {
+    [serialNumber: number]: OperationToCountMap<NFTLimitOperationString>;
   };
 };
 
@@ -417,10 +417,10 @@ export class BackendAPIService {
   }
 
   GetTransactionSpendingLimitHexString(
-    TransactionSpendingLimitResponse: TransactionSpendingLimitResponse
+    transactionSpendingLimitResponse: TransactionSpendingLimitResponse
   ): Observable<string> {
     return this.post('get-transaction-spending-limit-hex-string', {
-      TransactionSpendingLimit: TransactionSpendingLimitResponse,
+      TransactionSpendingLimit: transactionSpendingLimitResponse,
     }).pipe(
       map((res) => {
         return res.HexString;
