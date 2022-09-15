@@ -535,10 +535,15 @@ export class AccountService {
     const privateUser = privateUsers[ownerPublicKeyBase58Check];
     const seedHex = privateUser.seedHex;
     // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
-    const messagingPrivateKeyBuff = await this.getMessagingKey(
-      privateUser,
-      messagingKeyName
-    );
+    let messagingPrivateKeyBuff;
+    try {
+      messagingPrivateKeyBuff = await this.getMessagingKey(
+        privateUser,
+        messagingKeyName
+      );
+    } catch (e) {
+      throw new Error(`Problem getting messaging key: ${e}`);
+    }
     const messagingPrivateKey = messagingPrivateKeyBuff.toString('hex');
     const ec = new EC('secp256k1');
 
@@ -618,6 +623,11 @@ export class AccountService {
       } else {
         const randomnessString = this.getMetamaskMessagingKeyRandomnessHex();
         try {
+          await this.metamaskService.connectWallet();
+        } catch (e) {
+          throw new Error(`Can\'t connect to the Metamask API. Error: ${e}. Please try again.`);
+        }
+        try {
           const {
             message,
             signature,
@@ -634,7 +644,7 @@ export class AccountService {
           const properPublicKey = this.cryptoService.publicKeyToEthAddress(privateUserPkHex);
           assert(metamaskPublicKeyHex === privateUser.publicKeyHex, `Wrong account selected in MetaMask,
             requested account: ${properPublicKey}`);
-          userSecret = sha256.x2([...new Buffer(signature, 'hex')]);
+          userSecret = sha256.x2([...new Buffer(signature.slice(2), 'hex')]);
           this.addPrivateUser({
             ...privateUser,
             messagingKeyRandomness: userSecret,
