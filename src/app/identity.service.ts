@@ -98,8 +98,13 @@ export class IdentityService {
     return this.send('initialize', {});
   }
 
-  storageGranted(): void {
-    this.cast('storageGranted');
+  /**
+   * @param status whether or not the user confirmed access to storage.
+   */
+  storageGranted(status: boolean): void {
+    this.cast('storageGranted', {
+      status,
+    });
   }
 
   login(payload: {
