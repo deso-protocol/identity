@@ -168,7 +168,7 @@ export class SignUpMetamaskComponent implements OnInit {
       let errorMessage = (e as any)?.error?.error;
       if (
         ![
-          'MetamaskSignin:  Account already has a balance',
+          'MetamaskSignin: Account already has a balance',
           'MetamaskSignin: Account has already received airdrop',
         ].includes(errorMessage)
       ) {
