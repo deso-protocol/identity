@@ -7,8 +7,8 @@
   <div class="mb-20px">
     <span class="title-text">Log in to {{ globalVars.hostname }}</span>
     <div class="main-text">
-      Sign up with MetaMask, Google,<br />
-      or DeSo seed phrase!
+        Sign up with {{ globalVars.showMetamask() ? "MetaMask, Google," : "Google" }}<br />
+        or DeSo seed phrase!
     </div>
   </div>
   <app-account-select

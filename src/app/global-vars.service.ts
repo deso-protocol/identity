@@ -47,6 +47,7 @@ export class GlobalVarsService {
 
   nanosPerUSDExchangeRate = 0;
   nanosToDeSoMemo = {};
+  blockHeight = 0;
 
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
@@ -111,6 +112,10 @@ export class GlobalVarsService {
       minimumFractionDigits: decimal,
       maximumFractionDigits: decimal,
     });
+  }
+
+  showMetamask(): boolean {
+    return this.network === Network.testnet || this.blockHeight > 166066;
   }
 
   getFreeDESOMessage(): string {

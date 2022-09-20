@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { RouteNames } from '../app-routing.module';
 import { GlobalVarsService } from '../global-vars.service';
 import { GoogleDriveService } from '../google-drive.service';
+import { Network } from '../../types/identity';
 
 @Component({
   selector: 'app-log-in-options',
