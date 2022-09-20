@@ -132,7 +132,8 @@ export class DeriveComponent implements OnInit {
       pkAndSpendingLimits ||
       dkAndSpendingLimits ||
       pkDkAndSpendingLimits ||
-      deleteDerivedKey
+      deleteDerivedKey ||
+      params.transactionSpendingLimitResponse
     );
   }
 }
