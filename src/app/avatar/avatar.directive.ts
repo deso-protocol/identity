@@ -1,6 +1,7 @@
 import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
+import _ from 'lodash';
 
 @Directive({
   selector: '[appAvatar]',
@@ -18,26 +19,36 @@ export class AvatarDirective implements OnChanges {
     if (!this.appAvatar) {
       return;
     }
-    // cast the this object to a normal var since binding get out of wack in the arrow function
-    const appAvatar = this.appAvatar;
-    const element = this.el.nativeElement;
-    // calling fetch here to see if an page has a 404
-    fetch(this.backendApi.GetSingleProfilePictureURL(this.appAvatar)).then(
-      (res) => {
-        if (res.status === 200) {
-          element.style.backgroundImage = `url(${this.backendApi.GetSingleProfilePictureURL(
-            appAvatar
-          )})`;
-        } else {
-          element.style.backgroundImage = `url( assets/placeholder-account-image.png)`;
-        }
-      }
+
+    if (!this.appAvatar) {
+      this.setURLOnElement(
+        this.backendApi.GetDefaultProfilePictureURL(window.location.host)
+      );
+      return;
+    }
+    // The fallback route is the route to the pic we use if we can't find an avatar for the user.
+    const fallbackRoute = `fallback=${this.backendApi.GetDefaultProfilePictureURL(window.location.host)}`;
+
+    // Although it would be hard for an attacker to inject a malformed public key into the app,
+    // we do a basic _.escape anyways just to be extra safe.
+    const profPicURL = _.escape(
+      this.backendApi.GetSingleProfilePictureURL(
+        this.appAvatar,
+        fallbackRoute
+      )
     );
+
+    // Set the URL on the element.
+    this.setURLOnElement(profPicURL);
   }
 
   ngOnChanges(changes: any): void {
     if (changes.appAvatar && changes.appAvatar !== this.appAvatar) {
       this.setAvatar();
     }
+  }
+
+  setURLOnElement(profilePicURL: string) {
+    this.el.nativeElement.style.backgroundImage = `url(${profilePicURL})`;
   }
 }
