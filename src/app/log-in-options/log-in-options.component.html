@@ -3,6 +3,7 @@
     class="button button-large mb-20px bg-dark text-white"
     (click)="navigateToMetamaskSignup()"
     queryParamsHandling="merge"
+    *ngIf="globalVars.showMetamask()"
   >
     <img src="assets/metamask.png" height="32px" width="32px" class="mr-10px" />
 
