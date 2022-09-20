@@ -1,7 +1,7 @@
 # Global caddy config options must be first
 {
-  admin off
-  auto_https off
+	admin off
+	auto_https off
 }
 
 # Bind to port 82
@@ -12,13 +12,13 @@ file_server
 
 # Fallback to index.html for everything but assets
 @html {
-  not path *.js *.css *.png *.svg *.ttf *.woff2
+	not path *.js *.css *.png *.svg *.ttf *.woff2
 
-  file index.html
+	file index.html
 }
 
 handle_errors {
-  header Cache-Control no-store
+	header Cache-Control no-store
 }
 
 rewrite @html {http.matchers.file.relative}
