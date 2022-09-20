@@ -47,6 +47,7 @@ export class GlobalVarsService {
 
   nanosPerUSDExchangeRate = 0;
   nanosToDeSoMemo = {};
+  blockHeight = 0;
 
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);

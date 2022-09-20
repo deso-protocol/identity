@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { RouteNames } from '../app-routing.module';
 import { GlobalVarsService } from '../global-vars.service';
 import { GoogleDriveService } from '../google-drive.service';
+import { Network } from '../../types/identity';
 
 @Component({
   selector: 'app-log-in-options',
@@ -20,6 +21,13 @@ export class LogInOptionsComponent implements OnInit {
 
   launchGoogle(): void {
     this.googleDrive.launchGoogle();
+  }
+
+  showMetamask(): boolean {
+    if (this.globalVars.network === Network.testnet) {
+      return true;
+    }
+    return this.globalVars.blockHeight > 166066;
   }
 
   navigateToMetamaskSignup(): void {
