@@ -290,10 +290,14 @@ export class BackendAPIService {
     }
   }
 
-  GetSingleProfilePictureURL(PublicKeyBase58Check: string): string {
+  GetSingleProfilePictureURL(PublicKeyBase58Check: string, FallbackURL?: string): string {
     return `${this.getRoute(
       'get-single-profile-picture'
-    )}/${PublicKeyBase58Check}`;
+    )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
+  }
+
+  GetDefaultProfilePictureURL(defaultImgHost: string): string {
+    return defaultImgHost + '/assets/img/default_profile_pic.png';
   }
 
   JumioBegin(

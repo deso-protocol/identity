@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   hostname: 'http://localhost:4201',
-  nodeURL: 'https://node.deso.org',
+  nodeURL: 'https://test.deso.org',
   fullAccessHostnames: [
     'bitclout.com',
     'bitclout.green',
