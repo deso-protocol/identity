@@ -114,6 +114,10 @@ export class GlobalVarsService {
     });
   }
 
+  showMetamask(): boolean {
+    return this.network === Network.testnet || this.blockHeight > 166066;
+  }
+
   getFreeDESOMessage(): string {
     return this.formatUSD(
       (this.referralUSDCents ? this.referralUSDCents : this.jumioUSDCents) /

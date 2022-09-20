@@ -23,13 +23,6 @@ export class LogInOptionsComponent implements OnInit {
     this.googleDrive.launchGoogle();
   }
 
-  showMetamask(): boolean {
-    if (this.globalVars.network === Network.testnet) {
-      return true;
-    }
-    return this.globalVars.blockHeight > 166066;
-  }
-
   navigateToMetamaskSignup(): void {
     this.router.navigate(['/', RouteNames.SIGN_UP_METAMASK], {
       queryParamsHandling: 'merge',
