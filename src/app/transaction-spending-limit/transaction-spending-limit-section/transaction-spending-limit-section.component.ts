@@ -59,17 +59,17 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
           | OperationToCountMap<CreatorCoinLimitOperationString>
           | OperationToCountMap<DAOCoinLimitOperationString>
           | undefined;
-        delete this.sectionMap[''];
-        this.coinLimitMap = this.sectionMap as
+        this.coinLimitMap = {...this.sectionMap} as
           | CreatorCoinOperationLimitMap
           | DAOCoinOperationLimitMap;
+        delete this.coinLimitMap[''];
         break;
       case TransactionSpendingLimitComponent.NFTLimitsSection:
         this.anyNFTItem = this.sectionMap[''] as
           | OperationToCountMap<NFTLimitOperationString>
           | undefined;
-        delete this.sectionMap[''];
-        this.nftLimitMap = this.sectionMap as NFTOperationLimitMap;
+        this.nftLimitMap = {...this.sectionMap} as NFTOperationLimitMap;
+        delete this.nftLimitMap[''];
         break;
       case TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection:
         this.daoCoinLimitOrderLimitMap = this
