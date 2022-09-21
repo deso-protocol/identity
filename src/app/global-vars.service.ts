@@ -118,6 +118,10 @@ export class GlobalVarsService {
     return this.network === Network.testnet || this.blockHeight > 166066;
   }
 
+  isMobile(): boolean {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
   getFreeDESOMessage(): string {
     return this.formatUSD(
       (this.referralUSDCents ? this.referralUSDCents : this.jumioUSDCents) /

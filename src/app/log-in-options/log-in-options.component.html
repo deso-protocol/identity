@@ -1,9 +1,9 @@
 <div class="d-flex align-items-center flex-column">
   <button
-    class="button button-large mb-20px bg-dark text-white d-none d-sm-flex"
+    class="button button-large mb-20px bg-dark text-white"
     (click)="navigateToMetamaskSignup()"
     queryParamsHandling="merge"
-    *ngIf="globalVars.showMetamask()"
+    *ngIf="globalVars.showMetamask() && !globalVars.isMobile()"
   >
     <img src="assets/metamask.png" height="32px" width="32px" class="mr-10px" />
 
