@@ -3,7 +3,8 @@ import { ethers } from 'ethers';
 import {ec} from 'elliptic';
 import {GlobalVarsService} from './global-vars.service';
 import WalletConnect from '@walletconnect/client';
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
+import QRCodeModal from '@walletconnect/qrcode-modal';
+import { Network } from '../types/identity';
 
 @Injectable({
   providedIn: 'root',
@@ -159,11 +160,18 @@ export class WalletProvider {
     this.walletConnect = new WalletConnect(
       {
         bridge: 'https://bridge.walletconnect.org', // Required
+        qrcodeModal: QRCodeModal,
         qrcodeModalOptions: {
           mobileLinks: ['metamask'],
         }
       },
     );
+
+    if (!this.walletConnect.connected) {
+      this.walletConnect.createSession({
+        chainId: this.globalVars.network === Network.testnet ? 420 : 1
+      });
+    }
 
     // Subscribe to connection events
     this.walletConnect.on('connect', (error: any, payload: any) => {
@@ -172,7 +180,7 @@ export class WalletProvider {
       }
 
       // Close QR Code Modal
-      WalletConnectQRCodeModal.close();
+      QRCodeModal.close();
 
       // Get provided accounts and chainId
       const { accounts, chainId } = payload.params[0];
@@ -243,7 +251,7 @@ export class WalletProvider {
         // get uri for QR Code modal
         const uri = (this.walletConnect as WalletConnect).uri;
         // display QR Code modal
-        WalletConnectQRCodeModal.open(
+        QRCodeModal.open(
           uri,
           () => {},
         );
