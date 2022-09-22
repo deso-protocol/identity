@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
 import {ec} from 'elliptic';
 import {GlobalVarsService} from './global-vars.service';
-import NodeWalletConnect from '@walletconnect/node';
+import WalletConnect from '@walletconnect/client';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 
 @Injectable({
@@ -136,7 +136,7 @@ export class MetamaskService {
 }
 
 export class WalletProvider {
-  walletConnect: NodeWalletConnect | null = null;
+  walletConnect: WalletConnect | null = null;
   walletConnectAddress: string | null = null;
 
   constructor(
@@ -156,18 +156,13 @@ export class WalletProvider {
       return;
     }
 
-    this.walletConnect = new NodeWalletConnect(
+    this.walletConnect = new WalletConnect(
       {
         bridge: 'https://bridge.walletconnect.org', // Required
+        qrcodeModalOptions: {
+          mobileLinks: ['metamask'],
+        }
       },
-      {
-        clientMeta: {
-          description: 'WalletConnect NodeJS Client',
-          url: 'https://nodejs.org/en/',
-          icons: ['https://nodejs.org/static/images/logo.svg'],
-          name: 'WalletConnect',
-        },
-      }
     );
 
     // Subscribe to connection events
@@ -242,19 +237,19 @@ export class WalletProvider {
     if (this.globalVars.isMobile()) {
       // Create a connector
       this._setupWalletConnect();
-      if (!(this.walletConnect as NodeWalletConnect).connected) {
+      if (!(this.walletConnect as WalletConnect).connected) {
         // create new session
-        await (this.walletConnect as NodeWalletConnect).createSession();
+        await (this.walletConnect as WalletConnect).createSession();
         // get uri for QR Code modal
-        const uri = (this.walletConnect as NodeWalletConnect).uri;
+        const uri = (this.walletConnect as WalletConnect).uri;
         // display QR Code modal
         WalletConnectQRCodeModal.open(
           uri,
           () => {},
         );
       } else {
-        if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
-          this.walletConnectAddress = (this.walletConnect as NodeWalletConnect).accounts[0];
+        if ((this.walletConnect as WalletConnect).accounts.length > 0) {
+          this.walletConnectAddress = (this.walletConnect as WalletConnect).accounts[0];
         }
       }
     } else {
@@ -302,7 +297,7 @@ export class WalletProvider {
       ];
 
       // Sign message
-      return (this.walletConnect as NodeWalletConnect)
+      return (this.walletConnect as WalletConnect)
         .signPersonalMessage(msgParams);
     } else {
       return this._getEthersProvider().getSigner().signMessage(message);
