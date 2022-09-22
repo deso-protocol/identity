@@ -1,12 +1,30 @@
 import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
-import {ec} from 'elliptic';
-
+import { ec } from 'elliptic';
+import { WindowPostMessageStream } from '@metamask/post-message-stream';
+import { initializeProvider } from '@metamask/providers';
 @Injectable({
   providedIn: 'root',
 })
 export class MetamaskService {
-  constructor() {}
+  constructor() {
+    if ((window as any).ethereum || (window as any).web3) {
+      return;
+    }
+    if (navigator.userAgent.includes('Firefox')) {
+      // setup background connection
+      const metamaskStream = new WindowPostMessageStream({
+        name: 'metamask-inpage',
+        target: 'metamask-contentscript',
+      }) as any;
+
+      // this will initialize the provider and set it as window.ethereum
+      initializeProvider({
+        connectionStream: metamaskStream,
+        shouldShimWeb3: true,
+      });
+    }
+  }
   public async connectWallet(): Promise<void> {
     const accounts = await this.getProvider().listAccounts();
     if (accounts.length === 0) {
