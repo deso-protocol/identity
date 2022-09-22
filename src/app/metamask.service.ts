@@ -51,20 +51,20 @@ export class MetamaskService {
       publicEthAddress: string;
     }>((resolve, reject) => {
 
-    this.walletProvider
-      .signMessage(message)
-      .then(async (signature) => {
-        try {
-          const publicEthAddress =
-            await this.verifySignatureAndRecoverAddress(message, signature);
-          resolve({message, signature, publicEthAddress});
-        } catch (e) {
-          reject(`signature error: ${e}`);
-        }
-      })
-      .catch((err) => {
-        reject(err);
-      });
+      this.walletProvider
+        .signMessage(message)
+        .then(async (signature) => {
+          try {
+            const publicEthAddress =
+              await this.verifySignatureAndRecoverAddress(message, signature);
+            resolve({message, signature, publicEthAddress});
+          } catch (e) {
+            reject(`signature error: ${e}`);
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
     });
   }
 
@@ -143,14 +143,19 @@ export class WalletProvider {
     private globalVars: GlobalVarsService,
   ) {}
 
+  private _isInitialized(): boolean {
+    return this.walletConnect !== null;
+  }
+
   private _getEthersProvider(): ethers.providers.Web3Provider {
     return new ethers.providers.Web3Provider((window as any).ethereum);
   }
 
   private _setupWalletConnect(): void {
-    if (this.walletConnect !== null) {
+    if (this._isInitialized()) {
       return;
     }
+
     this.walletConnect = new NodeWalletConnect(
       {
         bridge: 'https://bridge.walletconnect.org', // Required
@@ -180,7 +185,6 @@ export class WalletProvider {
       if (accounts.length > 0) {
         this.walletConnectAddress = accounts[0];
       }
-      console.log('connect, accounts:', accounts, 'chainId:', chainId);
     });
 
     this.walletConnect.on('session_update', (error: any, payload: any) => {
@@ -191,7 +195,9 @@ export class WalletProvider {
 
       // Get updated accounts and chainId
       const { accounts, chainId } = payload.params[0];
-      console.log('session_update, accounts:', accounts, 'chainId:', chainId);
+      if (accounts.length > 0) {
+        this.walletConnectAddress = accounts[0];
+      }
     });
 
     this.walletConnect.on('disconnect', (error: any, payload: any) => {
@@ -201,7 +207,8 @@ export class WalletProvider {
       }
 
       // Delete walletConnector
-      console.log('disconnect, payload:', payload);
+      this.walletConnect = null;
+      this.walletConnectAddress = null;
     });
   }
 
@@ -209,20 +216,7 @@ export class WalletProvider {
     if (this.globalVars.isMobile()) {
       // Create a connector
       this._setupWalletConnect();
-      if (!(this.walletConnect as NodeWalletConnect).connected) {
-        // create new session
-        (this.walletConnect as NodeWalletConnect).createSession().then(() => {
-          // get uri for QR Code modal
-          const uri = (this.walletConnect as NodeWalletConnect).uri;
-          // display QR Code modal
-          WalletConnectQRCodeModal.open(
-            uri,
-            () => {
-              console.log('QR Code Modal closed');
-            },
-          );
-        });
-      }
+      await this.connectMetamaskMiddleware();
     } else {
       const accounts = await this.listAccounts();
       if (accounts.length === 0) {
@@ -249,22 +243,40 @@ export class WalletProvider {
 
   async connectMetamaskMiddleware(): Promise<boolean> {
     if (this.globalVars.isMobile()) {
-      return true;
-    }
-
-    const accounts = await this.listAccounts();
-    if (accounts.length === 0) {
-      await this
-        .send('eth_requestAccounts', [])
-        .then()
-        .catch((err) => {
-          // EIP-1193 userRejectedRequest error.
-          if (err.code === 4001) {
-            throw new Error('user rejected the eth_requestAccounts request');
-          } else {
-            throw new Error(`error while sending eth_requestAccounts: ${err}`);
-          }
-        });
+      // Create a connector
+      this._setupWalletConnect();
+      if (!(this.walletConnect as NodeWalletConnect).connected) {
+        // create new session
+        await (this.walletConnect as NodeWalletConnect).createSession();
+        // get uri for QR Code modal
+        const uri = (this.walletConnect as NodeWalletConnect).uri;
+        // display QR Code modal
+        WalletConnectQRCodeModal.open(
+          uri,
+          () => {
+            console.log('QR Code Modal closed');
+          },
+        );
+      } else {
+        if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
+          this.walletConnectAddress = (this.walletConnect as NodeWalletConnect).accounts[0];
+        }
+      }
+    } else {
+      const accounts = await this.listAccounts();
+      if (accounts.length === 0) {
+        await this
+          .send('eth_requestAccounts', [])
+          .then()
+          .catch((err) => {
+            // EIP-1193 userRejectedRequest error.
+            if (err.code === 4001) {
+              throw new Error('user rejected the eth_requestAccounts request');
+            } else {
+              throw new Error(`error while sending eth_requestAccounts: ${err}`);
+            }
+          });
+      }
     }
     return true;
   }
