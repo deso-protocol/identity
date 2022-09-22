@@ -82,6 +82,7 @@ header @html Content-Security-Policy "
     https://api.blockcypher.com/v1/btc/main/addrs/full
     https://api.sendwyre.com/v3/widget/supportedCountries
     https://api.testwyre.com/v3/widget/supportedCountries
+    wss://n.bridge.walletconnect.org
     https://bridge.walletconnect.org;
   img-src 'self'
       {$DOMAIN:https://node.deso.org}/api/v0/get-single-profile-picture/
