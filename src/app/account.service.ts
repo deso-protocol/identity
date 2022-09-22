@@ -581,7 +581,7 @@ export class AccountService {
   }
 
   getMetamaskMessagingKeyRandomnessHex(): string {
-    const randomnessString = `Don't mind me, I'm just some randomness needed to create a DeSo messaging group.`;
+    const randomnessString = `Please click sign in order to generate your messaging key.`;
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
   getOwnerPublicKeyBase58CheckForSeed(seedHex: string): string {
