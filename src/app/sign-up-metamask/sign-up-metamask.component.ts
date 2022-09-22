@@ -57,9 +57,6 @@ export class SignUpMetamaskComponent implements OnInit {
     private router: Router
   ) {}
   async ngOnInit(): Promise<void> {
-    if (this.globalVars.isMobile()){
-      this.metamaskService.connectWallet();
-    }
     // grab the currently connected wallet if there is one
     this.existingConnectedWallet =
       await this.metamaskService.getUserEthAddress();

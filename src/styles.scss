@@ -1404,3 +1404,7 @@ bs-dropdown-container {
 .txt-center {
   text-align: center;
 }
+
+.walletconnect-qrcode__image, .walletconnect-qrcode__text, .walletconnect-modal__footer {
+  display: none !important;
+}

@@ -156,22 +156,11 @@ export class WalletProvider {
     if (this._isInitialized()) {
       return;
     }
-
     this.walletConnect = new WalletConnect(
       {
         bridge: 'https://bridge.walletconnect.org', // Required
-        qrcodeModal: QRCodeModal,
-        qrcodeModalOptions: {
-          mobileLinks: ['metamask'],
-        }
       },
     );
-
-    if (!this.walletConnect.connected) {
-      this.walletConnect.createSession({
-        chainId: this.globalVars.network === Network.testnet ? 420 : 1
-      });
-    }
 
     // Subscribe to connection events
     this.walletConnect.on('connect', (error: any, payload: any) => {
@@ -247,13 +236,18 @@ export class WalletProvider {
       this._setupWalletConnect();
       if (!(this.walletConnect as WalletConnect).connected) {
         // create new session
-        await (this.walletConnect as WalletConnect).createSession();
+        await (this.walletConnect as WalletConnect).createSession({
+          chainId: this.globalVars.network === Network.testnet ? 420 : 1
+        });
         // get uri for QR Code modal
         const uri = (this.walletConnect as WalletConnect).uri;
         // display QR Code modal
         QRCodeModal.open(
           uri,
           () => {},
+          {
+            mobileLinks: ['metamask'],
+          }
         );
       } else {
         if ((this.walletConnect as WalletConnect).accounts.length > 0) {
