@@ -1,21 +1,37 @@
 import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
-import {ec} from 'elliptic';
-import {GlobalVarsService} from './global-vars.service';
+import { GlobalVarsService } from './global-vars.service';
 import NodeWalletConnect from '@walletconnect/node';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
+import { ec } from 'elliptic';
+import { WindowPostMessageStream } from '@metamask/post-message-stream';
+import { initializeProvider } from '@metamask/providers';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MetamaskService {
   walletProvider: WalletProvider;
-
-  constructor(
-    private globalVars: GlobalVarsService,
-  ) {
+  constructor(private globalVars: GlobalVarsService) {
     this.walletProvider = new WalletProvider(globalVars);
+    if ((window as any).ethereum || (window as any).web3) {
+      return;
+    }
+    if (navigator.userAgent.includes('Firefox')) {
+      // setup background connection
+      const metamaskStream = new WindowPostMessageStream({
+        name: 'metamask-inpage',
+        target: 'metamask-contentscript',
+      }) as any;
+
+      // this will initialize the provider and set it as window.ethereum
+      initializeProvider({
+        connectionStream: metamaskStream,
+        shouldShimWeb3: true,
+      });
+    }
   }
+
   public connectWallet(): Promise<void> {
     return this.walletProvider.connectWallet();
   }
@@ -251,6 +267,9 @@ export class WalletProvider {
         WalletConnectQRCodeModal.open(
           uri,
           () => {},
+          {
+            mobileLinks: ['metamask'],
+          }
         );
       } else {
         if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {

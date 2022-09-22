@@ -58,7 +58,7 @@ export class SignUpMetamaskComponent implements OnInit {
   ) {}
   async ngOnInit(): Promise<void> {
     if (this.globalVars.isMobile()){
-      this.metamaskService.connectWallet();
+      await this.metamaskService.connectWallet();
     }
     // grab the currently connected wallet if there is one
     this.existingConnectedWallet =
