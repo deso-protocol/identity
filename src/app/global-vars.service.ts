@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AccessLevel, Network } from '../types/identity';
 import { environment } from '../environments/environment';
+import NodeWalletConnect from "@walletconnect/node";
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +36,7 @@ export class GlobalVarsService {
   // Derived key callback URL href / debug info
   callback = '';
   callbackInvalid = false;
+  connector: NodeWalletConnect | null = null;
 
   jumioUSDCents = 0;
   referralUSDCents = 0;
