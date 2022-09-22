@@ -251,6 +251,9 @@ export class WalletProvider {
         WalletConnectQRCodeModal.open(
           uri,
           () => {},
+          {
+            mobileLinks: ['metamask'],
+          }
         );
       } else {
         if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
