@@ -172,7 +172,6 @@ export class WalletProvider {
 
     // Subscribe to connection events
     this.walletConnect.on('connect', (error: any, payload: any) => {
-      console.log('connect', payload);
       if (error) {
         throw error;
       }
@@ -188,7 +187,6 @@ export class WalletProvider {
     });
 
     this.walletConnect.on('session_update', (error: any, payload: any) => {
-      console.log('session_update');
       if (error) {
         throw error;
       }
@@ -201,7 +199,6 @@ export class WalletProvider {
     });
 
     this.walletConnect.on('disconnect', (error: any, payload: any) => {
-      console.log('disconnect');
       if (error) {
         throw error;
       }
@@ -253,9 +250,7 @@ export class WalletProvider {
         // display QR Code modal
         WalletConnectQRCodeModal.open(
           uri,
-          () => {
-            console.log('QR Code Modal closed');
-          },
+          () => {},
         );
       } else {
         if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
