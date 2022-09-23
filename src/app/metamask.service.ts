@@ -117,6 +117,9 @@ export class MetamaskService {
    * @param addressToDisplay address in template to update when the signer changes
    */
   public onSignerChange(callback: (updatedAccount: string) => void): void {
+    if (this.globalVars.isMobile()) {
+      return;
+    }
     (window as any).ethereum.on(
       'accountsChanged',
       function (accounts: string[]) {
