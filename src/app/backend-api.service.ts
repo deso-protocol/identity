@@ -430,7 +430,7 @@ export class BackendAPIService {
         return res.HexString;
       }),
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -453,7 +453,7 @@ export class BackendAPIService {
         };
       }),
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -470,7 +470,7 @@ export class BackendAPIService {
   ): Observable<any> {
     return this.post('send-starter-deso-for-metamask-account', request).pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -503,7 +503,7 @@ export class BackendAPIService {
       .get<any>('https://api.blockchain.com/mempool/fees')
       .pipe(
         catchError((err) => {
-          console.error(err);
+          console.error(JSON.stringify(err));
           return throwError(err);
         })
       );
@@ -526,7 +526,7 @@ export class BackendAPIService {
             return res;
           }),
           catchError((err) => {
-            console.error(err);
+            console.error(JSON.stringify(err));
             return throwError(err);
           })
         )
@@ -554,7 +554,7 @@ export class BackendAPIService {
                   resolve(res);
                 },
                 (err) => {
-                  console.error(err);
+                  console.error(JSON.stringify(err));
                   resolve(tx);
                 }
               );
@@ -563,7 +563,7 @@ export class BackendAPIService {
             }
           },
           (err) => {
-            console.error(err);
+            console.error(JSON.stringify(err));
             resolve(err);
           }
         );
@@ -603,7 +603,7 @@ export class BackendAPIService {
         return Promise.all(txnPromises).then((xxx) => res);
       }),
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -636,7 +636,7 @@ export class BackendAPIService {
 
     return req.pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -657,7 +657,7 @@ export class BackendAPIService {
 
     return req.pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -671,7 +671,7 @@ export class BackendAPIService {
 
     return req.pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -694,7 +694,7 @@ export class BackendAPIService {
 
     return req.pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -713,7 +713,7 @@ export class BackendAPIService {
 
     return req.pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -744,7 +744,7 @@ export class BackendAPIService {
 
     return req.pipe(
       catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
@@ -761,7 +761,7 @@ export class BackendAPIService {
 
     return req.pipe(
     catchError((err) => {
-        console.error(err);
+        console.error(JSON.stringify(err));
         return throwError(err);
       })
     );
