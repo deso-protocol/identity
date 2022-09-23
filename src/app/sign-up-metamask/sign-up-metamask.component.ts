@@ -57,9 +57,12 @@ export class SignUpMetamaskComponent implements OnInit {
     private router: Router
   ) {}
   async ngOnInit(): Promise<void> {
+    if (this.globalVars.isMobile()){
+      await this.metamaskService.connectWallet();
+    }
     // grab the currently connected wallet if there is one
     this.existingConnectedWallet =
-      await this.metamaskService.getSignerAddress();
+      await this.metamaskService.getUserEthAddress();
     // if they change wallets then update the display
     this.metamaskService.onSignerChange((updatedAccount: string) => {
       this.existingConnectedWallet = updatedAccount;
@@ -125,7 +128,7 @@ export class SignUpMetamaskComponent implements OnInit {
       signature = resp.signature;
     } catch (e) {
       this.errorMessage =
-        'Something went wrong while producing Metamask signature. Please try again.';
+        `Something went wrong while producing Metamask signature. Please try again. Error: ${e}`;
       this.metamaskState = METAMASK.ERROR;
       return;
     }
