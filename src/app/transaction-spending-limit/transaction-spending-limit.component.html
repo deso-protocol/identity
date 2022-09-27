@@ -4,22 +4,28 @@
       <div class="text-left">Cumulative Spending Limit</div>
       <div>
         {{
-        globalVars.nanosToDeSo(
-        transactionSpendingLimitResponse.GlobalDESOLimit || 0,
-        4
-        )
+          globalVars.nanosToDeSo(
+            transactionSpendingLimitResponse.GlobalDESOLimit || 0,
+            4
+          )
         }}
         DESO
       </div>
     </div>
     <app-transaction-spending-limit-section
       [sectionMap]="transactionSpendingLimitResponse.TransactionCountLimitMap"
-      [sectionTitle]="TransactionSpendingLimitComponent.TransactionLimitsSection"
+      [sectionTitle]="
+        TransactionSpendingLimitComponent.TransactionLimitsSection
+      "
       *ngIf="transactionSpendingLimitResponse.TransactionCountLimitMap"
     ></app-transaction-spending-limit-section>
     <app-transaction-spending-limit-section
-      [sectionMap]="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
-      [sectionTitle]="TransactionSpendingLimitComponent.CreatorCoinLimitsSection"
+      [sectionMap]="
+        transactionSpendingLimitResponse.CreatorCoinOperationLimitMap
+      "
+      [sectionTitle]="
+        TransactionSpendingLimitComponent.CreatorCoinLimitsSection
+      "
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
     ></app-transaction-spending-limit-section>
@@ -38,8 +44,8 @@
     <app-transaction-spending-limit-section
       [sectionMap]="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
       [sectionTitle]="
-      TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
-    "
+        TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
+      "
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
     >

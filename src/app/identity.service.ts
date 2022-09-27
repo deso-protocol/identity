@@ -56,7 +56,7 @@ export type MessagingGroupPayload = {
 export type MessagingGroup = {
   EncryptedKey: string;
   ExtraData: null | { [k: string]: string };
-  GroupOwnerPublicKeyBase58Check: string,
+  GroupOwnerPublicKeyBase58Check: string;
   MessagingGroupKeyName: string;
   MessagingGroupMembers: MessagingGroupMember[];
   MessagingPublicKeyBase58Check: string;
@@ -145,8 +145,11 @@ export class IdentityService {
         .then((derivedPrivateUserInfo) => {
           if (this.globalVars.callback) {
             // If callback is passed, we redirect to it with payload as URL parameters.
-            const httpParams = this.parseTypeToHttpParams(derivedPrivateUserInfo);
-            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+            const httpParams = this.parseTypeToHttpParams(
+              derivedPrivateUserInfo
+            );
+            window.location.href =
+              this.globalVars.callback + `?${httpParams.toString()}`;
           } else {
             this.cast('derive', derivedPrivateUserInfo);
           }
@@ -161,7 +164,8 @@ export class IdentityService {
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       const httpParams = this.parseTypeToHttpParams(payload);
-      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+      window.location.href =
+        this.globalVars.callback + `?${httpParams.toString()}`;
     } else {
       this.cast('messagingGroup', payload);
     }
@@ -320,20 +324,27 @@ export class IdentityService {
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      this.respond(id, {decryptedHexes: this.accountService.decryptMessagesLegacy(
-        seedHex,
-        encryptedHexes
-      )});
+      this.respond(id, {
+        decryptedHexes: this.accountService.decryptMessagesLegacy(
+          seedHex,
+          encryptedHexes
+        ),
+      });
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      this.accountService.decryptMessages(
-        seedHex,
-        encryptedMessages,
-        data.payload.messagingGroups || [],
-      ).then((res) => this.respond(id, { decryptedHexes: res }), (err) => {
-        this.respond(id, { decryptedHexes: {}, error: err });
-      });
+      this.accountService
+        .decryptMessages(
+          seedHex,
+          encryptedMessages,
+          data.payload.messagingGroups || []
+        )
+        .then(
+          (res) => this.respond(id, { decryptedHexes: res }),
+          (err) => {
+            this.respond(id, { decryptedHexes: {}, error: err });
+          }
+        );
     }
   }
 
