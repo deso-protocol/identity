@@ -111,14 +111,28 @@ export class SigningService {
     return signedHashes;
   }
 
-  encryptGroupMessagingPrivateKeyToMember(memberMessagingPublicKeyBase58Check: string, privateKeyHex: string): string {
-    const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(memberMessagingPublicKeyBase58Check);
-    // @ts-ignore
-    const messagingPkBuffer = new Buffer(memberMessagingPkKeyPair.getPublic('arr'));
-    return ecies.encrypt(messagingPkBuffer, privateKeyHex, { legacy: false }).toString('hex');
+  encryptGroupMessagingPrivateKeyToMember(
+    memberMessagingPublicKeyBase58Check: string,
+    privateKeyHex: string
+  ): string {
+    const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(
+      memberMessagingPublicKeyBase58Check
+    );
+    const messagingPkBuffer = new Buffer(
+      // @ts-ignore
+      memberMessagingPkKeyPair.getPublic('arr')
+    );
+    return ecies
+      .encrypt(messagingPkBuffer, privateKeyHex, { legacy: false })
+      .toString('hex');
   }
-  decryptGroupMessagingPrivateKeyToMember(privateKeyBuffer: Buffer, encryptedPrivateKeyBuffer: Buffer): ec.KeyPair {
-    const memberMessagingPriv = ecies.decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, { legacy: false }).toString();
+  decryptGroupMessagingPrivateKeyToMember(
+    privateKeyBuffer: Buffer,
+    encryptedPrivateKeyBuffer: Buffer
+  ): ec.KeyPair {
+    const memberMessagingPriv = ecies
+      .decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, { legacy: false })
+      .toString();
     const EC = new ec('secp256k1');
     return EC.keyFromPrivate(memberMessagingPriv);
   }
