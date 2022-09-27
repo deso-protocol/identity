@@ -118,8 +118,8 @@ export class SigningService {
     const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(
       memberMessagingPublicKeyBase58Check
     );
-    // @ts-ignore
     const messagingPkBuffer = new Buffer(
+      // @ts-ignore
       memberMessagingPkKeyPair.getPublic('arr')
     );
     return ecies
