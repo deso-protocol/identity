@@ -249,7 +249,7 @@ export class SignUpMetamaskComponent implements OnInit {
           derivedPublicKeyBase58Check
         );
 
-        this.accountService.setMetamaskCookie(keychain);
+        this.accountService.setMetamaskCookie(this.publicKey);
         this.metamaskState = this.METAMASK.START;
         this.login();
       })

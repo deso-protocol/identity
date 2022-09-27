@@ -1007,21 +1007,24 @@ export class AccountService {
   }
 
   public hasMetamaskCookie(encryptedSeedHex: string): boolean {
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const publicKey = this.cryptoService.publicKeyHexToDeSoPublicKey(
+      seedHex,
+      this.globalVars.network
+    );
     return (
       this.cookieService.get(
-        `${AccountService.metamaskEncryptedSeedHexes}${encryptedSeedHex}`
+        `${AccountService.metamaskEncryptedSeedHexes}${publicKey}`
       ) === 'true'
     );
   }
-
-  public setMetamaskCookie(keychain: HDNode) {
-    const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const encryptedSeedHex = this.cryptoService.encryptSeedHex(
-      seedHex,
-      this.globalVars.hostname
-    );
+  // upon metamask account generation store a cookie indicating it came from metamask
+  public setMetamaskCookie(publicKey: string) {
     this.cookieService.put(
-      `${AccountService.metamaskEncryptedSeedHexes}${encryptedSeedHex}`,
+      `${AccountService.metamaskEncryptedSeedHexes}${publicKey}`,
       'true'
     );
   }
