@@ -909,17 +909,30 @@ export class AccountService {
   }
 
   private getPrivateUsersRaw(): { [key: string]: PrivateUserInfo } {
-    return JSON.parse(
-      localStorage.getItem(AccountService.usersStorageKey) || '{}'
-    );
+    if (this.cryptoService.mustUseStorageAccess()) {
+      return JSON.parse(
+        this.cookieService.get(AccountService.usersStorageKey) || '{}'
+      );
+    } else {
+      return JSON.parse(
+        localStorage.getItem(AccountService.usersStorageKey) || '{}'
+      );
+    }
   }
 
   private setPrivateUsersRaw(privateUsers: {
     [key: string]: PrivateUserInfo;
   }): void {
-    localStorage.setItem(
-      AccountService.usersStorageKey,
-      JSON.stringify(privateUsers)
-    );
+    if (this.cryptoService.mustUseStorageAccess()) {
+      this.cookieService.put(
+        AccountService.usersStorageKey,
+        JSON.stringify(privateUsers)
+      );
+    } else {
+      localStorage.setItem(
+        AccountService.usersStorageKey,
+        JSON.stringify(privateUsers)
+      );
+    }
   }
 }
