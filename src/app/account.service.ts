@@ -10,7 +10,7 @@ import {
   Network,
   PrivateUserInfo,
   PrivateUserVersion,
-  PublicUserInfo
+  PublicUserInfo,
 } from '../types/identity';
 import { CookieService } from 'ngx-cookie';
 import HDKey from 'hdkey';
@@ -20,9 +20,16 @@ import sha256 from 'sha256';
 import { uint64ToBufBigEndian } from '../lib/bindata/util';
 import * as ecies from '../lib/ecies';
 import { ec as EC } from 'elliptic';
-import { BackendAPIService, GetAccessBytesResponse, TransactionSpendingLimitResponse } from './backend-api.service';
+import {
+  BackendAPIService,
+  GetAccessBytesResponse,
+  TransactionSpendingLimitResponse,
+} from './backend-api.service';
 import { MetamaskService } from './metamask.service';
-import { Transaction, TransactionMetadataAuthorizeDerivedKey } from '../lib/deso/transaction';
+import {
+  Transaction,
+  TransactionMetadataAuthorizeDerivedKey,
+} from '../lib/deso/transaction';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
@@ -134,7 +141,7 @@ export class AccountService {
     blockHeight: number,
     transactionSpendingLimit?: TransactionSpendingLimitResponse,
     derivedPublicKeyBase58CheckInput?: string,
-    expirationDays?: number,
+    expirationDays?: number
   ): Promise<DerivedPrivateUserInfo | undefined> {
     if (!(publicKeyBase58Check in this.getPrivateUsers())) {
       return undefined;
@@ -265,8 +272,15 @@ export class AccountService {
       ])[0];
     }
 
-    const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeyName, messagingKeySignature} =
-      await this.getMessagingGroupStandardDerivation(publicKeyBase58Check, this.globalVars.defaultMessageKeyName);
+    const {
+      messagingPublicKeyBase58Check,
+      messagingPrivateKeyHex,
+      messagingKeyName,
+      messagingKeySignature,
+    } = await this.getMessagingGroupStandardDerivation(
+      publicKeyBase58Check,
+      this.globalVars.defaultMessageKeyName
+    );
     const messagingPrivateKey = messagingPrivateKeyHex;
     return {
       derivedSeedHex,
@@ -293,8 +307,15 @@ export class AccountService {
     const network = privateUser.network;
     // create jwt with private key and app public key
     const keyEncoder = new KeyEncoder('secp256k1');
-    const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
-    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 minutes' });
+    const encodedPrivateKey = keyEncoder.encodePrivate(
+      privateUser.seedHex,
+      'raw',
+      'pem'
+    );
+    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, {
+      algorithm: 'ES256',
+      expiresIn: '30 minutes',
+    });
     return {
       publicKey,
       appPublicKey,
@@ -424,7 +445,7 @@ export class AccountService {
     ethDepositAddress: string,
     loginMethod: LoginMethod,
     publicKeyHex: string,
-    derivedPublicKeyBase58Check: string,
+    derivedPublicKeyBase58Check: string
   ): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     return this.addPrivateUser({
@@ -513,7 +534,10 @@ export class AccountService {
     this.setPrivateUsersRaw(privateUsers);
   }
 
-  getPrivateSharedSecret(ownerPublicKeyBase58Check: string, publicKey: string): string {
+  getPrivateSharedSecret(
+    ownerPublicKeyBase58Check: string,
+    publicKey: string
+  ): string {
     const privateUsers = this.getPrivateUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       return '';
@@ -527,7 +551,10 @@ export class AccountService {
     return sharedPrivateKey.toString('hex');
   }
 
-  async getMessagingGroupStandardDerivation(ownerPublicKeyBase58Check: string, messagingKeyName: string): Promise<DefaultKeyPrivateInfo> {
+  async getMessagingGroupStandardDerivation(
+    ownerPublicKeyBase58Check: string,
+    messagingKeyName: string
+  ): Promise<DefaultKeyPrivateInfo> {
     const privateUsers = this.getPrivateUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       throw new Error('User not found');
@@ -566,10 +593,9 @@ export class AccountService {
 
     let messagingKeySignature = '';
     if (messagingKeyName === this.globalVars.defaultMessageKeyName) {
-      messagingKeySignature = this.signingService.signHashes(
-        seedHex,
-        [messagingKeyHash]
-      )[0];
+      messagingKeySignature = this.signingService.signHashes(seedHex, [
+        messagingKeyHash,
+      ])[0];
     }
 
     return {
@@ -588,9 +614,15 @@ export class AccountService {
     const privateUsers = this.getPrivateUsers();
     for (const user of Object.values(privateUsers)) {
       if (user.seedHex === seedHex) {
-        return user.loginMethod === LoginMethod.METAMASK ? this.cryptoService.publicKeyHexToDeSoPublicKey(
-          user.publicKeyHex as string, this.globalVars.network) :
-          this.cryptoService.privateKeyToDeSoPublicKey(this.cryptoService.seedHexToPrivateKey(seedHex), this.globalVars.network);
+        return user.loginMethod === LoginMethod.METAMASK
+          ? this.cryptoService.publicKeyHexToDeSoPublicKey(
+              user.publicKeyHex as string,
+              this.globalVars.network
+            )
+          : this.cryptoService.privateKeyToDeSoPublicKey(
+              this.cryptoService.seedHexToPrivateKey(seedHex),
+              this.globalVars.network
+            );
       }
     }
     return '';
@@ -602,9 +634,14 @@ export class AccountService {
       if (user.seedHex === seedHex) {
         if (user.loginMethod === LoginMethod.METAMASK) {
           if (user.messagingKeyRandomness) {
-            return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+            return this.cryptoService.deriveMessagingKey(
+              user.messagingKeyRandomness,
+              keyName
+            );
           } else {
-            throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+            throw new Error(
+              'No messaging key randomness found, you need to first create a default key to use group messages.'
+            );
           }
         } else {
           return this.cryptoService.deriveMessagingKey(seedHex, keyName);
@@ -615,7 +652,10 @@ export class AccountService {
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
-  async getMessagingKey(privateUser: PrivateUserInfo, keyName: string): Promise<Buffer> {
+  async getMessagingKey(
+    privateUser: PrivateUserInfo,
+    keyName: string
+  ): Promise<Buffer> {
     let userSecret = privateUser.seedHex;
     if (privateUser.loginMethod === LoginMethod.METAMASK) {
       if (privateUser.messagingKeyRandomness) {
@@ -625,25 +665,40 @@ export class AccountService {
         try {
           await this.metamaskService.connectWallet();
         } catch (e) {
-          throw new Error(`Can\'t connect to the Metamask API. Error: ${e}. Please try again.`);
+          throw new Error(
+            `Can\'t connect to the Metamask API. Error: ${e}. Please try again.`
+          );
         }
         try {
-          const {
-            message,
-            signature,
-            publicEthAddress
-          } = await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(randomnessString);
-          assert(signature && publicEthAddress, 'Failed to get randomness with Metamask');
-          const metamaskKeyPair = this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(signature, message);
+          const { message, signature, publicEthAddress } =
+            await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
+              randomnessString
+            );
+          assert(
+            signature && publicEthAddress,
+            'Failed to get randomness with Metamask'
+          );
+          const metamaskKeyPair =
+            this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(
+              signature,
+              message
+            );
           const metamaskPublicKey = Buffer.from(
             metamaskKeyPair.getPublic().encode('array', true)
           );
           const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
           const ec = new EC('secp256k1');
-          const privateUserPkHex = ec.keyFromPublic(privateUser.publicKeyHex as string, 'hex');
-          const properPublicKey = this.cryptoService.publicKeyToEthAddress(privateUserPkHex);
-          assert(metamaskPublicKeyHex === privateUser.publicKeyHex, `Wrong account selected in MetaMask,
-            requested account: ${properPublicKey}`);
+          const privateUserPkHex = ec.keyFromPublic(
+            privateUser.publicKeyHex as string,
+            'hex'
+          );
+          const properPublicKey =
+            this.cryptoService.publicKeyToEthAddress(privateUserPkHex);
+          assert(
+            metamaskPublicKeyHex === privateUser.publicKeyHex,
+            `Wrong account selected in MetaMask,
+            requested account: ${properPublicKey}`
+          );
           userSecret = sha256.x2([...new Buffer(signature.slice(2), 'hex')]);
           this.addPrivateUser({
             ...privateUser,
@@ -666,13 +721,17 @@ export class AccountService {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
-    const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
+    const publicKeyBuffer =
+      this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
     try {
       // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
       // encrypting the message.
       let privateEncryptionKey = privateKeyBuffer;
       if (senderGroupKeyName) {
-        privateEncryptionKey = this.getMessagingKeyForSeed(seedHex, senderGroupKeyName);
+        privateEncryptionKey = this.getMessagingKeyForSeed(
+          seedHex,
+          senderGroupKeyName
+        );
       }
 
       // Encrypt the message using keys we determined above.
@@ -720,7 +779,7 @@ export class AccountService {
   async decryptMessages(
     seedHex: string,
     encryptedMessages: EncryptedMessage[],
-    messagingGroups: MessagingGroup[],
+    messagingGroups: MessagingGroup[]
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
@@ -798,25 +857,44 @@ export class AccountService {
               // 2. get our member entry in this group
               // 3. get encrypted key from member entry.
               // 4. decrypt this encrypted key with default key -> this is private encryption key
-              if (encryptedMessage.RecipientMessagingGroupKeyName !== 'default-key') {
+              if (
+                encryptedMessage.RecipientMessagingGroupKeyName !==
+                'default-key'
+              ) {
                 const messagingGroup = messagingGroups.filter((mg) => {
-                  return mg.MessagingGroupKeyName === encryptedMessage.RecipientMessagingGroupKeyName;
+                  return (
+                    mg.MessagingGroupKeyName ===
+                    encryptedMessage.RecipientMessagingGroupKeyName
+                  );
                 });
-                if (messagingGroup.length === 1 && messagingGroup[0].MessagingGroupMembers) {
-                  const myMessagingGroupMemberEntries = messagingGroup[0].MessagingGroupMembers.filter((mgm) => {
-                    return mgm.GroupMemberPublicKeyBase58Check === myPublicKey;
-                  });
+                if (
+                  messagingGroup.length === 1 &&
+                  messagingGroup[0].MessagingGroupMembers
+                ) {
+                  const myMessagingGroupMemberEntries =
+                    messagingGroup[0].MessagingGroupMembers.filter((mgm) => {
+                      return (
+                        mgm.GroupMemberPublicKeyBase58Check === myPublicKey
+                      );
+                    });
                   if (myMessagingGroupMemberEntries.length === 1) {
-                    const myMessagingGroupMemberEntry = myMessagingGroupMemberEntries[0];
-                    const groupPrivateEncryptionKey = await this.getMessagingKeyForSeed(
-                      seedHex,
-                      myMessagingGroupMemberEntry.GroupMemberKeyName,
-                    );
-                    privateEncryptionKey = this.signingService.
-                    decryptGroupMessagingPrivateKeyToMember(
-                      groupPrivateEncryptionKey,
-                      Buffer.from(myMessagingGroupMemberEntry.EncryptedKey, 'hex')
-                    ).getPrivate().toBuffer(undefined, 32);
+                    const myMessagingGroupMemberEntry =
+                      myMessagingGroupMemberEntries[0];
+                    const groupPrivateEncryptionKey =
+                      await this.getMessagingKeyForSeed(
+                        seedHex,
+                        myMessagingGroupMemberEntry.GroupMemberKeyName
+                      );
+                    privateEncryptionKey = this.signingService
+                      .decryptGroupMessagingPrivateKeyToMember(
+                        groupPrivateEncryptionKey,
+                        Buffer.from(
+                          myMessagingGroupMemberEntry.EncryptedKey,
+                          'hex'
+                        )
+                      )
+                      .getPrivate()
+                      .toBuffer(undefined, 32);
                   }
                 }
               }
@@ -909,17 +987,30 @@ export class AccountService {
   }
 
   private getPrivateUsersRaw(): { [key: string]: PrivateUserInfo } {
-    return JSON.parse(
-      localStorage.getItem(AccountService.usersStorageKey) || '{}'
-    );
+    if (this.cryptoService.mustUseStorageAccess()) {
+      return JSON.parse(
+        this.cookieService.get(AccountService.usersStorageKey) || '{}'
+      );
+    } else {
+      return JSON.parse(
+        localStorage.getItem(AccountService.usersStorageKey) || '{}'
+      );
+    }
   }
 
   private setPrivateUsersRaw(privateUsers: {
     [key: string]: PrivateUserInfo;
   }): void {
-    localStorage.setItem(
-      AccountService.usersStorageKey,
-      JSON.stringify(privateUsers)
-    );
+    if (this.cryptoService.mustUseStorageAccess()) {
+      this.cookieService.put(
+        AccountService.usersStorageKey,
+        JSON.stringify(privateUsers)
+      );
+    } else {
+      localStorage.setItem(
+        AccountService.usersStorageKey,
+        JSON.stringify(privateUsers)
+      );
+    }
   }
 }
