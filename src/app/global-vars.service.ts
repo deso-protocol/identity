@@ -117,7 +117,7 @@ export class GlobalVarsService {
   }
 
   showMetamask(): boolean {
-    return this.network === Network.testnet || this.blockHeight > 166066;
+    return (this.network === Network.testnet || this.blockHeight > 166066) && !this.isMobile();
   }
 
   isMobile(): boolean {
