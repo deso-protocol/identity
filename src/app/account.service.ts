@@ -952,8 +952,9 @@ export class AccountService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const publicKey = this.cryptoService.publicKeyHexToDeSoPublicKey(
-      seedHex,
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
       this.globalVars.network
     );
     return (
