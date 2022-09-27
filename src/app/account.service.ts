@@ -587,6 +587,7 @@ export class AccountService {
   }
 
   getMetamaskMessagingKeyRandomnessHex(): string {
+  // NOTE due to the cookie check in getMessagingKeyForSeed we should not change the randomness string 
     const randomnessString = `Please click sign in order to generate your messaging key.`;
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
@@ -604,13 +605,30 @@ export class AccountService {
 
   getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
     const privateUsers = this.getPrivateUsers();
+    const encryptedSeedHex = this.cryptoService.encryptSeedHex(
+      seedHex,
+      this.globalVars.hostname
+    );
+    // Check for the metamask cookie first
+    if (this.isMetamaskAndDerived(encryptedSeedHex)) {
+      return this.cryptoService.deriveMessagingKey(
+        // if it is a metamask cookie then we know the randomness
+        this.getMetamaskMessagingKeyRandomnessHex(),
+        keyName
+      );
+    }
     for (const user of Object.values(privateUsers)) {
       if (user.seedHex === seedHex) {
         if (user.loginMethod === LoginMethod.METAMASK) {
           if (user.messagingKeyRandomness) {
-            return this.cryptoService.deriveMessagingKey(user.messagingKeyRandomness, keyName);
+            return this.cryptoService.deriveMessagingKey(
+              user.messagingKeyRandomness,
+              keyName
+            );
           } else {
-            throw new Error('No messaging key randomness found, you need to first create a default key to use group messages.');
+            throw new Error(
+              'No messaging key randomness found, you need to first create a default key to use group messages.'
+            );
           }
         } else {
           return this.cryptoService.deriveMessagingKey(seedHex, keyName);
