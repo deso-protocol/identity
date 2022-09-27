@@ -8,9 +8,8 @@ describe('MessagingGroupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MessagingGroupComponent ]
-    })
-      .compileComponents();
+      declarations: [MessagingGroupComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

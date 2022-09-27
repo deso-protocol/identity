@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AccessLevel, Network } from '../types/identity';
 import { environment } from '../environments/environment';
-import NodeWalletConnect from "@walletconnect/node";
+import NodeWalletConnect from '@walletconnect/node';
 
 @Injectable({
   providedIn: 'root',
@@ -117,11 +117,16 @@ export class GlobalVarsService {
   }
 
   showMetamask(): boolean {
-    return (this.network === Network.testnet || this.blockHeight > 166066) && !this.isMobile();
+    return (
+      (this.network === Network.testnet || this.blockHeight > 166066) &&
+      !this.isMobile()
+    );
   }
 
   isMobile(): boolean {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
   }
 
   getFreeDESOMessage(): string {

@@ -290,7 +290,10 @@ export class BackendAPIService {
     }
   }
 
-  GetSingleProfilePictureURL(PublicKeyBase58Check: string, FallbackURL?: string): string {
+  GetSingleProfilePictureURL(
+    PublicKeyBase58Check: string,
+    FallbackURL?: string
+  ): string {
     return `${this.getRoute(
       'get-single-profile-picture'
     )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
@@ -752,7 +755,7 @@ export class BackendAPIService {
 
   GetBulkMessagingPublicKeys(
     GroupOwnerPublicKeysBase58Check: string[],
-    MessagingGroupKeyNames: string[],
+    MessagingGroupKeyNames: string[]
   ): Observable<any> {
     const req = this.post('get-bulk-messaging-public-keys', {
       GroupOwnerPublicKeysBase58Check,
@@ -760,7 +763,7 @@ export class BackendAPIService {
     });
 
     return req.pipe(
-    catchError((err) => {
+      catchError((err) => {
         console.error(JSON.stringify(err));
         return throwError(err);
       })

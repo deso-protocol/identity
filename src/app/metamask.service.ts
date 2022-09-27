@@ -66,14 +66,13 @@ export class MetamaskService {
       signature: string;
       publicEthAddress: string;
     }>((resolve, reject) => {
-
       this.walletProvider
         .signMessage(message)
         .then(async (signature) => {
           try {
             const publicEthAddress =
               await this.verifySignatureAndRecoverAddress(message, signature);
-            resolve({message, signature, publicEthAddress});
+            resolve({ message, signature, publicEthAddress });
           } catch (e) {
             reject(`signature error: ${e}`);
           }
@@ -158,9 +157,7 @@ export class WalletProvider {
   walletConnect: NodeWalletConnect | null = null;
   walletConnectAddress: string | null = null;
 
-  constructor(
-    private globalVars: GlobalVarsService,
-  ) {}
+  constructor(private globalVars: GlobalVarsService) {}
 
   private _isInitialized(): boolean {
     return this.walletConnect !== null;
@@ -238,21 +235,19 @@ export class WalletProvider {
       if (accounts.length === 0) {
         await this.connectMetamaskMiddleware();
       } else {
-        await this
-          .send('wallet_requestPermissions', [
-            {
-              eth_accounts: {},
-            },
-          ])
-          .catch((err) => {
-            if (err.code === 4001) {
-              throw new Error('user rejected the eth_requestPermissions');
-            } else {
-              throw new Error(
-                `error while sending eth_requestPermissions: ${err}`
-              );
-            }
-          });
+        await this.send('wallet_requestPermissions', [
+          {
+            eth_accounts: {},
+          },
+        ]).catch((err) => {
+          if (err.code === 4001) {
+            throw new Error('user rejected the eth_requestPermissions');
+          } else {
+            throw new Error(
+              `error while sending eth_requestPermissions: ${err}`
+            );
+          }
+        });
       }
     }
   }
@@ -267,30 +262,29 @@ export class WalletProvider {
         // get uri for QR Code modal
         const uri = (this.walletConnect as NodeWalletConnect).uri;
         // display QR Code modal
-        WalletConnectQRCodeModal.open(
-          uri,
-          () => {},
-          {
-            mobileLinks: ['metamask'],
-          }
-        );
+        WalletConnectQRCodeModal.open(uri, () => {}, {
+          mobileLinks: ['metamask'],
+        });
       } else {
         if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
-          this.walletConnectAddress = (this.walletConnect as NodeWalletConnect).accounts[0];
+          this.walletConnectAddress = (
+            this.walletConnect as NodeWalletConnect
+          ).accounts[0];
         }
       }
     } else {
       const accounts = await this.listAccounts();
       if (accounts.length === 0) {
-        await this
-          .send('eth_requestAccounts', [])
+        await this.send('eth_requestAccounts', [])
           .then()
           .catch((err) => {
             // EIP-1193 userRejectedRequest error.
             if (err.code === 4001) {
               throw new Error('user rejected the eth_requestAccounts request');
             } else {
-              throw new Error(`error while sending eth_requestAccounts: ${err}`);
+              throw new Error(
+                `error while sending eth_requestAccounts: ${err}`
+              );
             }
           });
       }
@@ -320,12 +314,13 @@ export class WalletProvider {
 
       const msgParams = [
         this.walletConnectAddress,
-        Buffer.from(message).toString('hex')
+        Buffer.from(message).toString('hex'),
       ];
 
       // Sign message
-      return (this.walletConnect as NodeWalletConnect)
-        .signPersonalMessage(msgParams);
+      return (this.walletConnect as NodeWalletConnect).signPersonalMessage(
+        msgParams
+      );
     } else {
       return this._getEthersProvider().getSigner().signMessage(message);
     }

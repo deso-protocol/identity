@@ -95,7 +95,7 @@ const routes: Routes = [
     path: RouteNames.MESSAGING_GROUP,
     component: MessagingGroupComponent,
     pathMatch: 'full',
-  }
+  },
 ];
 
 @NgModule({
