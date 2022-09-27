@@ -12,7 +12,7 @@ import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { SigningService } from '../signing.service';
 import { MetamaskService } from '../metamask.service';
-import {RouteNames} from '../app-routing.module';
+import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
 
 export const getSpendingLimitsForMetamask = () => {
@@ -54,10 +54,10 @@ export class SignUpMetamaskComponent implements OnInit {
     private backendApi: BackendAPIService,
     private signingService: SigningService,
     private metamaskService: MetamaskService,
-    private router: Router
+    private router: Router,
   ) {}
   async ngOnInit(): Promise<void> {
-    if (this.globalVars.isMobile()){
+    if (this.globalVars.isMobile()) {
       await this.metamaskService.connectWallet();
     }
     // grab the currently connected wallet if there is one
@@ -127,17 +127,17 @@ export class SignUpMetamaskComponent implements OnInit {
       message = resp.message;
       signature = resp.signature;
     } catch (e) {
-      this.errorMessage =
-        `Something went wrong while producing Metamask signature. Please try again. Error: ${e}`;
+      this.errorMessage = `Something went wrong while producing Metamask signature. Please try again. Error: ${e}`;
       this.metamaskState = METAMASK.ERROR;
       return;
     }
 
     // once we have the signature we can fetch the public key from it
-    const metamaskKeyPair = this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(
-      signature,
-      message
-    );
+    const metamaskKeyPair =
+      this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(
+        signature,
+        message
+      );
 
     const metamaskPublicKey = Buffer.from(
       metamaskKeyPair.getPublic().encode('array', true)
@@ -146,7 +146,7 @@ export class SignUpMetamaskComponent implements OnInit {
     const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
     const metamaskBtcAddress = this.cryptoService.publicKeyToBtcAddress(
       Buffer.from(derivedKeyPair.getPublic().encode('array', true)),
-      this.globalVars.network,
+      this.globalVars.network
     );
 
     const metamaskEthAddress =
@@ -175,9 +175,14 @@ export class SignUpMetamaskComponent implements OnInit {
           'MetamaskSignin: Account has already received airdrop',
         ].includes(errorMessage)
       ) {
-        if (errorMessage.match('MetamaskSignin: To be eligible for airdrop your account needs to have more than')){
+        if (
+          errorMessage.match(
+            'MetamaskSignin: To be eligible for airdrop your account needs to have more than'
+          )
+        ) {
           this.showAlternative = true;
-          this.errorMessage = 'Bummer! We send airdrops to cover the tiny account creation fees on DeSo, and you need at least ' +
+          this.errorMessage =
+            'Bummer! We send airdrops to cover the tiny account creation fees on DeSo, and you need at least ' +
             '0.001 ETH in your MetaMask wallet to be eligible. We do this to prevent bots.';
         } else {
           errorMessage =
@@ -241,8 +246,10 @@ export class SignUpMetamaskComponent implements OnInit {
           metamaskEthAddress,
           LoginMethod.METAMASK,
           metamaskPublicKeyHex,
-          derivedPublicKeyBase58Check,
+          derivedPublicKeyBase58Check
         );
+
+        this.accountService.setIsMetamaskAndDerived(derivedPublicKeyBase58Check);
         this.metamaskState = this.METAMASK.START;
         this.login();
       })

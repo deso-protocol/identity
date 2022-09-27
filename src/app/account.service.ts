@@ -33,8 +33,9 @@ import bs58check from 'bs58check';
   providedIn: 'root',
 })
 export class AccountService {
-  private static usersStorageKey = 'users';
-  private static levelsStorageKey = 'levels';
+  private static USERS_STORAGE_KEY:Readonly<string> = 'users';
+  private static LEVELS_STORAGE_KEY:Readonly<string> = 'levels';
+  private static METAMASK_IS_DERIVED:Readonly<string> = 'metamask_'
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -96,6 +97,11 @@ export class AccountService {
     return userInfo.loginMethod === LoginMethod.METAMASK;
   }
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
+    // if its a metamask account return true
+    if (this.isMetamaskAndDerived(encryptedSeedHex)) {
+      return true;
+    }
+
     const publicUsers = this.getEncryptedUsers();
 
     // Check if this user was signed in via a derived key.
@@ -114,7 +120,7 @@ export class AccountService {
     }
 
     const levels = JSON.parse(
-      localStorage.getItem(AccountService.levelsStorageKey) || '{}'
+      localStorage.getItem(AccountService.LEVELS_STORAGE_KEY) || '{}'
     );
     const hostMapping = levels[hostname] || {};
     const accessLevel = hostMapping[publicKey];
@@ -455,14 +461,14 @@ export class AccountService {
     accessLevel: AccessLevel
   ): void {
     const levels = JSON.parse(
-      localStorage.getItem(AccountService.levelsStorageKey) || '{}'
+      localStorage.getItem(AccountService.LEVELS_STORAGE_KEY) || '{}'
     );
 
     levels[hostname] ||= {};
     levels[hostname][publicKey] = accessLevel;
 
     localStorage.setItem(
-      AccountService.levelsStorageKey,
+      AccountService.LEVELS_STORAGE_KEY,
       JSON.stringify(levels)
     );
   }
@@ -910,7 +916,7 @@ export class AccountService {
 
   private getPrivateUsersRaw(): { [key: string]: PrivateUserInfo } {
     return JSON.parse(
-      localStorage.getItem(AccountService.usersStorageKey) || '{}'
+      localStorage.getItem(AccountService.USERS_STORAGE_KEY) || '{}'
     );
   }
 
@@ -918,8 +924,32 @@ export class AccountService {
     [key: string]: PrivateUserInfo;
   }): void {
     localStorage.setItem(
-      AccountService.usersStorageKey,
+      AccountService.USERS_STORAGE_KEY,
       JSON.stringify(privateUsers)
+    );
+  }
+
+  public isMetamaskAndDerived(encryptedSeedHex: string): boolean {
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    return (
+      this.cookieService.get(
+        `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
+      ) === 'true'
+    );
+  }
+  // upon metamask account generation store a cookie indicating it came from metamask
+  public setIsMetamaskAndDerived(publicKey: string) {
+    this.cookieService.put(
+      `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
+      'true'
     );
   }
 }
