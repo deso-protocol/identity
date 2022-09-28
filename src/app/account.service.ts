@@ -33,9 +33,9 @@ import bs58check from 'bs58check';
   providedIn: 'root',
 })
 export class AccountService {
-  private static USERS_STORAGE_KEY:Readonly<string> = 'users';
-  private static LEVELS_STORAGE_KEY:Readonly<string> = 'levels';
-  private static METAMASK_IS_DERIVED:Readonly<string> = 'metamask_'
+  private static USERS_STORAGE_KEY: Readonly<string> = 'users';
+  private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
+  private static METAMASK_IS_DERIVED: Readonly<string> = 'metamask_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -140,7 +140,7 @@ export class AccountService {
     blockHeight: number,
     transactionSpendingLimit?: TransactionSpendingLimitResponse,
     derivedPublicKeyBase58CheckInput?: string,
-    expirationDays?: number,
+    expirationDays?: number
   ): Promise<DerivedPrivateUserInfo | undefined> {
     if (!(publicKeyBase58Check in this.getPrivateUsers())) {
       return undefined;
@@ -271,8 +271,15 @@ export class AccountService {
       ])[0];
     }
 
-    const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeyName, messagingKeySignature} =
-      await this.getMessagingGroupStandardDerivation(publicKeyBase58Check, this.globalVars.defaultMessageKeyName);
+    const {
+      messagingPublicKeyBase58Check,
+      messagingPrivateKeyHex,
+      messagingKeyName,
+      messagingKeySignature,
+    } = await this.getMessagingGroupStandardDerivation(
+      publicKeyBase58Check,
+      this.globalVars.defaultMessageKeyName
+    );
     const messagingPrivateKey = messagingPrivateKeyHex;
     return {
       derivedSeedHex,
@@ -299,8 +306,15 @@ export class AccountService {
     const network = privateUser.network;
     // create jwt with private key and app public key
     const keyEncoder = new KeyEncoder('secp256k1');
-    const encodedPrivateKey = keyEncoder.encodePrivate(privateUser.seedHex, 'raw', 'pem');
-    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, { algorithm: 'ES256', expiresIn: '30 minutes' });
+    const encodedPrivateKey = keyEncoder.encodePrivate(
+      privateUser.seedHex,
+      'raw',
+      'pem'
+    );
+    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, {
+      algorithm: 'ES256',
+      expiresIn: '30 minutes',
+    });
     return {
       publicKey,
       appPublicKey,
@@ -430,7 +444,7 @@ export class AccountService {
     ethDepositAddress: string,
     loginMethod: LoginMethod,
     publicKeyHex: string,
-    derivedPublicKeyBase58Check: string,
+    derivedPublicKeyBase58Check: string
   ): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     return this.addPrivateUser({
@@ -519,7 +533,10 @@ export class AccountService {
     this.setPrivateUsersRaw(privateUsers);
   }
 
-  getPrivateSharedSecret(ownerPublicKeyBase58Check: string, publicKey: string): string {
+  getPrivateSharedSecret(
+    ownerPublicKeyBase58Check: string,
+    publicKey: string
+  ): string {
     const privateUsers = this.getPrivateUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       return '';
@@ -533,7 +550,10 @@ export class AccountService {
     return sharedPrivateKey.toString('hex');
   }
 
-  async getMessagingGroupStandardDerivation(ownerPublicKeyBase58Check: string, messagingKeyName: string): Promise<DefaultKeyPrivateInfo> {
+  async getMessagingGroupStandardDerivation(
+    ownerPublicKeyBase58Check: string,
+    messagingKeyName: string
+  ): Promise<DefaultKeyPrivateInfo> {
     const privateUsers = this.getPrivateUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       throw new Error('User not found');
@@ -572,10 +592,9 @@ export class AccountService {
 
     let messagingKeySignature = '';
     if (messagingKeyName === this.globalVars.defaultMessageKeyName) {
-      messagingKeySignature = this.signingService.signHashes(
-        seedHex,
-        [messagingKeyHash]
-      )[0];
+      messagingKeySignature = this.signingService.signHashes(seedHex, [
+        messagingKeyHash,
+      ])[0];
     }
 
     return {
@@ -587,7 +606,7 @@ export class AccountService {
   }
 
   getMetamaskMessagingKeyRandomnessHex(): string {
-  // NOTE due to the cookie check in getMessagingKeyForSeed we should not change the randomness string 
+    // NOTE due to the cookie check in getMessagingKeyForSeed we should not change the randomness string
     const randomnessString = `Please click sign in order to generate your messaging key.`;
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
@@ -595,9 +614,15 @@ export class AccountService {
     const privateUsers = this.getPrivateUsers();
     for (const user of Object.values(privateUsers)) {
       if (user.seedHex === seedHex) {
-        return user.loginMethod === LoginMethod.METAMASK ? this.cryptoService.publicKeyHexToDeSoPublicKey(
-          user.publicKeyHex as string, this.globalVars.network) :
-          this.cryptoService.privateKeyToDeSoPublicKey(this.cryptoService.seedHexToPrivateKey(seedHex), this.globalVars.network);
+        return user.loginMethod === LoginMethod.METAMASK
+          ? this.cryptoService.publicKeyHexToDeSoPublicKey(
+              user.publicKeyHex as string,
+              this.globalVars.network
+            )
+          : this.cryptoService.privateKeyToDeSoPublicKey(
+              this.cryptoService.seedHexToPrivateKey(seedHex),
+              this.globalVars.network
+            );
       }
     }
     return '';
@@ -639,7 +664,10 @@ export class AccountService {
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
-  async getMessagingKey(privateUser: PrivateUserInfo, keyName: string): Promise<Buffer> {
+  async getMessagingKey(
+    privateUser: PrivateUserInfo,
+    keyName: string
+  ): Promise<Buffer> {
     let userSecret = privateUser.seedHex;
     if (privateUser.loginMethod === LoginMethod.METAMASK) {
       if (privateUser.messagingKeyRandomness) {
@@ -649,25 +677,40 @@ export class AccountService {
         try {
           await this.metamaskService.connectWallet();
         } catch (e) {
-          throw new Error(`Can\'t connect to the Metamask API. Error: ${e}. Please try again.`);
+          throw new Error(
+            `Can\'t connect to the Metamask API. Error: ${e}. Please try again.`
+          );
         }
         try {
-          const {
-            message,
-            signature,
-            publicEthAddress
-          } = await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(randomnessString);
-          assert(signature && publicEthAddress, 'Failed to get randomness with Metamask');
-          const metamaskKeyPair = this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(signature, message);
+          const { message, signature, publicEthAddress } =
+            await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
+              randomnessString
+            );
+          assert(
+            signature && publicEthAddress,
+            'Failed to get randomness with Metamask'
+          );
+          const metamaskKeyPair =
+            this.metamaskService.getMetaMaskMasterPublicKeyFromSignature(
+              signature,
+              message
+            );
           const metamaskPublicKey = Buffer.from(
             metamaskKeyPair.getPublic().encode('array', true)
           );
           const metamaskPublicKeyHex = metamaskPublicKey.toString('hex');
           const ec = new EC('secp256k1');
-          const privateUserPkHex = ec.keyFromPublic(privateUser.publicKeyHex as string, 'hex');
-          const properPublicKey = this.cryptoService.publicKeyToEthAddress(privateUserPkHex);
-          assert(metamaskPublicKeyHex === privateUser.publicKeyHex, `Wrong account selected in MetaMask,
-            requested account: ${properPublicKey}`);
+          const privateUserPkHex = ec.keyFromPublic(
+            privateUser.publicKeyHex as string,
+            'hex'
+          );
+          const properPublicKey =
+            this.cryptoService.publicKeyToEthAddress(privateUserPkHex);
+          assert(
+            metamaskPublicKeyHex === privateUser.publicKeyHex,
+            `Wrong account selected in MetaMask,
+            requested account: ${properPublicKey}`
+          );
           userSecret = sha256.x2([...new Buffer(signature.slice(2), 'hex')]);
           this.addPrivateUser({
             ...privateUser,
@@ -690,13 +733,17 @@ export class AccountService {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
-    const publicKeyBuffer = this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
+    const publicKeyBuffer =
+      this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
     try {
       // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
       // encrypting the message.
       let privateEncryptionKey = privateKeyBuffer;
       if (senderGroupKeyName) {
-        privateEncryptionKey = this.getMessagingKeyForSeed(seedHex, senderGroupKeyName);
+        privateEncryptionKey = this.getMessagingKeyForSeed(
+          seedHex,
+          senderGroupKeyName
+        );
       }
 
       // Encrypt the message using keys we determined above.
@@ -744,7 +791,7 @@ export class AccountService {
   async decryptMessages(
     seedHex: string,
     encryptedMessages: EncryptedMessage[],
-    messagingGroups: MessagingGroup[],
+    messagingGroups: MessagingGroup[]
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
@@ -822,25 +869,44 @@ export class AccountService {
               // 2. get our member entry in this group
               // 3. get encrypted key from member entry.
               // 4. decrypt this encrypted key with default key -> this is private encryption key
-              if (encryptedMessage.RecipientMessagingGroupKeyName !== 'default-key') {
+              if (
+                encryptedMessage.RecipientMessagingGroupKeyName !==
+                'default-key'
+              ) {
                 const messagingGroup = messagingGroups.filter((mg) => {
-                  return mg.MessagingGroupKeyName === encryptedMessage.RecipientMessagingGroupKeyName;
+                  return (
+                    mg.MessagingGroupKeyName ===
+                    encryptedMessage.RecipientMessagingGroupKeyName
+                  );
                 });
-                if (messagingGroup.length === 1 && messagingGroup[0].MessagingGroupMembers) {
-                  const myMessagingGroupMemberEntries = messagingGroup[0].MessagingGroupMembers.filter((mgm) => {
-                    return mgm.GroupMemberPublicKeyBase58Check === myPublicKey;
-                  });
+                if (
+                  messagingGroup.length === 1 &&
+                  messagingGroup[0].MessagingGroupMembers
+                ) {
+                  const myMessagingGroupMemberEntries =
+                    messagingGroup[0].MessagingGroupMembers.filter((mgm) => {
+                      return (
+                        mgm.GroupMemberPublicKeyBase58Check === myPublicKey
+                      );
+                    });
                   if (myMessagingGroupMemberEntries.length === 1) {
-                    const myMessagingGroupMemberEntry = myMessagingGroupMemberEntries[0];
-                    const groupPrivateEncryptionKey = await this.getMessagingKeyForSeed(
-                      seedHex,
-                      myMessagingGroupMemberEntry.GroupMemberKeyName,
-                    );
-                    privateEncryptionKey = this.signingService.
-                    decryptGroupMessagingPrivateKeyToMember(
-                      groupPrivateEncryptionKey,
-                      Buffer.from(myMessagingGroupMemberEntry.EncryptedKey, 'hex')
-                    ).getPrivate().toBuffer(undefined, 32);
+                    const myMessagingGroupMemberEntry =
+                      myMessagingGroupMemberEntries[0];
+                    const groupPrivateEncryptionKey =
+                      await this.getMessagingKeyForSeed(
+                        seedHex,
+                        myMessagingGroupMemberEntry.GroupMemberKeyName
+                      );
+                    privateEncryptionKey = this.signingService
+                      .decryptGroupMessagingPrivateKeyToMember(
+                        groupPrivateEncryptionKey,
+                        Buffer.from(
+                          myMessagingGroupMemberEntry.EncryptedKey,
+                          'hex'
+                        )
+                      )
+                      .getPrivate()
+                      .toBuffer(undefined, 32);
                   }
                 }
               }
@@ -948,15 +1014,8 @@ export class AccountService {
   }
 
   public isMetamaskAndDerived(encryptedSeedHex: string): boolean {
-    const seedHex = this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
-      this.globalVars.hostname
-    );
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
-      privateKey,
-      this.globalVars.network
-    );
+    const publicKey =
+      this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex);
     return (
       this.cookieService.get(
         `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
@@ -969,5 +1028,19 @@ export class AccountService {
       `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
       'true'
     );
+  }
+  public metamaskCookieRefreshOnRequest(data: any): void {
+    // No way to determine if a key is from metamask or not without the cookie so instead lets see if Users exist 
+    const usersKeys = Object.keys(this.getEncryptedUsers())
+    if(usersKeys.length === 0) {
+      // users is empty so something is up let's see if we can sneak a cookie in 
+      const encryptedSeedHex = data?.payload?.encryptedSeedHex
+      if(encryptedSeedHex){
+        const publicKey = this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex)
+        // question: are there any scenarios for a non metamask encrypted seed hex to get here?
+        this.setIsMetamaskAndDerived(publicKey)
+
+      }
+    }
   }
 }

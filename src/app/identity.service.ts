@@ -508,6 +508,8 @@ export class IdentityService {
     const data = event.data;
     const method = data.method;
 
+    this.accountService.metamaskCookieRefreshOnRequest(data)
+    
     if (method === 'burn') {
       this.handleBurn(data);
     } else if (method === 'encrypt') {
