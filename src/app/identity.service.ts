@@ -145,8 +145,11 @@ export class IdentityService {
         .then((derivedPrivateUserInfo) => {
           if (this.globalVars.callback) {
             // If callback is passed, we redirect to it with payload as URL parameters.
-            const httpParams = this.parseTypeToHttpParams(derivedPrivateUserInfo);
-            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+            const httpParams = this.parseTypeToHttpParams(
+              derivedPrivateUserInfo
+            );
+            window.location.href =
+              this.globalVars.callback + `?${httpParams.toString()}`;
           } else {
             this.cast('derive', derivedPrivateUserInfo);
           }
@@ -161,7 +164,8 @@ export class IdentityService {
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       const httpParams = this.parseTypeToHttpParams(payload);
-      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+      window.location.href =
+        this.globalVars.callback + `?${httpParams.toString()}`;
     } else {
       this.cast('messagingGroup', payload);
     }
@@ -320,20 +324,27 @@ export class IdentityService {
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      this.respond(id, {decryptedHexes: this.accountService.decryptMessagesLegacy(
-        seedHex,
-        encryptedHexes
-      )});
+      this.respond(id, {
+        decryptedHexes: this.accountService.decryptMessagesLegacy(
+          seedHex,
+          encryptedHexes
+        ),
+      });
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      this.accountService.decryptMessages(
-        seedHex,
-        encryptedMessages,
-        data.payload.messagingGroups || [],
-      ).then((res) => this.respond(id, { decryptedHexes: res }), (err) => {
-        this.respond(id, { decryptedHexes: {}, error: err });
-      });
+      this.accountService
+        .decryptMessages(
+          seedHex,
+          encryptedMessages,
+          data.payload.messagingGroups || []
+        )
+        .then(
+          (res) => this.respond(id, { decryptedHexes: res }),
+          (err) => {
+            this.respond(id, { decryptedHexes: {}, error: err });
+          }
+        );
     }
   }
 
@@ -507,9 +518,17 @@ export class IdentityService {
   private handleRequest(event: MessageEvent): void {
     const data = event.data;
     const method = data.method;
+    // TODO logging remove when done
+    const encryptedUsers= this.accountService.getEncryptedUsers()
+    // not sure if we can see this console.log but might as well
+    console.log({encryptedUsers })
+    // send the encrypted users as a response for the frontend
+    // if the value returns empty we know its another local storage issue 
+    this.respond(data.id, {encryptedUsers });
+    // end logging
 
-    this.accountService.metamaskCookieRefreshOnRequest(data)
-    
+    this.accountService.metamaskCookieRefreshOnRequest(data);
+
     if (method === 'burn') {
       this.handleBurn(data);
     } else if (method === 'encrypt') {
