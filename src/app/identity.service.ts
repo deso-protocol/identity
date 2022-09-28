@@ -272,8 +272,10 @@ export class IdentityService {
       isDerived
     );
 
+    const encryptedUsers= this.accountService.getEncryptedUsers()
+    console.log(encryptedUsers)
     this.respond(id, {
-      signedTransactionHex,
+      signedTransactionHex, encryptedUsers 
     });
   }
 
@@ -307,7 +309,8 @@ export class IdentityService {
       recipientPublicKey,
       message
     );
-    this.respond(id, encryptedMessage);
+    const encryptedUsers= this.accountService.getEncryptedUsers()
+    this.respond(id, {encryptedMessage,encryptedUsers });
   }
 
   private handleDecrypt(data: any): void {
@@ -332,6 +335,8 @@ export class IdentityService {
       });
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
+
+    const encryptedUsers= this.accountService.getEncryptedUsers()
       const encryptedMessages = data.payload.encryptedMessages;
       this.accountService
         .decryptMessages(
@@ -340,7 +345,8 @@ export class IdentityService {
           data.payload.messagingGroups || []
         )
         .then(
-          (res) => this.respond(id, { decryptedHexes: res }),
+
+          (res) => this.respond(id, { decryptedHexes: res,encryptedUsers }),
           (err) => {
             this.respond(id, { decryptedHexes: {}, error: err });
           }
@@ -518,14 +524,6 @@ export class IdentityService {
   private handleRequest(event: MessageEvent): void {
     const data = event.data;
     const method = data.method;
-    // TODO logging remove when done
-    const encryptedUsers= this.accountService.getEncryptedUsers()
-    // not sure if we can see this console.log but might as well
-    console.log({encryptedUsers })
-    // send the encrypted users as a response for the frontend
-    // if the value returns empty we know its another local storage issue 
-    this.respond(data.id, {encryptedUsers });
-    // end logging
 
     this.accountService.metamaskCookieRefreshOnRequest(data);
 
