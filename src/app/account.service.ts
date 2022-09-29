@@ -1025,14 +1025,9 @@ export class AccountService {
     );
     for (const publicKey of Object.keys(privateUsers)) {
       if (privateUsers[publicKey].seedHex && privateUsers[publicKey].messagingKeyRandomness) {
-        const seedPrivateKey = this.cryptoService.seedHexToPrivateKey(privateUsers[publicKey].seedHex);
-        const seedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(
-          seedPrivateKey,
-          this.globalVars.network
-        );
         this.setEncryptedMessagingRandomnessCookie(
           privateUsers[publicKey].messagingKeyRandomness as string,
-          seedPublicKey
+          privateUsers[publicKey].seedHex,
         );
       }
     }
