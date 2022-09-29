@@ -36,8 +36,10 @@ export class AccountService {
   private static USERS_STORAGE_KEY: Readonly<string> = 'users';
   private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
   private static METAMASK_IS_DERIVED: Readonly<string> = 'metamask_';
-  private static MESSAGING_RANDOMNESS: Readonly<string> = 'messaging_randomness_';
-  private static OWNER_PUBLIC_KEY_BASE58_CHECK: Readonly<string> = 'owner_public_key_base58_check_';
+  private static MESSAGING_RANDOMNESS: Readonly<string> =
+    'messaging_randomness_';
+  private static OWNER_PUBLIC_KEY_BASE58_CHECK: Readonly<string> =
+    'owner_public_key_base58_check_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -613,7 +615,8 @@ export class AccountService {
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
   getOwnerPublicKeyBase58CheckForSeed(seedHex: string): string {
-    const ownerPublicKeyCookieVal = this.getOwnerPublicKeyBase58CheckCookie(seedHex);
+    const ownerPublicKeyCookieVal =
+      this.getOwnerPublicKeyBase58CheckCookie(seedHex);
     if (ownerPublicKeyCookieVal) {
       return ownerPublicKeyCookieVal;
     }
@@ -648,7 +651,10 @@ export class AccountService {
           keyName
         );
       } catch (e) {
-        console.error(e, 'Error getting messaging key for seed after cookie was found.');
+        console.error(
+          e,
+          'Error getting messaging key for seed after cookie was found.'
+        );
       }
     }
     for (const user of Object.values(privateUsers)) {
@@ -943,7 +949,6 @@ export class AccountService {
           } catch (e) {
             console.error(JSON.stringify(e) + ': error decrypting message');
           }
-
         }
       }
     }
@@ -1024,16 +1029,21 @@ export class AccountService {
       JSON.stringify(privateUsers)
     );
     for (const publicKey of Object.keys(privateUsers)) {
-      if (privateUsers[publicKey].seedHex && privateUsers[publicKey].messagingKeyRandomness) {
+      if (
+        privateUsers[publicKey].seedHex &&
+        privateUsers[publicKey].messagingKeyRandomness
+      ) {
         this.setEncryptedMessagingRandomnessCookie(
           privateUsers[publicKey].messagingKeyRandomness as string,
-          privateUsers[publicKey].seedHex,
+          privateUsers[publicKey].seedHex
         );
       }
     }
   }
 
-  public getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex: string): boolean {
+  public getIsDerivedCookieWithEncryptedSeed(
+    encryptedSeedHex: string
+  ): boolean {
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
@@ -1049,19 +1059,48 @@ export class AccountService {
       ) === 'true'
     );
   }
+
+  public setEncryptedMessagingRandomnessCookieForPublicKey(
+    publicKey: string
+  ): void {
+    const privateUser = this.getPrivateUsers()[publicKey];
+    if (privateUser?.loginMethod !== LoginMethod.METAMASK) {
+      return;
+    }
+    // setting for metamask users only
+    if (
+      privateUser &&
+      privateUser.messagingKeyRandomness &&
+      privateUser.seedHex
+    ) {
+      this.setEncryptedMessagingRandomnessCookie(
+        privateUser.messagingKeyRandomness,
+        privateUser.seedHex
+      );
+    }
+  }
   // upon metamask account generation store a cookie indicating it came from metamask
   public setIsDerivedCookieWithPublicKey(publicKey: string): void {
+    const privateUser = this.getPrivateUsers()[publicKey];
+    if (!privateUser) {
+      return;
+    }
+
     // TODO: add longer expiration.
     this.cookieService.put(
-      `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
-      'true',
+      `${AccountService.METAMASK_IS_DERIVED}${
+        privateUser.derivedPublicKeyBase58Check || publicKey
+      }`,
+      `${privateUser.loginMethod === LoginMethod.METAMASK}`,
       {
         expires: new Date('2100/01/01 00:00:00'),
       }
     );
   }
 
-  public getEncryptedMessagingRandomnessCookieWithPublicKey(seedHex: string): string {
+  public getEncryptedMessagingRandomnessCookieWithPublicKey(
+    seedHex: string
+  ): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const publicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
       privateKey,
@@ -1078,23 +1117,28 @@ export class AccountService {
       encryptedMessagingKeyRandomness,
       'hex'
     );
-    const decryptedMessagingKeyRandomness = ecies.decrypt(
-      decryptionKeyBuffer,
-      encryptedMessagingKeyRandomnessBuffer,
-      {legacy: false}).toString();
+    const decryptedMessagingKeyRandomness = ecies
+      .decrypt(decryptionKeyBuffer, encryptedMessagingKeyRandomnessBuffer, {
+        legacy: false,
+      })
+      .toString();
     return decryptedMessagingKeyRandomness;
   }
 
-  public setEncryptedMessagingRandomnessCookie(messagingKeyRandomness: string, seedHex: string): void {
+  public setEncryptedMessagingRandomnessCookie(
+    messagingKeyRandomness: string,
+    seedHex: string
+  ): void {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const publicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
       privateKey,
       this.globalVars.network
     );
-    const encryptedMessagingKeyRandomness = this.signingService.encryptGroupMessagingPrivateKeyToMember(
-      publicKeyBase58Check,
-      messagingKeyRandomness
-    );
+    const encryptedMessagingKeyRandomness =
+      this.signingService.encryptGroupMessagingPrivateKeyToMember(
+        publicKeyBase58Check,
+        messagingKeyRandomness
+      );
     this.cookieService.put(
       `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`,
       encryptedMessagingKeyRandomness,
@@ -1105,13 +1149,16 @@ export class AccountService {
   }
 
   public setOwnerPublicKeyBase58CheckCookie(
-    publicKey: string, ownerPublicKeyBase58Check: string): void {
+    publicKey: string,
+    ownerPublicKeyBase58Check: string
+  ): void {
     this.cookieService.put(
       `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${publicKey}`,
       ownerPublicKeyBase58Check,
       {
         expires: new Date('2100/01/01 00:00:00'),
-    });
+      }
+    );
   }
 
   public getOwnerPublicKeyBase58CheckCookie(seedHex: string): string {
@@ -1131,11 +1178,11 @@ export class AccountService {
     if (usersKeys.length === 0) {
       // users is empty so something is up let's see if we can sneak a cookie in
       const encryptedSeedHex = data?.payload?.encryptedSeedHex;
-      if (encryptedSeedHex){
-        const publicKey = this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex);
+      if (encryptedSeedHex) {
+        const publicKey =
+          this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex);
         // question: are there any scenarios for a non metamask encrypted seed hex to get here?
         this.setIsDerivedCookieWithPublicKey(publicKey);
-
       }
     }
   }

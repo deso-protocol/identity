@@ -26,7 +26,6 @@ export class LogInComponent implements OnInit {
   ngOnInit(): void {
     // Set showAccessLevels
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
-    this.rehydrateMetamaskCookies();
   }
 
   login(publicKey: string): void {
@@ -69,11 +68,5 @@ export class LogInComponent implements OnInit {
           }
         );
     }
-  }
-  rehydrateMetamaskCookies(): void {
-    const users = this.accountService.getEncryptedUsers();
-    Object.keys(users)
-      .filter((key) => users[key].loginMethod === LoginMethod.METAMASK)
-      .forEach(this.accountService.setIsDerivedCookieWithPublicKey);
   }
 }
