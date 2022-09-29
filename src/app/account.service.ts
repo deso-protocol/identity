@@ -799,6 +799,7 @@ export class AccountService {
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
+    debugger;
     const myPublicKey = this.getOwnerPublicKeyBase58CheckForSeed(seedHex);
     if (myPublicKey === '') {
       return Promise.reject('Public key not found in private users');
@@ -924,16 +925,21 @@ export class AccountService {
               );
             }
           } catch (e) {
-            console.error(e);
+            console.error(JSON.stringify(e));
           }
-          // Now decrypt the message based on computed keys.
-          decryptedHexes[encryptedMessage.EncryptedHex] = ecies
-            .decryptShared(
-              privateEncryptionKey,
-              publicEncryptionKey,
-              encryptedBytes
-            )
-            .toString();
+          try {
+            // Now decrypt the message based on computed keys.
+            decryptedHexes[encryptedMessage.EncryptedHex] = ecies
+              .decryptShared(
+                privateEncryptionKey,
+                publicEncryptionKey,
+                encryptedBytes
+              )
+              .toString();
+          } catch (e) {
+            console.error(JSON.stringify(e) + ': error decrypting message');
+          }
+
         }
       }
     }
@@ -1073,7 +1079,7 @@ export class AccountService {
     const decryptedMessagingKeyRandomness = ecies.decrypt(
       decryptionKeyBuffer,
       encryptedMessagingKeyRandomnessBuffer,
-      {legacy: true}).toString();
+      {legacy: false}).toString();
     return decryptedMessagingKeyRandomness;
   }
 
@@ -1096,11 +1102,11 @@ export class AccountService {
   public metamaskCookieRefreshOnRequest(data: any): void {
     // No way to determine if a key is from metamask or not without the cookie so instead lets see if Users exists
     const usersKeys = Object.keys(this.getEncryptedUsers());
-    if(usersKeys.length === 0) {
+    if (usersKeys.length === 0) {
       // users is empty so something is up let's see if we can sneak a cookie in
       const encryptedSeedHex = data?.payload?.encryptedSeedHex;
-      if(encryptedSeedHex){
-        const publicKey = this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex)
+      if (encryptedSeedHex){
+        const publicKey = this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex);
         // question: are there any scenarios for a non metamask encrypted seed hex to get here?
         this.setIsDerivedCookieWithPublicKey(publicKey);
 
