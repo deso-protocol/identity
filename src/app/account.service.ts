@@ -1054,7 +1054,10 @@ export class AccountService {
     // TODO: add longer expiration.
     this.cookieService.put(
       `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
-      'true'
+      'true',
+      {
+        expires: new Date('2100/01/01 00:00:00'),
+      }
     );
   }
 
@@ -1094,7 +1097,10 @@ export class AccountService {
     );
     this.cookieService.put(
       `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`,
-      enryptedMessagingKeyRandomness
+      enryptedMessagingKeyRandomness,
+      {
+        expires: new Date('2100/01/01 00:00:00'),
+      }
     );
   }
 
