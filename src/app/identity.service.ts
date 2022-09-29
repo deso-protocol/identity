@@ -56,7 +56,7 @@ export type MessagingGroupPayload = {
 export type MessagingGroup = {
   EncryptedKey: string;
   ExtraData: null | { [k: string]: string };
-  GroupOwnerPublicKeyBase58Check: string,
+  GroupOwnerPublicKeyBase58Check: string;
   MessagingGroupKeyName: string;
   MessagingGroupMembers: MessagingGroupMember[];
   MessagingPublicKeyBase58Check: string;
@@ -279,10 +279,8 @@ export class IdentityService {
       isDerived
     );
 
-    const encryptedUsers = this.accountService.getEncryptedUsers();
-    console.log(encryptedUsers);
     this.respond(id, {
-      signedTransactionHex, encryptedUsers
+      signedTransactionHex,
     });
   }
 
@@ -316,8 +314,7 @@ export class IdentityService {
       recipientPublicKey,
       message
     );
-    const encryptedUsers = this.accountService.getEncryptedUsers();
-    this.respond(id, { ...encryptedMessage, ...{ encryptedUsers }});
+    this.respond(id, { ...encryptedMessage });
   }
 
   private handleDecrypt(data: any): void {
@@ -343,17 +340,15 @@ export class IdentityService {
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
 
-    const encryptedUsers = this.accountService.getEncryptedUsers();
-    const encryptedMessages = data.payload.encryptedMessages;
-    this.accountService
+      const encryptedMessages = data.payload.encryptedMessages;
+      this.accountService
         .decryptMessages(
           seedHex,
           encryptedMessages,
           data.payload.messagingGroups || []
         )
         .then(
-
-          (res) => this.respond(id, { decryptedHexes: res, encryptedUsers }),
+          (res) => this.respond(id, { decryptedHexes: res }),
           (err) => {
             this.respond(id, { decryptedHexes: {}, error: err });
           }
