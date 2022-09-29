@@ -935,7 +935,8 @@ export class AccountService {
               );
             }
           } catch (e) {
-            console.error(JSON.stringify(e));
+            console.error(e);
+            break;
           }
           try {
             // Now decrypt the message based on computed keys.
@@ -947,7 +948,7 @@ export class AccountService {
               )
               .toString();
           } catch (e) {
-            console.error(JSON.stringify(e) + ': error decrypting message');
+            console.error(e);
           }
         }
       }
