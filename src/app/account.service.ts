@@ -1096,13 +1096,13 @@ export class AccountService {
       privateKey,
       this.globalVars.network
     );
-    const enryptedMessagingKeyRandomness = this.signingService.encryptGroupMessagingPrivateKeyToMember(
+    const encryptedMessagingKeyRandomness = this.signingService.encryptGroupMessagingPrivateKeyToMember(
       publicKeyBase58Check,
       messagingKeyRandomness
     );
     this.cookieService.put(
       `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`,
-      enryptedMessagingKeyRandomness,
+      encryptedMessagingKeyRandomness,
       {
         expires: new Date('2100/01/01 00:00:00'),
       }
