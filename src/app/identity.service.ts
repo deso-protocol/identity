@@ -115,6 +115,13 @@ export class IdentityService {
     jumioSuccess?: boolean;
     phoneNumberSuccess?: boolean;
   }): void {
+    const pubKeyAdded = payload.publicKeyAdded;
+    if (pubKeyAdded) {
+      const user = payload.users[pubKeyAdded];
+      if (user) {
+        this.accountService.setOwnerPublicKeyBase58CheckCookie(user.derivedPublicKeyBase58Check || pubKeyAdded, pubKeyAdded);
+      }
+    }
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       let httpParams = new HttpParams();

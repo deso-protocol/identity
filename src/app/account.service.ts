@@ -37,6 +37,7 @@ export class AccountService {
   private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
   private static METAMASK_IS_DERIVED: Readonly<string> = 'metamask_';
   private static MESSAGING_RANDOMNESS: Readonly<string> = 'messaging_randomness_';
+  private static OWNER_PUBLIC_KEY_BASE58_CHECK: Readonly<string> = 'owner_public_key_base58_check_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -612,6 +613,10 @@ export class AccountService {
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
   getOwnerPublicKeyBase58CheckForSeed(seedHex: string): string {
+    const ownerPublicKeyCookieVal = this.getOwnerPublicKeyBase58CheckCookie(seedHex);
+    if (ownerPublicKeyCookieVal) {
+      return ownerPublicKeyCookieVal;
+    }
     const privateUsers = this.getPrivateUsers();
     for (const user of Object.values(privateUsers)) {
       if (user.seedHex === seedHex) {
@@ -1101,6 +1106,27 @@ export class AccountService {
       {
         expires: new Date('2100/01/01 00:00:00'),
       }
+    );
+  }
+
+  public setOwnerPublicKeyBase58CheckCookie(
+    publicKey: string, ownerPublicKeyBase58Check: string): void {
+    this.cookieService.put(
+      `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${publicKey}`,
+      ownerPublicKeyBase58Check,
+      {
+        expires: new Date('2100/01/01 00:00:00'),
+    });
+  }
+
+  public getOwnerPublicKeyBase58CheckCookie(seedHex: string): string {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    return this.cookieService.get(
+      `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${publicKeyBase58Check}`
     );
   }
 
