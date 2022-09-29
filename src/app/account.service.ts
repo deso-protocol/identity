@@ -36,6 +36,7 @@ export class AccountService {
   private static USERS_STORAGE_KEY: Readonly<string> = 'users';
   private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
   private static METAMASK_IS_DERIVED: Readonly<string> = 'metamask_';
+  private static MESSAGING_RANDOMNESS: Readonly<string> = 'messaging_randomness_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -98,7 +99,7 @@ export class AccountService {
   }
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
     // if its a metamask account return true
-    if (this.isMetamaskAndDerived(encryptedSeedHex)) {
+    if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
       return true;
     }
 
@@ -635,12 +636,15 @@ export class AccountService {
       this.globalVars.hostname
     );
     // Check for the metamask cookie first
-    if (this.isMetamaskAndDerived(encryptedSeedHex)) {
-      return this.cryptoService.deriveMessagingKey(
-        // if it is a metamask cookie then we know the randomness
-        this.getMetamaskMessagingKeyRandomnessHex(),
-        keyName
-      );
+    if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
+      try {
+        return this.cryptoService.deriveMessagingKey(
+          this.getEncryptedMessagingRandomnessCookieWithPublicKey(seedHex),
+          keyName
+        );
+      } catch (e) {
+        console.error(e, 'Error getting messaging key for seed after cookie was found.');
+      }
     }
     for (const user of Object.values(privateUsers)) {
       if (user.seedHex === seedHex) {
@@ -829,14 +833,13 @@ export class AccountService {
           console.error(e);
         }
       } else {
-        // DeSo V3 Messages
-        try {
-          // V3 messages will have Legacy=false and Version=3.
-          if (encryptedMessage.Version && encryptedMessage.Version === 3) {
-            let privateEncryptionKey = privateKeyBuffer;
-            let publicEncryptionKey = publicKeyBytes;
-            let defaultKey = false;
-
+        // V3 messages will have Legacy=false and Version=3.
+        if (encryptedMessage.Version && encryptedMessage.Version === 3) {
+          // DeSo V3 Messages
+          let privateEncryptionKey = privateKeyBuffer;
+          let publicEncryptionKey = publicKeyBytes;
+          let defaultKey = false;
+          try {
             // public keys of the group - group messaging public keys.
             // assumption is that we've been added to a group with default key
             // for now. we will fix this later.
@@ -920,18 +923,17 @@ export class AccountService {
                 this.globalVars.defaultMessageKeyName
               );
             }
-
-            // Now decrypt the message based on computed keys.
-            decryptedHexes[encryptedMessage.EncryptedHex] = ecies
-              .decryptShared(
-                privateEncryptionKey,
-                publicEncryptionKey,
-                encryptedBytes
-              )
-              .toString();
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
+          // Now decrypt the message based on computed keys.
+          decryptedHexes[encryptedMessage.EncryptedHex] = ecies
+            .decryptShared(
+              privateEncryptionKey,
+              publicEncryptionKey,
+              encryptedBytes
+            )
+            .toString();
         }
       }
     }
@@ -1010,6 +1012,84 @@ export class AccountService {
     localStorage.setItem(
       AccountService.USERS_STORAGE_KEY,
       JSON.stringify(privateUsers)
+    );
+    for (const publicKey of Object.keys(privateUsers)) {
+      if (privateUsers[publicKey].seedHex && privateUsers[publicKey].messagingKeyRandomness) {
+        const seedPrivateKey = this.cryptoService.seedHexToPrivateKey(privateUsers[publicKey].seedHex);
+        const seedPublicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+          seedPrivateKey,
+          this.globalVars.network
+        );
+        this.setEncryptedMessagingRandomnessCookie(
+          privateUsers[publicKey].messagingKeyRandomness as string,
+          seedPublicKey
+        );
+      }
+    }
+  }
+
+  public getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex: string): boolean {
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    return (
+      this.cookieService.get(
+        `${AccountService.METAMASK_IS_DERIVED}_${publicKey}`
+      ) === 'true'
+    );
+  }
+  // upon metamask account generation store a cookie indicating it came from metamask
+  public setIsDerivedCookieWithPublicKey(publicKey: string): void {
+    // TODO: add longer expiration.
+    this.cookieService.put(
+      `${AccountService.METAMASK_IS_DERIVED}_${publicKey}`,
+      'true'
+    );
+  }
+
+  public getEncryptedMessagingRandomnessCookieWithPublicKey(seedHex: string): string {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    const decryptionKeyBuffer = Buffer.from(seedHex, 'hex');
+    const encryptedMessagingKeyRandomness = this.cookieService.get(
+      `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`
+    );
+    if (!encryptedMessagingKeyRandomness) {
+      throw new Error('No encrypted messaging randomness cookie found');
+    }
+    const encryptedMessagingKeyRandomnessBuffer = Buffer.from(
+      encryptedMessagingKeyRandomness,
+      'hex'
+    );
+    const decryptedMessagingKeyRandomness = ecies.decrypt(
+      decryptionKeyBuffer,
+      encryptedMessagingKeyRandomnessBuffer,
+      {legacy: true}).toString();
+    return decryptedMessagingKeyRandomness;
+  }
+
+  public setEncryptedMessagingRandomnessCookie(messagingKeyRandomness: string, seedHex: string): void {
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    const enryptedMessagingKeyRandomness = this.signingService.encryptGroupMessagingPrivateKeyToMember(
+      publicKeyBase58Check,
+      messagingKeyRandomness
+    );
+    this.cookieService.put(
+      `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`,
+      enryptedMessagingKeyRandomness
     );
   }
 
