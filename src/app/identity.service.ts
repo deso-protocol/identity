@@ -128,7 +128,6 @@ export class IdentityService {
            key
         );
       });
-      
 
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.

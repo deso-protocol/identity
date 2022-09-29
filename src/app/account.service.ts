@@ -644,17 +644,21 @@ export class AccountService {
       this.globalVars.hostname
     );
     // Check for the metamask cookie first
-    if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
-      try {
-        return this.cryptoService.deriveMessagingKey(
-          this.getEncryptedMessagingRandomnessCookieWithPublicKey(seedHex),
-          keyName
-        );
-      } catch (e) {
-        console.error(
-          e,
-          'Error getting messaging key for seed after cookie was found.'
-        );
+    if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
+      if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
+        try {
+          return this.cryptoService.deriveMessagingKey(
+            this.getEncryptedMessagingRandomnessCookieWithPublicKey(seedHex),
+            keyName
+          );
+        } catch (e) {
+          console.error(
+            e,
+            'Error getting messaging key for seed after cookie was found.'
+          );
+        }
+      } else {
+        return this.cryptoService.deriveMessagingKey(seedHex, keyName);
       }
     }
     for (const user of Object.values(privateUsers)) {
@@ -1058,6 +1062,23 @@ export class AccountService {
       this.cookieService.get(
         `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
       ) === 'true'
+    );
+  }
+
+  public isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex: string): boolean {
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    return (
+      this.cookieService.hasKey(
+        `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
+      )
     );
   }
 
