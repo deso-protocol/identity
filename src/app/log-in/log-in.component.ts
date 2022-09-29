@@ -74,6 +74,6 @@ export class LogInComponent implements OnInit {
     const users = this.accountService.getEncryptedUsers();
     Object.keys(users)
       .filter((key) => users[key].loginMethod === LoginMethod.METAMASK)
-      .forEach(this.accountService.setIsMetamaskAndDerived);
+      .forEach(this.accountService.setIsDerivedCookieWithPublicKey);
   }
 }

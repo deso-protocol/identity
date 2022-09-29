@@ -10,6 +10,7 @@ export const environment = {
     'buy.deso.org',
     'diamondapp.com',
     'node.deso.org',
+    'ln.deso.run',
   ],
   noAccessHostnames: [''],
   jumioSupported: false,

@@ -1040,7 +1040,7 @@ export class AccountService {
     );
     return (
       this.cookieService.get(
-        `${AccountService.METAMASK_IS_DERIVED}_${publicKey}`
+        `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
       ) === 'true'
     );
   }
@@ -1048,7 +1048,7 @@ export class AccountService {
   public setIsDerivedCookieWithPublicKey(publicKey: string): void {
     // TODO: add longer expiration.
     this.cookieService.put(
-      `${AccountService.METAMASK_IS_DERIVED}_${publicKey}`,
+      `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
       'true'
     );
   }
@@ -1093,32 +1093,16 @@ export class AccountService {
     );
   }
 
-  public isMetamaskAndDerived(encryptedSeedHex: string): boolean {
-    const publicKey =
-      this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex);
-    return (
-      this.cookieService.get(
-        `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
-      ) === 'true'
-    );
-  }
-  // upon metamask account generation store a cookie indicating it came from metamask
-  public setIsMetamaskAndDerived(publicKey: string) {
-    this.cookieService.put(
-      `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
-      'true'
-    );
-  }
   public metamaskCookieRefreshOnRequest(data: any): void {
-    // No way to determine if a key is from metamask or not without the cookie so instead lets see if Users exist 
-    const usersKeys = Object.keys(this.getEncryptedUsers())
+    // No way to determine if a key is from metamask or not without the cookie so instead lets see if Users exists
+    const usersKeys = Object.keys(this.getEncryptedUsers());
     if(usersKeys.length === 0) {
-      // users is empty so something is up let's see if we can sneak a cookie in 
-      const encryptedSeedHex = data?.payload?.encryptedSeedHex
+      // users is empty so something is up let's see if we can sneak a cookie in
+      const encryptedSeedHex = data?.payload?.encryptedSeedHex;
       if(encryptedSeedHex){
         const publicKey = this.cryptoService.encryptedSeedHexToPublicKey(encryptedSeedHex)
         // question: are there any scenarios for a non metamask encrypted seed hex to get here?
-        this.setIsMetamaskAndDerived(publicKey)
+        this.setIsDerivedCookieWithPublicKey(publicKey);
 
       }
     }

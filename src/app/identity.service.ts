@@ -272,10 +272,10 @@ export class IdentityService {
       isDerived
     );
 
-    const encryptedUsers= this.accountService.getEncryptedUsers()
-    console.log(encryptedUsers)
+    const encryptedUsers = this.accountService.getEncryptedUsers();
+    console.log(encryptedUsers);
     this.respond(id, {
-      signedTransactionHex, encryptedUsers 
+      signedTransactionHex, encryptedUsers
     });
   }
 
@@ -309,8 +309,8 @@ export class IdentityService {
       recipientPublicKey,
       message
     );
-    const encryptedUsers= this.accountService.getEncryptedUsers()
-    this.respond(id, {encryptedMessage,encryptedUsers });
+    const encryptedUsers = this.accountService.getEncryptedUsers();
+    this.respond(id, {encryptedMessage, encryptedUsers });
   }
 
   private handleDecrypt(data: any): void {
@@ -336,9 +336,9 @@ export class IdentityService {
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
 
-    const encryptedUsers= this.accountService.getEncryptedUsers()
-      const encryptedMessages = data.payload.encryptedMessages;
-      this.accountService
+    const encryptedUsers = this.accountService.getEncryptedUsers();
+    const encryptedMessages = data.payload.encryptedMessages;
+    this.accountService
         .decryptMessages(
           seedHex,
           encryptedMessages,
@@ -346,7 +346,7 @@ export class IdentityService {
         )
         .then(
 
-          (res) => this.respond(id, { decryptedHexes: res,encryptedUsers }),
+          (res) => this.respond(id, { decryptedHexes: res, encryptedUsers }),
           (err) => {
             this.respond(id, { decryptedHexes: {}, error: err });
           }
