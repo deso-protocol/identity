@@ -310,7 +310,7 @@ export class IdentityService {
       message
     );
     const encryptedUsers = this.accountService.getEncryptedUsers();
-    this.respond(id, {encryptedMessage, encryptedUsers });
+    this.respond(id, { ...encryptedMessage, ...{ encryptedUsers }});
   }
 
   private handleDecrypt(data: any): void {
