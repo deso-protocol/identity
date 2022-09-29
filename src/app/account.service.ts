@@ -1026,4 +1026,28 @@ export class AccountService {
       enryptedMessagingKeyRandomness
     );
   }
+
+  public isMetamaskAndDerived(encryptedSeedHex: string): boolean {
+    const seedHex = this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+      privateKey,
+      this.globalVars.network
+    );
+    return (
+      this.cookieService.get(
+        `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
+      ) === 'true'
+    );
+  }
+  // upon metamask account generation store a cookie indicating it came from metamask
+  public setIsMetamaskAndDerived(publicKey: string) {
+    this.cookieService.put(
+      `${AccountService.METAMASK_IS_DERIVED}${publicKey}`,
+      'true'
+    );
+  }
 }
