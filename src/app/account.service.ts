@@ -799,7 +799,6 @@ export class AccountService {
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
-    debugger;
     const myPublicKey = this.getOwnerPublicKeyBase58CheckForSeed(seedHex);
     if (myPublicKey === '') {
       return Promise.reject('Public key not found in private users');
