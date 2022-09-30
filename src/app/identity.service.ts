@@ -260,7 +260,6 @@ export class IdentityService {
     // that approvalRequired = true, which the caller can then uses to trigger
     // the /approve UI.
     if (!this.approve(data, requiredAccessLevel)) {
-      console.log('approve returned false');
       return;
     }
 
@@ -270,7 +269,6 @@ export class IdentityService {
     // latter case we need a subsequent check to ensure that the txn is not
     // sending money to any public keys other than the sender himself.
     if (!this.approveSpending(data)) {
-      console.log('approve spending returned false');
       return;
     }
 
@@ -487,23 +485,10 @@ export class IdentityService {
     if (accessLevel === AccessLevel.ApproveLarge) {
       const txBytes = new Buffer(transactionHex, 'hex');
       const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
-      const transactorPubKeyBase58Check = this.cryptoService.publicKeyHexToDeSoPublicKey(
-        transaction.publicKey.toString('hex'), this.globalVars.network);
-      console.log('transactorPublicKeyBase58Check: ', transactorPubKeyBase58Check);
-      const ownerPublicKeyBase58Check =
-        this.accountService.getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(
-          transactorPubKeyBase58Check);
-      console.log('ownerPublicKeyBase58Check: ', ownerPublicKeyBase58Check)
       for (const output of transaction.outputs) {
-        const outputPubKeyBase58Check = this.cryptoService.publicKeyHexToDeSoPublicKey(
-          output.publicKey.toString('hex'), this.globalVars.network);
-        console.log('outputPubKeyBase58Check: ', outputPubKeyBase58Check);
-        console.log('outputPubKeyHex: ', output.publicKey.toString('hex'));
-        console.log('transaction.publicKey.toString(hex): ', transaction.publicKey.toString('hex'));
         if (
           output.publicKey.toString('hex') !==
-          transaction.publicKey.toString('hex') &&
-          ownerPublicKeyBase58Check !== outputPubKeyBase58Check
+          transaction.publicKey.toString('hex')
         ) {
           this.respond(data.id, { approvalRequired: true });
           return false;
