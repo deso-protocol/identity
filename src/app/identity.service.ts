@@ -486,9 +486,17 @@ export class IdentityService {
       const txBytes = new Buffer(transactionHex, 'hex');
       const transaction = Transaction.fromBytes(txBytes)[0] as Transaction;
       for (const output of transaction.outputs) {
+        const transactorPubKeyBase58Check = this.cryptoService.publicKeyHexToDeSoPublicKey(
+          transaction.publicKey.toString('hex'), this.globalVars.network);
+        const outputPubKeyBase58Check = this.cryptoService.publicKeyHexToDeSoPublicKey(
+          output.publicKey.toString('hex'), this.globalVars.network);
+        const ownerPublicKeyBase58Check =
+          this.accountService.getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(
+            transactorPubKeyBase58Check);
         if (
           output.publicKey.toString('hex') !==
-          transaction.publicKey.toString('hex')
+          transaction.publicKey.toString('hex') &&
+          ownerPublicKeyBase58Check !== outputPubKeyBase58Check
         ) {
           this.respond(data.id, { approvalRequired: true });
           return false;

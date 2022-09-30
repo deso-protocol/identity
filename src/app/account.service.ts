@@ -1189,8 +1189,12 @@ export class AccountService {
       privateKey,
       this.globalVars.network
     );
+    return this.getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(publicKeyBase58Check);
+  }
+
+  public getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(childPubKey: string): string {
     return this.cookieService.get(
-      `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${publicKeyBase58Check}`
+      `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${childPubKey}`
     );
   }
 
