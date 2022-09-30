@@ -12,7 +12,6 @@ export const environment = {
     'bitclout.blue',
     'localhost',
     'node.deso.org',
-    'ln.deso.run',
   ],
   noAccessHostnames: [''],
   jumioSupported: false,
