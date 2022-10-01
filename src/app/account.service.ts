@@ -35,7 +35,12 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
 import { MessagingGroup } from './identity.service';
 import bs58check from 'bs58check';
-import { stringify } from 'querystring';
+
+export const ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE = 'No encrypted messaging randomness cookie found';
+export const ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND = 'No messaging key randomness found, you need to first create a default key to use group messages.';
+export const ERROR_USER_NOT_FOUND = 'User not found';
+export const ERROR_USER_AND_COOKIE_NOT_FOUND = 'User and cookie not found';
+export const ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND = 'Error getting messaging key for seed after cookie was found.';
 
 @Injectable({
   providedIn: 'root',
@@ -111,7 +116,7 @@ export class AccountService {
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
     // if its a metamask account return true
     if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
-      return true;
+      return this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex);
     }
     const publicUsers = this.getEncryptedUsers();
 
@@ -122,7 +127,7 @@ export class AccountService {
         return this.isMetamaskAccount(user);
       }
     }
-    throw Error('User and cookie not found');
+    throw Error(ERROR_USER_AND_COOKIE_NOT_FOUND);
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -567,7 +572,7 @@ export class AccountService {
   ): Promise<DefaultKeyPrivateInfo> {
     const privateUsers = this.getPrivateUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
-      throw new Error('User not found');
+      throw new Error(ERROR_USER_NOT_FOUND);
     }
     const privateUser = privateUsers[ownerPublicKeyBase58Check];
     const seedHex = privateUser.seedHex;
@@ -644,6 +649,23 @@ export class AccountService {
     return '';
   }
 
+  getMessagingRandomnessForSeedHex(seedHex: string): string {
+    const privateUsers = this.getPrivateUsers();
+    let messagingRandomness = '';
+    for (const user of Object.values(privateUsers)) {
+      if (user.seedHex === seedHex) {
+        if (user.messagingKeyRandomness) {
+          messagingRandomness = user.messagingKeyRandomness;
+        }
+        break;
+      }
+    }
+    if (!messagingRandomness) {
+      messagingRandomness = this.getDecryptedMessagingRandomnessCookieWithSeedHex(seedHex);
+    }
+    return messagingRandomness;
+  }
+
   getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
     const privateUsers = this.getPrivateUsers();
     const encryptedSeedHex = this.cryptoService.encryptSeedHex(
@@ -655,12 +677,12 @@ export class AccountService {
       if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
         try {
           return this.cryptoService.deriveMessagingKey(
-            this.getEncryptedMessagingRandomnessCookieWithPublicKey(seedHex),
+            this.getDecryptedMessagingRandomnessCookieWithSeedHex(seedHex),
             keyName
           );
         } catch (e) {
           const error =
-            'Error getting messaging key for seed after cookie was found.';
+            ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND;
           console.error(e, error);
           throw new Error(error);
         }
@@ -678,7 +700,7 @@ export class AccountService {
             );
           } else {
             throw new Error(
-              'No messaging key randomness found, you need to first create a default key to use group messages.'
+              ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND
             );
           }
         } else {
@@ -686,7 +708,7 @@ export class AccountService {
         }
       }
     }
-    throw new Error('User not found');
+    throw new Error(ERROR_USER_NOT_FOUND);
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
@@ -801,7 +823,6 @@ export class AccountService {
           .toString();
       } catch (e: any) {
         console.error(e);
-        throw Error(e.message);
       }
     }
     return decryptedHexes;
@@ -817,7 +838,7 @@ export class AccountService {
 
     const myPublicKey = this.getOwnerPublicKeyBase58CheckForSeed(seedHex);
     if (myPublicKey === '') {
-      throw new Error('Public key not found in private users');
+      return Promise.reject('Public key not found in private users');
     }
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
     const decryptedHexes: { [key: string]: any } = {};
@@ -839,7 +860,6 @@ export class AccountService {
           }
         } catch (e: any) {
           console.error(e);
-          throw new Error(e.message);
         }
       } else if (!encryptedMessage.Version || encryptedMessage.Version === 2) {
         try {
@@ -848,7 +868,6 @@ export class AccountService {
             .toString();
         } catch (e: any) {
           console.error(e);
-          throw new Error(e.message);
         }
       } else {
         // V3 messages will have Legacy=false and Version=3.
@@ -914,7 +933,7 @@ export class AccountService {
                     const myMessagingGroupMemberEntry =
                       myMessagingGroupMemberEntries[0];
                     const groupPrivateEncryptionKey =
-                      await this.getMessagingKeyForSeed(
+                      this.getMessagingKeyForSeed(
                         seedHex,
                         myMessagingGroupMemberEntry.GroupMemberKeyName
                       );
@@ -936,14 +955,14 @@ export class AccountService {
             // Currently, Identity only computes trapdoor public key with name "default-key".
             // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(key name) )
             if (defaultKey) {
-              privateEncryptionKey = await this.getMessagingKeyForSeed(
+              privateEncryptionKey = this.getMessagingKeyForSeed(
                 seedHex,
                 this.globalVars.defaultMessageKeyName
               );
             }
           } catch (e: any) {
             console.error(e);
-            throw new Error(e.message);
+            continue;
           }
           try {
             // Now decrypt the message based on computed keys.
@@ -956,7 +975,6 @@ export class AccountService {
               .toString();
           } catch (e: any) {
             console.error(e);
-            throw new Error(e.message);
           }
         }
       }
@@ -1124,7 +1142,7 @@ export class AccountService {
     );
   }
 
-  public getEncryptedMessagingRandomnessCookieWithPublicKey(
+  public getDecryptedMessagingRandomnessCookieWithSeedHex(
     seedHex: string
   ): string {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
@@ -1137,18 +1155,17 @@ export class AccountService {
       `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`
     );
     if (!encryptedMessagingKeyRandomness) {
-      throw new Error('No encrypted messaging randomness cookie found');
+      throw new Error(ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE);
     }
     const encryptedMessagingKeyRandomnessBuffer = Buffer.from(
       encryptedMessagingKeyRandomness,
       'hex'
     );
-    const decryptedMessagingKeyRandomness = ecies
+    return ecies
       .decrypt(decryptionKeyBuffer, encryptedMessagingKeyRandomnessBuffer, {
         legacy: false,
       })
       .toString();
-    return decryptedMessagingKeyRandomness;
   }
 
   public setEncryptedMessagingRandomnessCookie(

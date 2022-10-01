@@ -11,7 +11,13 @@ import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
-import { AccountService } from './account.service';
+import {
+  AccountService, ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND,
+  ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE,
+  ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
+  ERROR_USER_AND_COOKIE_NOT_FOUND,
+  ERROR_USER_NOT_FOUND
+} from './account.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -298,7 +304,8 @@ export class IdentityService {
         signedTransactionHex,
       });
     } catch (e: any) {
-      if (e.message === 'User and cookie not found') {
+      console.error(e);
+      if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
         this.respond(id, {
           Error: e.message,
           requestDerivedCookieWithEncryptedSeed: true,
@@ -343,22 +350,22 @@ export class IdentityService {
 
       this.respond(id, { ...encryptedMessage });
     } catch (e: any) {
+      console.error(e);
       if (
         e.message ===
-        'No messaging key randomness found, you need to first create a default key to use group messages.'
+        ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
+        e.message ===
+        ERROR_USER_NOT_FOUND ||
+        e.message ===
+        ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND
       ) {
         this.respond(id, {
           Error: e.message,
           requestMessagingRandomnessCookieWithPublicKey: true,
-        });
-      } else if (e.message === 'User not found') {
-        // only gets thrown after we check both cookies and local storage
-        this.respond(id, {
-          Error: e.message,
-          requestDerivedCookieWithEncryptedSeed: true,
+          encryptedMessage: '', // We include an empty encryptedMessage for backward compatibility.
         });
       } else {
-        this.respond(id, { Error: e.message }); // unhandled error, no suggestion on fix
+        this.respond(id, { Error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
       }
     }
   }
@@ -368,8 +375,9 @@ export class IdentityService {
       return;
     }
 
+    const encryptedSeedHex = data.payload.encryptedSeedHex;
     const seedHex = this.cryptoService.decryptSeedHex(
-      data.payload.encryptedSeedHex,
+      encryptedSeedHex,
       this.globalVars.hostname
     );
     const id = data.id;
@@ -386,9 +394,46 @@ export class IdentityService {
           decryptedHexes,
         });
       } catch (e: any) {
-        this.respond(id, { error: e.message }); // no suggestion just throw
+        console.error(e);
+        // We include an empty decryptedHexes response to be backward compatible
+        this.respond(id, { error: e.message, decryptedHexes: {} }); // no suggestion just throw
       }
     } else {
+      // First, we make sure we have the necessary information to decrypt.
+      try {
+        const isDerived = this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex);
+        if (isDerived) {
+          // We need messaging randomness
+          const messagingRandomness = this.accountService.getMessagingRandomnessForSeedHex(seedHex);
+          if (!messagingRandomness) {
+            this.respond(id, {
+              Error: ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
+              requestMessagingRandomnessCookieWithPublicKey: true,
+              decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
+            });
+            return;
+          }
+        }
+      } catch (e: any) {
+        console.error(e);
+        if (
+          e.message ===
+          ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
+          e.message === ERROR_USER_NOT_FOUND ||
+          e.message === ERROR_USER_AND_COOKIE_NOT_FOUND ||
+          e.message === ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE
+        ) {
+          this.respond(id, {
+            Error: e.message,
+            requestMessagingRandomnessCookieWithPublicKey: true,
+            decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
+          });
+          return;
+        } else {
+          this.respond(id, { error: e.message }); // no suggestion just throw
+          return;
+        }
+      }
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
       this.accountService
@@ -397,26 +442,13 @@ export class IdentityService {
           encryptedMessages,
           data.payload.messagingGroups || []
         )
-        .then((res) => this.respond(id, { decryptedHexes: res }))
-        .catch((e: any) => {
-          if (
-            e.message ===
-            'No messaging key randomness found, you need to first create a default key to use group messages.'
-          ) {
-            this.respond(id, {
-              Error: e.message,
-              requestMessagingRandomnessCookieWithPublicKey: true,
-            });
-          } else if (e.message === 'User not found') {
-            // only gets thrown after we check both cookies and local storage
-            this.respond(id, {
-              Error: e.message,
-              requestDerivedCookieWithEncryptedSeed: true,
-            });
-          } else {
-            this.respond(id, { error: e.message }); // no suggestion just throw
-          }
-        });
+        .then(
+          (res) => this.respond(id, { decryptedHexes: res }),
+          (err) => {
+            console.error(err);
+            this.respond(id, { decryptedHexes: {}, error: err });
+          },
+        );
     }
   }
 
@@ -444,7 +476,8 @@ export class IdentityService {
         jwt,
       });
     } catch (e: any) {
-      if (e.message === 'User and cookie not found') {
+      console.error(e);
+      if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
         this.respond(id, {
           Error: e.message,
           requestDerivedCookieWithEncryptedSeed: true,
