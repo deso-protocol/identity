@@ -653,10 +653,8 @@ export class AccountService {
     const privateUsers = this.getPrivateUsers();
     let messagingRandomness = '';
     for (const user of Object.values(privateUsers)) {
-      if (user.seedHex === seedHex) {
-        if (user.messagingKeyRandomness) {
-          messagingRandomness = user.messagingKeyRandomness;
-        }
+      if (user.seedHex === seedHex && user.messagingKeyRandomness) {
+        messagingRandomness = user.messagingKeyRandomness;
         break;
       }
     }
