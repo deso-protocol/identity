@@ -122,7 +122,7 @@ export class AccountService {
         return this.isMetamaskAccount(user);
       }
     }
-    return false;
+    throw Error('User and cookie not found');
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {

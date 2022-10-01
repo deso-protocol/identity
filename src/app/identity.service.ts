@@ -297,7 +297,16 @@ export class IdentityService {
       this.respond(id, {
         signedTransactionHex,
       });
-    } catch (e) {}
+    } catch (e: any) {
+      if (e.message === 'User and cookie not found') {
+        this.respond(id, {
+          Error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+        });
+      } else {
+        this.respond(id, { Error: e.message }); // unhandled error, no suggestion on fix
+      }
+    }
   }
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
@@ -405,7 +414,7 @@ export class IdentityService {
               requestDerivedCookieWithEncryptedSeed: true,
             });
           } else {
-            this.respond(id, { decryptedHexes: {}, error: e.message });
+            this.respond(id, { error: e.message }); // no suggestion just throw
           }
         });
     }
@@ -424,15 +433,26 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const isDerived =
-      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-        encryptedSeedHex
-      );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
+    try {
+      const isDerived =
+        this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+          encryptedSeedHex
+        );
+      const jwt = this.signingService.signJWT(seedHex, isDerived);
 
-    this.respond(id, {
-      jwt,
-    });
+      this.respond(id, {
+        jwt,
+      });
+    } catch (e: any) {
+      if (e.message === 'User and cookie not found') {
+        this.respond(id, {
+          Error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+        });
+      } else {
+        this.respond(id, { error: e.message }); // no suggestion just throw
+      }
+    }
   }
 
   private async handleInfo(event: MessageEvent): Promise<void> {
