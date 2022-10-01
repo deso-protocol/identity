@@ -347,14 +347,21 @@ export class IdentityService {
         e.message ===
         ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
         e.message ===
-        ERROR_USER_NOT_FOUND ||
-        e.message ===
         ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND
       ) {
         this.respond(id, {
           error: e.message,
           requestMessagingRandomnessCookieWithPublicKey: true,
           encryptedMessage: '', // We include an empty encryptedMessage for backward compatibility.
+        });
+      } else if (
+        e.message ===
+        ERROR_USER_NOT_FOUND
+      ) {
+        this.respond(id, {
+          error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+          encryptedMessage: '',
         });
       } else {
         this.respond(id, { error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
@@ -411,8 +418,6 @@ export class IdentityService {
         if (
           e.message ===
           ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
-          e.message === ERROR_USER_NOT_FOUND ||
-          e.message === ERROR_USER_AND_COOKIE_NOT_FOUND ||
           e.message === ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE
         ) {
           this.respond(id, {
@@ -420,11 +425,19 @@ export class IdentityService {
             requestMessagingRandomnessCookieWithPublicKey: true,
             decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
           });
-          return;
+        } else if (
+          e.message === ERROR_USER_NOT_FOUND ||
+          e.message === ERROR_USER_AND_COOKIE_NOT_FOUND
+        ) {
+          this.respond(id, {
+            error: e.message,
+            requestDerivedCookieWithEncryptedSeed: true,
+            decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
+          });
         } else {
           this.respond(id, { error: e.message }); // no suggestion just throw
-          return;
         }
+        return;
       }
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
