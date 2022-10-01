@@ -130,16 +130,7 @@ export class IdentityService {
     jumioSuccess?: boolean;
     phoneNumberSuccess?: boolean;
   }): void {
-    Object.entries(payload.users).forEach(([key, value]) => {
-      this.accountService.setEncryptedMessagingRandomnessCookieForPublicKey(
-        key
-      );
-      this.accountService.setOwnerPublicKeyBase58CheckCookie(
-        value.derivedPublicKeyBase58Check || key,
-        key
-      );
-      this.accountService.setIsDerivedCookieWithPublicKey(key);
-    });
+    this.accountService.populateCookies();
 
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
@@ -187,6 +178,7 @@ export class IdentityService {
   }
 
   messagingGroup(payload: MessagingGroupPayload): void {
+    this.accountService.populateCookies();
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       const httpParams = this.parseTypeToHttpParams(payload);

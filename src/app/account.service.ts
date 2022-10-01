@@ -109,6 +109,20 @@ export class AccountService {
     return publicUsers;
   }
 
+  populateCookies(): void {
+    const publicUsers = this.getEncryptedUsers();
+    Object.entries(publicUsers).forEach(([key, value]) => {
+      this.setEncryptedMessagingRandomnessCookieForPublicKey(
+        key
+      );
+      this.setOwnerPublicKeyBase58CheckCookie(
+        value.derivedPublicKeyBase58Check || key,
+        key
+      );
+      this.setIsDerivedCookieWithPublicKey(key);
+    });
+  }
+
   // Check if the account is signed in via a derived key.
   isMetamaskAccount(userInfo: PublicUserInfo | PrivateUserInfo): boolean {
     return userInfo.loginMethod === LoginMethod.METAMASK;
