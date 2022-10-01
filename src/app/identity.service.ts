@@ -307,11 +307,11 @@ export class IdentityService {
       console.error(e);
       if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
         this.respond(id, {
-          Error: e.message,
+          error: e.message,
           requestDerivedCookieWithEncryptedSeed: true,
         });
       } else {
-        this.respond(id, { Error: e.message }); // unhandled error, no suggestion on fix
+        this.respond(id, { error: e.message }); // unhandled error, no suggestion on fix
       }
     }
   }
@@ -360,12 +360,12 @@ export class IdentityService {
         ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND
       ) {
         this.respond(id, {
-          Error: e.message,
+          error: e.message,
           requestMessagingRandomnessCookieWithPublicKey: true,
           encryptedMessage: '', // We include an empty encryptedMessage for backward compatibility.
         });
       } else {
-        this.respond(id, { Error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
+        this.respond(id, { error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
       }
     }
   }
@@ -407,7 +407,7 @@ export class IdentityService {
           const messagingRandomness = this.accountService.getMessagingRandomnessForSeedHex(seedHex);
           if (!messagingRandomness) {
             this.respond(id, {
-              Error: ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
+              error: ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
               requestMessagingRandomnessCookieWithPublicKey: true,
               decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
             });
@@ -424,7 +424,7 @@ export class IdentityService {
           e.message === ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE
         ) {
           this.respond(id, {
-            Error: e.message,
+            error: e.message,
             requestMessagingRandomnessCookieWithPublicKey: true,
             decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
           });
@@ -479,7 +479,7 @@ export class IdentityService {
       console.error(e);
       if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
         this.respond(id, {
-          Error: e.message,
+          error: e.message,
           requestDerivedCookieWithEncryptedSeed: true,
         });
       } else {
