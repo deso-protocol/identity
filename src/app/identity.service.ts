@@ -459,7 +459,7 @@ export class IdentityService {
     // check storage access API
     let hasStorageAccess = true;
     if (this.cryptoService.mustUseStorageAccess()) {
-      hasStorageAccess = await document.hasStorageAccess();
+      hasStorageAccess = await document?.hasStorageAccess();
     }
 
     // check for localStorage access
