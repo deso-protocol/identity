@@ -39,6 +39,15 @@ import {
   TransactionMetadataDAOCoinLimitOrder,
 } from '../lib/deso/transaction';
 
+export enum RequestType {
+  BURN = 'burn',
+  ENCRYPT = 'encrypt',
+  DECRYPT = 'decrypt',
+  SIGN = 'sign',
+  SIGN_ETH = 'signETH',
+  HANDLE_JWT = 'jwt',
+  INFO = 'info',
+}
 export type DerivePayload = {
   publicKey: string;
   derivedPublicKey?: string;
@@ -115,19 +124,16 @@ export class IdentityService {
     jumioSuccess?: boolean;
     phoneNumberSuccess?: boolean;
   }): void {
-    Object.entries(payload.users)
-      .forEach(([key, value]) => {
-        this.accountService.setEncryptedMessagingRandomnessCookieForPublicKey(
-          key
-        );
-        this.accountService.setOwnerPublicKeyBase58CheckCookie(
-          value.derivedPublicKeyBase58Check || key,
-          key
-        );
-        this.accountService.setIsDerivedCookieWithPublicKey(
-           key
-        );
-      });
+    Object.entries(payload.users).forEach(([key, value]) => {
+      this.accountService.setEncryptedMessagingRandomnessCookieForPublicKey(
+        key
+      );
+      this.accountService.setOwnerPublicKeyBase58CheckCookie(
+        value.derivedPublicKeyBase58Check || key,
+        key
+      );
+      this.accountService.setIsDerivedCookieWithPublicKey(key);
+    });
 
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
@@ -276,21 +282,23 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const isDerived =
-      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-        encryptedSeedHex
+    try {
+      const isDerived =
+        this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+          encryptedSeedHex
+        );
+
+      const signedTransactionHex = this.signingService.signTransaction(
+        seedHex,
+        transactionHex,
+        isDerived
       );
-    const signedTransactionHex = this.signingService.signTransaction(
-      seedHex,
-      transactionHex,
-      isDerived
-    );
 
-    this.respond(id, {
-      signedTransactionHex,
-    });
+      this.respond(id, {
+        signedTransactionHex,
+      });
+    } catch (e) {}
   }
-
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
@@ -315,13 +323,35 @@ export class IdentityService {
     // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
     // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
     // senderGroupKeyName parameter.
-    const encryptedMessage = this.accountService.encryptMessage(
-      seedHex,
-      senderGroupKeyName,
-      recipientPublicKey,
-      message
-    );
-    this.respond(id, { ...encryptedMessage });
+
+    try {
+      const encryptedMessage = this.accountService.encryptMessage(
+        seedHex,
+        senderGroupKeyName,
+        recipientPublicKey,
+        message
+      );
+
+      this.respond(id, { ...encryptedMessage });
+    } catch (e: any) {
+      if (
+        e.message ===
+        'No messaging key randomness found, you need to first create a default key to use group messages.'
+      ) {
+        this.respond(id, {
+          Error: e.message,
+          requestMessagingRandomnessCookieWithPublicKey: true,
+        });
+      } else if (e.message === 'User not found') {
+        // only gets thrown after we check both cookies and local storage
+        this.respond(id, {
+          Error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+        });
+      } else {
+        this.respond(id, { Error: e.message }); // unhandled error, no suggestion on fix
+      }
+    }
   }
 
   private handleDecrypt(data: any): void {
@@ -338,15 +368,19 @@ export class IdentityService {
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      this.respond(id, {
-        decryptedHexes: this.accountService.decryptMessagesLegacy(
+      try {
+        const decryptedHexes = this.accountService.decryptMessagesLegacy(
           seedHex,
           encryptedHexes
-        ),
-      });
+        );
+        this.respond(id, {
+          decryptedHexes,
+        });
+      } catch (e: any) {
+        this.respond(id, { error: e.message }); // no suggestion just throw
+      }
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
-
       const encryptedMessages = data.payload.encryptedMessages;
       this.accountService
         .decryptMessages(
@@ -354,12 +388,26 @@ export class IdentityService {
           encryptedMessages,
           data.payload.messagingGroups || []
         )
-        .then(
-          (res) => this.respond(id, { decryptedHexes: res }),
-          (err) => {
-            this.respond(id, { decryptedHexes: {}, error: err });
+        .then((res) => this.respond(id, { decryptedHexes: res }))
+        .catch((e: any) => {
+          if (
+            e.message ===
+            'No messaging key randomness found, you need to first create a default key to use group messages.'
+          ) {
+            this.respond(id, {
+              Error: e.message,
+              requestMessagingRandomnessCookieWithPublicKey: true,
+            });
+          } else if (e.message === 'User not found') {
+            // only gets thrown after we check both cookies and local storage
+            this.respond(id, {
+              Error: e.message,
+              requestDerivedCookieWithEncryptedSeed: true,
+            });
+          } else {
+            this.respond(id, { decryptedHexes: {}, error: e.message });
           }
-        );
+        });
     }
   }
 
@@ -533,7 +581,6 @@ export class IdentityService {
   private handleRequest(event: MessageEvent): void {
     const data = event.data;
     const method = data.method;
-
     this.accountService.metamaskCookieRefreshOnRequest(data);
 
     if (method === 'burn') {

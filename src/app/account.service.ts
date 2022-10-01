@@ -10,7 +10,7 @@ import {
   Network,
   PrivateUserInfo,
   PrivateUserVersion,
-  PublicUserInfo
+  PublicUserInfo,
 } from '../types/identity';
 import { CookieService } from 'ngx-cookie';
 import HDKey from 'hdkey';
@@ -20,14 +20,22 @@ import sha256 from 'sha256';
 import { uint64ToBufBigEndian } from '../lib/bindata/util';
 import * as ecies from '../lib/ecies';
 import { ec as EC } from 'elliptic';
-import { BackendAPIService, GetAccessBytesResponse, TransactionSpendingLimitResponse } from './backend-api.service';
+import {
+  BackendAPIService,
+  GetAccessBytesResponse,
+  TransactionSpendingLimitResponse,
+} from './backend-api.service';
 import { MetamaskService } from './metamask.service';
-import { Transaction, TransactionMetadataAuthorizeDerivedKey } from '../lib/deso/transaction';
+import {
+  Transaction,
+  TransactionMetadataAuthorizeDerivedKey,
+} from '../lib/deso/transaction';
 import KeyEncoder from 'key-encoder';
 import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
 import { MessagingGroup } from './identity.service';
 import bs58check from 'bs58check';
+import { stringify } from 'querystring';
 
 @Injectable({
   providedIn: 'root',
@@ -102,10 +110,9 @@ export class AccountService {
   }
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
     // if its a metamask account return true
-    if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
+    if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
       return true;
     }
-
     const publicUsers = this.getEncryptedUsers();
 
     // Check if this user was signed in via a derived key.
@@ -652,10 +659,10 @@ export class AccountService {
             keyName
           );
         } catch (e) {
-          console.error(
-            e,
-            'Error getting messaging key for seed after cookie was found.'
-          );
+          const error =
+            'Error getting messaging key for seed after cookie was found.';
+          console.error(e, error);
+          throw new Error(error);
         }
       } else {
         return this.cryptoService.deriveMessagingKey(seedHex, keyName);
@@ -754,32 +761,25 @@ export class AccountService {
 
     const publicKeyBuffer =
       this.cryptoService.publicKeyToECBuffer(recipientPublicKey);
-    try {
-      // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
-      // encrypting the message.
-      let privateEncryptionKey = privateKeyBuffer;
-      if (senderGroupKeyName) {
-        privateEncryptionKey = this.getMessagingKeyForSeed(
-          seedHex,
-          senderGroupKeyName
-        );
-      }
-
-      // Encrypt the message using keys we determined above.
-      const encryptedMessage = ecies.encryptShared(
-        privateEncryptionKey,
-        publicKeyBuffer,
-        message
+    // Depending on if the senderGroupKeyName parameter was passed, we will determine the private key to use when
+    // encrypting the message.
+    let privateEncryptionKey = privateKeyBuffer;
+    if (senderGroupKeyName) {
+      privateEncryptionKey = this.getMessagingKeyForSeed(
+        seedHex,
+        senderGroupKeyName
       );
-      return {
-        encryptedMessage: encryptedMessage.toString('hex'),
-      };
-    } catch (e) {
-      console.error(e);
-      return {
-        encryptedMessage: '',
-      };
     }
+
+    // Encrypt the message using keys we determined above.
+    const encryptedMessage = ecies.encryptShared(
+      privateEncryptionKey,
+      publicKeyBuffer,
+      message
+    );
+    return {
+      encryptedMessage: encryptedMessage.toString('hex'),
+    };
   }
 
   // Legacy decryption for older clients
@@ -799,8 +799,9 @@ export class AccountService {
         decryptedHexes[encryptedHex] = ecies
           .decrypt(privateKeyBuffer, encryptedBytes, opts)
           .toString();
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
+        throw Error(e.message);
       }
     }
     return decryptedHexes;
@@ -816,7 +817,7 @@ export class AccountService {
 
     const myPublicKey = this.getOwnerPublicKeyBase58CheckForSeed(seedHex);
     if (myPublicKey === '') {
-      return Promise.reject('Public key not found in private users');
+      throw new Error('Public key not found in private users');
     }
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
     const decryptedHexes: { [key: string]: any } = {};
@@ -836,16 +837,18 @@ export class AccountService {
           } else {
             decryptedHexes[encryptedMessage.EncryptedHex] = '';
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(e);
+          throw new Error(e.message);
         }
       } else if (!encryptedMessage.Version || encryptedMessage.Version === 2) {
         try {
           decryptedHexes[encryptedMessage.EncryptedHex] = ecies
             .decryptShared(privateKeyBuffer, publicKeyBytes, encryptedBytes)
             .toString();
-        } catch (e) {
+        } catch (e: any) {
           console.error(e);
+          throw new Error(e.message);
         }
       } else {
         // V3 messages will have Legacy=false and Version=3.
@@ -938,9 +941,9 @@ export class AccountService {
                 this.globalVars.defaultMessageKeyName
               );
             }
-          } catch (e) {
+          } catch (e: any) {
             console.error(e);
-            break;
+            throw new Error(e.message);
           }
           try {
             // Now decrypt the message based on computed keys.
@@ -951,8 +954,9 @@ export class AccountService {
                 encryptedBytes
               )
               .toString();
-          } catch (e) {
+          } catch (e: any) {
             console.error(e);
+            throw new Error(e.message);
           }
         }
       }
@@ -1065,7 +1069,9 @@ export class AccountService {
     );
   }
 
-  public isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex: string): boolean {
+  public isDerivedCookieWithEncryptedSeedExists(
+    encryptedSeedHex: string
+  ): boolean {
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
@@ -1075,10 +1081,8 @@ export class AccountService {
       privateKey,
       this.globalVars.network
     );
-    return (
-      this.cookieService.hasKey(
-        `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
-      )
+    return this.cookieService.hasKey(
+      `${AccountService.METAMASK_IS_DERIVED}${publicKey}`
     );
   }
 
@@ -1189,10 +1193,14 @@ export class AccountService {
       privateKey,
       this.globalVars.network
     );
-    return this.getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(publicKeyBase58Check);
+    return this.getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(
+      publicKeyBase58Check
+    );
   }
 
-  public getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(childPubKey: string): string {
+  public getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(
+    childPubKey: string
+  ): string {
     return this.cookieService.get(
       `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${childPubKey}`
     );
