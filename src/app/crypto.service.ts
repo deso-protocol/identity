@@ -156,6 +156,15 @@ export class CryptoService {
     return ec.keyFromPrivate(seedHex);
   }
 
+  encryptedSeedHexToPublicKey(encryptedSeedHex: string): string {
+    const seedHex = this.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
+    );
+    const privateKey = this.seedHexToPrivateKey(seedHex);
+    return this.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
+  }
+
   privateKeyToDeSoPublicKey(privateKey: EC.KeyPair, network: Network): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].deso;
     const key = privateKey.getPublic().encode('array', true);

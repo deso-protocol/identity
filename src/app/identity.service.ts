@@ -11,7 +11,13 @@ import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
-import { AccountService } from './account.service';
+import {
+  AccountService, ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND,
+  ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE,
+  ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
+  ERROR_USER_AND_COOKIE_NOT_FOUND,
+  ERROR_USER_NOT_FOUND
+} from './account.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,
@@ -56,7 +62,7 @@ export type MessagingGroupPayload = {
 export type MessagingGroup = {
   EncryptedKey: string;
   ExtraData: null | { [k: string]: string };
-  GroupOwnerPublicKeyBase58Check: string,
+  GroupOwnerPublicKeyBase58Check: string;
   MessagingGroupKeyName: string;
   MessagingGroupMembers: MessagingGroupMember[];
   MessagingPublicKeyBase58Check: string;
@@ -115,6 +121,8 @@ export class IdentityService {
     jumioSuccess?: boolean;
     phoneNumberSuccess?: boolean;
   }): void {
+    this.accountService.populateCookies();
+
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       let httpParams = new HttpParams();
@@ -145,8 +153,11 @@ export class IdentityService {
         .then((derivedPrivateUserInfo) => {
           if (this.globalVars.callback) {
             // If callback is passed, we redirect to it with payload as URL parameters.
-            const httpParams = this.parseTypeToHttpParams(derivedPrivateUserInfo);
-            window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+            const httpParams = this.parseTypeToHttpParams(
+              derivedPrivateUserInfo
+            );
+            window.location.href =
+              this.globalVars.callback + `?${httpParams.toString()}`;
           } else {
             this.cast('derive', derivedPrivateUserInfo);
           }
@@ -158,10 +169,12 @@ export class IdentityService {
   }
 
   messagingGroup(payload: MessagingGroupPayload): void {
+    this.accountService.populateCookies();
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       const httpParams = this.parseTypeToHttpParams(payload);
-      window.location.href = this.globalVars.callback + `?${httpParams.toString()}`;
+      window.location.href =
+        this.globalVars.callback + `?${httpParams.toString()}`;
     } else {
       this.cast('messagingGroup', payload);
     }
@@ -258,21 +271,33 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const isDerived =
-      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-        encryptedSeedHex
+    try {
+      const isDerived =
+        this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+          encryptedSeedHex
+        );
+
+      const signedTransactionHex = this.signingService.signTransaction(
+        seedHex,
+        transactionHex,
+        isDerived
       );
-    const signedTransactionHex = this.signingService.signTransaction(
-      seedHex,
-      transactionHex,
-      isDerived
-    );
 
-    this.respond(id, {
-      signedTransactionHex,
-    });
+      this.respond(id, {
+        signedTransactionHex,
+      });
+    } catch (e: any) {
+      console.error(e);
+      if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
+        this.respond(id, {
+          error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+        });
+      } else {
+        this.respond(id, { error: e.message }); // unhandled error, no suggestion on fix
+      }
+    }
   }
-
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
@@ -297,13 +322,42 @@ export class IdentityService {
     // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
     // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
     // senderGroupKeyName parameter.
-    const encryptedMessage = this.accountService.encryptMessage(
-      seedHex,
-      senderGroupKeyName,
-      recipientPublicKey,
-      message
-    );
-    this.respond(id, encryptedMessage);
+
+    try {
+      const encryptedMessage = this.accountService.encryptMessage(
+        seedHex,
+        senderGroupKeyName,
+        recipientPublicKey,
+        message
+      );
+
+      this.respond(id, { ...encryptedMessage });
+    } catch (e: any) {
+      console.error(e);
+      if (
+        e.message ===
+        ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
+        e.message ===
+        ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND
+      ) {
+        this.respond(id, {
+          error: e.message,
+          requestMessagingRandomnessCookieWithPublicKey: true,
+          encryptedMessage: '', // We include an empty encryptedMessage for backward compatibility.
+        });
+      } else if (
+        e.message ===
+        ERROR_USER_NOT_FOUND
+      ) {
+        this.respond(id, {
+          error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+          encryptedMessage: '',
+        });
+      } else {
+        this.respond(id, { error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
+      }
+    }
   }
 
   private handleDecrypt(data: any): void {
@@ -311,8 +365,9 @@ export class IdentityService {
       return;
     }
 
+    const encryptedSeedHex = data.payload.encryptedSeedHex;
     const seedHex = this.cryptoService.decryptSeedHex(
-      data.payload.encryptedSeedHex,
+      encryptedSeedHex,
       this.globalVars.hostname
     );
     const id = data.id;
@@ -320,20 +375,76 @@ export class IdentityService {
     if (data.payload.encryptedHexes) {
       // Legacy public key decryption
       const encryptedHexes = data.payload.encryptedHexes;
-      this.respond(id, {decryptedHexes: this.accountService.decryptMessagesLegacy(
-        seedHex,
-        encryptedHexes
-      )});
+      try {
+        const decryptedHexes = this.accountService.decryptMessagesLegacy(
+          seedHex,
+          encryptedHexes
+        );
+        this.respond(id, {
+          decryptedHexes,
+        });
+      } catch (e: any) {
+        console.error(e);
+        // We include an empty decryptedHexes response to be backward compatible
+        this.respond(id, { error: e.message, decryptedHexes: {} }); // no suggestion just throw
+      }
     } else {
+      // First, we make sure we have the necessary information to decrypt.
+      try {
+        const isDerived = this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex);
+        if (isDerived) {
+          // We need messaging randomness
+          const messagingRandomness = this.accountService.getMessagingRandomnessForSeedHex(seedHex);
+          if (!messagingRandomness) {
+            this.respond(id, {
+              error: ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
+              requestMessagingRandomnessCookieWithPublicKey: true,
+              decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
+            });
+            return;
+          }
+        }
+      } catch (e: any) {
+        console.error(e);
+        if (
+          e.message ===
+          ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
+          e.message === ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE
+        ) {
+          this.respond(id, {
+            error: e.message,
+            requestMessagingRandomnessCookieWithPublicKey: true,
+            decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
+          });
+        } else if (
+          e.message === ERROR_USER_NOT_FOUND ||
+          e.message === ERROR_USER_AND_COOKIE_NOT_FOUND
+        ) {
+          this.respond(id, {
+            error: e.message,
+            requestDerivedCookieWithEncryptedSeed: true,
+            decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
+          });
+        } else {
+          this.respond(id, { error: e.message }); // no suggestion just throw
+        }
+        return;
+      }
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
-      this.accountService.decryptMessages(
-        seedHex,
-        encryptedMessages,
-        data.payload.messagingGroups || [],
-      ).then((res) => this.respond(id, { decryptedHexes: res }), (err) => {
-        this.respond(id, { decryptedHexes: {}, error: err });
-      });
+      this.accountService
+        .decryptMessages(
+          seedHex,
+          encryptedMessages,
+          data.payload.messagingGroups || []
+        )
+        .then(
+          (res) => this.respond(id, { decryptedHexes: res }),
+          (err) => {
+            console.error(err);
+            this.respond(id, { decryptedHexes: {}, error: err });
+          },
+        );
     }
   }
 
@@ -350,22 +461,34 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const isDerived =
-      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-        encryptedSeedHex
-      );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
+    try {
+      const isDerived =
+        this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+          encryptedSeedHex
+        );
+      const jwt = this.signingService.signJWT(seedHex, isDerived);
 
-    this.respond(id, {
-      jwt,
-    });
+      this.respond(id, {
+        jwt,
+      });
+    } catch (e: any) {
+      console.error(e);
+      if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
+        this.respond(id, {
+          error: e.message,
+          requestDerivedCookieWithEncryptedSeed: true,
+        });
+      } else {
+        this.respond(id, { error: e.message }); // no suggestion just throw
+      }
+    }
   }
 
   private async handleInfo(event: MessageEvent): Promise<void> {
     // check storage access API
     let hasStorageAccess = true;
     if (this.cryptoService.mustUseStorageAccess()) {
-      hasStorageAccess = await document.hasStorageAccess();
+      hasStorageAccess = await document?.hasStorageAccess();
     }
 
     // check for localStorage access

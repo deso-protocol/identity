@@ -6,7 +6,6 @@ import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
-import { EncryptedMessage } from '../types/identity';
 import { ec } from 'elliptic';
 
 @Injectable({

@@ -249,7 +249,6 @@ export class SignUpMetamaskComponent implements OnInit {
           derivedPublicKeyBase58Check
         );
 
-        this.accountService.setIsMetamaskAndDerived(derivedPublicKeyBase58Check);
         this.metamaskState = this.METAMASK.START;
         this.login();
       })
