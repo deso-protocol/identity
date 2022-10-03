@@ -639,7 +639,6 @@ export class IdentityService {
   private handleRequest(event: MessageEvent): void {
     const data = event.data;
     const method = data.method;
-    this.accountService.metamaskCookieRefreshOnRequest(data);
 
     if (method === 'burn') {
       this.handleBurn(data);
