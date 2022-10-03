@@ -45,15 +45,6 @@ import {
   TransactionMetadataDAOCoinLimitOrder,
 } from '../lib/deso/transaction';
 
-export enum RequestType {
-  BURN = 'burn',
-  ENCRYPT = 'encrypt',
-  DECRYPT = 'decrypt',
-  SIGN = 'sign',
-  SIGN_ETH = 'signETH',
-  HANDLE_JWT = 'jwt',
-  INFO = 'info',
-}
 export type DerivePayload = {
   publicKey: string;
   derivedPublicKey?: string;
