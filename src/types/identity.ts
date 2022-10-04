@@ -50,6 +50,7 @@ export interface PublicUserInfo {
   loginMethod?: LoginMethod;
   version: PrivateUserVersion;
   derivedPublicKeyBase58Check?: string;
+  encryptedMessagingKeyRandomness?: string;
 }
 
 export interface DerivedPrivateUserInfo {

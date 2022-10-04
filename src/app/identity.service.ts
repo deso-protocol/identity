@@ -14,6 +14,7 @@ import {
 import {
   AccountService, ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND,
   ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE,
+  ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
 } from './account.service';
 import {
   Transaction,
@@ -118,8 +119,6 @@ export class IdentityService {
     jumioSuccess?: boolean;
     phoneNumberSuccess?: boolean;
   }): void {
-    this.accountService.populateCookies();
-
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       let httpParams = new HttpParams();
@@ -166,7 +165,6 @@ export class IdentityService {
   }
 
   messagingGroup(payload: MessagingGroupPayload): void {
-    this.accountService.populateCookies();
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       const httpParams = this.parseTypeToHttpParams(payload);
@@ -241,7 +239,7 @@ export class IdentityService {
   private handleSign(data: any): void {
     const {
       id,
-      payload: { encryptedSeedHex, transactionHex },
+      payload: { encryptedSeedHex, derivedPublicKeyBase58Check, transactionHex },
     } = data;
 
     // This will tell us whether we need full signing access or just ApproveLarge
@@ -268,10 +266,8 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const isDerived =
-      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-        encryptedSeedHex
-      );
+
+    const isDerived = !!data.payload.derivedPublicKeyBase58Check;
 
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
@@ -296,44 +292,32 @@ export class IdentityService {
         senderGroupKeyName,
         recipientPublicKey,
         message,
+        encryptedMessagingKeyRandomness,
       },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
+    let messagingKeyRandomness: string | undefined;
+    if (encryptedMessagingKeyRandomness) {
+      messagingKeyRandomness = this.cryptoService.decryptSeedHex(encryptedMessagingKeyRandomness, this.globalVars.hostname);
+    }
 
     // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
     // can ask this function to encrypt a message from sender's derived messaging key. For example if we want to use
     // the "default-key" or any other deterministically derived messaging key, we can call this function with the field
     // senderGroupKeyName parameter.
 
-    try {
-      const encryptedMessage = this.accountService.encryptMessage(
-        seedHex,
-        senderGroupKeyName,
-        recipientPublicKey,
-        message
-      );
+    const encryptedMessage = this.accountService.encryptMessage(
+      seedHex,
+      senderGroupKeyName,
+      recipientPublicKey,
+      message,
+      messagingKeyRandomness,
+    );
 
-      this.respond(id, { ...encryptedMessage });
-    } catch (e: any) {
-      console.error(e);
-      if (
-        e.message ===
-        ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
-        e.message ===
-        ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND
-      ) {
-        this.respond(id, {
-          error: e.message,
-          requestMessagingRandomnessCookieWithPublicKey: true,
-          encryptedMessage: '', // We include an empty encryptedMessage for backward compatibility.
-        });
-      } else {
-        this.respond(id, { error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
-      }
-    }
+    this.respond(id, { ...encryptedMessage });
   }
 
   private handleDecrypt(data: any): void {
@@ -346,6 +330,12 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
+    let messagingKeyRandomness: string | undefined;
+    if (data.payload.encryptedMessagingKeyRandomness) {
+      messagingKeyRandomness = this.cryptoService.decryptSeedHex(
+        data.payload.encryptedMessagingKeyRandomness,
+        this.globalVars.hostname);
+    }
     const id = data.id;
 
     if (data.payload.encryptedHexes) {
@@ -365,45 +355,15 @@ export class IdentityService {
         this.respond(id, { error: e.message, decryptedHexes: {} }); // no suggestion just throw
       }
     } else {
-      // First, we make sure we have the necessary information to decrypt.
-      try {
-        const isDerived = this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex);
-        if (isDerived) {
-          // We need messaging randomness
-          const messagingRandomness = this.accountService.getMessagingRandomnessForSeedHex(seedHex);
-          if (!messagingRandomness) {
-            this.respond(id, {
-              error: ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
-              requestMessagingRandomnessCookieWithPublicKey: true,
-              decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
-            });
-            return;
-          }
-        }
-      } catch (e: any) {
-        console.error(e);
-        if (
-          e.message ===
-          ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND ||
-          e.message === ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE
-        ) {
-          this.respond(id, {
-            error: e.message,
-            requestMessagingRandomnessCookieWithPublicKey: true,
-            decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
-          });
-        } else {
-          this.respond(id, { error: e.message }); // no suggestion just throw
-        }
-        return;
-      }
       // Messages can be V1, V2, or V3. The message entries will indicate version.
       const encryptedMessages = data.payload.encryptedMessages;
       this.accountService
         .decryptMessages(
           seedHex,
           encryptedMessages,
-          data.payload.messagingGroups || []
+          data.payload.messagingGroups || [],
+          messagingKeyRandomness,
+          data.payload.ownerPublicKeyBase58Check,
         )
         .then(
           (res) => this.respond(id, { decryptedHexes: res }),
@@ -422,16 +382,13 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex },
+      payload: { encryptedSeedHex, derivedPublicKeyBase58Check },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const isDerived =
-      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-        encryptedSeedHex
-      );
+    const isDerived = !!derivedPublicKeyBase58Check;
     const jwt = this.signingService.signJWT(seedHex, isDerived);
 
     this.respond(id, {
