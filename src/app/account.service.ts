@@ -47,11 +47,6 @@ export const ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND = 'Error ge
 export class AccountService {
   private static USERS_STORAGE_KEY: Readonly<string> = 'users';
   private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
-  private static METAMASK_IS_DERIVED: Readonly<string> = 'mm_';
-  private static MESSAGING_RANDOMNESS: Readonly<string> =
-    'mr_';
-  private static OWNER_PUBLIC_KEY_BASE58_CHECK: Readonly<string> =
-    'opkbc_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
