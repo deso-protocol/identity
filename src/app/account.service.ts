@@ -80,7 +80,10 @@ export class AccountService {
       );
       let encryptedMessagingKeyRandomness: string | undefined;
       if (privateUser.messagingKeyRandomness) {
-        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(privateUser.messagingKeyRandomness, hostname);
+        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(
+          privateUser.messagingKeyRandomness,
+          hostname
+        );
       }
       const accessLevelHmac = this.cryptoService.accessLevelHmac(
         accessLevel,
@@ -607,8 +610,15 @@ export class AccountService {
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
 
-  getMessagingKeyForSeed(seedHex: string, keyName: string, messagingRandomness: string | undefined): Buffer {
-    return this.cryptoService.deriveMessagingKey(messagingRandomness ? messagingRandomness : seedHex, keyName);
+  getMessagingKeyForSeed(
+    seedHex: string,
+    keyName: string,
+    messagingRandomness: string | undefined
+  ): Buffer {
+    return this.cryptoService.deriveMessagingKey(
+      messagingRandomness ? messagingRandomness : seedHex,
+      keyName
+    );
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
@@ -677,7 +687,7 @@ export class AccountService {
     senderGroupKeyName: string,
     recipientPublicKey: string,
     message: string,
-    messagingKeyRandomness: string | undefined,
+    messagingKeyRandomness: string | undefined
   ): any {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
@@ -691,7 +701,7 @@ export class AccountService {
       privateEncryptionKey = this.getMessagingKeyForSeed(
         seedHex,
         senderGroupKeyName,
-        messagingKeyRandomness,
+        messagingKeyRandomness
       );
     }
 
@@ -736,11 +746,16 @@ export class AccountService {
     encryptedMessages: EncryptedMessage[],
     messagingGroups: MessagingGroup[],
     messagingKeyRandomness: string | undefined,
-    ownerPublicKeyBase58Check: string | undefined,
+    ownerPublicKeyBase58Check: string | undefined
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
-    const myPublicKey = ownerPublicKeyBase58Check || this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
+    const myPublicKey =
+      ownerPublicKeyBase58Check ||
+      this.cryptoService.privateKeyToDeSoPublicKey(
+        privateKey,
+        this.globalVars.network
+      );
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {
@@ -837,7 +852,7 @@ export class AccountService {
                       this.getMessagingKeyForSeed(
                         seedHex,
                         myMessagingGroupMemberEntry.GroupMemberKeyName,
-                        messagingKeyRandomness,
+                        messagingKeyRandomness
                       );
                     privateEncryptionKey = this.signingService
                       .decryptGroupMessagingPrivateKeyToMember(
@@ -860,7 +875,7 @@ export class AccountService {
               privateEncryptionKey = this.getMessagingKeyForSeed(
                 seedHex,
                 this.globalVars.defaultMessageKeyName,
-                messagingKeyRandomness,
+                messagingKeyRandomness
               );
             }
           } catch (e: any) {
@@ -952,10 +967,12 @@ export class AccountService {
   }
 
   encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex: string): string {
-    return this.seedHexToPublicKeyBase58Check(this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
-      this.globalVars.hostname
-    ));
+    return this.seedHexToPublicKeyBase58Check(
+      this.cryptoService.decryptSeedHex(
+        encryptedSeedHex,
+        this.globalVars.hostname
+      )
+    );
   }
 
   seedHexToPublicKeyBase58Check(seedHex: string): string {
