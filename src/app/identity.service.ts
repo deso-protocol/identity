@@ -190,21 +190,27 @@ export class IdentityService {
     if (!this.approve(data, AccessLevel.Full)) {
       return;
     }
+    const response = this.getDataOrMissingInputs(
+      ['encryptedSeedHex', 'unsignedHashes'],
+      data
+    );
 
-    const {
-      id,
-      payload: { encryptedSeedHex, unsignedHashes },
-    } = data;
+    if (response.missingData) {
+      this.respond(response.id, {
+        missingData: response.missingData,
+      });
+      return;
+    }
     const seedHex = this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
+      response.requiredData.encryptedSeedHex,
       this.globalVars.hostname
     );
     const signedHashes = this.signingService.signHashes(
       seedHex,
-      unsignedHashes
+      response.requiredData.unsignedHashes
     );
 
-    this.respond(id, {
+    this.respond(response.id, {
       signedHashes,
     });
   }
@@ -214,33 +220,49 @@ export class IdentityService {
       return;
     }
 
-    const {
-      id,
-      payload: { encryptedSeedHex, unsignedHashes },
-    } = data;
+    const response = this.getDataOrMissingInputs(
+      ['encryptedSeedHex', 'unsignedHashes'],
+      data
+    );
+
+    if (response.missingData) {
+      this.respond(response.id, {
+        missingData: response.missingData,
+      });
+      return;
+    }
     const seedHex = this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
+      response.requiredData.encryptedSeedHex,
       this.globalVars.hostname
     );
     const signatures = this.signingService.signHashesETH(
       seedHex,
-      unsignedHashes
+      response.requiredData.unsignedHashes
     );
 
-    this.respond(id, {
+    this.respond(response.id, {
       signatures,
     });
   }
 
   private handleSign(data: any): void {
-    const {
-      id,
-      payload: { encryptedSeedHex, derivedPublicKeyBase58Check, transactionHex },
-    } = data;
+    const response = this.getDataOrMissingInputs(
+      ['encryptedSeedHex', 'derivedPublicKeyBase58Check', 'transactionHex'],
+      data
+    );
+
+    if (response.missingData) {
+      this.respond(response.id, {
+        missingData: response.missingData,
+      });
+      return;
+    }
 
     // This will tell us whether we need full signing access or just ApproveLarge
     // level of access.
-    const requiredAccessLevel = this.getRequiredAccessLevel(transactionHex);
+    const requiredAccessLevel = this.getRequiredAccessLevel(
+      response.requiredData.transactionHex
+    );
 
     // In the case that approve() fails, it responds with a message indicating
     // that approvalRequired = true, which the caller can then uses to trigger
@@ -259,19 +281,19 @@ export class IdentityService {
     }
 
     const seedHex = this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
+      response.requiredData.encryptedSeedHex,
       this.globalVars.hostname
     );
 
-    const isDerived = !!data.payload.derivedPublicKeyBase58Check;
+    const isDerived = !!response.requiredData.derivedPublicKeyBase58Check;
 
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
-      transactionHex,
+      response.requiredData.transactionHex,
       isDerived
     );
 
-    this.respond(id, {
+    this.respond(response.id, {
       signedTransactionHex,
     });
   }
@@ -281,23 +303,31 @@ export class IdentityService {
       return;
     }
 
-    const {
-      id,
-      payload: {
-        encryptedSeedHex,
-        senderGroupKeyName,
-        recipientPublicKey,
-        message,
-        encryptedMessagingKeyRandomness,
-      },
-    } = data;
+    const response = this.getDataOrMissingInputs(
+      [
+        'encryptedSeedHex',
+        'senderGroupKeyName',
+        'recipientPublicKey',
+        'message',
+        'encryptedMessagingKeyRandomness',
+      ],
+      data
+    );
+    if (response.missingData) {
+      this.respond(response.id, { missingData: response.missingData });
+      return;
+    }
+
     const seedHex = this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
+      response.requiredData.encryptedSeedHex,
       this.globalVars.hostname
     );
     let messagingKeyRandomness: string | undefined;
-    if (encryptedMessagingKeyRandomness) {
-      messagingKeyRandomness = this.cryptoService.decryptSeedHex(encryptedMessagingKeyRandomness, this.globalVars.hostname);
+    if (response.requiredData.encryptedMessagingKeyRandomness) {
+      messagingKeyRandomness = this.cryptoService.decryptSeedHex(
+        response.requiredData.encryptedMessagingKeyRandomness,
+        this.globalVars.hostname
+      );
     }
 
     // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
@@ -307,13 +337,12 @@ export class IdentityService {
 
     const encryptedMessage = this.accountService.encryptMessage(
       seedHex,
-      senderGroupKeyName,
-      recipientPublicKey,
-      message,
-      messagingKeyRandomness,
+      response.requiredData.senderGroupKeyName,
+      response.requiredData.recipientPublicKey,
+      response.requiredData.message,
+      messagingKeyRandomness
     );
-
-    this.respond(id, { ...encryptedMessage });
+    this.respond(response.id, { ...encryptedMessage });
   }
 
   private handleDecrypt(data: any): void {
@@ -321,6 +350,24 @@ export class IdentityService {
       return;
     }
 
+    const responseLegacy = this.getDataOrMissingInputs(
+      ['encryptedSeedHex', 'encryptedHexes'],
+      data
+    );
+
+    const response = this.getDataOrMissingInputs(
+      ['encryptedSeedHex', 'encryptedMessages', 'ownerPublicKeyBase58Check'],
+      data
+    );
+    // both types are invalid, lets return
+    if (response.missingData && responseLegacy.missingData) {
+      this.respond(response.id, {
+        info: 'Please provide the missing data for the type of decryption being called',
+        missingData: response.missingData,
+        missingLegacyData: responseLegacy.missingData,
+      });
+      return;
+    }
     const encryptedSeedHex = data.payload.encryptedSeedHex;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
@@ -330,7 +377,8 @@ export class IdentityService {
     if (data.payload.encryptedMessagingKeyRandomness) {
       messagingKeyRandomness = this.cryptoService.decryptSeedHex(
         data.payload.encryptedMessagingKeyRandomness,
-        this.globalVars.hostname);
+        this.globalVars.hostname
+      );
     }
     const id = data.id;
 
@@ -359,14 +407,14 @@ export class IdentityService {
           encryptedMessages,
           data.payload.messagingGroups || [],
           messagingKeyRandomness,
-          data.payload.ownerPublicKeyBase58Check,
+          data.payload.ownerPublicKeyBase58Check
         )
         .then(
           (res) => this.respond(id, { decryptedHexes: res }),
           (err) => {
             console.error(err);
             this.respond(id, { decryptedHexes: {}, error: err });
-          },
+          }
         );
     }
   }
@@ -376,6 +424,13 @@ export class IdentityService {
       return;
     }
 
+    const response = this.getDataOrMissingInputs(
+      ['encryptedSeedHex', 'derivedPublicKeyBase58Check'],
+      data
+    );
+    if (response?.missingData?.encryptedSeedHex) {
+      this.respond(response.id, { missingData: response.missingData });
+    }
     const {
       id,
       payload: { encryptedSeedHex, derivedPublicKeyBase58Check },
@@ -661,4 +716,27 @@ export class IdentityService {
       this.currentWindow.postMessage(message, '*');
     }
   }
+  // Helper method to grab the required data from the payload and lets us know if an invalid payload came through
+  private getDataOrMissingInputs = (
+    requiredAttributes: string[],
+    data: { id: string; payload: any }
+  ) => {
+    let requiredData: any = {};
+    let missingData: any = {};
+    requiredAttributes.forEach((attribute) => {
+      const requiredAttribute = data.payload?.[attribute] ?? null;
+      // null check in the scenario a boolean gets passed in
+      if (requiredAttribute === null) {
+        requiredData = {
+          ...requiredData,
+          [requiredAttribute]: data.payload[attribute],
+        };
+      } else {
+        missingData = { ...missingData, [requiredAttribute]: true };
+      }
+    });
+    return Object.keys(missingData).length > 1
+      ? { id: data.id, missingData }
+      : { id: data.id, requiredData };
+  };
 }
