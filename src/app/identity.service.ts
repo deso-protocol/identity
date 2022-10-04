@@ -271,32 +271,20 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    try {
-      const isDerived =
-        this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-          encryptedSeedHex
-        );
-
-      const signedTransactionHex = this.signingService.signTransaction(
-        seedHex,
-        transactionHex,
-        isDerived
+    const isDerived =
+      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+        encryptedSeedHex
       );
 
-      this.respond(id, {
-        signedTransactionHex,
-      });
-    } catch (e: any) {
-      console.error(e);
-      if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
-        this.respond(id, {
-          error: e.message,
-          requestDerivedCookieWithEncryptedSeed: true,
-        });
-      } else {
-        this.respond(id, { error: e.message }); // unhandled error, no suggestion on fix
-      }
-    }
+    const signedTransactionHex = this.signingService.signTransaction(
+      seedHex,
+      transactionHex,
+      isDerived
+    );
+
+    this.respond(id, {
+      signedTransactionHex,
+    });
   }
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
@@ -344,15 +332,6 @@ export class IdentityService {
           error: e.message,
           requestMessagingRandomnessCookieWithPublicKey: true,
           encryptedMessage: '', // We include an empty encryptedMessage for backward compatibility.
-        });
-      } else if (
-        e.message ===
-        ERROR_USER_NOT_FOUND
-      ) {
-        this.respond(id, {
-          error: e.message,
-          requestDerivedCookieWithEncryptedSeed: true,
-          encryptedMessage: '',
         });
       } else {
         this.respond(id, { error: e.message, encryptedMessage: '', }); // unhandled error, no suggestion on fix
@@ -417,8 +396,7 @@ export class IdentityService {
             decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
           });
         } else if (
-          e.message === ERROR_USER_NOT_FOUND ||
-          e.message === ERROR_USER_AND_COOKIE_NOT_FOUND
+          e.message === ERROR_USER_NOT_FOUND
         ) {
           this.respond(id, {
             error: e.message,
@@ -461,27 +439,15 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    try {
-      const isDerived =
-        this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
-          encryptedSeedHex
-        );
-      const jwt = this.signingService.signJWT(seedHex, isDerived);
+    const isDerived =
+      this.accountService.isDerivedKeyAccountFromEncryptedSeedHex(
+        encryptedSeedHex
+      );
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
 
-      this.respond(id, {
-        jwt,
-      });
-    } catch (e: any) {
-      console.error(e);
-      if (e.message === ERROR_USER_AND_COOKIE_NOT_FOUND) {
-        this.respond(id, {
-          error: e.message,
-          requestDerivedCookieWithEncryptedSeed: true,
-        });
-      } else {
-        this.respond(id, { error: e.message }); // no suggestion just throw
-      }
-    }
+    this.respond(id, {
+      jwt,
+    });
   }
 
   private async handleInfo(event: MessageEvent): Promise<void> {

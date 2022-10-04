@@ -48,11 +48,11 @@ export const ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND = 'Error ge
 export class AccountService {
   private static USERS_STORAGE_KEY: Readonly<string> = 'users';
   private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
-  private static METAMASK_IS_DERIVED: Readonly<string> = 'metamask_';
+  private static METAMASK_IS_DERIVED: Readonly<string> = 'mm_';
   private static MESSAGING_RANDOMNESS: Readonly<string> =
-    'messaging_randomness_';
+    'mr_';
   private static OWNER_PUBLIC_KEY_BASE58_CHECK: Readonly<string> =
-    'owner_public_key_base58_check_';
+    'opkbc_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -112,14 +112,16 @@ export class AccountService {
   populateCookies(): void {
     const publicUsers = this.getEncryptedUsers();
     Object.entries(publicUsers).forEach(([key, value]) => {
-      this.setEncryptedMessagingRandomnessCookieForPublicKey(
-        key
-      );
-      this.setOwnerPublicKeyBase58CheckCookie(
-        value.derivedPublicKeyBase58Check || key,
-        key
-      );
-      this.setIsDerivedCookieWithPublicKey(key);
+      if (value.derivedPublicKeyBase58Check) {
+        this.setEncryptedMessagingRandomnessCookieForPublicKey(
+          key
+        );
+        this.setOwnerPublicKeyBase58CheckCookie(
+          value.derivedPublicKeyBase58Check,
+          key
+        );
+        this.setIsDerivedCookieWithPublicKey(key);
+      }
     });
   }
 
@@ -129,8 +131,8 @@ export class AccountService {
   }
   isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
     // if its a metamask account return true
-    if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
-      return this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex);
+    if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
+      return true;
     }
     const publicUsers = this.getEncryptedUsers();
 
@@ -141,7 +143,8 @@ export class AccountService {
         return this.isMetamaskAccount(user);
       }
     }
-    throw Error(ERROR_USER_AND_COOKIE_NOT_FOUND);
+    // If we didn't find the user, we assume they're non-metamask.
+    return false;
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -660,7 +663,11 @@ export class AccountService {
             );
       }
     }
-    return '';
+    // We assume you're not a metamask user if we get here.
+    return this.cryptoService.privateKeyToDeSoPublicKey(
+      this.cryptoService.seedHexToPrivateKey(seedHex),
+      this.globalVars.network
+    );
   }
 
   getMessagingRandomnessForSeedHex(seedHex: string): string {
@@ -685,8 +692,7 @@ export class AccountService {
       this.globalVars.hostname
     );
     // Check for the metamask cookie first
-    if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
-      if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
+    if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
         try {
           return this.cryptoService.deriveMessagingKey(
             this.getDecryptedMessagingRandomnessCookieWithSeedHex(seedHex),
@@ -698,9 +704,6 @@ export class AccountService {
           console.error(e, error);
           throw new Error(error);
         }
-      } else {
-        return this.cryptoService.deriveMessagingKey(seedHex, keyName);
-      }
     }
     for (const user of Object.values(privateUsers)) {
       if (user.seedHex === seedHex) {
@@ -720,7 +723,8 @@ export class AccountService {
         }
       }
     }
-    throw new Error(ERROR_USER_NOT_FOUND);
+    // If user is not found, we assume non-metamask.
+    return this.cryptoService.deriveMessagingKey(seedHex, keyName);
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
@@ -1102,13 +1106,6 @@ export class AccountService {
     );
   }
 
-  public isDerivedCookieWithEncryptedSeedExists(
-    encryptedSeedHex: string
-  ): boolean {
-    return this.cookieService.hasKey(
-      this.getIsDerivedCookieNameFromPublicKeyBase58Check(this.encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex))
-    );
-  }
   // upon metamask account generation store a cookie indicating it came from metamask
   public setIsDerivedCookieWithPublicKey(publicKey: string): void {
     const privateUser = this.getPrivateUsers()[publicKey];
