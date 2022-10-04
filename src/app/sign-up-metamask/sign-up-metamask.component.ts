@@ -54,7 +54,7 @@ export class SignUpMetamaskComponent implements OnInit {
     private backendApi: BackendAPIService,
     private signingService: SigningService,
     private metamaskService: MetamaskService,
-    private router: Router,
+    private router: Router
   ) {}
   async ngOnInit(): Promise<void> {
     if (this.globalVars.isMobile()) {

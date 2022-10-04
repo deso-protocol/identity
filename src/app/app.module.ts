@@ -51,6 +51,7 @@ import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 import { LogInOptionsComponent } from './log-in-options/log-in-options.component';
 import { AccountSelectComponent } from './account-select/account-select.component';
+import { DisplayQueryParamMessageComponent } from './display-query-param-message/display-query-param-message.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { AccountSelectComponent } from './account-select/account-select.componen
     LogInOptionsComponent,
     AccountSelectComponent,
     MessagingGroupComponent,
+    DisplayQueryParamMessageComponent,
   ],
   imports: [
     BrowserModule,

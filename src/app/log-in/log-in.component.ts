@@ -5,7 +5,6 @@ import { GlobalVarsService } from '../global-vars.service';
 import { BackendAPIService } from '../backend-api.service';
 import { RouteNames } from '../app-routing.module';
 import { Router } from '@angular/router';
-import { LoginMethod, Network } from '../../types/identity';
 
 @Component({
   selector: 'app-log-in',

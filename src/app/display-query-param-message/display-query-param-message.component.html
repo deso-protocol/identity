@@ -1,0 +1,5 @@
+<div
+*ngIf="(messages$ | async) !== ''"
+ class="flex justify-center alert alert-info rounded">
+ <div class="fs-18px text-center"><b>Whoops!</b></div>
+ {{messages$ | async}}</div>
