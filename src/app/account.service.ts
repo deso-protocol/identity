@@ -607,7 +607,7 @@ export class AccountService {
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
 
-  getMessagingKeyForSeed(seedHex: string, keyName: string, messagingRandomness?: string): Buffer {
+  getMessagingKeyForSeed(seedHex: string, keyName: string, messagingRandomness: string | undefined): Buffer {
     return this.cryptoService.deriveMessagingKey(messagingRandomness ? messagingRandomness : seedHex, keyName);
   }
 
@@ -835,8 +835,9 @@ export class AccountService {
                       myMessagingGroupMemberEntries[0];
                     const groupPrivateEncryptionKey =
                       this.getMessagingKeyForSeed(
-                        messagingKeyRandomness ? messagingKeyRandomness : seedHex,
-                        myMessagingGroupMemberEntry.GroupMemberKeyName
+                        seedHex,
+                        myMessagingGroupMemberEntry.GroupMemberKeyName,
+                        messagingKeyRandomness,
                       );
                     privateEncryptionKey = this.signingService
                       .decryptGroupMessagingPrivateKeyToMember(
@@ -857,8 +858,9 @@ export class AccountService {
             // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(key name) )
             if (defaultKey) {
               privateEncryptionKey = this.getMessagingKeyForSeed(
-                messagingKeyRandomness ? messagingKeyRandomness : seedHex,
-                this.globalVars.defaultMessageKeyName
+                seedHex,
+                this.globalVars.defaultMessageKeyName,
+                messagingKeyRandomness,
               );
             }
           } catch (e: any) {
