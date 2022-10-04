@@ -11,11 +11,7 @@ import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
-import {
-  AccountService, ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND,
-  ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE,
-  ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
-} from './account.service';
+import { AccountService } from './account.service';
 import {
   Transaction,
   TransactionMetadataBasicTransfer,

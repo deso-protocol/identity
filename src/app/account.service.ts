@@ -36,10 +36,7 @@ import assert from 'assert';
 import { MessagingGroup } from './identity.service';
 import bs58check from 'bs58check';
 
-export const ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE = 'No encrypted messaging randomness cookie found';
-export const ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND = 'No messaging key randomness found, you need to first create a default key to use group messages.';
 export const ERROR_USER_NOT_FOUND = 'User not found';
-export const ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND = 'Error getting messaging key for seed after cookie was found.';
 
 @Injectable({
   providedIn: 'root',
