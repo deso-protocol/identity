@@ -14,9 +14,6 @@ import {
 import {
   AccountService, ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND,
   ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE,
-  ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND,
-  ERROR_USER_AND_COOKIE_NOT_FOUND,
-  ERROR_USER_NOT_FOUND
 } from './account.service';
 import {
   Transaction,
@@ -393,14 +390,6 @@ export class IdentityService {
           this.respond(id, {
             error: e.message,
             requestMessagingRandomnessCookieWithPublicKey: true,
-            decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
-          });
-        } else if (
-          e.message === ERROR_USER_NOT_FOUND
-        ) {
-          this.respond(id, {
-            error: e.message,
-            requestDerivedCookieWithEncryptedSeed: true,
             decryptedHexes: {}, // Include empty decrypted hexes for backward compatibility
           });
         } else {
