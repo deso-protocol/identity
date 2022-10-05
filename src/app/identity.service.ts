@@ -298,11 +298,10 @@ export class IdentityService {
       },
     } = data;
 
-    // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness
+    // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness and ownerPublicKeyBase58Check
     if (
-      ownerPublicKeyBase58Check &&
       derivedPublicKeyBase58Check &&
-      !encryptedMessagingKeyRandomness
+      (!ownerPublicKeyBase58Check || !encryptedMessagingKeyRandomness)
     ) {
       // Let them know they need to request encryptedMessagingKeyRandomness
       this.respond(id, {
@@ -344,11 +343,11 @@ export class IdentityService {
       return;
     }
 
-    // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness
+    // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness and ownerPublicKeyBase58Check
     if (
-      data.payload.ownerPublicKeyBase58Check &&
       data.payload.derivedPublicKeyBase58Check &&
-      !data.payload.encryptedMessagingKeyRandomness
+      (!data.payload.ownerPublicKeyBase58Check ||
+        !data.payload.encryptedMessagingKeyRandomness)
     ) {
       // Let them know they need to request encryptedMessagingKeyRandomness
       this.respond(data.id, {
