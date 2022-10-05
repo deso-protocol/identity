@@ -36,11 +36,7 @@ import assert from 'assert';
 import { MessagingGroup } from './identity.service';
 import bs58check from 'bs58check';
 
-export const ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE = 'No encrypted messaging randomness cookie found';
-export const ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND = 'No messaging key randomness found, you need to first create a default key to use group messages.';
 export const ERROR_USER_NOT_FOUND = 'User not found';
-export const ERROR_USER_AND_COOKIE_NOT_FOUND = 'User and cookie not found';
-export const ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND = 'Error getting messaging key for seed after cookie was found.';
 
 @Injectable({
   providedIn: 'root',
@@ -48,11 +44,6 @@ export const ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND = 'Error ge
 export class AccountService {
   private static USERS_STORAGE_KEY: Readonly<string> = 'users';
   private static LEVELS_STORAGE_KEY: Readonly<string> = 'levels';
-  private static METAMASK_IS_DERIVED: Readonly<string> = 'metamask_';
-  private static MESSAGING_RANDOMNESS: Readonly<string> =
-    'messaging_randomness_';
-  private static OWNER_PUBLIC_KEY_BASE58_CHECK: Readonly<string> =
-    'owner_public_key_base58_check_';
 
   private static publicKeyRegex = /^[a-zA-Z0-9]{54,55}$/;
 
@@ -87,6 +78,10 @@ export class AccountService {
         privateUser.seedHex,
         hostname
       );
+      let encryptedMessagingKeyRandomness: string | undefined;
+      if (privateUser.messagingKeyRandomness) {
+        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(privateUser.messagingKeyRandomness, hostname);
+      }
       const accessLevelHmac = this.cryptoService.accessLevelHmac(
         accessLevel,
         privateUser.seedHex
@@ -103,45 +98,16 @@ export class AccountService {
         accessLevel,
         accessLevelHmac,
         derivedPublicKeyBase58Check: privateUser.derivedPublicKeyBase58Check,
+        encryptedMessagingKeyRandomness,
       };
     }
 
     return publicUsers;
   }
 
-  populateCookies(): void {
-    const publicUsers = this.getEncryptedUsers();
-    Object.entries(publicUsers).forEach(([key, value]) => {
-      this.setEncryptedMessagingRandomnessCookieForPublicKey(
-        key
-      );
-      this.setOwnerPublicKeyBase58CheckCookie(
-        value.derivedPublicKeyBase58Check || key,
-        key
-      );
-      this.setIsDerivedCookieWithPublicKey(key);
-    });
-  }
-
   // Check if the account is signed in via a derived key.
   isMetamaskAccount(userInfo: PublicUserInfo | PrivateUserInfo): boolean {
     return userInfo.loginMethod === LoginMethod.METAMASK;
-  }
-  isDerivedKeyAccountFromEncryptedSeedHex(encryptedSeedHex: string): boolean {
-    // if its a metamask account return true
-    if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
-      return this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex);
-    }
-    const publicUsers = this.getEncryptedUsers();
-
-    // Check if this user was signed in via a derived key.
-    for (const publicKey of Object.keys(publicUsers)) {
-      const user = publicUsers[publicKey];
-      if (user.encryptedSeedHex === encryptedSeedHex) {
-        return this.isMetamaskAccount(user);
-      }
-    }
-    throw Error(ERROR_USER_AND_COOKIE_NOT_FOUND);
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -640,87 +606,9 @@ export class AccountService {
     const randomnessString = `Please click sign in order to generate your messaging key.`;
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
-  getOwnerPublicKeyBase58CheckForSeed(seedHex: string): string {
-    const ownerPublicKeyCookieVal =
-      this.getOwnerPublicKeyBase58CheckCookie(seedHex);
-    if (ownerPublicKeyCookieVal) {
-      return ownerPublicKeyCookieVal;
-    }
-    const privateUsers = this.getPrivateUsers();
-    for (const user of Object.values(privateUsers)) {
-      if (user.seedHex === seedHex) {
-        return user.loginMethod === LoginMethod.METAMASK
-          ? this.cryptoService.publicKeyHexToDeSoPublicKey(
-              user.publicKeyHex as string,
-              this.globalVars.network
-            )
-          : this.cryptoService.privateKeyToDeSoPublicKey(
-              this.cryptoService.seedHexToPrivateKey(seedHex),
-              this.globalVars.network
-            );
-      }
-    }
-    return '';
-  }
 
-  getMessagingRandomnessForSeedHex(seedHex: string): string {
-    const privateUsers = this.getPrivateUsers();
-    let messagingRandomness = '';
-    for (const user of Object.values(privateUsers)) {
-      if (user.seedHex === seedHex && user.messagingKeyRandomness) {
-        messagingRandomness = user.messagingKeyRandomness;
-        break;
-      }
-    }
-    if (!messagingRandomness) {
-      messagingRandomness = this.getDecryptedMessagingRandomnessCookieWithSeedHex(seedHex);
-    }
-    return messagingRandomness;
-  }
-
-  getMessagingKeyForSeed(seedHex: string, keyName: string): Buffer {
-    const privateUsers = this.getPrivateUsers();
-    const encryptedSeedHex = this.cryptoService.encryptSeedHex(
-      seedHex,
-      this.globalVars.hostname
-    );
-    // Check for the metamask cookie first
-    if (this.isDerivedCookieWithEncryptedSeedExists(encryptedSeedHex)) {
-      if (this.getIsDerivedCookieWithEncryptedSeed(encryptedSeedHex)) {
-        try {
-          return this.cryptoService.deriveMessagingKey(
-            this.getDecryptedMessagingRandomnessCookieWithSeedHex(seedHex),
-            keyName
-          );
-        } catch (e) {
-          const error =
-            ERROR_GETTING_MESSAGING_KEY_FOR_SEED_AFTER_COOKIE_FOUND;
-          console.error(e, error);
-          throw new Error(error);
-        }
-      } else {
-        return this.cryptoService.deriveMessagingKey(seedHex, keyName);
-      }
-    }
-    for (const user of Object.values(privateUsers)) {
-      if (user.seedHex === seedHex) {
-        if (user.loginMethod === LoginMethod.METAMASK) {
-          if (user.messagingKeyRandomness) {
-            return this.cryptoService.deriveMessagingKey(
-              user.messagingKeyRandomness,
-              keyName
-            );
-          } else {
-            throw new Error(
-              ERROR_NO_MESSAGING_KEY_RANDOMNESS_FOUND
-            );
-          }
-        } else {
-          return this.cryptoService.deriveMessagingKey(seedHex, keyName);
-        }
-      }
-    }
-    throw new Error(ERROR_USER_NOT_FOUND);
+  getMessagingKeyForSeed(seedHex: string, keyName: string, messagingRandomness: string | undefined): Buffer {
+    return this.cryptoService.deriveMessagingKey(messagingRandomness ? messagingRandomness : seedHex, keyName);
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
@@ -788,7 +676,8 @@ export class AccountService {
     seedHex: string,
     senderGroupKeyName: string,
     recipientPublicKey: string,
-    message: string
+    message: string,
+    messagingKeyRandomness: string | undefined,
   ): any {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
@@ -801,7 +690,8 @@ export class AccountService {
     if (senderGroupKeyName) {
       privateEncryptionKey = this.getMessagingKeyForSeed(
         seedHex,
-        senderGroupKeyName
+        senderGroupKeyName,
+        messagingKeyRandomness,
       );
     }
 
@@ -844,14 +734,13 @@ export class AccountService {
   async decryptMessages(
     seedHex: string,
     encryptedMessages: EncryptedMessage[],
-    messagingGroups: MessagingGroup[]
+    messagingGroups: MessagingGroup[],
+    messagingKeyRandomness: string | undefined,
+    ownerPublicKeyBase58Check: string | undefined,
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
-    const myPublicKey = this.getOwnerPublicKeyBase58CheckForSeed(seedHex);
-    if (myPublicKey === '') {
-      return Promise.reject('Public key not found in private users');
-    }
+    const myPublicKey = ownerPublicKeyBase58Check || this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {
@@ -947,7 +836,8 @@ export class AccountService {
                     const groupPrivateEncryptionKey =
                       this.getMessagingKeyForSeed(
                         seedHex,
-                        myMessagingGroupMemberEntry.GroupMemberKeyName
+                        myMessagingGroupMemberEntry.GroupMemberKeyName,
+                        messagingKeyRandomness,
                       );
                     privateEncryptionKey = this.signingService
                       .decryptGroupMessagingPrivateKeyToMember(
@@ -969,7 +859,8 @@ export class AccountService {
             if (defaultKey) {
               privateEncryptionKey = this.getMessagingKeyForSeed(
                 seedHex,
-                this.globalVars.defaultMessageKeyName
+                this.globalVars.defaultMessageKeyName,
+                messagingKeyRandomness,
               );
             }
           } catch (e: any) {
@@ -1081,154 +972,6 @@ export class AccountService {
     localStorage.setItem(
       AccountService.USERS_STORAGE_KEY,
       JSON.stringify(privateUsers)
-    );
-    this.populateCookies();
-  }
-
-  //
-  // Is Derived Cookie Logic
-  //
-  private getIsDerivedCookieNameFromPublicKeyBase58Check(publicKeyBase58Check: string): string {
-    return `${AccountService.METAMASK_IS_DERIVED}${publicKeyBase58Check}`;
-  }
-
-  public getIsDerivedCookieWithEncryptedSeed(
-    encryptedSeedHex: string
-  ): boolean {
-    return (
-      this.cookieService.get(
-        this.getIsDerivedCookieNameFromPublicKeyBase58Check(this.encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex))
-      ) === 'true'
-    );
-  }
-
-  public isDerivedCookieWithEncryptedSeedExists(
-    encryptedSeedHex: string
-  ): boolean {
-    return this.cookieService.hasKey(
-      this.getIsDerivedCookieNameFromPublicKeyBase58Check(this.encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex))
-    );
-  }
-  // upon metamask account generation store a cookie indicating it came from metamask
-  public setIsDerivedCookieWithPublicKey(publicKey: string): void {
-    const privateUser = this.getPrivateUsers()[publicKey];
-    if (!privateUser) {
-      return;
-    }
-
-    this.cookieService.put(
-      this.getIsDerivedCookieNameFromPublicKeyBase58Check(privateUser.derivedPublicKeyBase58Check || publicKey),
-      `${privateUser.loginMethod === LoginMethod.METAMASK}`,
-      {
-        expires: new Date('2100/01/01 00:00:00'),
-      }
-    );
-  }
-
-  //
-  // Encrypted Messaging Randomness Cookie Logic
-  //
-  private getMessagingRandomnessCookieNameFromPublicKeyBase58Check(publicKeyBase58Check: string): string {
-    return `${AccountService.MESSAGING_RANDOMNESS}_${publicKeyBase58Check}`;
-  }
-
-  public getDecryptedMessagingRandomnessCookieWithSeedHex(
-    seedHex: string
-  ): string {
-    const publicKeyBase58Check = this.seedHexToPublicKeyBase58Check(seedHex);
-    const decryptionKeyBuffer = Buffer.from(seedHex, 'hex');
-    const encryptedMessagingKeyRandomness = this.cookieService.get(
-      this.getMessagingRandomnessCookieNameFromPublicKeyBase58Check(publicKeyBase58Check)
-    );
-    if (!encryptedMessagingKeyRandomness) {
-      throw new Error(ERROR_NO_ENCRYPTED_MESSAGING_RANDOMNESS_COOKIE);
-    }
-    const encryptedMessagingKeyRandomnessBuffer = Buffer.from(
-      encryptedMessagingKeyRandomness,
-      'hex'
-    );
-    return ecies
-      .decrypt(decryptionKeyBuffer, encryptedMessagingKeyRandomnessBuffer, {
-        legacy: false,
-      })
-      .toString();
-  }
-
-  public setEncryptedMessagingRandomnessCookieForPublicKey(
-    publicKey: string
-  ): void {
-    const privateUser = this.getPrivateUsers()[publicKey];
-    if (privateUser?.loginMethod !== LoginMethod.METAMASK) {
-      return;
-    }
-    // setting for metamask users only
-    if (
-      privateUser &&
-      privateUser.messagingKeyRandomness &&
-      privateUser.seedHex
-    ) {
-      this.setEncryptedMessagingRandomnessCookie(
-        privateUser.messagingKeyRandomness,
-        privateUser.seedHex
-      );
-    }
-  }
-
-  public setEncryptedMessagingRandomnessCookie(
-    messagingKeyRandomness: string,
-    seedHex: string
-  ): void {
-    const publicKeyBase58Check = this.seedHexToPublicKeyBase58Check(seedHex);
-    const encryptedMessagingKeyRandomness =
-      this.signingService.encryptGroupMessagingPrivateKeyToMember(
-        publicKeyBase58Check,
-        messagingKeyRandomness
-      );
-    this.cookieService.put(
-      this.getMessagingRandomnessCookieNameFromPublicKeyBase58Check(publicKeyBase58Check),
-      encryptedMessagingKeyRandomness,
-      {
-        expires: new Date('2100/01/01 00:00:00'),
-      }
-    );
-  }
-
-  //
-  // Owner Public Key Cookie Logic
-  //
-  private getOwnerPublicKeyBase58CheckCookieName(publicKeyBase58Check: string): string {
-    return `${AccountService.OWNER_PUBLIC_KEY_BASE58_CHECK}_${publicKeyBase58Check}`;
-  }
-
-  public getOwnerPublicKeyBase58CheckCookie(seedHex: string): string {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    const publicKeyBase58Check = this.cryptoService.privateKeyToDeSoPublicKey(
-      privateKey,
-      this.globalVars.network
-    );
-    return this.getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(
-      publicKeyBase58Check
-    );
-  }
-
-  public getOwnerPublicKeyBase58CheckFromChildPublicKeyBase58Check(
-    childPubKey: string
-  ): string {
-    return this.cookieService.get(
-      this.getOwnerPublicKeyBase58CheckCookieName(childPubKey)
-    );
-  }
-
-  public setOwnerPublicKeyBase58CheckCookie(
-    publicKey: string,
-    ownerPublicKeyBase58Check: string
-  ): void {
-    this.cookieService.put(
-      this.getOwnerPublicKeyBase58CheckCookieName(publicKey),
-      ownerPublicKeyBase58Check,
-      {
-        expires: new Date('2100/01/01 00:00:00'),
-      }
     );
   }
 }
