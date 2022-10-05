@@ -235,7 +235,11 @@ export class IdentityService {
   private handleSign(data: any): void {
     const {
       id,
-      payload: { encryptedSeedHex, transactionHex },
+      payload: {
+        encryptedSeedHex,
+        transactionHex,
+        derivedPublicKeyBase58Check,
+      },
     } = data;
 
     // This will tell us whether we need full signing access or just ApproveLarge
@@ -263,7 +267,7 @@ export class IdentityService {
       this.globalVars.hostname
     );
 
-    const isDerived = !!data.payload.derivedPublicKeyBase58Check;
+    const isDerived = !!derivedPublicKeyBase58Check;
 
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
@@ -290,13 +294,21 @@ export class IdentityService {
         message,
         encryptedMessagingKeyRandomness,
         derivedPublicKeyBase58Check,
+        ownerPublicKeyBase58Check,
       },
     } = data;
 
     // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness
-    if (derivedPublicKeyBase58Check && !encryptedMessagingKeyRandomness) {
+    if (
+      ownerPublicKeyBase58Check &&
+      derivedPublicKeyBase58Check &&
+      !encryptedMessagingKeyRandomness
+    ) {
       // Let them know they need to request encryptedMessagingKeyRandomness
-      this.respond(id, { encryptedMessagingKeyRandomness: true });
+      this.respond(id, {
+        requiresEncryptedMessagingKeyRandomness: true,
+        encryptedMessage: '',
+      });
       return;
     }
     const seedHex = this.cryptoService.decryptSeedHex(
@@ -334,11 +346,16 @@ export class IdentityService {
 
     // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness
     if (
+      data.payload.ownerPublicKeyBase58Check &&
       data.payload.derivedPublicKeyBase58Check &&
       !data.payload.encryptedMessagingKeyRandomness
     ) {
       // Let them know they need to request encryptedMessagingKeyRandomness
-      this.respond(data.id, { encryptedMessagingKeyRandomness: true });
+      this.respond(data.id, {
+        requiresEncryptedMessagingKeyRandomness: true,
+        decryptedHexes: {},
+      });
+
       return;
     }
 
