@@ -235,7 +235,7 @@ export class IdentityService {
   private handleSign(data: any): void {
     const {
       id,
-      payload: { encryptedSeedHex, derivedPublicKeyBase58Check, transactionHex },
+      payload: { encryptedSeedHex, transactionHex },
     } = data;
 
     // This will tell us whether we need full signing access or just ApproveLarge
@@ -289,15 +289,26 @@ export class IdentityService {
         recipientPublicKey,
         message,
         encryptedMessagingKeyRandomness,
+        derivedPublicKeyBase58Check,
       },
     } = data;
+
+    // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness
+    if (derivedPublicKeyBase58Check && !encryptedMessagingKeyRandomness) {
+      // Let them know they need to request encryptedMessagingKeyRandomness
+      this.respond(id, { encryptedMessagingKeyRandomness: true });
+      return;
+    }
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
     let messagingKeyRandomness: string | undefined;
     if (encryptedMessagingKeyRandomness) {
-      messagingKeyRandomness = this.cryptoService.decryptSeedHex(encryptedMessagingKeyRandomness, this.globalVars.hostname);
+      messagingKeyRandomness = this.cryptoService.decryptSeedHex(
+        encryptedMessagingKeyRandomness,
+        this.globalVars.hostname
+      );
     }
 
     // In the DeSo V3 Messages, users can register messaging keys on the blockchain. When invoking this function, one
@@ -310,7 +321,7 @@ export class IdentityService {
       senderGroupKeyName,
       recipientPublicKey,
       message,
-      messagingKeyRandomness,
+      messagingKeyRandomness
     );
 
     this.respond(id, { ...encryptedMessage });
@@ -318,6 +329,16 @@ export class IdentityService {
 
   private handleDecrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
+      return;
+    }
+
+    // Are they a derived user? better make sure they have encryptedMessagingKeyRandomness
+    if (
+      data.payload.derivedPublicKeyBase58Check &&
+      !data.payload.encryptedMessagingKeyRandomness
+    ) {
+      // Let them know they need to request encryptedMessagingKeyRandomness
+      this.respond(data.id, { encryptedMessagingKeyRandomness: true });
       return;
     }
 
@@ -330,7 +351,8 @@ export class IdentityService {
     if (data.payload.encryptedMessagingKeyRandomness) {
       messagingKeyRandomness = this.cryptoService.decryptSeedHex(
         data.payload.encryptedMessagingKeyRandomness,
-        this.globalVars.hostname);
+        this.globalVars.hostname
+      );
     }
     const id = data.id;
 
@@ -359,14 +381,14 @@ export class IdentityService {
           encryptedMessages,
           data.payload.messagingGroups || [],
           messagingKeyRandomness,
-          data.payload.ownerPublicKeyBase58Check,
+          data.payload.ownerPublicKeyBase58Check
         )
         .then(
           (res) => this.respond(id, { decryptedHexes: res }),
           (err) => {
             console.error(err);
             this.respond(id, { decryptedHexes: {}, error: err });
-          },
+          }
         );
     }
   }
