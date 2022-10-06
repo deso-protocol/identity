@@ -223,15 +223,31 @@ export class MessagingGroupComponent implements OnInit {
     const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeySignature} =
      await this.accountService.getMessagingGroupStandardDerivation(
         this.updatedGroupOwnerPublicKeyBase58Check, this.updatedGroupKeyName);
-
+    let encryptedMessagingKeyRandomness: string | undefined;
+    const publicUser = this.accountService.getEncryptedUsers()[this.updatedGroupOwnerPublicKeyBase58Check];
+    if (publicUser?.encryptedMessagingKeyRandomness) {
+      encryptedMessagingKeyRandomness = publicUser.encryptedMessagingKeyRandomness;
+    }
     const encryptedToApplicationGroupMessagingPrivateKey = this.signingService.encryptGroupMessagingPrivateKeyToMember(
       this.applicationMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
-        this.respondToClient(messagingKeySignature, encryptedToApplicationGroupMessagingPrivateKey, [], messagingPublicKeyBase58Check);
+        this.respondToClient(
+          messagingKeySignature,
+          encryptedToApplicationGroupMessagingPrivateKey,
+          [],
+          messagingPublicKeyBase58Check,
+          encryptedMessagingKeyRandomness
+        );
         break;
       case MESSAGING_GROUP_OPERATION.CREATE_GROUP:
-        this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey, [], messagingPublicKeyBase58Check);
+        this.respondToClient(
+          '',
+          encryptedToApplicationGroupMessagingPrivateKey,
+          [],
+          messagingPublicKeyBase58Check,
+          encryptedMessagingKeyRandomness
+        );
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:
         try {
@@ -250,8 +266,13 @@ export class MessagingGroupComponent implements OnInit {
               memberMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
             encryptedToMembersGroupMessagingPrivateKey.push(encryptedGroupMessagingPriv);
           }
-          this.respondToClient('', encryptedToApplicationGroupMessagingPrivateKey,
-            encryptedToMembersGroupMessagingPrivateKey, messagingPublicKeyBase58Check);
+          this.respondToClient(
+            '',
+            encryptedToApplicationGroupMessagingPrivateKey,
+            encryptedToMembersGroupMessagingPrivateKey,
+            messagingPublicKeyBase58Check,
+            encryptedMessagingKeyRandomness,
+          );
         } catch (e) {
           throw new Error('Error getting bulk messaging public keys');
         }
@@ -260,13 +281,19 @@ export class MessagingGroupComponent implements OnInit {
         throw new Error('Error invalid operation');
     }
   }
-  respondToClient(messagingKeySignature: string, encryptedToApplicationGroupMessagingPrivateKey: string,
-                  encryptedToMembersGroupMessagingPrivateKey: string[], messagingPublicKeyBase58Check: string): void {
+  respondToClient(
+    messagingKeySignature: string,
+    encryptedToApplicationGroupMessagingPrivateKey: string,
+    encryptedToMembersGroupMessagingPrivateKey: string[],
+    messagingPublicKeyBase58Check: string,
+    encryptedMessagingKeyRandomness: string | undefined
+  ): void {
     this.identityService.messagingGroup({
       messagingKeySignature,
       encryptedToApplicationGroupMessagingPrivateKey,
       encryptedToMembersGroupMessagingPrivateKey,
       messagingPublicKeyBase58Check,
+      encryptedMessagingKeyRandomness,
     });
   }
 

@@ -51,6 +51,7 @@ export type MessagingGroupPayload = {
   encryptedToApplicationGroupMessagingPrivateKey: string;
   encryptedToMembersGroupMessagingPrivateKey: string[];
   messagingPublicKeyBase58Check: string;
+  encryptedMessagingKeyRandomness: string | undefined;
 };
 
 export type MessagingGroup = {
