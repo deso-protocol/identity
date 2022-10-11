@@ -32,10 +32,11 @@ import { IconsModule } from '../../icons/icons.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CryptoService } from '../../crypto.service';
 import { SignUpBuyDesoComponent } from '../sign-up-buy-deso.component';
-import { RouteNames } from 'src/app/app-routing.module';
+import { AppRoutingModule, RouteNames } from 'src/app/app-routing.module';
 import { Network } from '../../../types/identity';
 import { BuyDeSoCompletePageComponent } from '../buy-deso-complete-page/buy-deso-complete-page.component';
 import { BuyDesoPageComponent } from '../buy-deso-page/buy-deso-page.component';
+import { BuyDeSoMegaSwapComponent } from '../buy-deso-megaswap/buy-deso-megaswap.component';
 
 class Messages {
   static INCORRECT_PASSWORD = `The password you entered was incorrect.`;
@@ -58,6 +59,7 @@ export class BuyDeSoComponent implements OnInit {
   static BUY_WITH_BTC = 'Buy with Bitcoin';
   static BUY_WITH_ETH = 'Buy with Ethereum';
   static BUY_ON_CB = 'Buy on Coinbase';
+  static BUY_WITH_MEGASWAP = 'Buy with Crypto';
   static CB_LINK = 'https://www.coinbase.com/price/decentralized-social';
 
   appData: GlobalVarsService;
@@ -75,9 +77,9 @@ export class BuyDeSoComponent implements OnInit {
 
   BuyDeSoComponent = BuyDeSoComponent;
   latestBitcoinAPIResponse: any = null;
-
-  buyTabs = [BuyDeSoComponent.BUY_WITH_BTC];
-  activeTab = BuyDeSoComponent.BUY_WITH_BTC;
+  defaultBuyTabs = [BuyDeSoComponent.BUY_WITH_MEGASWAP, BuyDeSoComponent.BUY_WITH_USD, BuyDeSoComponent.BUY_ON_CB];
+  buyTabs = this.defaultBuyTabs;
+  activeTab = BuyDeSoComponent.BUY_WITH_MEGASWAP;
   linkTabs = { [BuyDeSoComponent.BUY_ON_CB]: BuyDeSoComponent.CB_LINK };
 
   satoshisPerDeSoExchangeRate = 0;
@@ -119,10 +121,6 @@ export class BuyDeSoComponent implements OnInit {
   ) {
     this.appData = globalVars;
     this.route.queryParams.subscribe((params: Params) => {
-      if (params.btc) {
-        this.activeTab = BuyDeSoComponent.BUY_WITH_BTC;
-        this.router.navigate([], { queryParamsHandling: 'merge' });
-      }
       if (params.publicKey) {
         this.publicKey = params.publicKey;
       }
@@ -148,7 +146,7 @@ export class BuyDeSoComponent implements OnInit {
       'To get started, simply send Bitcoin to your deposit address below. Note that deposits should show up ' +
       'within thirty seconds or so but sometimes, for various technical reasons, it can take up to an hour ' +
       '(though this should be extremely rare).\n\n' +
-      "Once you've deposited Bitcoin, you can swap it for DESO in step two below. If it's your first " +
+      'Once you\'ve deposited Bitcoin, you can swap it for DESO in step two below. If it\'s your first ' +
       'time doing this, we recommend starting with a small test amount of Bitcoin to get comfortable with the flow.'
     );
   }
@@ -169,8 +167,8 @@ export class BuyDeSoComponent implements OnInit {
     return (
       'If you send too much Bitcoin to your deposit address and need to get it back, you ' +
       'can access the Bitcoin in this address by importing your DeSo seed phrase into most standard Bitcoin wallets ' +
-      "like Electrum and choosing m/44'/0'/0'/0/0 as your derivation path. This works because your DeSo seed phrase is " +
-      "what's used to generate your Bitcoin deposit address."
+      'like Electrum and choosing m/44\'/0\'/0\'/0/0 as your derivation path. This works because your DeSo seed phrase is ' +
+      'what\'s used to generate your Bitcoin deposit address.'
     );
   }
 
@@ -524,8 +522,6 @@ export class BuyDeSoComponent implements OnInit {
       queryParamsHandling: 'merge',
     });
     comp.ref.detectChanges();
-
-    console.log('NOW SHOULD CLOSE IDENTITY');
   }
 
   _clickBuyDeSoSuccessButTimeout(comp: BuyDeSoComponent): void {
@@ -534,7 +530,7 @@ export class BuyDeSoComponent implements OnInit {
     const errString =
       'Your DeSo purchase was successfully broadcast. Due to high load' +
       ' your balance may take up to half an hour to show up in your wallet. Please ' +
-      " check back and hit the 'help' button if you have any problems.";
+      ' check back and hit the \'help\' button if you have any problems.';
     comp._alertSuccess(errString);
   }
 
@@ -777,11 +773,21 @@ export class BuyDeSoComponent implements OnInit {
     window.scroll(0, 0);
 
     // Add extra tabs
-    this.activeTab = BuyDeSoComponent.BUY_WITH_ETH;
-    this.buyTabs.unshift(BuyDeSoComponent.BUY_WITH_ETH);
-    this.buyTabs.push(BuyDeSoComponent.BUY_WITH_USD);
-    this.buyTabs.push(BuyDeSoComponent.BUY_ON_CB);
+    this.activeTab = BuyDeSoComponent.BUY_WITH_MEGASWAP;
 
+    this.route.params.subscribe((params) => {
+      const ticker = (params.ticker || '').toUpperCase();
+      console.log(ticker);
+      if (ticker === 'BTC') {
+        this.buyTabs = [BuyDeSoComponent.BUY_WITH_BTC];
+        this.activeTab = BuyDeSoComponent.BUY_WITH_BTC;
+      } else if (ticker === 'ETH') {
+        this.buyTabs = [BuyDeSoComponent.BUY_WITH_ETH];
+        this.activeTab = BuyDeSoComponent.BUY_WITH_ETH;
+      } else {
+        this.buyTabs = this.defaultBuyTabs;
+      }
+    });
     if (!isNil(this.activeTabInput)) {
       this.activeTab = this.activeTabInput;
     }
@@ -795,7 +801,7 @@ export class BuyDeSoComponent implements OnInit {
           // console.log('Using Bitcoin sats/KB fee: ', this.buyDeSoFields.bitcoinTransactionFeeRateSatoshisPerKB)
         } else {
           console.error(
-            "res.priority was null so didn't set default fee: ",
+            'res.priority was null so didn\'t set default fee: ',
             res
           );
         }
@@ -829,6 +835,7 @@ export class BuyDeSoComponent implements OnInit {
     BuyDeSoCompleteComponent,
     BuyDeSoEthComponent,
     BuyDeSoUSDComponent,
+    BuyDeSoMegaSwapComponent,
     SignUpBuyDesoComponent,
   ],
   imports: [
@@ -837,6 +844,7 @@ export class BuyDeSoComponent implements OnInit {
     MatTooltipModule,
     CommonModule,
     IconsModule,
+    AppRoutingModule,
     BsDropdownModule.forRoot(),
   ],
   exports: [BuyDeSoComponent, BuyDeSoCompleteComponent],

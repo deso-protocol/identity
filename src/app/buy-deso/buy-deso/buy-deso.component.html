@@ -2,7 +2,7 @@
 <div class="buy-deso__container">
   <div *ngIf="!publicKeyNotInIdentity; else showPublicKeyNotInIdentity">
     <div *ngIf="!waitingOnTxnConfirmation" class="buy-deso__title mx-16px">
-      Buy $DESO
+      Buy $DESO {{ activeTab }}
     </div>
     <div class="d-flex flex-column">
       <div style="flex-grow: 1">
@@ -22,6 +22,9 @@
           </div>
           <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD">
             <buy-deso-usd [parentComponent]="this"></buy-deso-usd>
+          </div>
+          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_MEGASWAP">
+            <buy-deso-megaswap [publicKey]='publicKey' [parentComponent]='this'></buy-deso-megaswap>
           </div>
           <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_BTC">
             <div *ngIf="buyWithBTCStep === 1">
