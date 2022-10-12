@@ -731,13 +731,13 @@ export class AccountService {
   }
 
   // Decrypt messages encrypted with shared secret
-  async decryptMessages(
+  decryptMessages(
     seedHex: string,
     encryptedMessages: EncryptedMessage[],
     messagingGroups: MessagingGroup[],
     messagingKeyRandomness: string | undefined,
     ownerPublicKeyBase58Check: string | undefined,
-  ): Promise<{ [key: string]: any }> {
+  ): { [key: string]: any } {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
     const myPublicKey = ownerPublicKeyBase58Check || this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
