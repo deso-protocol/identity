@@ -134,4 +134,8 @@ export interface GoogleAuthState {
   derive: boolean;
   getFreeDeso: boolean;
   signedUp: boolean;
+  transactionSpendingLimitResponse: string;
+  deleteKey: boolean;
+  derivedPublicKey: string;
+  expirationDays: string;
 }

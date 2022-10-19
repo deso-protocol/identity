@@ -51,6 +51,11 @@ export class GlobalVarsService {
   nanosToDeSoMemo = {};
   blockHeight = 0;
 
+  derivedPublicKey = '';
+  transactionSpendingLimitResponse = '';
+  deleteKey = false;
+  expirationDays = 0;
+
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
   }
