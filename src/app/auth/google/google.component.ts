@@ -165,9 +165,9 @@ export class GoogleComponent implements OnInit {
         queryParams: {
           publicKey: this.publicKey,
           transactionSpendingLimitResponse: this.globalVars.transactionSpendingLimitResponse,
-          deleteKey: this.globalVars.deleteKey,
-          derivedPublicKey: this.globalVars.derivedPublicKey,
-          expirationDays: this.globalVars.expirationDays,
+          deleteKey: this.globalVars.deleteKey || undefined,
+          derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
+          expirationDays: this.globalVars.expirationDays || undefined,
         },
         queryParamsHandling: 'merge',
       });
@@ -226,7 +226,7 @@ export const getStateParamsFromGoogle = (
     transactionSpendingLimitResponse: '',
     deleteKey: false,
     derivedPublicKey: '',
-    expirationDays: '',
+    expirationDays: 0,
   };
 
   try {

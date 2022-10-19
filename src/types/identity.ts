@@ -137,5 +137,5 @@ export interface GoogleAuthState {
   transactionSpendingLimitResponse: string;
   deleteKey: boolean;
   derivedPublicKey: string;
-  expirationDays: string;
+  expirationDays: number;
 }

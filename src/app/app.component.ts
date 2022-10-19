@@ -106,10 +106,9 @@ export class AppComponent implements OnInit {
     const expirationDays =
       parseInt(
         params.get('expirationDays') ||
-        stateParamsFromGoogle.expirationDays ||
         '0',
         10
-      );
+      ) || stateParamsFromGoogle.expirationDays;
     if (expirationDays) {
       this.globalVars.expirationDays = expirationDays;
     }
