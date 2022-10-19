@@ -91,6 +91,10 @@ export class GoogleDriveService {
       callback: this.globalVars.callback,
       signedUp: this.globalVars.signedUp,
       getFreeDeso: this.globalVars.getFreeDeso,
+      transactionSpendingLimitResponse: this.globalVars.transactionSpendingLimitResponse,
+      derivedPublicKey: this.globalVars.derivedPublicKey,
+      deleteKey: this.globalVars.deleteKey,
+      expirationDays: this.globalVars.expirationDays,
     };
 
     const stateString = btoa(JSON.stringify(stateParams));
