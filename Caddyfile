@@ -84,7 +84,8 @@ header @html Content-Security-Policy "
     https://api.testwyre.com/v3/widget/supportedCountries
     https://registry.walletconnect.com/
     wss://*.bridge.walletconnect.org/
-    megaswap.dev;
+    megaswap.dev
+    megaswap.xyz;
   img-src 'self'
       {$DOMAIN:https://node.deso.org}/api/v0/get-single-profile-picture/
       https://test.deso.org/api/v0/get-single-profile-picture/
@@ -104,4 +105,5 @@ header @html Content-Security-Policy "
     https://ka-f.fontawesome.com;
   frame-src 'self'
     https://iframe.videodelivery.net
-    megaswap.dev;"
+    megaswap.dev
+    megaswap.xyz;"

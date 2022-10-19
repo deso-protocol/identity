@@ -17,7 +17,7 @@ export const environment = {
   ],
   noAccessHostnames: [''],
   jumioSupported: false,
-  megaswapURL: 'https://deso-protocol.github.io/megaswap-private-frontend',
+  megaswapURL: 'https://megaswap.xyz',
 };
 
 /*
