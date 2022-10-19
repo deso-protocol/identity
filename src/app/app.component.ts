@@ -75,8 +75,43 @@ export class AppComponent implements OnInit {
       }
     }
 
-    if (stateParamsFromGoogle.derive) {
+    if (
+      params.get('derive') === 'true' ||
+      stateParamsFromGoogle.derive
+    ) {
       this.globalVars.derive = true;
+    }
+
+    const transactionSpendingLimitResponse =
+      params.get('transactionSpendingLimitResponse') ||
+      stateParamsFromGoogle.transactionSpendingLimitResponse;
+    if (transactionSpendingLimitResponse) {
+      this.globalVars.transactionSpendingLimitResponse = transactionSpendingLimitResponse;
+    }
+
+    const derivedPublicKey =
+      params.get('derivedPublicKey') ||
+      stateParamsFromGoogle.derivedPublicKey;
+    if (derivedPublicKey) {
+      this.globalVars.derivedPublicKey = derivedPublicKey;
+    }
+
+    const deleteKey =
+      params.get('deleteKey') === 'true' ||
+      stateParamsFromGoogle.deleteKey;
+    if (deleteKey) {
+      this.globalVars.deleteKey = true;
+    }
+
+    const expirationDays =
+      parseInt(
+        params.get('expirationDays') ||
+        stateParamsFromGoogle.expirationDays ||
+        '0',
+        10
+      );
+    if (expirationDays) {
+      this.globalVars.expirationDays = expirationDays;
     }
 
     const referralCodeKey = 'referralCode';

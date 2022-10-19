@@ -162,7 +162,13 @@ export class GoogleComponent implements OnInit {
 
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+        queryParams: {
+          publicKey: this.publicKey,
+          transactionSpendingLimitResponse: this.globalVars.transactionSpendingLimitResponse,
+          deleteKey: this.globalVars.deleteKey,
+          derivedPublicKey: this.globalVars.derivedPublicKey,
+          expirationDays: this.globalVars.expirationDays,
+        },
         queryParamsHandling: 'merge',
       });
     } else {
@@ -217,6 +223,10 @@ export const getStateParamsFromGoogle = (
     derive: false,
     getFreeDeso: false,
     signedUp: false,
+    transactionSpendingLimitResponse: '',
+    deleteKey: false,
+    derivedPublicKey: '',
+    expirationDays: '',
   };
 
   try {
