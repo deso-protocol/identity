@@ -226,7 +226,7 @@ export const getStateParamsFromGoogle = (
     transactionSpendingLimitResponse: '',
     deleteKey: false,
     derivedPublicKey: '',
-    expirationDays: '',
+    expirationDays: 0,
   };
 
   try {
