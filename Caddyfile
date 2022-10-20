@@ -1,5 +1,6 @@
 # Global caddy config options must be first
 {
+  debug
   admin off
   auto_https off
 }
@@ -102,4 +103,5 @@ header @html Content-Security-Policy "
     https://fonts.gstatic.com
     https://ka-f.fontawesome.com;
   frame-src 'self'
+    https://megaswap.xyz
     https://iframe.videodelivery.net;"
