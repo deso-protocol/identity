@@ -76,6 +76,8 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/get-txn
     https://test.deso.org/api/v0/get-bulk-messaging-public-keys
     https://test.deso.org/api/v0/submit-transaction
+    megaswap.dev
+    megaswap.xyz
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files
@@ -102,4 +104,6 @@ header @html Content-Security-Policy "
     https://fonts.gstatic.com
     https://ka-f.fontawesome.com;
   frame-src 'self'
+    megaswap.dev
+    megaswap.xyz
     https://iframe.videodelivery.net;"
