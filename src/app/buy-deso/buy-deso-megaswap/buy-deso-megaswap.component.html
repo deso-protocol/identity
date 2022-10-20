@@ -1,30 +1,35 @@
-<div>
-  <p class="mb-4 px-3 fs-7 text-muted pt-2">
+<div class="d-flex flex-column" style="height: 75vh">
+  <p class="py-2 px-3 fs-7 text-muted">
     <i class="fas fa-info-circle"></i>
     Swap from BTC, ETH, SOL, and other chains to DESO using MegaSwap.
     The legacy <a [routerLink]="'/' + RouteNames.BUY_DESO + '/BTC'" queryParamsHandling="merge">Buy with BTC</a>
       and <a [routerLink]="'/' + RouteNames.BUY_DESO + '/ETH'" queryParamsHandling="merge">Buy with ETH</a> flows are
     still accessible but being deprecated.
   </p>
-
-  <div class="row" *ngIf="iframeURL; else elseBlockIframe">
-    <div class="col-10 offset-1 embed-responsive embed-responsive-16by9">
-      <iframe [src]="iframeURL" class="w-100 h-100 rounded embed-responsive-item"></iframe>
-    </div>
-  </div>
+  <p class="py-2 px-3 fs-18px">
+    <a class="link--unstyled" (click)="finishFlow()">
+      Click here
+    </a>
+    to login once you're done purchasing DESO
+  </p>
+  <iframe
+    [src]="iframeURL"
+    class="border-0 rounded w-100 h-100"
+    *ngIf="iframeURL; else elseBlockIframe"
+  ></iframe>
   <ng-template #elseBlockIframe>
     <p class="fs-8 text-danger text-center">
       <i class="fas fa-exclamation-triangle"></i> Unable to render iFrame.<br />Invalid MegaSwap URL.
     </p>
   </ng-template>
-  <button
-    (click)="finishFlow()"
-    [ngStyle]="{
-          width: '30%',
-          'min-width': '250px'
-        }"
-    class="styled-primary-button mt-30px mb-10px"
-  >
-    Login
-  </button>
+<!--  <div class="d-flex justify-content-center">-->
+<!--    <button-->
+<!--      (click)="finishFlow()"-->
+<!--      style="'min-width': '200px'"-->
+<!--      class="styled-primary-button mt-30px mb-10px"-->
+<!--    >-->
+<!--      Login-->
+<!--    </button>-->
+<!--  </div>-->
+
 </div>
