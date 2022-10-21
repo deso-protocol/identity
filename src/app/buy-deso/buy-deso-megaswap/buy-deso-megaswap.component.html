@@ -6,12 +6,6 @@
       and <a [routerLink]="'/' + RouteNames.BUY_DESO + '/ETH'" queryParamsHandling="merge">Buy with ETH</a> flows are
     still accessible but being deprecated.
   </p>
-  <p class="py-2 px-3 fs-18px">
-    <a class="link--unstyled cursor-pointer" (click)="finishFlow()">
-      Click here
-    </a>
-    to login once you're done purchasing DESO
-  </p>
   <iframe
     [src]="iframeURL"
     class="border-0 rounded w-100 h-100"
@@ -22,14 +16,14 @@
       <i class="fas fa-exclamation-triangle"></i> Unable to render iFrame.<br />Invalid MegaSwap URL.
     </p>
   </ng-template>
-<!--  <div class="d-flex justify-content-center">-->
-<!--    <button-->
-<!--      (click)="finishFlow()"-->
-<!--      style="'min-width': '200px'"-->
-<!--      class="styled-primary-button mt-30px mb-10px"-->
-<!--    >-->
-<!--      Login-->
-<!--    </button>-->
-<!--  </div>-->
+  <div class="d-flex justify-content-center">
+    <button
+      (click)="finishFlow()"
+      style="'min-width': '200px'"
+      class="styled-primary-button mt-30px mb-10px"
+    >
+     Continue
+    </button>
+  </div>
 
 </div>
