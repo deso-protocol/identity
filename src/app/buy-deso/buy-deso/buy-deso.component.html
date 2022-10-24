@@ -23,6 +23,9 @@
           <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD">
             <buy-deso-usd [parentComponent]="this"></buy-deso-usd>
           </div>
+          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_MEGASWAP">
+            <buy-deso-megaswap [publicKey]='publicKey' [parentComponent]='this'></buy-deso-megaswap>
+          </div>
           <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_BTC">
             <div *ngIf="buyWithBTCStep === 1">
               <!-- Step One Box -->

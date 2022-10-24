@@ -1,0 +1,29 @@
+<div class="d-flex flex-column" style="height: 75vh">
+  <p class="py-2 px-3 fs-7 text-muted">
+    <i class="fas fa-info-circle"></i>
+    Swap from BTC, ETH, SOL, and other chains to DESO using MegaSwap.
+    The legacy <a [routerLink]="'/' + RouteNames.BUY_DESO + '/BTC'" queryParamsHandling="merge">Buy with BTC</a>
+      and <a [routerLink]="'/' + RouteNames.BUY_DESO + '/ETH'" queryParamsHandling="merge">Buy with ETH</a> flows are
+    still accessible but being deprecated.
+  </p>
+  <iframe
+    [src]="iframeURL"
+    class="border-0 rounded w-100 h-100"
+    *ngIf="iframeURL; else elseBlockIframe"
+  ></iframe>
+  <ng-template #elseBlockIframe>
+    <p class="fs-8 text-danger text-center">
+      <i class="fas fa-exclamation-triangle"></i> Unable to render iFrame.<br />Invalid MegaSwap URL.
+    </p>
+  </ng-template>
+  <div class="d-flex justify-content-center">
+    <button
+      (click)="finishFlow()"
+      style="'min-width': '200px'"
+      class="styled-primary-button mt-30px mb-10px"
+    >
+     Continue
+    </button>
+  </div>
+
+</div>

@@ -40,4 +40,11 @@ WORKDIR /identity
 COPY ./Caddyfile .
 COPY --from=identity /identity/dist/identity .
 
-ENTRYPOINT ["caddy", "run"]
+# We use a run.sh script so that we can pass environment variables
+# to it.
+COPY ./run.sh .
+
+# Default options overrideable by docker-compose
+ENV CADDY_FILE "/identity/Caddyfile"
+
+ENTRYPOINT ["/identity/run.sh"]

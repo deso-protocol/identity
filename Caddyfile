@@ -79,7 +79,7 @@ header @html Content-Security-Policy "
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files
-    https://api.blockcypher.com/v1/btc/main/addrs/full
+    https://api.blockchain.com/mempool/fees
     https://api.sendwyre.com/v3/widget/supportedCountries
     https://api.testwyre.com/v3/widget/supportedCountries
     https://registry.walletconnect.com/
@@ -102,4 +102,5 @@ header @html Content-Security-Policy "
     https://fonts.gstatic.com
     https://ka-f.fontawesome.com;
   frame-src 'self'
+    megaswap.xyz
     https://iframe.videodelivery.net;"

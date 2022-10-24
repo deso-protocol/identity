@@ -15,4 +15,5 @@ export const environment = {
   ],
   noAccessHostnames: [''],
   jumioSupported: false,
+  megaswapURL: 'https://megaswap.xyz',
 };
