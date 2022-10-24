@@ -271,10 +271,17 @@ export class SignUpMetamaskComponent implements OnInit {
       this.globalVars.hostname,
       this.globalVars.accessLevelRequest
     );
-    this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
-      publicKeyAdded: this.publicKey,
-      signedUp: true,
-    });
+    if (this.globalVars.derive) {
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: { publicKey: this.publicKey },
+        queryParamsHandling: 'merge',
+      });
+    } else {
+      this.identityService.login({
+        users: this.accountService.getEncryptedUsers(),
+        publicKeyAdded: this.publicKey,
+        signedUp: true,
+      });
+    }
   }
 }
