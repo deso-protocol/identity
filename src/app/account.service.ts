@@ -35,6 +35,7 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
 import { MessagingGroup } from './identity.service';
 import bs58check from 'bs58check';
+import { SwalHelper } from '../lib/helpers/swal-helper';
 
 export const ERROR_USER_NOT_FOUND = 'User not found';
 
@@ -246,6 +247,7 @@ export class AccountService {
     const accessHash = sha256.x2(accessBytes);
 
     let accessSignature: string;
+    let defaultPrivateKeyInfo: DefaultKeyPrivateInfo;
     if (isMetamask) {
       // TODO: if we want to allow generic log-in with derived keys, we should error because a derived key can't produce a
       //  valid access signature. For now, we ignore this because the only derived key log-in is coming through Metamask signup.
@@ -267,15 +269,40 @@ export class AccountService {
       ])[0];
     }
 
+    if (isMetamask && this.globalVars.isMobile()) {
+      const swalRes = await SwalHelper.fire({
+        target: 'sign-messaging-randomness',
+        icon: 'info',
+        title: 'Generate Messaging Key',
+        html: `Metamask will open and request that you sign a message.
+          This is used to generate a key pair that will be used to encrypt and decrypt messages on the DeSo Blockchain`,
+        showConfirmButton: true,
+        showCancelButton: false,
+        allowEscapeKey: false,
+        allowOutsideClick: false,
+      });
+      if (swalRes.isConfirmed) {
+        defaultPrivateKeyInfo = await this.getMessagingGroupStandardDerivation(
+          publicKeyBase58Check,
+          this.globalVars.defaultMessageKeyName
+        );
+      }
+      else {
+        throw new Error('Error generating messaging key');
+      }
+    } else {
+      defaultPrivateKeyInfo = await this.getMessagingGroupStandardDerivation(
+        publicKeyBase58Check,
+        this.globalVars.defaultMessageKeyName
+      );
+    }
+
     const {
       messagingPublicKeyBase58Check,
       messagingPrivateKeyHex,
       messagingKeyName,
       messagingKeySignature,
-    } = await this.getMessagingGroupStandardDerivation(
-      publicKeyBase58Check,
-      this.globalVars.defaultMessageKeyName
-    );
+    } = defaultPrivateKeyInfo;
     const messagingPrivateKey = messagingPrivateKeyHex;
     return {
       derivedSeedHex,

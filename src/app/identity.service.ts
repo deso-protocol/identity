@@ -38,6 +38,7 @@ import {
   TransactionMetadataTransferDAOCoin,
   TransactionMetadataDAOCoinLimitOrder,
 } from '../lib/deso/transaction';
+import { SwalHelper } from '../lib/helpers/swal-helper';
 
 export type DerivePayload = {
   publicKey: string;
@@ -157,6 +158,12 @@ export class IdentityService {
         })
         .catch((err) => {
           console.error(err);
+          SwalHelper.fire({
+            icon: 'error',
+            title: 'Error Creating Derived Key',
+            html: `${err.toString()}`,
+            showCancelButton: false,
+          });
         });
     });
   }
