@@ -265,10 +265,11 @@ export class WalletProvider {
         // create new session
         await (this.walletConnect as NodeWalletConnect).createSession();
         // get uri for QR Code modal
-        const uri = (this.walletConnect as NodeWalletConnect).uri;
+        const uri = encodeURIComponent((this.walletConnect as NodeWalletConnect).uri);
+        const href = `https://metamask.app.link/wc?uri=${uri}&target=_self`;
         // display QR Code modal
         WalletConnectQRCodeModal.open(
-          uri,
+          href,
           () => {},
           {
             mobileLinks: ['metamask'],
