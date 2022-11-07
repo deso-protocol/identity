@@ -274,6 +274,10 @@ export class WalletProvider {
             mobileLinks: ['metamask'],
           }
         );
+        const connectButton = document.getElementById('walletconnect-connect-button-Connect');
+        if (connectButton && connectButton.tagName === 'A' && connectButton.parentElement?.className === 'walletconnect-connect__buttons__wrapper__android') {
+          (connectButton as HTMLAnchorElement).target = '_self';
+        }
       } else {
         if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
           this.walletConnectAddress = (this.walletConnect as NodeWalletConnect).accounts[0];
