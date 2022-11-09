@@ -127,7 +127,7 @@ export class SignUpMetamaskComponent implements OnInit {
       message = resp.message;
       signature = resp.signature;
     } catch (e) {
-      this.errorMessage = `Something went wrong while producing Metamask signature. Please try again. Error: ${JSON.stringify(e)}`;
+      this.errorMessage = `Something went wrong while producing Metamask signature. Please try again. Error: ${e}`;
       this.metamaskState = METAMASK.ERROR;
       return;
     }
