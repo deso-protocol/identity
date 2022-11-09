@@ -33,7 +33,10 @@ export class LogoutComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.finishFlow();
+    this.identityService.login({
+      users: this.accountService.getEncryptedUsers(),
+      publicKeyAdded: this.publicKey,
+    });
   }
 
   onSubmit(): void {
