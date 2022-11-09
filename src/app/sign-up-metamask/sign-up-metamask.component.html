@@ -21,6 +21,14 @@
         DeSo doesn't cost ETH gas fees so creating an account only
         requires proof of identity.
       </p>
+      <div *ngIf="metamaskState === METAMASK.ERROR" class="mt-20px">
+        <div class="text-danger">
+          {{ errorMessage }}
+          <span *ngIf="showAlternative" class="fc-blue cursor-pointer fs-underline-hover">
+          <a (click)="redirectToLogIn()">Alternatively, you can sign up with other methods.</a>
+        </span>
+        </div>
+      </div>
       <button
         class="button button-large mb-20px bg-dark text-white mt-20px"
         (click)="launchMetamask()"
@@ -53,15 +61,6 @@
         pick the correct account and click connect.
       </div>
     </ng-container>
-
-    <div *ngIf="metamaskState === METAMASK.ERROR" class="mt-20px">
-      <div class="text-danger">
-        {{ errorMessage }}
-        <span *ngIf="showAlternative" class="fc-blue cursor-pointer fs-underline-hover">
-          <a (click)="redirectToLogIn()">Alternatively, you can sign up with other methods.</a>
-        </span>
-      </div>
-    </div>
   </div>
   <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
     <span class="title-text">Authorize Derived Key</span>
