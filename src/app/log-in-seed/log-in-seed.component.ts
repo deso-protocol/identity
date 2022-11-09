@@ -23,6 +23,7 @@ export class LogInSeedComponent implements OnInit {
   loginError = '';
   mnemonic = '';
   extraText = '';
+  seedHex = '';
 
   // Logging in
   canLogin = false;
@@ -45,65 +46,85 @@ export class LogInSeedComponent implements OnInit {
   ngOnInit(): void {}
 
   clickLoadAccount(): void {
-    // Store mnemonic and extraText locally because we clear them below and otherwise
+    // Store mnemonic, seedHex and extraText locally because we clear them below and otherwise
     // they don't get saved in local storage reliably
     const mnemonic = this.mnemonic;
     const extraText = this.extraText;
+    const seedHex = this.seedHex;
     const network = this.globalVars.network;
 
-    if (!this.entropyService.isValidMnemonic(mnemonic)) {
-      this.loginError = 'Invalid mnemonic';
+    if (mnemonic && seedHex) {
+      this.loginError = 'Cannot use both mnemonic and seed hex';
       return;
     }
 
-    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
-    const keychainNonStandard = this.cryptoService.mnemonicToKeychain(
-      mnemonic,
-      extraText,
-      true
-    );
+    let userPublicKey: string
 
-    let userPublicKey = this.accountService.addUser(
-      keychain,
-      mnemonic,
-      extraText,
-      network
-    );
+    if (seedHex) {
+      if (!/^[\da-f]{64}$/i.test(seedHex)) {
+        this.loginError = 'Invalid seed hex';
+        return;
+      }
 
-    // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
-    if (keychain.publicKey !== keychainNonStandard.publicKey) {
-      const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
-      const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-      const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
-        privateKey,
+      userPublicKey = this.accountService.addUserWithSeedHex(
+        seedHex,
+        network
+      );
+    } else {
+      if (!this.entropyService.isValidMnemonic(mnemonic)) {
+        this.loginError = 'Invalid mnemonic';
+        return;
+      }
+
+      const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+      const keychainNonStandard = this.cryptoService.mnemonicToKeychain(
+        mnemonic,
+        extraText,
+        true
+      );
+      userPublicKey = this.accountService.addUser(
+        keychain,
+        mnemonic,
+        extraText,
         network
       );
 
-      // We only want to add nonStandard derivations if the account is worth importing
-      this.backendApi.GetUsersStateless([publicKey]).subscribe((res) => {
-        if (!res.UserList.length) {
-          return;
-        }
-        const user = res.UserList[0];
-        if (
-          user.ProfileEntryResponse ||
-          user.BalanceNanos > 0 ||
-          user.UsersYouHODL?.length
-        ) {
-          // Add the non-standard key if the user has a profile, a balance, or holdings
-          userPublicKey = this.accountService.addUser(
-            keychainNonStandard,
-            mnemonic,
-            extraText,
-            network
-          );
-        }
-      });
+      // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
+      if (keychain.publicKey !== keychainNonStandard.publicKey) {
+        const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
+        const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+        const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
+          privateKey,
+          network
+        );
+
+        // We only want to add nonStandard derivations if the account is worth importing
+        this.backendApi.GetUsersStateless([publicKey]).subscribe((res) => {
+          if (!res.UserList.length) {
+            return;
+          }
+          const user = res.UserList[0];
+          if (
+            user.ProfileEntryResponse ||
+            user.BalanceNanos > 0 ||
+            user.UsersYouHODL?.length
+          ) {
+            // Add the non-standard key if the user has a profile, a balance, or holdings
+            userPublicKey = this.accountService.addUser(
+              keychainNonStandard,
+              mnemonic,
+              extraText,
+              network
+            );
+          }
+        });
+      }
     }
 
     // Clear the form
     this.mnemonic = '';
     this.extraText = '';
+    this.seedHex = '';
 
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
