@@ -268,42 +268,15 @@ export class AccountService {
         accessHash,
       ])[0];
     }
-
-    if (isMetamask && this.globalVars.isMobile()) {
-      const swalRes = await SwalHelper.fire({
-        target: 'sign-messaging-randomness',
-        icon: 'info',
-        title: 'Generate Messaging Key',
-        html: `Metamask will open and request that you sign a message.
-          This is used to generate a key pair that will be used to encrypt and decrypt messages on the DeSo Blockchain`,
-        showConfirmButton: true,
-        showCancelButton: false,
-        allowEscapeKey: false,
-        allowOutsideClick: false,
-      });
-      if (swalRes.isConfirmed) {
-        defaultPrivateKeyInfo = await this.getMessagingGroupStandardDerivation(
-          publicKeyBase58Check,
-          this.globalVars.defaultMessageKeyName
-        );
-      }
-      else {
-        throw new Error('Error generating messaging key');
-      }
-    } else {
-      defaultPrivateKeyInfo = await this.getMessagingGroupStandardDerivation(
-        publicKeyBase58Check,
-        this.globalVars.defaultMessageKeyName
-      );
-    }
-
     const {
       messagingPublicKeyBase58Check,
       messagingPrivateKeyHex,
       messagingKeyName,
       messagingKeySignature,
-    } = defaultPrivateKeyInfo;
-    const messagingPrivateKey = messagingPrivateKeyHex;
+    } = await this.getMessagingGroupStandardDerivation(
+      publicKeyBase58Check,
+      this.globalVars.defaultMessageKeyName
+    );
     return {
       derivedSeedHex,
       derivedPublicKeyBase58Check,
@@ -316,7 +289,7 @@ export class AccountService {
       jwt,
       derivedJwt,
       messagingPublicKeyBase58Check,
-      messagingPrivateKey,
+      messagingPrivateKey: messagingPrivateKeyHex,
       messagingKeyName,
       messagingKeySignature,
       transactionSpendingLimitHex,
