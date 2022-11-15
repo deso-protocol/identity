@@ -247,7 +247,6 @@ export class AccountService {
     const accessHash = sha256.x2(accessBytes);
 
     let accessSignature: string;
-    let defaultPrivateKeyInfo: DefaultKeyPrivateInfo;
     if (isMetamask) {
       // TODO: if we want to allow generic log-in with derived keys, we should error because a derived key can't produce a
       //  valid access signature. For now, we ignore this because the only derived key log-in is coming through Metamask signup.
