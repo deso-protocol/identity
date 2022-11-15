@@ -45,6 +45,7 @@ export type DerivePayload = {
   derivedPublicKey?: string;
   transactionSpendingLimit?: TransactionSpendingLimitResponse;
   expirationDays?: number;
+  blockHeight: number;
 };
 
 export type MessagingGroupPayload = {
@@ -133,39 +134,53 @@ export class IdentityService {
   }
 
   derive(payload: DerivePayload): void {
-    this.backendApi.GetAppState().subscribe((res) => {
-      const blockHeight = res.BlockHeight;
-      this.accountService
-        .getDerivedPrivateUser(
-          this.backendApi,
-          payload.publicKey,
-          blockHeight,
-          payload.transactionSpendingLimit,
-          payload.derivedPublicKey,
-          payload.expirationDays
-        )
-        .then((derivedPrivateUserInfo) => {
-          if (this.globalVars.callback) {
-            // If callback is passed, we redirect to it with payload as URL parameters.
-            const httpParams = this.parseTypeToHttpParams(
-              derivedPrivateUserInfo
-            );
-            window.location.href =
-              this.globalVars.callback + `?${httpParams.toString()}`;
-          } else {
-            this.cast('derive', derivedPrivateUserInfo);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          SwalHelper.fire({
-            icon: 'error',
-            title: 'Error Creating Derived Key',
-            html: `${err.toString()}`,
-            showCancelButton: false,
-          });
+    this.accountService
+      .getDerivedPrivateUser(
+        this.backendApi,
+        payload.publicKey,
+        payload.blockHeight,
+        payload.transactionSpendingLimit,
+        payload.derivedPublicKey,
+        payload.expirationDays
+      )
+      .then((derivedPrivateUserInfo) => {
+        if (this.globalVars.callback) {
+          // If callback is passed, we redirect to it with payload as URL parameters.
+          const httpParams = this.parseTypeToHttpParams(
+            derivedPrivateUserInfo
+          );
+          const callbackURL = this.globalVars.callback + `?${httpParams.toString()}`;
+          window.location.href = callbackURL;
+          // This is a temporary hack to fix an issue with callback URLs on
+          // android devices. Sometimes we need an additional user click
+          // to trigger to callback.
+          setTimeout(() => {
+            if (window.location.href !== callbackURL) {
+              SwalHelper.fire({
+                icon: 'info',
+                title: 'Click ok to login',
+                showCancelButton: false,
+                showConfirmButton: true,
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+              }).then(() => {
+                window.location.href = callbackURL;
+              });
+            }
+          }, 1000);
+        } else {
+          this.cast('derive', derivedPrivateUserInfo);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        SwalHelper.fire({
+          icon: 'error',
+          title: 'Error Creating Derived Key',
+          html: `${err.toString()}`,
+          showCancelButton: false,
         });
-    });
+      });
   }
 
   messagingGroup(payload: MessagingGroupPayload): void {

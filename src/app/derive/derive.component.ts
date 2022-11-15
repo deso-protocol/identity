@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../account.service';
-import { IdentityService } from '../identity.service';
+import { DerivePayload, IdentityService } from '../identity.service';
 import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
@@ -9,6 +9,7 @@ import { GlobalVarsService } from '../global-vars.service';
 import { UserProfile } from '../../types/identity';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
+import { SwalHelper } from '../../lib/helpers/swal-helper';
 type Accounts = { [key: string]: UserProfile } | {};
 type DeriveParams = {
   publicKey?: string;
@@ -37,6 +38,7 @@ export class DeriveComponent implements OnInit {
   deleteKey = false;
   isSingleAccount = false;
   validationErrors = false;
+  blockHeight = 0;
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -49,6 +51,10 @@ export class DeriveComponent implements OnInit {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
+
+    this.backendApi.GetAppState().subscribe((res) => {
+      this.blockHeight = res.BlockHeight;
+    });
     // first grab the query params
     this.activatedRoute.queryParams.subscribe((params: DeriveParams) => {
       // verify they sent the correct parameter permutation
@@ -92,22 +98,66 @@ export class DeriveComponent implements OnInit {
     // Set derive to true
   }
 
-  selectAccountAndDeriveKey(publicKey: string): void {
-    this.identityService.derive({
-      publicKey,
-      transactionSpendingLimit: this.transactionSpendingLimitResponse,
-      expirationDays: this.expirationDays,
-    });
-  }
-
-  approveDerivedKey(publicKey: string | undefined): void {
-    if (!publicKey) return;
+  async approveDerivedKey(publicKey: string | undefined): Promise<void> {
+    if (!publicKey) { return; }
+    try {
+      if (this.requiresMessagingKeyRandomness(publicKey)) {
+        await this.getMessagingKeyRandomness(publicKey);
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+      await SwalHelper.fire({
+        icon: 'error',
+        title: 'Error getting messaging key randomness',
+        html: `${e}`,
+      });
+      return;
+    }
     this.identityService.derive({
       publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
       transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
+      blockHeight: this.blockHeight,
     });
+  }
+
+  requiresMessagingKeyRandomness(publicKey: string): boolean {
+    const encryptedUser = this.accountService.getEncryptedUsers()[publicKey];
+    if (!encryptedUser) {
+      console.error('encrypted user not found');
+      throw new Error('encrypted user not found');
+    }
+    return this.accountService.isMetamaskAccount(encryptedUser) &&
+      !encryptedUser.encryptedMessagingKeyRandomness;
+  }
+
+  async getMessagingKeyRandomness(publicKey: string): Promise<void> {
+    const swalRes = await SwalHelper.fire({
+        target: 'sign-messaging-randomness',
+        icon: 'info',
+        title: 'Generate Messaging Key',
+        html: `Metamask will open and request that you sign a message.
+          This is used to generate a key pair that will be used to encrypt and decrypt messages on the DeSo Blockchain.
+          Messaging keys are required for derived keys to properly encrypt and decrypt messages`,
+        showConfirmButton: true,
+        showCancelButton: false,
+        allowEscapeKey: false,
+        allowOutsideClick: false,
+      });
+    if (!swalRes.isConfirmed) {
+      return Promise.reject('User declined to sign messaging key randomness');
+    }
+    try {
+      await this.accountService.getMessagingGroupStandardDerivation(
+        publicKey,
+        this.globalVars.defaultMessageKeyName
+      );
+    }
+    catch (e) {
+      return Promise.reject('Error getting messaing group derivation');
+    }
   }
 
   private getParameterValidationErrors(params: Params): boolean {
