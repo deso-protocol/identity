@@ -22,6 +22,7 @@
     <div
       class="fs-18px pt-15px pb-5px"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
+      *ngIf="publicKeyBase58Check"
     >
       <div class="pl-20px text-left d-flex justify-content-between">
         Public Key
@@ -37,7 +38,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="transactionSpendingLimitResponse" class="mb-40px">
+  <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="mb-40px">
     <app-transaction-spending-limit
       [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
     ></app-transaction-spending-limit>
@@ -47,6 +48,7 @@
     [disabled]="!publicKeyBase58Check"
     class="button btn-primary button-large mb-20px text-white font-weight-bold"
     (click)="approveDerivedKey(publicKeyBase58Check)"
+    *ngIf="publicKeyBase58Check"
   >
     Approve
   </button>
