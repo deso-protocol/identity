@@ -111,6 +111,16 @@ export class AccountService {
     return userInfo.loginMethod === LoginMethod.METAMASK;
   }
 
+  requiresMessagingKeyRandomness(publicKey: string): boolean {
+    const privateUser = this.getPrivateUsers()[publicKey];
+    if (!privateUser) {
+      console.error('private user not found');
+      throw new Error('private user not found');
+    }
+    return this.isMetamaskAccount(privateUser) &&
+      !privateUser.messagingKeyRandomness;
+  }
+
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
     if (GlobalVarsService.noAccessHostnames.includes(hostname)) {
       return AccessLevel.None;
