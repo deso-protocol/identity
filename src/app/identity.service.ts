@@ -144,29 +144,28 @@ export class IdentityService {
         payload.expirationDays
       )
       .then((derivedPrivateUserInfo) => {
-        console.log('Received derived private user');
-        console.log(JSON.stringify(derivedPrivateUserInfo));
         if (this.globalVars.callback) {
           // If callback is passed, we redirect to it with payload as URL parameters.
           const httpParams = this.parseTypeToHttpParams(
             derivedPrivateUserInfo
           );
-          console.log('trying callback');
-          window.location.href =
-            this.globalVars.callback + `?${httpParams.toString()}`;
-          console.log('callback didn\'t work, trying sweet alert');
-          SwalHelper.fire({
-            icon: 'info',
-            title: 'Click to login',
-            showCancelButton: false,
-            showConfirmButton: true,
-            allowEscapeKey: false,
-            allowOutsideClick: false,
-          }).then(() => {
-            console.log('callback after sweet alert');
-            window.location.href =
-              this.globalVars.callback + `?${httpParams.toString()}`;
-          });
+          const callbackURL = this.globalVars.callback + `?${httpParams.toString()}`;
+          window.location.href = callbackURL;
+          setTimeout(() => {
+            if (window.location.href !== callbackURL) {
+              SwalHelper.fire({
+                icon: 'info',
+                title: 'Click to login',
+                showCancelButton: false,
+                showConfirmButton: true,
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+              }).then(() => {
+                window.location.href =
+                  this.globalVars.callback + `?${httpParams.toString()}`;
+              });
+            }
+          }, 1000);
         } else {
           this.cast('derive', derivedPrivateUserInfo);
         }
