@@ -151,6 +151,9 @@ export class IdentityService {
           );
           const callbackURL = this.globalVars.callback + `?${httpParams.toString()}`;
           window.location.href = callbackURL;
+          // This is a temporary hack to fix an issue with callback URLs on
+          // android devices. Sometimes we need an additional user click
+          // to trigger to callback.
           setTimeout(() => {
             if (window.location.href !== callbackURL) {
               SwalHelper.fire({
@@ -161,8 +164,7 @@ export class IdentityService {
                 allowEscapeKey: false,
                 allowOutsideClick: false,
               }).then(() => {
-                window.location.href =
-                  this.globalVars.callback + `?${httpParams.toString()}`;
+                window.location.href = callbackURL;
               });
             }
           }, 1000);
