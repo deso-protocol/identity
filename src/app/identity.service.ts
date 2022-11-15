@@ -45,6 +45,7 @@ export type DerivePayload = {
   derivedPublicKey?: string;
   transactionSpendingLimit?: TransactionSpendingLimitResponse;
   expirationDays?: number;
+  blockHeight: number;
 };
 
 export type MessagingGroupPayload = {
@@ -133,39 +134,38 @@ export class IdentityService {
   }
 
   derive(payload: DerivePayload): void {
-    this.backendApi.GetAppState().subscribe((res) => {
-      const blockHeight = res.BlockHeight;
-      this.accountService
-        .getDerivedPrivateUser(
-          this.backendApi,
-          payload.publicKey,
-          blockHeight,
-          payload.transactionSpendingLimit,
-          payload.derivedPublicKey,
-          payload.expirationDays
-        )
-        .then((derivedPrivateUserInfo) => {
-          if (this.globalVars.callback) {
-            // If callback is passed, we redirect to it with payload as URL parameters.
-            const httpParams = this.parseTypeToHttpParams(
-              derivedPrivateUserInfo
-            );
-            window.location.href =
-              this.globalVars.callback + `?${httpParams.toString()}`;
-          } else {
-            this.cast('derive', derivedPrivateUserInfo);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          SwalHelper.fire({
-            icon: 'error',
-            title: 'Error Creating Derived Key',
-            html: `${err.toString()}`,
-            showCancelButton: false,
-          });
+    this.accountService
+      .getDerivedPrivateUser(
+        this.backendApi,
+        payload.publicKey,
+        payload.blockHeight,
+        payload.transactionSpendingLimit,
+        payload.derivedPublicKey,
+        payload.expirationDays
+      )
+      .then((derivedPrivateUserInfo) => {
+        console.log('Received derived private user');
+        console.log(JSON.stringify(derivedPrivateUserInfo));
+        if (this.globalVars.callback) {
+          // If callback is passed, we redirect to it with payload as URL parameters.
+          const httpParams = this.parseTypeToHttpParams(
+            derivedPrivateUserInfo
+          );
+          window.location.href =
+            this.globalVars.callback + `?${httpParams.toString()}`;
+        } else {
+          this.cast('derive', derivedPrivateUserInfo);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        SwalHelper.fire({
+          icon: 'error',
+          title: 'Error Creating Derived Key',
+          html: `${err.toString()}`,
+          showCancelButton: false,
         });
-    });
+      });
   }
 
   messagingGroup(payload: MessagingGroupPayload): void {

@@ -38,6 +38,7 @@ export class DeriveComponent implements OnInit {
   deleteKey = false;
   isSingleAccount = false;
   validationErrors = false;
+  blockHeight = 0;
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -50,6 +51,10 @@ export class DeriveComponent implements OnInit {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
+
+    this.backendApi.GetAppState().subscribe((res) => {
+      this.blockHeight = res.BlockHeight;
+    });
     // first grab the query params
     this.activatedRoute.queryParams.subscribe((params: DeriveParams) => {
       // verify they sent the correct parameter permutation
@@ -114,6 +119,7 @@ export class DeriveComponent implements OnInit {
       derivedPublicKey: this.derivedPublicKeyBase58Check,
       transactionSpendingLimit: this.transactionSpendingLimitResponse,
       expirationDays: this.expirationDays,
+      blockHeight: this.blockHeight,
     });
   }
 
