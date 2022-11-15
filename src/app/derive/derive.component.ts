@@ -101,7 +101,7 @@ export class DeriveComponent implements OnInit {
   async approveDerivedKey(publicKey: string | undefined): Promise<void> {
     if (!publicKey) { return; }
     try {
-      if (this.requiresMessagingKeyRandomness(publicKey)) {
+      if (this.accountService.requiresMessagingKeyRandomness(publicKey)) {
         await this.getMessagingKeyRandomness(publicKey);
         return;
       }
@@ -121,16 +121,6 @@ export class DeriveComponent implements OnInit {
       expirationDays: this.expirationDays,
       blockHeight: this.blockHeight,
     });
-  }
-
-  requiresMessagingKeyRandomness(publicKey: string): boolean {
-    const encryptedUser = this.accountService.getEncryptedUsers()[publicKey];
-    if (!encryptedUser) {
-      console.error('encrypted user not found');
-      throw new Error('encrypted user not found');
-    }
-    return this.accountService.isMetamaskAccount(encryptedUser) &&
-      !encryptedUser.encryptedMessagingKeyRandomness;
   }
 
   async getMessagingKeyRandomness(publicKey: string): Promise<void> {
