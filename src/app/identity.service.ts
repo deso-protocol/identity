@@ -151,8 +151,22 @@ export class IdentityService {
           const httpParams = this.parseTypeToHttpParams(
             derivedPrivateUserInfo
           );
+          console.log('trying callback');
           window.location.href =
             this.globalVars.callback + `?${httpParams.toString()}`;
+          console.log('callback didn\'t work, trying sweet alert');
+          SwalHelper.fire({
+            icon: 'info',
+            title: 'Click to login',
+            showCancelButton: false,
+            showConfirmButton: true,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+          }).then(() => {
+            console.log('callback after sweet alert');
+            window.location.href =
+              this.globalVars.callback + `?${httpParams.toString()}`;
+          });
         } else {
           this.cast('derive', derivedPrivateUserInfo);
         }
