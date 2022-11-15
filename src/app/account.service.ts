@@ -257,6 +257,7 @@ export class AccountService {
           );
         // Slice the '0x' prefix from the signature.
         accessSignature = signature.slice(2);
+        console.log('got signed spending limits from metamask');
       } catch (e) {
         throw new Error(
           'Something went wrong while producing Metamask signature. Please try again.'
@@ -276,6 +277,7 @@ export class AccountService {
       publicKeyBase58Check,
       this.globalVars.defaultMessageKeyName
     );
+    console.log('got messaging group derivation');
     return {
       derivedSeedHex,
       derivedPublicKeyBase58Check,
