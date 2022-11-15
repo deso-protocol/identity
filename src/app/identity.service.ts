@@ -155,7 +155,7 @@ export class IdentityService {
             if (window.location.href !== callbackURL) {
               SwalHelper.fire({
                 icon: 'info',
-                title: 'Click to login',
+                title: 'Click ok to login',
                 showCancelButton: false,
                 showConfirmButton: true,
                 allowEscapeKey: false,
