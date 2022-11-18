@@ -418,7 +418,8 @@ export class AccountService {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(
-      keychain,
+      // @ts-ignore TODO: add "identifier" to type definition
+      keychain.identifier,
       network
     );
     const ethDepositAddress = this.cryptoService.publicKeyToEthAddress(keyPair);
@@ -436,6 +437,30 @@ export class AccountService {
       ethDepositAddress,
       network,
       loginMethod,
+      version: PrivateUserVersion.V2,
+    });
+  }
+
+  addUserWithSeedHex(seedHex: string, network: Network): string {
+    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const helperKeychain = new HDKey();
+    helperKeychain.privateKey = Buffer.from(seedHex, 'hex');
+    // @ts-ignore TODO: add "identifier" to type definition
+    const identifier = helperKeychain.identifier;
+    const btcDepositAddress = this.cryptoService.keychainToBtcAddress(
+      identifier,
+      network
+    );
+    const ethDepositAddress = this.cryptoService.publicKeyToEthAddress(keyPair);
+
+    return this.addPrivateUser({
+      seedHex,
+      mnemonic: '',
+      extraText: '',
+      btcDepositAddress,
+      ethDepositAddress,
+      network,
+      loginMethod: LoginMethod.DESO,
       version: PrivateUserVersion.V2,
     });
   }

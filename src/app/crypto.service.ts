@@ -211,10 +211,8 @@ export class CryptoService {
     return publicKeyEC.getPublic().encode('array', true);
   }
 
-  keychainToBtcAddress(keychain: HDNode, network: Network): string {
+  keychainToBtcAddress(identifier: Buffer, network: Network): string {
     const prefix = CryptoService.PUBLIC_KEY_PREFIXES[network].bitcoin;
-    // @ts-ignore TODO: add "identifier" to type definition
-    const identifier = keychain.identifier;
     const prefixAndKey = Uint8Array.from([...prefix, ...identifier]);
 
     return bs58check.encode(prefixAndKey);
