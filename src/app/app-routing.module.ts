@@ -87,11 +87,6 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: RouteNames.BUY_DESO + '/:ticker',
-    component: BuyDesoPageComponent,
-    pathMatch: 'full',
-  },
-  {
     path: RouteNames.BUY_OR_SEND_DESO,
     component: BuyOrSendDesoComponent,
     pathMatch: 'full',
