@@ -459,6 +459,44 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   bidderInputs: DeSoInputsByTransactor[] = [];
 }
 
+export class TransactionMetadataCreateUserAssociation extends BinaryRecord {
+  @Transcode(FixedBuffer(33))
+  targetUserPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(FixedBuffer(33))
+  appPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationType: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationValue: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataDeleteUserAssociation extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  associationID: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataCreatePostAssociation extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  postHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(FixedBuffer(33))
+  appPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationType: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationValue: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataDeletePostAssociation extends BinaryRecord {
+  @Transcode(FixedBuffer(32))
+  associationID: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -485,6 +523,10 @@ export const TransactionTypeMetadataMap = {
   24: TransactionMetadataDAOCoin,
   25: TransactionMetadataTransferDAOCoin,
   26: TransactionMetadataDAOCoinLimitOrder,
+  27: TransactionMetadataCreateUserAssociation,
+  28: TransactionMetadataDeleteUserAssociation,
+  29: TransactionMetadataCreatePostAssociation,
+  30: TransactionMetadataDeletePostAssociation
 };
 
 export class Transaction extends BinaryRecord {

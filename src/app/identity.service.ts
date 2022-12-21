@@ -37,6 +37,10 @@ import {
   TransactionMetadataDAOCoin,
   TransactionMetadataTransferDAOCoin,
   TransactionMetadataDAOCoinLimitOrder,
+  TransactionMetadataCreateUserAssociation,
+  TransactionMetadataDeleteUserAssociation,
+  TransactionMetadataCreatePostAssociation,
+  TransactionMetadataDeletePostAssociation,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 
@@ -515,6 +519,10 @@ export class IdentityService {
       case TransactionMetadataPrivateMessage:
       case TransactionMetadataSubmitPost:
       case TransactionMetadataLike:
+      case TransactionMetadataCreateUserAssociation:
+      case TransactionMetadataDeleteUserAssociation:
+      case TransactionMetadataCreatePostAssociation:
+      case TransactionMetadataDeletePostAssociation:
         return AccessLevel.ApproveLarge;
     }
 
