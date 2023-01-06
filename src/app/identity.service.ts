@@ -669,12 +669,22 @@ export class IdentityService {
 
   // Transmit a message without expecting a response
   private cast(method: string, payload?: any): void {
-    this.postMessage({
-      id: null,
-      service: 'identity',
-      method,
-      payload,
-    });
+    if (this.globalVars.redirectURI) {
+      window.location.href = `${
+        this.globalVars.redirectURI
+      }?${new URLSearchParams({
+        method,
+        service: 'identity',
+        payload: encodeURIComponent(JSON.stringify(payload)),
+      } as any)}`;
+    } else {
+      this.postMessage({
+        id: null,
+        service: 'identity',
+        method,
+        payload,
+      });
+    }
   }
 
   // Post message to correct client

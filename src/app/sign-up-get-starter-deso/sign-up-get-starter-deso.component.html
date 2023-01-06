@@ -34,7 +34,7 @@
 <div
   class="page-container"
   *ngIf="
-    (globalVars.inTab || globalVars.webview || globalVars.callback) &&
+    (globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI) &&
     !loading &&
     user &&
     user.HasPhoneNumber
@@ -48,7 +48,7 @@
 <div
   class="page-container"
   *ngIf="
-    (globalVars.inTab || globalVars.webview || globalVars.callback) &&
+    (globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI) &&
     !loading &&
     user &&
     !user.HasPhoneNumber

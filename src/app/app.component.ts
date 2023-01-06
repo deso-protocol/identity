@@ -75,6 +75,8 @@ export class AppComponent implements OnInit {
       }
     }
 
+    this.globalVars.redirectURI = params.get('redirect_uri') ?? stateParamsFromGoogle.redirect_uri ?? '';
+
     if (
       params.get('derive') === 'true' ||
       stateParamsFromGoogle.derive
@@ -148,9 +150,10 @@ export class AppComponent implements OnInit {
       console.error(e);
     }
 
-    if (this.globalVars.callback) {
-      // If callback is set, we won't be sending the initialize message.
-      this.globalVars.hostname = 'localhost';
+    if (this.globalVars.callback || this.globalVars.redirectURI) {
+      if (this.globalVars.callback) {
+        this.globalVars.hostname = 'localhost';
+      }
       this.finishInit();
     } else if (
       this.globalVars.webview ||
@@ -168,7 +171,7 @@ export class AppComponent implements OnInit {
       });
     } else {
       // Identity currently doesn't have any management UIs that can be accessed directly
-      window.location.href = `https://deso.org`;
+      window.location.href = 'https://deso.org';
     }
 
     this.backendApiService.GetAppState().subscribe((res) => {
