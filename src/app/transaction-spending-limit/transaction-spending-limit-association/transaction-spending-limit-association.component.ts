@@ -1,0 +1,34 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { GlobalVarsService } from 'src/app/global-vars.service';
+import {
+  AssociationLimitMapItem,
+  BackendAPIService, User
+} from '../../backend-api.service';
+import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
+
+@Component({
+  selector: 'app-transaction-spending-limit-association',
+  templateUrl: './transaction-spending-limit-association.component.html',
+  styleUrls: ['./transaction-spending-limit-association.component.scss'],
+})
+export class TransactionSpendingLimitAssociationComponent implements OnInit {
+  @Input() associationLimitMapItem: AssociationLimitMapItem | undefined;
+  @Input() appUser: User | undefined;
+  TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
+
+  constructor(
+    private backendApi: BackendAPIService,
+    public globalVars: GlobalVarsService
+  ) {}
+
+  ngOnInit(): void {
+    console.log(this.appUser);
+  }
+
+  getOperationString(): string {
+    return this.associationLimitMapItem ?
+      this.globalVars.cleanSpendingLimitOperationName(
+        this.associationLimitMapItem.AssociationOperation
+      ) : '';
+  }
+}

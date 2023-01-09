@@ -1,0 +1,30 @@
+<div class="d-flex flex-column border br-12px border-primary p-1">
+  <div class="d-flex d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-start align-items-center py-10px col-6">
+        <div
+          class="avatar mr-15px"
+          [appAvatar]="associationLimitMapItem?.AppPublicKeyBase58Check"
+          *ngIf="associationLimitMapItem?.AppPublicKeyBase58Check"
+        ></div>
+        <div>
+          {{
+          appUser?.ProfileEntryResponse?.Username || (appUser?.PublicKeyBase58Check | truncateAddressOrUsername) || 'Any App'
+          }}
+        </div>
+      </div>
+    <div class="col-6 text-right">
+      {{ associationLimitMapItem?.AppScopeType }} Scope
+    </div>
+  </div>
+  <div class="d-flex justify-content-between">
+    <div class="col-6 text-left">
+      {{ associationLimitMapItem?.AssociationType || 'Any Association Type' }}
+    </div>
+    <div class="col-3 text-center">
+      {{ getOperationString() }}
+    </div>
+    <div class="col-3 text-right">
+      {{ associationLimitMapItem?.OpCount }}
+    </div>
+  </div>
+</div>
