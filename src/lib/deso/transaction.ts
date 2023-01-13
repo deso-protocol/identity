@@ -460,10 +460,10 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
 }
 
 export class TransactionMetadataCreateUserAssociation extends BinaryRecord {
-  @Transcode(FixedBuffer(33))
+  @Transcode(VarBuffer)
   targetUserPublicKey: Buffer = Buffer.alloc(0);
 
-  @Transcode(FixedBuffer(33))
+  @Transcode(VarBuffer)
   appPublicKey: Buffer = Buffer.alloc(0);
 
   @Transcode(VarBuffer)
@@ -474,15 +474,15 @@ export class TransactionMetadataCreateUserAssociation extends BinaryRecord {
 }
 
 export class TransactionMetadataDeleteUserAssociation extends BinaryRecord {
-  @Transcode(FixedBuffer(32))
+  @Transcode(VarBuffer)
   associationID: Buffer = Buffer.alloc(0);
 }
 
 export class TransactionMetadataCreatePostAssociation extends BinaryRecord {
-  @Transcode(FixedBuffer(32))
+  @Transcode(VarBuffer)
   postHash: Buffer = Buffer.alloc(0);
 
-  @Transcode(FixedBuffer(33))
+  @Transcode(VarBuffer)
   appPublicKey: Buffer = Buffer.alloc(0);
 
   @Transcode(VarBuffer)
@@ -493,7 +493,7 @@ export class TransactionMetadataCreatePostAssociation extends BinaryRecord {
 }
 
 export class TransactionMetadataDeletePostAssociation extends BinaryRecord {
-  @Transcode(FixedBuffer(32))
+  @Transcode(VarBuffer)
   associationID: Buffer = Buffer.alloc(0);
 }
 
