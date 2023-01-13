@@ -16,6 +16,8 @@ import {
   Transaction,
   TransactionMetadataAcceptNFTBid,
   TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataAccessGroup,
+  TransactionMetadataAccessGroupMembers,
   TransactionMetadataAuthorizeDerivedKey,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
@@ -28,6 +30,7 @@ import {
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataMessagingGroup,
+  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
   TransactionMetadataPrivateMessage,
@@ -442,6 +445,91 @@ export class ApproveComponent implements OnInit {
               `${sellingCoin} for ${buyingCoin} with an exchange rate of ${exchangeRate} and a quantity of ${quantityToFill}`;
           }
         }
+        break;
+      case TransactionMetadataAccessGroup:
+        const accessGroupMetadata = this.transaction
+          .metadata as TransactionMetadataAccessGroup;
+        description = `${
+          accessGroupMetadata.accessGroupOperationType == 0 ? 'create' : 'update'
+        } access group with name "${accessGroupMetadata.accessGroupKeyName.toString()}"`;
+        break;
+      case TransactionMetadataAccessGroupMembers:
+        const accessGroupMembersMetadata = this.transaction
+          .metadata as TransactionMetadataAccessGroupMembers;
+        const numMembers = accessGroupMembersMetadata.accessGroupMembersList.length;
+        const pluralSuffix = numMembers > 1 ? 's' : '';
+        let operation: string;
+        switch (accessGroupMembersMetadata.accessGroupMemberOperationType) {
+          case 0:
+            operation = `add ${numMembers} member${pluralSuffix} to`;
+            break;
+          case 1:
+            operation = `remove ${numMembers} member${pluralSuffix} from`;
+            break;
+          case 2:
+            operation = `update ${numMembers} member${pluralSuffix} of`;
+            break;
+          default:
+            operation = 'unknown action'
+        }
+        publicKeys = [
+          this.base58KeyCheck(accessGroupMembersMetadata.accessGroupOwnerPublicKey),
+          ...accessGroupMembersMetadata.accessGroupMembersList
+            .map(
+              (member) =>
+                this.base58KeyCheck(member.accessGroupMemberPublicKey)
+            )];
+        description = `
+        ${operation} group with name ${accessGroupMembersMetadata.accessGroupKeyName.toString()}.\n
+        ${accessGroupMembersMetadata.accessGroupMembersList.map((member) => {
+          return `${
+            this.base58KeyCheck(member.accessGroupMemberPublicKey)
+          } - key name: ${
+            member.accessGroupMemberKeyName.toString()
+          }, encrypted key:${
+            member.encryptedKey.toString()
+          }\n`
+        })}
+         `
+        break;
+      case TransactionMetadataNewMessage:
+        const newMessageMetadata = this.transaction
+          .metadata as TransactionMetadataNewMessage;
+        let messageType: string;
+        let recipient: string;
+        switch (newMessageMetadata.newMessageType) {
+          case 0:
+            messageType = 'dm';
+            recipient = this.base58KeyCheck(newMessageMetadata.recipientAccessGroupPublicKey);
+            publicKeys = [recipient];
+            break;
+          case 1:
+            messageType = 'group chat';
+            recipient = `group with name ${
+              this.base58KeyCheck(newMessageMetadata.recipientAccessGroupKeyname)
+            }`;
+            publicKeys = [recipient];
+            break;
+          default:
+            recipient = 'unknown';
+            messageType = 'unknown';
+        }
+        let messageOperation: string;
+        switch (newMessageMetadata.newMessageOperation) {
+          case 0:
+            messageOperation = `send new ${messageType}`;
+            break;
+          case 1:
+            messageOperation = `update existing ${messageType}`;
+            break;
+          case 2:
+            messageOperation = `update thread attributes for a ${messageType}`;
+            break;
+          default:
+            messageOperation = 'unknown';
+        }
+        // TODO: this description could be improved.
+        description = `${messageOperation}`
         break;
     }
 
