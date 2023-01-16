@@ -559,9 +559,9 @@ export const TransactionTypeMetadataMap = {
   24: TransactionMetadataDAOCoin,
   25: TransactionMetadataTransferDAOCoin,
   26: TransactionMetadataDAOCoinLimitOrder,
-  27: TransactionMetadataAccessGroup,
-  28: TransactionMetadataAccessGroupMembers,
-  29: TransactionMetadataNewMessage,
+  31: TransactionMetadataAccessGroup,
+  32: TransactionMetadataAccessGroupMembers,
+  33: TransactionMetadataNewMessage,
 };
 
 export class Transaction extends BinaryRecord {
