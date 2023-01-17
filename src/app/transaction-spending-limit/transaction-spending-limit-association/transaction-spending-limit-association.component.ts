@@ -25,7 +25,6 @@ export class TransactionSpendingLimitAssociationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.appUser);
   }
 
   getOperationString(): string {
