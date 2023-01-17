@@ -1,10 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { GlobalVarsService } from 'src/app/global-vars.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {GlobalVarsService} from 'src/app/global-vars.service';
 import {
+  AssociationAppScopeType,
   AssociationLimitMapItem,
-  BackendAPIService, User
+  AssociationOperationString,
+  BackendAPIService,
+  User
 } from '../../backend-api.service';
-import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
+import {TransactionSpendingLimitComponent} from '../transaction-spending-limit.component';
 
 @Component({
   selector: 'app-transaction-spending-limit-association',
@@ -22,13 +25,18 @@ export class TransactionSpendingLimitAssociationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.appUser);
   }
 
   getOperationString(): string {
-    return this.associationLimitMapItem ?
-      this.globalVars.cleanSpendingLimitOperationName(
-        this.associationLimitMapItem.AssociationOperation
-      ) : '';
+    switch (this.associationLimitMapItem?.AssociationOperation) {
+      case AssociationOperationString.ANY:
+        return 'Create or delete';
+      case AssociationOperationString.CREATE:
+        return 'Create';
+      case AssociationOperationString.DELETE:
+        return 'Delete';
+      default:
+        return '';
+    }
   }
 }
