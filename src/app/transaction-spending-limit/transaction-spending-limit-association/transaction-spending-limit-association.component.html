@@ -6,11 +6,6 @@
         {{ associationLimitMapItem?.AssociationClass }}
         {{ associationLimitMapItem?.AssociationType }}
         associations on
-<!--        <span-->
-<!--          class="avatar"-->
-<!--          [appAvatar]="associationLimitMapItem?.AppPublicKeyBase58Check"-->
-<!--          *ngIf="isScoped()"-->
-<!--        ></span>-->
         {{ (appUser?.ProfileEntryResponse?.Username || associationLimitMapItem?.AppPublicKeyBase58Check | truncateAddressOrUsername) || 'any app' }}.
       </div>
   </div>

@@ -39,8 +39,4 @@ export class TransactionSpendingLimitAssociationComponent implements OnInit {
         return '';
     }
   }
-
-  isScoped(): boolean {
-    return this.associationLimitMapItem?.AppScopeType === AssociationAppScopeType.SCOPED;
-  }
 }
