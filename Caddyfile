@@ -76,6 +76,30 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/get-txn
     https://test.deso.org/api/v0/get-bulk-messaging-public-keys
     https://test.deso.org/api/v0/submit-transaction
+    https://rt.deso.run/api/v0/get-users-stateless
+    https://rt.deso.run/api/v0/get-app-state
+    https://rt.deso.run/api/v0/jumio-begin
+    https://rt.deso.run/api/v0/jumio-flow-finished
+    https://rt.deso.run/api/v0/get-referral-info-for-referral-hash
+    https://rt.deso.run/api/v0/get-user-derived-keys
+    https://rt.deso.run/api/v0/get-transaction-spending
+    https://rt.deso.run/api/v0/send-phone-number-verification-text
+    https://rt.deso.run/api/v0/submit-phone-number-verification-code
+    https://rt.deso.run/api/v0/get-transaction-spending-limit-hex-string
+    https://rt.deso.run/api/v0/get-transaction-spending-limit-response-from-hex/
+    https://rt.deso.run/api/v0/get-single-post
+    https://rt.deso.run/api/v0/get-wyre-wallet-order-quotation
+    https://rt.deso.run/api/v0/get-wyre-wallet-order-reservation
+    https://rt.deso.run/api/v0/get-exchange-rate
+    https://rt.deso.run/api/v0/query-eth-rpc
+    https://rt.deso.run/api/v0/submit-eth-tx
+    https://rt.deso.run/api/v0/exchange-bitcoin
+    https://rt.deso.run/api/v0/get-access-bytes
+    https://rt.deso.run/api/v0/send-starter-deso-for-metamask-account
+    https://rt.deso.run/api/v0/authorize-derived-key
+    https://rt.deso.run/api/v0/get-txn
+    https://rt.deso.run/api/v0/get-bulk-messaging-public-keys
+    https://rt.deso.run/api/v0/submit-transaction
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files
@@ -87,6 +111,7 @@ header @html Content-Security-Policy "
   img-src 'self'
       {$DOMAIN:https://node.deso.org}/api/v0/get-single-profile-picture/
       https://test.deso.org/api/v0/get-single-profile-picture/
+      https://rt.deso.run/api/v0/get-single-profile-picture/
       i.imgur.com
       images.deso.org
       images.bitclout.com
