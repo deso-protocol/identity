@@ -458,6 +458,7 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   @Transcode(ArrayOf(DeSoInputsByTransactor))
   bidderInputs: DeSoInputsByTransactor[] = [];
 }
+
 export class TransactionMetadataCreateUserAssociation extends BinaryRecord {
   @Transcode(VarBuffer)
   targetUserPublicKey: Buffer = Buffer.alloc(0);
@@ -495,6 +496,7 @@ export class TransactionMetadataDeletePostAssociation extends BinaryRecord {
   @Transcode(VarBuffer)
   associationID: Buffer = Buffer.alloc(0);
 }
+
 export class TransactionMetadataAccessGroup extends BinaryRecord {
   @Transcode(VarBuffer)
   accessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
