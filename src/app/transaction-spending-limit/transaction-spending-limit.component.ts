@@ -1,13 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {
+  AssociationLimitMapItem,
   BackendAPIService,
   CoinLimitOperationString,
   CoinOperationLimitMap,
   DAOCoinLimitOrderLimitMap,
   TransactionSpendingLimitResponse,
-  User,
+  User
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
+
 @Component({
   selector: 'app-transaction-spending-limit',
   templateUrl: './transaction-spending-limit.component.html',
@@ -27,6 +29,7 @@ export class TransactionSpendingLimitComponent implements OnInit {
   static DAOCoinLimitsSection = 'DAOs';
   static NFTLimitsSection = 'NFTs';
   static DAOCoinLimitOrderLimitSection = 'DAO Coin Limit Orders';
+  static AssociationSection = 'Associations';
 
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
   constructor(
@@ -48,6 +51,11 @@ export class TransactionSpendingLimitComponent implements OnInit {
           .concat(
             this.getPublicKeysFromDAOCoinLimitOrderLimitMap(
               this.transactionSpendingLimitResponse?.DAOCoinLimitOrderLimitMap
+            )
+          )
+          .concat(
+            this.getPublicKeysFromAssociationLimitMap(
+              this.transactionSpendingLimitResponse?.AssociationLimitMap,
             )
           )
       ),
@@ -84,5 +92,17 @@ export class TransactionSpendingLimitComponent implements OnInit {
       }
     }
     return Array.from(allKeysSet);
+  }
+
+  getPublicKeysFromAssociationLimitMap(
+    associationLimitMap: AssociationLimitMapItem[] | undefined
+  ): string[] {
+    if (!associationLimitMap) {
+      return [];
+    }
+
+    let allPublicKeys = new Set<string>();
+    associationLimitMap.forEach((item) => allPublicKeys.add(item.AppPublicKeyBase58Check));
+    return Array.from(allPublicKeys);
   }
 }

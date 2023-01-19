@@ -44,6 +44,12 @@
       *ngIf="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
     >
     </app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.AssociationLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.AssociationSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.AssociationLimitMap"
+      ></app-transaction-spending-limit-section>
   </div>
 
   <div *ngIf="transactionSpendingLimitResponse.IsUnlimited">
