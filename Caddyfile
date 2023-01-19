@@ -52,30 +52,6 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/get-txn
     {$DOMAIN:https://node.deso.org}/api/v0/get-bulk-messaging-public-keys
     {$DOMAIN:https://node.deso.org}/api/v0/submit-transaction
-    https://test.deso.org/api/v0/get-users-stateless
-    https://test.deso.org/api/v0/get-app-state
-    https://test.deso.org/api/v0/jumio-begin
-    https://test.deso.org/api/v0/jumio-flow-finished
-    https://test.deso.org/api/v0/get-referral-info-for-referral-hash
-    https://test.deso.org/api/v0/get-user-derived-keys
-    https://test.deso.org/api/v0/get-transaction-spending
-    https://test.deso.org/api/v0/send-phone-number-verification-text
-    https://test.deso.org/api/v0/submit-phone-number-verification-code
-    https://test.deso.org/api/v0/get-transaction-spending-limit-hex-string
-    https://test.deso.org/api/v0/get-transaction-spending-limit-response-from-hex/
-    https://test.deso.org/api/v0/get-single-post
-    https://test.deso.org/api/v0/get-wyre-wallet-order-quotation
-    https://test.deso.org/api/v0/get-wyre-wallet-order-reservation
-    https://test.deso.org/api/v0/get-exchange-rate
-    https://test.deso.org/api/v0/query-eth-rpc
-    https://test.deso.org/api/v0/submit-eth-tx
-    https://test.deso.org/api/v0/exchange-bitcoin
-    https://test.deso.org/api/v0/get-access-bytes
-    https://test.deso.org/api/v0/send-starter-deso-for-metamask-account
-    https://test.deso.org/api/v0/authorize-derived-key
-    https://test.deso.org/api/v0/get-txn
-    https://test.deso.org/api/v0/get-bulk-messaging-public-keys
-    https://test.deso.org/api/v0/submit-transaction
     https://rt.deso.run/api/v0/get-users-stateless
     https://rt.deso.run/api/v0/get-app-state
     https://rt.deso.run/api/v0/jumio-begin
@@ -110,7 +86,6 @@ header @html Content-Security-Policy "
     wss://*.bridge.walletconnect.org/;
   img-src 'self'
       {$DOMAIN:https://node.deso.org}/api/v0/get-single-profile-picture/
-      https://test.deso.org/api/v0/get-single-profile-picture/
       https://rt.deso.run/api/v0/get-single-profile-picture/
       i.imgur.com
       images.deso.org
