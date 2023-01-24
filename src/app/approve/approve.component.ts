@@ -494,28 +494,37 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataAccessGroup:
         const accessGroupMetadata = this.transaction
           .metadata as TransactionMetadataAccessGroup;
-        description = `${
-          accessGroupMetadata.accessGroupOperationType == 0 ? 'create' : 'update'
-        } access group with name "${accessGroupMetadata.accessGroupKeyName.toString()}"`;
+        let accessGroupOperation: string;
+        switch (accessGroupMetadata.accessGroupOperationType) {
+          case 2:
+            accessGroupOperation = 'create';
+            break;
+          case 3:
+            accessGroupOperation = 'update';
+            break;
+          default:
+            accessGroupOperation = 'take unknown action on'
+        }
+        description = `${accessGroupOperation} access group with name "${accessGroupMetadata.accessGroupKeyName.toString()}"`;
         break;
       case TransactionMetadataAccessGroupMembers:
         const accessGroupMembersMetadata = this.transaction
           .metadata as TransactionMetadataAccessGroupMembers;
         const numMembers = accessGroupMembersMetadata.accessGroupMembersList.length;
         const pluralSuffix = numMembers > 1 ? 's' : '';
-        let operation: string;
+        let accessGroupMemberOperation: string;
         switch (accessGroupMembersMetadata.accessGroupMemberOperationType) {
-          case 0:
-            operation = `add ${numMembers} member${pluralSuffix} to`;
-            break;
-          case 1:
-            operation = `remove ${numMembers} member${pluralSuffix} from`;
-            break;
           case 2:
-            operation = `update ${numMembers} member${pluralSuffix} of`;
+            accessGroupMemberOperation = `add ${numMembers} member${pluralSuffix} to`;
+            break;
+          case 3:
+            accessGroupMemberOperation = `remove ${numMembers} member${pluralSuffix} from`;
+            break;
+          case 4:
+            accessGroupMemberOperation = `update ${numMembers} member${pluralSuffix} of`;
             break;
           default:
-            operation = 'unknown action'
+            accessGroupMemberOperation = `take unknown action on ${numMembers} member${pluralSuffix} of`;
         }
         publicKeys = [
           this.base58KeyCheck(accessGroupMembersMetadata.accessGroupOwnerPublicKey),
@@ -525,7 +534,7 @@ export class ApproveComponent implements OnInit {
                 this.base58KeyCheck(member.accessGroupMemberPublicKey)
             )];
         description = `
-        ${operation} group with name ${accessGroupMembersMetadata.accessGroupKeyName.toString()}.\n
+        ${accessGroupMemberOperation} group with name ${accessGroupMembersMetadata.accessGroupKeyName.toString()}.\n
         ${accessGroupMembersMetadata.accessGroupMembersList.map((member) => {
           return `${
             this.base58KeyCheck(member.accessGroupMemberPublicKey)
@@ -549,32 +558,27 @@ export class ApproveComponent implements OnInit {
             publicKeys = [recipient];
             break;
           case 1:
-            messageType = 'group chat';
-            recipient = `group with name ${
-              this.base58KeyCheck(newMessageMetadata.recipientAccessGroupKeyname)
+            messageType = 'message';
+            const groupOwnerPublicKey = this.base58KeyCheck(newMessageMetadata.recipientAccessGroupOwnerPublicKey);
+            recipient = `${groupOwnerPublicKey}'s group with name ${
+              newMessageMetadata.recipientAccessGroupKeyname.toString()
             }`;
-            publicKeys = [recipient];
+            publicKeys = [groupOwnerPublicKey];
             break;
           default:
-            recipient = 'unknown';
-            messageType = 'unknown';
+            recipient = 'unknown recipient';
+            messageType = 'unknown message type';
         }
-        let messageOperation: string;
         switch (newMessageMetadata.newMessageOperation) {
           case 0:
-            messageOperation = `send new ${messageType}`;
+            description = `send new ${messageType} to ${recipient}`;
             break;
           case 1:
-            messageOperation = `update existing ${messageType}`;
-            break;
-          case 2:
-            messageOperation = `update thread attributes for a ${messageType}`;
+            description = `update existing ${messageType} to ${recipient}`;
             break;
           default:
-            messageOperation = 'unknown';
+            description = `unknown messaging action on ${messageType} to ${recipient}`;
         }
-        // TODO: this description could be improved.
-        description = `${messageOperation}`
         break;
     }
 
