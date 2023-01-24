@@ -497,6 +497,80 @@ export class TransactionMetadataDeletePostAssociation extends BinaryRecord {
   associationID: Buffer = Buffer.alloc(0);
 }
 
+export class TransactionMetadataAccessGroup extends BinaryRecord {
+  @Transcode(VarBuffer)
+  accessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  accessGroupOperationType: number = 0;
+}
+
+export class AccessGroupMember extends BinaryRecord {
+  @Transcode(VarBuffer)
+  accessGroupMemberPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupMemberKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  encryptedKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Record(TransactionExtraData))
+  extraData: TransactionExtraData | null = null;
+}
+
+export class TransactionMetadataAccessGroupMembers extends BinaryRecord {
+  @Transcode(VarBuffer)
+  accessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(ArrayOf(AccessGroupMember))
+  accessGroupMembersList: AccessGroupMember[] = [];
+
+  @Transcode(Uint8)
+  accessGroupMemberOperationType: number = 0;
+}
+
+export class TransactionMetadataNewMessage extends BinaryRecord {
+  @Transcode(VarBuffer)
+  senderAccessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  senderAccessGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  senderAccessGroupPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientAccessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientAccessGroupKeyname: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientAccessGroupPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  encryptedText: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  timestampNanos: number = 0;
+
+  @Transcode(Uint8)
+  newMessageType: number = 0;
+
+  @Transcode(Uint8)
+  newMessageOperation: number = 0;
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -526,7 +600,10 @@ export const TransactionTypeMetadataMap = {
   27: TransactionMetadataCreateUserAssociation,
   28: TransactionMetadataDeleteUserAssociation,
   29: TransactionMetadataCreatePostAssociation,
-  30: TransactionMetadataDeletePostAssociation
+  30: TransactionMetadataDeletePostAssociation,
+  31: TransactionMetadataAccessGroup,
+  32: TransactionMetadataAccessGroupMembers,
+  33: TransactionMetadataNewMessage,
 };
 
 export class Transaction extends BinaryRecord {
