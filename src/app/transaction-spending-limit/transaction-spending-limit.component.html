@@ -50,6 +50,18 @@
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.AssociationLimitMap"
       ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.AccessGroupLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.AccessGroupSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.AccessGroupLimitMap"
+      ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.AccessGroupMemberLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.AccessGroupMemberSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.AccessGroupMemberLimitMap"
+      ></app-transaction-spending-limit-section>
   </div>
 
   <div *ngIf="transactionSpendingLimitResponse.IsUnlimited">

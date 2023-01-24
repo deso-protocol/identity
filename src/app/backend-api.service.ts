@@ -211,7 +211,7 @@ export enum AccessGroupOperationString {
 
 export type AccessGroupLimitMapItem = {
   AccessGroupOwnerPublicKeyBase58Check: string;
-  AccessGroupScopeType: AccessGroupScopeType;
+  ScopeType: AccessGroupScopeType;
   AccessGroupKeyName: string;
   OperationType: AccessGroupOperationString;
   OpCount: number;
@@ -226,7 +226,7 @@ export enum AccessGroupMemberOperationString {
 
 export type AccessGroupMemberLimitMapItem = {
   AccessGroupOwnerPublicKeyBase58Check: string;
-  AccessGroupScopeType: AccessGroupScopeType;
+  ScopeType: AccessGroupScopeType;
   AccessGroupKeyName: string;
   OperationType: AccessGroupMemberOperationString;
   OpCount: number;

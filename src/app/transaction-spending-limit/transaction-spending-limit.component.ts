@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {
+  AccessGroupLimitMapItem,
+  AccessGroupMemberLimitMapItem,
   AssociationLimitMapItem,
   BackendAPIService,
   CoinLimitOperationString,
@@ -30,6 +32,8 @@ export class TransactionSpendingLimitComponent implements OnInit {
   static NFTLimitsSection = 'NFTs';
   static DAOCoinLimitOrderLimitSection = 'DAO Coin Limit Orders';
   static AssociationSection = 'Associations';
+  static AccessGroupSection = 'Access Groups';
+  static AccessGroupMemberSection = 'Access Group Members';
 
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
   constructor(
@@ -56,6 +60,16 @@ export class TransactionSpendingLimitComponent implements OnInit {
           .concat(
             this.getPublicKeysFromAssociationLimitMap(
               this.transactionSpendingLimitResponse?.AssociationLimitMap,
+            )
+          )
+          .concat(
+            this.getPublicKeysFromAccessGroupLimitMap(
+              this.transactionSpendingLimitResponse?.AccessGroupLimitMap,
+            )
+          )
+          .concat(
+            this.getPublicKeysFromAccessGroupLimitMap(
+              this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap,
             )
           )
       ),
@@ -103,6 +117,18 @@ export class TransactionSpendingLimitComponent implements OnInit {
 
     let allPublicKeys = new Set<string>();
     associationLimitMap.forEach((item) => allPublicKeys.add(item.AppPublicKeyBase58Check));
+    return Array.from(allPublicKeys);
+  }
+
+  getPublicKeysFromAccessGroupLimitMap(
+    accessGroupLimitMap: AccessGroupLimitMapItem[] | AccessGroupMemberLimitMapItem[] | undefined
+  ): string[] {
+    if (!accessGroupLimitMap) {
+      return [];
+    }
+
+    let allPublicKeys = new Set<string>();
+    accessGroupLimitMap.forEach((item) => allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check));
     return Array.from(allPublicKeys);
   }
 }
