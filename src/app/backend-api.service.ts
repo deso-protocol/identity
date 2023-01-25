@@ -199,8 +199,8 @@ export type AssociationLimitMapItem = {
 }
 
 export enum AccessGroupScopeType {
-  ANY = 'any',
-  SCOPED = 'scoped',
+  ANY = 'Any',
+  SCOPED = 'Scoped',
 }
 
 export enum AccessGroupOperationString {
