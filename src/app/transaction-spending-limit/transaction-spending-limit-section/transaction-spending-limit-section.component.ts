@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import {
   AccessGroupLimitMapItem,
   AccessGroupMemberLimitMapItem,
-  AssociationClass,
   AssociationLimitMapItem,
   CreatorCoinLimitOperationString,
   CreatorCoinOperationLimitMap,
@@ -52,9 +51,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   daoCoinLimitOrderLimitMap: DAOCoinLimitOrderLimitMap = {};
   daoCoinLimitOrderLimitItems: DAOCoinLimitOrderLimitItem[] = [];
   associationLimitMap: AssociationLimitMapItem[] = [];
-  // TODO: define these for associations
-  userAssociationItems: any[] = [];
-  postAssociationItems: any[] = [];
   accessGroupLimitMap: AccessGroupLimitMapItem[] = [];
   accessGroupMemberLimitMap: AccessGroupMemberLimitMapItem[] = [];
 
@@ -106,8 +102,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         break;
       case TransactionSpendingLimitComponent.AssociationSection:
         this.associationLimitMap = this.sectionMap as AssociationLimitMapItem[];
-        this.userAssociationItems = this.associationLimitMap.filter((item) => item.AssociationClass === AssociationClass.USER);
-        this.postAssociationItems = this.userAssociationItems.filter((item) => item.AssociationClass === AssociationClass.POST);
         break;
       case TransactionSpendingLimitComponent.AccessGroupSection:
         this.accessGroupLimitMap = this.sectionMap as AccessGroupLimitMapItem[];

@@ -56,6 +56,8 @@ export class GlobalVarsService {
   deleteKey = false;
   expirationDays = 0;
 
+  redirectURI = '';
+
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
   }
