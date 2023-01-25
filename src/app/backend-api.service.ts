@@ -141,7 +141,8 @@ export type OperationToCountMap<T extends LimitOperationString> = {
 export type LimitOperationString =
   | DAOCoinLimitOperationString
   | CreatorCoinLimitOperationString
-  | NFTLimitOperationString;
+  | NFTLimitOperationString
+  | AssociationOperationString;
 export type CreatorCoinOperationLimitMap =
   CoinOperationLimitMap<CreatorCoinLimitOperationString>;
 export type DAOCoinOperationLimitMap =
@@ -170,6 +171,32 @@ export type NFTOperationLimitMap = {
   };
 };
 
+
+export enum AssociationClass {
+  USER = 'user',
+  POST = 'post',
+}
+
+export enum AssociationAppScopeType {
+  ANY = 'any',
+  SCOPED = 'scoped',
+}
+
+export enum AssociationOperationString {
+  ANY = 'any',
+  CREATE = 'create',
+  DELETE = 'delete',
+}
+
+export type AssociationLimitMapItem = {
+  AssociationClass: AssociationClass;
+  AssociationType: string;
+  AppScopeType: AssociationAppScopeType;
+  AppPublicKeyBase58Check: string;
+  AssociationOperation: AssociationOperationString;
+  OpCount: number;
+}
+
 export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
   // TODO: make enum for transaction type string
@@ -178,6 +205,7 @@ export interface TransactionSpendingLimitResponse {
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
   DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
+  AssociationLimitMap?: AssociationLimitMapItem[];
   IsUnlimited?: boolean;
   DerivedKeyMemo?: string;
 }

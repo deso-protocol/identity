@@ -153,6 +153,28 @@
           ></app-transaction-spending-limit-dao-coin-limit-order>
         </div>
       </ng-container>
+      <ng-container
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.AssociationSection
+        "
+      >
+        <div
+          *ngFor="
+            let associationLimitMapItem of associationLimitMap
+              | slice
+                : 0
+                : (showAll
+                    ? associationLimitMap.length
+                    : defaultNumShown)
+          "
+          class="d-flex flex-column pb-15px"
+        >
+          <app-transaction-spending-limit-association
+            [associationLimitMapItem]="associationLimitMapItem"
+            [appUser]="userMap[associationLimitMapItem.AppPublicKeyBase58Check]"
+          ></app-transaction-spending-limit-association>
+        </div>
+      </ng-container>
     </div>
   </div>
 
