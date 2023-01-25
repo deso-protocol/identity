@@ -136,7 +136,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     }
   }
 
-  // TODO: update for Associations
   hasAnyCreatorOrNFT(): boolean {
     switch (this.sectionTitle) {
       case TransactionSpendingLimitComponent.CreatorCoinLimitsSection:
@@ -144,13 +143,10 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return !!this.anyCreatorItem;
       case TransactionSpendingLimitComponent.NFTLimitsSection:
         return !!this.anyNFTItem;
-      // case TransactionSpendingLimitComponent.AssociationSection:
-      //   return !!this.anyCreatorItem;
     }
     return false;
   }
 
-  // TODO: update for Associations
   sectionSummary(): string {
     const operationsStr =
       this.sectionTitle !==
@@ -170,7 +166,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     }`;
   }
 
-  // TODO: update for Associations
   getSectionMapLength(): number {
     switch (this.sectionTitle) {
       case TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection:
