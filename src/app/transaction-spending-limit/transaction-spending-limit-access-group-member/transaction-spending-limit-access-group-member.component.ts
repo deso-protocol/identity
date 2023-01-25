@@ -34,13 +34,13 @@ export class TransactionSpendingLimitAccessGroupMemberComponent implements OnIni
   getOperationString(): string {
     switch (this.accessGroupMemberLimitMapItem?.OperationType) {
       case AccessGroupMemberOperationString.ANY:
-        return 'Add, remove, or update';
+        return 'Add, remove, or update members from';
       case AccessGroupMemberOperationString.ADD:
-        return 'Add';
+        return 'Add members to';
       case AccessGroupMemberOperationString.REMOVE:
-        return 'Remove';
+        return 'Remove members from';
       case AccessGroupMemberOperationString.UPDATE:
-        return 'Update';
+        return 'Update members from';
       default:
         return '';
     }
