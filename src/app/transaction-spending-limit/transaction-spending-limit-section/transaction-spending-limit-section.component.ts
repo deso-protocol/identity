@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {
+  AccessGroupLimitMapItem,
+  AccessGroupMemberLimitMapItem,
   AssociationLimitMapItem,
   CreatorCoinLimitOperationString,
   CreatorCoinOperationLimitMap,
@@ -27,7 +29,9 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     | DAOCoinOperationLimitMap
     | NFTOperationLimitMap
     | DAOCoinLimitOrderLimitMap
-    | AssociationLimitMapItem[] = {};
+    | AssociationLimitMapItem[]
+    | AccessGroupLimitMapItem[]
+    | AccessGroupMemberLimitMapItem[] = {};
   @Input() sectionTitle: string = '';
 
   @Input() userMap: { [k: string]: User } = {};
@@ -47,6 +51,8 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   daoCoinLimitOrderLimitMap: DAOCoinLimitOrderLimitMap = {};
   daoCoinLimitOrderLimitItems: DAOCoinLimitOrderLimitItem[] = [];
   associationLimitMap: AssociationLimitMapItem[] = [];
+  accessGroupLimitMap: AccessGroupLimitMapItem[] = [];
+  accessGroupMemberLimitMap: AccessGroupMemberLimitMapItem[] = [];
 
   constructor(public globalVars: GlobalVarsService) {}
 
@@ -96,6 +102,12 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         break;
       case TransactionSpendingLimitComponent.AssociationSection:
         this.associationLimitMap = this.sectionMap as AssociationLimitMapItem[];
+        break;
+      case TransactionSpendingLimitComponent.AccessGroupSection:
+        this.accessGroupLimitMap = this.sectionMap as AccessGroupLimitMapItem[];
+        break;
+      case TransactionSpendingLimitComponent.AccessGroupMemberSection:
+        this.accessGroupMemberLimitMap = this.sectionMap as AccessGroupMemberLimitMapItem[];
     }
 
     this.showAll = this.getSectionMapLength() <= this.defaultNumShown;
@@ -115,6 +127,10 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return 'DAO coin limit order';
       case TransactionSpendingLimitComponent.AssociationSection:
         return 'Association';
+      case TransactionSpendingLimitComponent.AccessGroupSection:
+        return 'Access Group';
+      case TransactionSpendingLimitComponent.AccessGroupMemberSection:
+        return 'Access Group Member';
       default:
         return '';
     }
@@ -156,6 +172,10 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return this.daoCoinLimitOrderLimitItems.length;
       case TransactionSpendingLimitComponent.AssociationSection:
         return this.associationLimitMap.length;
+      case TransactionSpendingLimitComponent.AccessGroupSection:
+        return this.accessGroupLimitMap.length;
+      case TransactionSpendingLimitComponent.AccessGroupMemberSection:
+        return this.accessGroupMemberLimitMap.length;
       default:
         return this.globalVars.ObjectKeyLength(this.sectionMap);
     }
