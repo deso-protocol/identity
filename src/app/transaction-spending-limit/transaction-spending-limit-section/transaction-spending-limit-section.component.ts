@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {
-  AssociationClass,
   AssociationLimitMapItem,
   CreatorCoinLimitOperationString,
   CreatorCoinOperationLimitMap,
@@ -48,9 +47,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   daoCoinLimitOrderLimitMap: DAOCoinLimitOrderLimitMap = {};
   daoCoinLimitOrderLimitItems: DAOCoinLimitOrderLimitItem[] = [];
   associationLimitMap: AssociationLimitMapItem[] = [];
-  // TODO: define these for associations
-  userAssociationItems: any[] = [];
-  postAssociationItems: any[] = [];
 
   constructor(public globalVars: GlobalVarsService) {}
 
@@ -100,8 +96,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         break;
       case TransactionSpendingLimitComponent.AssociationSection:
         this.associationLimitMap = this.sectionMap as AssociationLimitMapItem[];
-        this.userAssociationItems = this.associationLimitMap.filter((item) => item.AssociationClass === AssociationClass.USER);
-        this.postAssociationItems = this.userAssociationItems.filter((item) => item.AssociationClass === AssociationClass.POST);
     }
 
     this.showAll = this.getSectionMapLength() <= this.defaultNumShown;
@@ -126,7 +120,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     }
   }
 
-  // TODO: update for Associations
   hasAnyCreatorOrNFT(): boolean {
     switch (this.sectionTitle) {
       case TransactionSpendingLimitComponent.CreatorCoinLimitsSection:
@@ -134,13 +127,10 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return !!this.anyCreatorItem;
       case TransactionSpendingLimitComponent.NFTLimitsSection:
         return !!this.anyNFTItem;
-      // case TransactionSpendingLimitComponent.AssociationSection:
-      //   return !!this.anyCreatorItem;
     }
     return false;
   }
 
-  // TODO: update for Associations
   sectionSummary(): string {
     const operationsStr =
       this.sectionTitle !==
@@ -160,7 +150,6 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     }`;
   }
 
-  // TODO: update for Associations
   getSectionMapLength(): number {
     switch (this.sectionTitle) {
       case TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection:
