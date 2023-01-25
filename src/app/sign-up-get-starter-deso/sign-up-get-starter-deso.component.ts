@@ -269,6 +269,13 @@ export class SignUpGetStarterDESOComponent implements OnInit {
 
   finishFlow(): void {
     this.finishFlowEvent.emit();
+    if (this.globalVars.derive) {
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: { publicKey: this.publicKey },
+        queryParamsHandling: 'merge',
+      });
+      return;
+    }
     if (!this.finishFlowEventOnly) {
       this.identityService.login({
         users: this.accountService.getEncryptedUsers(),
