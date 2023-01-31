@@ -77,10 +77,13 @@ export class AppComponent implements OnInit {
 
     this.globalVars.redirectURI = params.get('redirect_uri') ?? stateParamsFromGoogle.redirect_uri ?? '';
 
-    if (
-      params.get('derive') === 'true' ||
-      stateParamsFromGoogle.derive
-    ) {
+    const showSkip = params.get('showSkip');
+    this.globalVars.showSkip =
+      (showSkip && JSON.parse(showSkip)) ??
+      stateParamsFromGoogle.showSkip ??
+      false;
+
+    if (params.get('derive') === 'true' || stateParamsFromGoogle.derive) {
       this.globalVars.derive = true;
     }
 

@@ -45,6 +45,7 @@
         Transfer from an exchange or a DeSo account
       </div>
       <button
+        *ngIf="this.globalVars.showSkip"
         (click)="finishFlow()"
         [ngStyle]="{
           width: '40%',

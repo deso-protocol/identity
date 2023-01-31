@@ -58,6 +58,11 @@ export class GlobalVarsService {
 
   redirectURI = '';
 
+  /**
+   * If true, the "Skip" button will be shown on the get deso page.
+   */
+  showSkip: boolean = false;
+
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
   }
