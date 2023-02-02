@@ -46,8 +46,7 @@
           <div>
             {{ globalVars.cleanSpendingLimitOperationName(txnLimitItem.key) }}
           </div>
-          <!-- NOTE: If the count is 1 million or more, it will be displayed as "UNLIMITED" -->
-          <div>{{ txnLimitItem.value >= 1e9 ? 'UNLIMITED' : txnLimitItem.value }}</div>
+          <div>{{ globalVars.formatTxCountLimit(txnLimitItem.value) }}</div>
         </div>
       </ng-container>
       <ng-container

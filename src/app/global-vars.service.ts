@@ -158,4 +158,9 @@ export class GlobalVarsService {
       )
       .join(' ');
   }
+
+  // If the count is 1 billion or more, it will be displayed as "UNLIMITED"
+  formatTxCountLimit(count: number = 0): string {
+    return count >= 1e9 ? 'UNLIMITED' : count.toString();
+  }
 }
