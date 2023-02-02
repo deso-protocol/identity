@@ -51,6 +51,9 @@ import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 import { LogInOptionsComponent } from './log-in-options/log-in-options.component';
 import { AccountSelectComponent } from './account-select/account-select.component';
+import { TransactionSpendingLimitAssociationComponent } from './transaction-spending-limit/transaction-spending-limit-association/transaction-spending-limit-association.component';
+import { TransactionSpendingLimitAccessGroupComponent } from './transaction-spending-limit/transaction-spending-limit-access-group/transaction-spending-limit-access-group.component';
+import { TransactionSpendingLimitAccessGroupMemberComponent } from './transaction-spending-limit/transaction-spending-limit-access-group-member/transaction-spending-limit-access-group-member.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +94,9 @@ import { AccountSelectComponent } from './account-select/account-select.componen
     LogInOptionsComponent,
     AccountSelectComponent,
     MessagingGroupComponent,
+    TransactionSpendingLimitAssociationComponent,
+    TransactionSpendingLimitAccessGroupComponent,
+    TransactionSpendingLimitAccessGroupMemberComponent,
   ],
   imports: [
     BrowserModule,

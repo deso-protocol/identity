@@ -35,7 +35,6 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import assert from 'assert';
 import { MessagingGroup } from './identity.service';
 import bs58check from 'bs58check';
-import { SwalHelper } from '../lib/helpers/swal-helper';
 
 export const ERROR_USER_NOT_FOUND = 'User not found';
 

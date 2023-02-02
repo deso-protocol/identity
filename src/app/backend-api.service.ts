@@ -141,7 +141,10 @@ export type OperationToCountMap<T extends LimitOperationString> = {
 export type LimitOperationString =
   | DAOCoinLimitOperationString
   | CreatorCoinLimitOperationString
-  | NFTLimitOperationString;
+  | NFTLimitOperationString
+  | AssociationOperationString
+  | AccessGroupOperationString
+  | AccessGroupMemberOperationString;
 export type CreatorCoinOperationLimitMap =
   CoinOperationLimitMap<CreatorCoinLimitOperationString>;
 export type DAOCoinOperationLimitMap =
@@ -170,6 +173,65 @@ export type NFTOperationLimitMap = {
   };
 };
 
+export enum AssociationClass {
+  USER = 'User',
+  POST = 'Post',
+}
+
+export enum AssociationAppScopeType {
+  ANY = 'Any',
+  SCOPED = 'Scoped',
+}
+
+export enum AssociationOperationString {
+  ANY = 'Any',
+  CREATE = 'Create',
+  DELETE = 'Delete',
+}
+
+export type AssociationLimitMapItem = {
+  AssociationClass: AssociationClass;
+  AssociationType: string;
+  AppScopeType: AssociationAppScopeType;
+  AppPublicKeyBase58Check: string;
+  AssociationOperation: AssociationOperationString;
+  OpCount: number;
+}
+
+export enum AccessGroupScopeType {
+  ANY = 'Any',
+  SCOPED = 'Scoped',
+}
+
+export enum AccessGroupOperationString {
+  ANY = 'Any',
+  CREATE = 'Create',
+  UPDATE = 'Update',
+}
+
+export type AccessGroupLimitMapItem = {
+  AccessGroupOwnerPublicKeyBase58Check: string;
+  ScopeType: AccessGroupScopeType;
+  AccessGroupKeyName: string;
+  OperationType: AccessGroupOperationString;
+  OpCount: number;
+}
+
+export enum AccessGroupMemberOperationString {
+  ANY = 'Any',
+  ADD = 'Add',
+  REMOVE = 'Remove',
+  UPDATE = 'Update',
+}
+
+export type AccessGroupMemberLimitMapItem = {
+  AccessGroupOwnerPublicKeyBase58Check: string;
+  ScopeType: AccessGroupScopeType;
+  AccessGroupKeyName: string;
+  OperationType: AccessGroupMemberOperationString;
+  OpCount: number;
+}
+
 export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
   // TODO: make enum for transaction type string
@@ -178,6 +240,9 @@ export interface TransactionSpendingLimitResponse {
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
   DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
+  AssociationLimitMap?: AssociationLimitMapItem[];
+  AccessGroupLimitMap?: AccessGroupLimitMapItem[];
+  AccessGroupMemberLimitMap?: AccessGroupMemberLimitMapItem[];
   IsUnlimited?: boolean;
   DerivedKeyMemo?: string;
 }
