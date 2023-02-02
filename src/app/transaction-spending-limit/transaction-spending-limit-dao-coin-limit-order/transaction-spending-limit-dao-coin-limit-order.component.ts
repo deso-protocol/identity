@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { GlobalVarsService } from 'src/app/global-vars.service';
 import { DAOCoinLimitOrderLimitItem, User } from '../../backend-api.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
@@ -17,6 +18,8 @@ export class TransactionSpendingLimitDaoCoinLimitOrderComponent
   @Input() buyingUser: User | undefined;
   @Input() sellingUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
+
+  constructor(public globalVars: GlobalVarsService) {}
 
   ngOnInit(): void {}
 }

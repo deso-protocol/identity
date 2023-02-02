@@ -4,7 +4,7 @@
       {{ getOperationString() }}{{ !isScoped() ? ' any of' : '' }}
       {{ (appUser?.ProfileEntryResponse?.Username || accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check | truncateAddressOrUsername)}}'s
       access group{{ isScoped() ? ' "' + accessGroupLimitMapItem?.AccessGroupKeyName + '"' : 's' }}
-      ({{ accessGroupLimitMapItem?.OpCount }}x).
+      ({{ globalVars.formatTxCountLimit(accessGroupLimitMapItem?.OpCount) }}x).
     </div>
   </div>
 </div>
