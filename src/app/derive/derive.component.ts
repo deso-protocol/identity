@@ -160,8 +160,7 @@ export class DeriveComponent implements OnInit {
       .GetUsersStateless(
         [publicKey],
         true /*SkipForLeaderboard*/,
-        true /*IncludeBalance*/,
-        true /*GetUnminedBalance*/
+        true /*IncludeBalance*/
       )
       .pipe(take(1))
       .subscribe((res) => {
