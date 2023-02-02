@@ -116,7 +116,7 @@ export class GetDesoComponent implements OnInit {
     this.refreshBalanceRetryTime = 30;
 
     this.backendAPIService
-      .GetUsersStateless([this.publicKeyAdded], true, true, true)
+      .GetUsersStateless([this.publicKeyAdded], true, true)
       .subscribe((res) => {
         if (!res.UserList.length) {
           return;

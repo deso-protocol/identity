@@ -39,7 +39,7 @@ export class BuyDeSoCompleteComponent implements OnInit {
 
   ngOnInit(): void {
     this.backendApi
-      .GetUsersStateless([this.publicKey], true, true, true)
+      .GetUsersStateless([this.publicKey], true, true)
       .subscribe((res) => {
         if (!res.UserList.length) {
           return;
