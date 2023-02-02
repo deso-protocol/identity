@@ -164,7 +164,7 @@ export class DeriveComponent implements OnInit {
       )
       .pipe(take(1))
       .subscribe((res) => {
-        if (res.UserList[0].BalanceNanos === 0) {
+        if (res.UserList?.[0]?.BalanceNanos === 0) {
           this.router.navigate(['/', RouteNames.GET_DESO], {
             queryParams: { publicKey },
             queryParamsHandling: 'merge',
