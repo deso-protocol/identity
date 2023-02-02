@@ -14,7 +14,7 @@
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
         [allUsers]="allUsers"
-        (onAccountSelect)="publicKeyBase58Check = $event"
+        (onAccountSelect)="this.onAccountSelected($event)"
       ></app-account-select>
       <div class="mb-2">or</div>
       <app-log-in-options></app-log-in-options>
