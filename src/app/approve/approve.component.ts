@@ -635,6 +635,7 @@ export class ApproveComponent implements OnInit {
     if (publicKeys.length === 0) {
       return of(description);
     }
+    // TODO: make a get usernames for public key endpoint
     // Otherwise, we hit get-users-stateless to fetch profiles.
     return this.backendApi.GetUsersStateless(publicKeys, true).pipe(
       map((res) => {
