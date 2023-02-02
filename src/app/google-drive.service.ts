@@ -96,6 +96,7 @@ export class GoogleDriveService {
       deleteKey: this.globalVars.deleteKey,
       expirationDays: this.globalVars.expirationDays,
       redirect_uri: this.globalVars.redirectURI,
+      showSkip: this.globalVars.showSkip,
     };
 
     const stateString = btoa(JSON.stringify(stateParams));
