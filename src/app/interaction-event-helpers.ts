@@ -1,4 +1,4 @@
-export const setupCIEListener = () => {
+export const setupInteractionEventListener = () => {
   window.addEventListener('load', () => logInteractionEvent('window', 'open', null));
   window.addEventListener('beforeunload', () =>
     logInteractionEvent('window', 'close', null)
@@ -47,7 +47,7 @@ export const logInteractionEvent = (object: string, event: string, data: any = {
   // NOTE: this only works on web apps.
   window.opener?.postMessage(
     {
-      category: 'control-interaction-event',
+      category: 'interaction-event',
       payload: { object, event, data },
     },
     '*'

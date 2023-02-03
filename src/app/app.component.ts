@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { setupCIEListener } from 'src/app/cie-helpers';
+import { setupInteractionEventListener } from 'src/app/interaction-event-helpers';
 import { AccessLevel, Network } from '../types/identity';
 import { AccountService } from './account.service';
 import { getStateParamsFromGoogle } from './auth/google/google.component';
@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
     private identityService: IdentityService,
     private backendApiService: BackendAPIService
   ) {
-    setupCIEListener();
+    setupInteractionEventListener();
   }
 
   ngOnInit(): void {
