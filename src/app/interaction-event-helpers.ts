@@ -13,7 +13,6 @@ export const setupInteractionEventListener = () => {
 
       while (node && node !== document.body && controlName === '') {
         node = node.parentElement;
-        if (node === null) break;
         controlName = node?.dataset.controlName ?? '';
       }
 
