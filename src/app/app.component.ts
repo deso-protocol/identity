@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { GlobalVarsService } from './global-vars.service';
-import { IdentityService } from './identity.service';
+import { setupCIEListener } from 'src/app/setupCIEListener';
 import { AccessLevel, Network } from '../types/identity';
+import { AccountService } from './account.service';
 import { getStateParamsFromGoogle } from './auth/google/google.component';
 import { BackendAPIService } from './backend-api.service';
-import { AccountService } from './account.service';
+import { GlobalVarsService } from './global-vars.service';
+import { IdentityService } from './identity.service';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,9 @@ export class AppComponent implements OnInit {
     private globalVars: GlobalVarsService,
     private identityService: IdentityService,
     private backendApiService: BackendAPIService
-  ) {}
+  ) {
+    setupCIEListener();
+  }
 
   ngOnInit(): void {
     // load params
