@@ -158,4 +158,10 @@ export class GlobalVarsService {
       )
       .join(' ');
   }
+
+  // If the count is 1 billion or more, it will be displayed as "UNLIMITED"
+  // Otherwise, it will be displayed as a delimited number based on the user's locale.
+  formatTxCountLimit(count: number = 0): string {
+    return count >= 1e9 ? 'UNLIMITED' : count.toLocaleString();
+  }
 }

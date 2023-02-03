@@ -46,7 +46,7 @@
           <div>
             {{ globalVars.cleanSpendingLimitOperationName(txnLimitItem.key) }}
           </div>
-          <div>{{ txnLimitItem.value }}</div>
+          <div>{{ globalVars.formatTxCountLimit(txnLimitItem.value) }}</div>
         </div>
       </ng-container>
       <ng-container
