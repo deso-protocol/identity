@@ -64,15 +64,26 @@
       ></app-transaction-spending-limit-section>
   </div>
 
-  <div *ngIf="transactionSpendingLimitResponse.IsUnlimited">
-    <div class="d-flex flex-column">
-      <div class="d-flex">
-        <div class="d-flex justify-content-start align-items-center col-5">
-          This key is unlimited.
-        </div>
-      </div>
-    </div>
+  <div class="mt-5">
+    <button
+      class="button btn-primary button-large text-white font-weight-bold"
+      (click)="this.onApproveClick()"
+    >
+      Approve
+    </button>
   </div>
+
+  <div class="mt-3 text-center" *ngIf="transactionSpendingLimitResponse?.IsUnlimited">
+    <div *ngIf="this.globalVars.isFullAccessHostname(); else elseBlock">
+      By clicking approve, you are granting <strong>{{ globalVars.hostname }}</strong> unlimited signing access for your account.
+    </div>
+    <ng-template #elseBlock>
+      <div class="warning-text">
+        By clicking approve, you are granting <strong>{{ globalVars.hostname }}</strong> unlimited signing access for your account.
+      </div>
+    </ng-template>
+  </div>
+
   <div *ngIf="transactionSpendingLimitResponse.DerivedKeyMemo">
     <div class="flex-grow-1 pt-15px"></div>
     <div class="py-15px mb-2">

@@ -22,6 +22,7 @@ export class TransactionSpendingLimitComponent implements OnInit {
     {
       GlobalDESOLimit: 0,
     };
+  @Input() onApproveClick: () => void = () => {};
   hasUsers = false;
   userMap: { [k: string]: User } = {};
   showTransactions: boolean = false;
