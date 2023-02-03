@@ -1,7 +1,7 @@
 export const setupCIEListener = () => {
-  window.addEventListener('load', () => doPostMessage('window', 'open', null));
+  window.addEventListener('load', () => logInteractionEvent('window', 'open', null));
   window.addEventListener('beforeunload', () =>
-    doPostMessage('window', 'close', null)
+    logInteractionEvent('window', 'close', null)
   );
   window.addEventListener(
     'click',
@@ -31,14 +31,20 @@ export const setupCIEListener = () => {
           },
           {} as any
         );
-        doPostMessage(controlName, 'click', data);
+        logInteractionEvent(controlName, 'click', data);
       }
     },
     true
   );
 };
 
-const doPostMessage = (object: string, event: string, data: any) => {
+/**
+ *
+ * @param object the object that was interacted with, could be a button, a page, a link, a modal, etc.
+ * @param event the event that was triggered, could be a click, a hover, a focus, PageView, etc.
+ * @param data arbitrary data map that can be used to pass additional information about the interaction.
+ */
+export const logInteractionEvent = (object: string, event: string, data: any = {}) => {
   // NOTE: this only works on web apps.
   window.opener?.postMessage(
     {

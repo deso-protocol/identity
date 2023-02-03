@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { setupCIEListener } from 'src/app/setupCIEListener';
+import { setupCIEListener } from 'src/app/cie-helpers';
 import { AccessLevel, Network } from '../types/identity';
 import { AccountService } from './account.service';
 import { getStateParamsFromGoogle } from './auth/google/google.component';
