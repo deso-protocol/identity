@@ -39,7 +39,6 @@ export const setupCIEListener = () => {
 };
 
 /**
- *
  * @param object the object that was interacted with, could be a button, a page, a link, a modal, etc.
  * @param event the event that was triggered, could be a click, a hover, a focus, PageView, etc.
  * @param data arbitrary data map that can be used to pass additional information about the interaction.
