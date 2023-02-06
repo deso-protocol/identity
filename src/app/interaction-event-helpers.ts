@@ -1,3 +1,5 @@
+import { environment } from "src/environments/environment";
+
 const SEED_REGEX = /^[0-9a-fA-Z]{64}$/;
 const MNEMONIC_REGEX = /^(?:[a-z]+\s){11}(?:[a-z]+)$/;
 const JWT_REGEX = /^(?:[a-zA-Z0-9_=]+)\.(?:[a-zA-Z0-9_=]+)\.(?:[a-zA-Z0-9_\-\+\/=]*)/;
@@ -47,13 +49,15 @@ export const setupInteractionEventListener = () => {
  * @param data arbitrary data map that can be used to pass additional information about the interaction.
  */
 export const logInteractionEvent = (object: string, event: string, data: Record<string,string | number> = {}) => {
-  // NOTE: this only works on web apps.
+  // if the referrer is not a full access hostname, don't send the event
+  if (!environment.fullAccessHostnames.includes(new URL(document.referrer).hostname)) return;
+
   window.opener?.postMessage(
     {
       category: 'interaction-event',
       payload: { object, event, data: sanitizeData(data) },
     },
-    '*'
+    document.referrer
   );
 };
 
