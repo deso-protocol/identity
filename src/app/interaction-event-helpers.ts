@@ -5,9 +5,7 @@ const JWT_REGEX = /^(?:[a-zA-Z0-9_=]+)\.(?:[a-zA-Z0-9_=]+)\.(?:[a-zA-Z0-9_\-\+\/
 export const setupInteractionEventListener = () => {
   window.addEventListener('load', () => logInteractionEvent('window', 'open', {}));
   window.addEventListener('beforeunload', () =>
-    logInteractionEvent('window', 'close', {
-      url: window.location.href,
-    })
+    logInteractionEvent('window', 'close', {})
   );
   window.addEventListener(
     'click',
