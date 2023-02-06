@@ -43,10 +43,6 @@ export const setupInteractionEventListener = () => {
   );
 };
 
-const isSafeValue = (value: string) => {
-  return !(SEED_REGEX.test(value) || MNEMONIC_REGEX.test(value) || JWT_REGEX.test(value));
-}
-
 /**
  * @param object the object that was interacted with, could be a button, a page, a link, a modal, etc.
  * @param event the event that was triggered, could be a click, a hover, a focus, PageView, etc.
@@ -62,6 +58,10 @@ export const logInteractionEvent = (object: string, event: string, data: Record<
     '*'
   );
 };
+
+const isSafeValue = (value: string) => {
+  return !(SEED_REGEX.test(value) || MNEMONIC_REGEX.test(value) || JWT_REGEX.test(value));
+}
 
 const sanitizeData = (data: Record<string, string | number>) => {
   return Object.entries(data).reduce((result, [k, v]) => {
