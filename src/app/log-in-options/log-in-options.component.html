@@ -1,5 +1,7 @@
 <div class="d-flex align-items-center flex-column">
   <button
+    data-control-name="log-in-cta"
+    data-control-login-option="metamask"
     class="button button-large mb-20px bg-dark text-white"
     (click)="navigateToMetamaskSignup()"
     queryParamsHandling="merge"
@@ -10,6 +12,8 @@
     <span class="font-weight-bold">Sign up / log in with MetaMask</span>
   </button>
   <button
+    data-control-name="log-in-cta"
+    data-control-login-option="google"
     class="button button-large button-primary mb-20px"
     (click)="launchGoogle()"
     *ngIf="!globalVars.hideGoogle"
@@ -23,13 +27,20 @@
     <span class="font-weight-bold">Sign up / log in with Google</span>
   </button>
   <button
+    data-control-name="log-in-cta"
+    data-control-login-option="sign-up-with-deso-seed"
     class="button button-large button-secondary mb-20px"
     [routerLink]="['/sign-up']"
     queryParamsHandling="merge"
   >
     <span class="font-weight-normal">Sign up with DeSo seed</span>
   </button>
-  <a class="link" [routerLink]="['/load-seed']" queryParamsHandling="merge"
-    ><u>Log in with DeSo seed</u></a
+  <a
+    data-control-name="log-in-cta"
+    data-control-login-option="log-in-with-deso-seed"
+    class="link" [routerLink]="['/load-seed']" queryParamsHandling="merge"
+  >
+    <u>Log in with DeSo seed</u>
+  </a
   >
 </div>
