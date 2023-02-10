@@ -8,7 +8,7 @@
     >
       <div *ngIf="globalVars.callback; else elseBlock">Continue</div>
       <ng-template #elseBlock
-        >Continue to {{ globalVars.hostname }}</ng-template
+        >Continue {{ !globalVars.derive ? "to " + globalVars.hostname : ""}}</ng-template
       >
     </button>
   </div>
