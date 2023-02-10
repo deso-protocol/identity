@@ -127,7 +127,6 @@ export class TransactionSpendingLimitComponent implements OnInit {
     if (!accessGroupLimitMap) {
       return [];
     }
-
     let allPublicKeys = new Set<string>();
     accessGroupLimitMap.forEach((item) => allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check));
     return Array.from(allPublicKeys);

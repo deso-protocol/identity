@@ -119,6 +119,20 @@ export class DeriveComponent implements OnInit {
       });
       return;
     }
+    if (this.transactionSpendingLimitResponse?.AccessGroupLimitMap) {
+      this.transactionSpendingLimitResponse.AccessGroupLimitMap.forEach((agl) => {
+        if (!agl.AccessGroupOwnerPublicKeyBase58Check) {
+          agl.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+        }
+      })
+    }
+    if (this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap) {
+      this.transactionSpendingLimitResponse.AccessGroupMemberLimitMap.forEach((agml) => {
+        if (!agml.AccessGroupOwnerPublicKeyBase58Check) {
+          agml.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+        }
+      })
+    }
     this.identityService.derive({
       publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
