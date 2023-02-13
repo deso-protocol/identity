@@ -3,6 +3,7 @@
 <ng-template #continueToHost>
   <div class="d-flex pt-15px justify-content-between">
     <button
+      data-control-name="get-starter-deso-finish-flow-button"
       (click)="finishFlow()"
       class="button button-secondary button-large font-weight-bold fs-15px sign-up-btn"
     >
@@ -157,6 +158,7 @@
         }"
       >
         <a
+          data-control-name="get-starter-deso-cancel-button"
           class="fc-muted cursor-pointer"
           style="cursor: pointer"
           (click)="cancelButtonClicked()"
@@ -164,6 +166,7 @@
           >Cancel</a
         >
         <button
+          data-control-name="get-starter-deso-next-button"
           (click)="sendVerificationText()"
           [ngClass]="{
             disabled: !phoneForm.valid,
@@ -241,7 +244,11 @@
       <div class="mt-5px">
         <!--        Resend button will have a 60s cooldown indicated by resentVerificationCode and resentVerificationCodeTimeout -->
         <div *ngIf="!resentVerificationCode">
-          <a href="" (click)="resendVerificationCode($event)">Resend</a>
+          <a
+            data-control-name="get-starter-deso-resend-code-button"
+            href=""
+            (click)="resendVerificationCode($event)"
+          >Resend</a>
         </div>
         <div *ngIf="resentVerificationCode">
           <div class="fc-muted">
@@ -257,6 +264,7 @@
 
     <div class="mt-15px justify-content-between">
       <button
+        data-control-name="get-starter-deso-back-button"
         *ngIf="displayForSignupFlow"
         (click)="backButtonClickedOnSubmitVerificationScreen()"
         class="button button-secondary button-small font-weight-bold fs-15px floatl"
@@ -265,6 +273,7 @@
       </button>
       <!--      align the Verify button as the rightmost element using float property.-->
       <button
+        data-control-name="get-starter-deso-confirm-code-button"
         (click)="submitVerificationCode()"
         [ngClass]="{
           disabled: !verificationCodeForm.valid,
