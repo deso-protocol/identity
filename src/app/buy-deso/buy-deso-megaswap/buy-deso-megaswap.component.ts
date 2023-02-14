@@ -1,19 +1,20 @@
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { GlobalVarsService } from 'src/app/global-vars.service';
-import { environment } from 'src/environments/environment';
-import { RouteNames } from '../../app-routing.module';
 import { Router } from '@angular/router';
-import { IdentityService } from '../../identity.service';
+import { GlobalVarsService } from 'src/app/global-vars.service';
+import { logInteractionEvent } from 'src/app/interaction-event-helpers';
+import { environment } from 'src/environments/environment';
 import { AccountService } from '../../account.service';
+import { RouteNames } from '../../app-routing.module';
+import { IdentityService } from '../../identity.service';
 
 @Component({
   selector: 'buy-deso-megaswap',
   templateUrl: './buy-deso-megaswap.component.html',
   styleUrls: ['./buy-deso-megaswap.component.scss'],
 })
-export class BuyDeSoMegaSwapComponent implements OnInit {
+export class BuyDeSoMegaSwapComponent implements OnInit, OnDestroy {
   iframeURL: SafeResourceUrl = '';
 
   RouteNames = RouteNames;
@@ -44,6 +45,12 @@ export class BuyDeSoMegaSwapComponent implements OnInit {
         `&now=${Date.now()}`,
       ].join('')
     );
+
+    window.addEventListener("message", this.#megaswapMessageListener);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener("message", this.#megaswapMessageListener);
   }
 
   finishFlow(): void {
@@ -63,5 +70,10 @@ export class BuyDeSoMegaSwapComponent implements OnInit {
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });
+  }
+
+  #megaswapMessageListener = (event: MessageEvent) => {
+      if (event.origin !== environment.megaswapURL) return;
+      logInteractionEvent("megaswap-iframe", "message", event.data);
   }
 }

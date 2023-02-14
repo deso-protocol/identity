@@ -66,6 +66,10 @@
 
   <div class="mt-5">
     <button
+      data-control-name="tx-spending-limit-approve-button"
+      [attr.data-control-is-unlimited]="this.transactionSpendingLimitResponse.IsUnlimited"
+      [attr.data-control-is-full-access-host]="this.globalVars.isFullAccessHostname()"
+      [attr.data-control-tx-memo]="this.transactionSpendingLimitResponse.DerivedKeyMemo"
       class="button btn-primary button-large text-white font-weight-bold"
       (click)="this.onApproveClick()"
     >

@@ -46,8 +46,9 @@ export const setupInteractionEventListener = () => {
  * @param event the event that was triggered, could be a click, a hover, a focus, PageView, etc.
  * @param data arbitrary data map that can be used to pass additional information about the interaction.
  */
-export const logInteractionEvent = (object: string, event: string, data: Record<string,string | number> = {}) => {
-  // NOTE: this only works on web apps.
+export const logInteractionEvent = (object: string, event: string, data: Record<string,string | number | boolean> = {}) => {
+  data.publicKeyBase58Check = getPublicKeyFromQueryString(window.location.search);
+
   window.opener?.postMessage(
     {
       category: 'interaction-event',
@@ -61,11 +62,19 @@ const isSafeValue = (value: string) => {
   return !(SEED_REGEX.test(value) || MNEMONIC_REGEX.test(value) || JWT_REGEX.test(value));
 }
 
-const sanitizeData = (data: Record<string, string | number>) => {
+const sanitizeData = (data: Record<string, string | number | boolean>) => {
   return Object.entries(data).reduce((result, [k, v]) => {
     if (isSafeValue(v.toString())) {
       result[k] = v;
     }
     return result;
-  }, {} as Record<string, string | number>);
+  }, {} as Record<string, string | number | boolean>);
 }
+
+export const getPublicKeyFromQueryString = (
+  search: string
+): string => {
+  const params = new URLSearchParams(search);
+
+  return params.get('public_key') ?? params.get('publicKey') ?? ''
+};

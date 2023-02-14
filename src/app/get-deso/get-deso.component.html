@@ -30,6 +30,8 @@
         (click)="stepThreeNextPhone()"
         [ngStyle]="{ width: '40%', 'min-width': '300px' }"
         class="styled-primary-button mb-10px"
+        data-control-name="get-deso-button"
+        data-control-get-deso-option="phone"
       >
         Get $DESO with Phone Number
       </button>
@@ -38,6 +40,8 @@
         (click)="stepThreeNextBuy()"
         [ngStyle]="{ width: '40%', 'min-width': '300px' }"
         class="styled-secondary-button mt-30px mb-10px"
+        data-control-name="get-deso-button"
+        data-control-get-deso-option="anon"
       >
         Buy or Send $DESO Anonymously
       </button>
@@ -54,6 +58,7 @@
           color: 'gray'
         }"
         class="styled-secondary-button mt-30px mb-10px"
+        data-control-name="skip-get-deso-button"
       >
         Skip
       </button>
