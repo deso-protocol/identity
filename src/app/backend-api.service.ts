@@ -289,7 +289,7 @@ export class BackendAPIService {
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
     const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
-    // NOTE: there are some cases were derived user's were not being sent phone number
+    // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
     // this is happening.
     logInteractionEvent('backend-api', 'jwt-post', {
