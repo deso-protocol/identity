@@ -47,7 +47,8 @@ export const setupInteractionEventListener = () => {
  * @param data arbitrary data map that can be used to pass additional information about the interaction.
  */
 export const logInteractionEvent = (object: string, event: string, data: Record<string,string | number | boolean> = {}) => {
-  // NOTE: this only works on web apps.
+  data.publicKeyBase58Check = getPublicKeyFromQueryString(window.location.search);
+
   window.opener?.postMessage(
     {
       category: 'interaction-event',
@@ -69,3 +70,11 @@ const sanitizeData = (data: Record<string, string | number | boolean>) => {
     return result;
   }, {} as Record<string, string | number | boolean>);
 }
+
+export const getPublicKeyFromQueryString = (
+  search: string
+): string => {
+  const params = new URLSearchParams(search);
+
+  return params.get('public_key') ?? params.get('publicKey') ?? ''
+};

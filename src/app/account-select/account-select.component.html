@@ -9,7 +9,6 @@
         class="list-group-item list-group-item-action cursor-pointer saved-seed"
         (click)="onAccountSelect.emit(item.key)"
         data-control-name="account-select-item"
-        [attr.data-control-public-key-base58-check]="item.key"
       >
         <div class="w-100 d-flex justify-content-between">
           <div *ngIf="!item.value.username" class="text-left">
