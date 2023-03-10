@@ -5,10 +5,11 @@ import {
   ChunkBuffer,
   Enum,
   FixedBuffer,
+  Optional,
   Record,
   Uint8,
   Uvarint64,
-  VarBuffer,
+  VarBuffer
 } from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {
@@ -624,4 +625,15 @@ export class Transaction extends BinaryRecord {
 
   @Transcode(VarBuffer)
   signature: Buffer | null = null;
+
+  // TODO: figure out how to deal with versioning. I don't LOVE
+  // this optional field, but it's the best I can think of for now.
+  @Transcode(Optional(Uvarint64))
+  version: number = 0;
+
+  @Transcode(Optional(Uvarint64))
+  feeNanos: number = 0;
+
+  @Transcode(Optional(Uvarint64))
+  nonce: number = 0;
 }

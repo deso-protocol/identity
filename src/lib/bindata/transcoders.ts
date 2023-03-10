@@ -49,6 +49,13 @@ export const VarBuffer: Transcoder<Buffer> = {
   write: (bytes) => Buffer.concat([uvarint64ToBuf(bytes.length), bytes]),
 };
 
+export function Optional<T>(transcoder: Transcoder<T>): Transcoder<T|null> {
+  return {
+    read: (bytes: Buffer) => !bytes.length ? [null, bytes] : transcoder.read(bytes),
+    write: (value: T | null) => value === null ? Buffer.alloc(0) : transcoder.write(value),
+  };
+}
+
 export const ChunkBuffer = (width: number): Transcoder<Buffer[]> => ({
   read: (bytes) => {
     let [count, buffer] = bufToUvarint64(bytes);
