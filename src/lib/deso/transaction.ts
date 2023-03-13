@@ -637,3 +637,23 @@ export class Transaction extends BinaryRecord {
   @Transcode(Optional(Uvarint64))
   nonce: number = 0;
 }
+
+export class TransactionV0 extends BinaryRecord {
+  @Transcode(ArrayOf(TransactionInput))
+  inputs: TransactionInput[] = [];
+
+  @Transcode(ArrayOf(TransactionOutput))
+  outputs: TransactionOutput[] = [];
+
+  @Transcode(Enum(TransactionTypeMetadataMap))
+  metadata: TransactionMetadata | null = null;
+
+  @Transcode(VarBuffer)
+  publicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Record(TransactionExtraData))
+  extraData: TransactionExtraData | null = null;
+
+  @Transcode(VarBuffer)
+  signature: Buffer | null = null;
+}
