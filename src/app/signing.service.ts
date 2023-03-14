@@ -58,7 +58,7 @@ export class SigningService {
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
     const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [TransactionV0, Buffer];
-    const signatureIndex = v1FieldsBuffer.length ? transactionBytes.indexOf(v1FieldsBuffer) : -1;
+    const signatureIndex = v1FieldsBuffer.length ? transactionBytes.indexOf(v1FieldsBuffer) -1 : -1;
     const v0FieldsWithoutSignature = transactionBytes.slice(0, signatureIndex);
     const transactionHash = new Buffer(sha256.x2(transactionBytes), 'hex');
     const signature = privateKey.sign(transactionHash, { canonical: true });
