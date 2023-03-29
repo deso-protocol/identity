@@ -1,4 +1,5 @@
 import { bufToUvarint64, uvarint64ToBuf } from './util';
+import { TransactionNonce } from '../deso/transaction';
 
 export interface Transcoder<T> {
   read: (bytes: Buffer) => [T, Buffer];
@@ -48,6 +49,18 @@ export const VarBuffer: Transcoder<Buffer> = {
   },
   write: (bytes) => Buffer.concat([uvarint64ToBuf(bytes.length), bytes]),
 };
+
+export const TransactionNonceTranscoder: Transcoder<TransactionNonce | null> = {
+  read: (bytes) => {
+    return TransactionNonce.fromBytes(bytes) as [TransactionNonce, Buffer];
+  },
+  write: (nonce) => {
+    if (nonce) {
+      return Buffer.concat([nonce.toBytes()])
+    }
+    return Buffer.alloc(0);
+  }
+}
 
 export function Optional<T>(transcoder: Transcoder<T>): Transcoder<T|null> {
   return {

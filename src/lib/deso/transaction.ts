@@ -7,6 +7,7 @@ import {
   FixedBuffer,
   Optional,
   Record,
+  TransactionNonceTranscoder,
   Uint8,
   Uvarint64,
   VarBuffer
@@ -26,6 +27,14 @@ export class TransactionOutput extends BinaryRecord {
 
   @Transcode(Uvarint64)
   amountNanos: number = 0;
+}
+
+export class TransactionNonce extends BinaryRecord {
+  @Transcode(Uvarint64)
+  expirationBlockHeight: number = 0;
+
+  @Transcode(Uvarint64)
+  partialId: number = 0;
 }
 
 export class TransactionExtraDataKV extends BinaryRecord {
@@ -634,8 +643,8 @@ export class Transaction extends BinaryRecord {
   @Transcode(Optional(Uvarint64))
   feeNanos: number = 0;
 
-  @Transcode(Optional(Uvarint64))
-  nonce: number = 0;
+  @Transcode(Optional(TransactionNonceTranscoder))
+  nonce: TransactionNonce | null = null;
 }
 
 export class TransactionV0 extends BinaryRecord {
