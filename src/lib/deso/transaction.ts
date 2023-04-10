@@ -5,10 +5,12 @@ import {
   ChunkBuffer,
   Enum,
   FixedBuffer,
+  Optional,
   Record,
+  TransactionNonceTranscoder,
   Uint8,
   Uvarint64,
-  VarBuffer,
+  VarBuffer
 } from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {
@@ -25,6 +27,14 @@ export class TransactionOutput extends BinaryRecord {
 
   @Transcode(Uvarint64)
   amountNanos: number = 0;
+}
+
+export class TransactionNonce extends BinaryRecord {
+  @Transcode(Uvarint64)
+  expirationBlockHeight: number = 0;
+
+  @Transcode(Uvarint64)
+  partialId: number = 0;
 }
 
 export class TransactionExtraDataKV extends BinaryRecord {
@@ -607,6 +617,37 @@ export const TransactionTypeMetadataMap = {
 };
 
 export class Transaction extends BinaryRecord {
+  @Transcode(ArrayOf(TransactionInput))
+  inputs: TransactionInput[] = [];
+
+  @Transcode(ArrayOf(TransactionOutput))
+  outputs: TransactionOutput[] = [];
+
+  @Transcode(Enum(TransactionTypeMetadataMap))
+  metadata: TransactionMetadata | null = null;
+
+  @Transcode(VarBuffer)
+  publicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Record(TransactionExtraData))
+  extraData: TransactionExtraData | null = null;
+
+  @Transcode(VarBuffer)
+  signature: Buffer | null = null;
+
+  // TODO: figure out how to deal with versioning. I don't LOVE
+  // this optional field, but it's the best I can think of for now.
+  @Transcode(Optional(Uvarint64))
+  version: number = 0;
+
+  @Transcode(Optional(Uvarint64))
+  feeNanos: number = 0;
+
+  @Transcode(Optional(TransactionNonceTranscoder))
+  nonce: TransactionNonce | null = null;
+}
+
+export class TransactionV0 extends BinaryRecord {
   @Transcode(ArrayOf(TransactionInput))
   inputs: TransactionInput[] = [];
 
