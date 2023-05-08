@@ -8,6 +8,7 @@
         *ngFor="let item of allUsers | async | keyvalue; let i = index"
         class="list-group-item list-group-item-action cursor-pointer saved-seed"
         (click)="onAccountSelect.emit(item.key)"
+        data-control-name="account-select-item"
       >
         <div class="w-100 d-flex justify-content-between">
           <div *ngIf="!item.value.username" class="text-left">

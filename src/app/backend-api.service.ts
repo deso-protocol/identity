@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { logInteractionEvent } from 'src/app/interaction-event-helpers';
 import { environment } from '../environments/environment';
-import { SigningService } from './signing.service';
+import { DerivedKey, Network, UserProfile } from '../types/identity';
 import { AccountService } from './account.service';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
-import { DerivedKey, Network, UserProfile } from '../types/identity';
+import { SigningService } from './signing.service';
 
 export interface MetamaskSignInRequest {
   AmountNanos: number;
@@ -288,6 +289,13 @@ export class BackendAPIService {
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
     const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
+    // NOTE: there are some cases where derived user's were not being sent phone number
+    // verification texts due to missing public user info. This is to log how often
+    // this is happening.
+    logInteractionEvent('backend-api', 'jwt-post', {
+      hasPublicUserInfo: !!publicUserInfo,
+    });
+
     if (!publicUserInfo) {
       return of(null);
     }

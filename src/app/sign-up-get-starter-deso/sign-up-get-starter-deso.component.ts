@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { CountryISO } from 'ngx-intl-tel-input';
-import { GlobalVarsService } from '../global-vars.service';
-import { BackendAPIService, User } from '../backend-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IdentityService } from '../identity.service';
+import { CountryISO } from 'ngx-intl-tel-input';
+import { logInteractionEvent } from 'src/app/interaction-event-helpers';
 import { AccountService } from '../account.service';
 import { RouteNames } from '../app-routing.module';
+import { BackendAPIService, User } from '../backend-api.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { IdentityService } from '../identity.service';
 
 @Component({
   selector: 'sign-up-get-starter-deso',
@@ -113,6 +114,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     if (this.phoneForm.invalid) {
       return;
     }
+
+    logInteractionEvent('get-starter-deso', 'send-verification-text');
 
     this._sendPhoneNumberVerificationText();
   }
