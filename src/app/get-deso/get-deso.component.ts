@@ -26,6 +26,7 @@ export class GetDesoComponent implements OnInit {
   stepScreen: string = GetDesoComponent.STEP_GET_STARTER_DESO;
   GetDesoComponent = GetDesoComponent;
   publicKeyAdded = '';
+  derivedPublicKeyParam = '';
 
   environment = environment;
 
@@ -58,6 +59,9 @@ export class GetDesoComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       if (queryParams.publicKey) {
         this.publicKeyAdded = queryParams.publicKey;
+      }
+      if (queryParams.derivedPublicKey) {
+        this.derivedPublicKeyParam = queryParams.derivedPublicKey;
       }
     });
   }
@@ -138,12 +142,27 @@ export class GetDesoComponent implements OnInit {
   }
 
   ////// FINISH FLOW ///////
-  finishFlow(): void {
+  finishFlow(skipGetDeso: boolean = false): void {
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKeyAdded },
-        queryParamsHandling: 'merge',
-      });
+      if (skipGetDeso && this.derivedPublicKeyParam) {
+        // If we're skipping the get deso flow and we have a derived key param
+        // it means the user is logging in with a pre-generated derived key and
+        // the user doesn't have a deso balance so the key cannot be authorized.
+        // In this special case, we skip the derive key approval flow and return
+        // the payload immediately with no permissions attached.
+        this.identityService.derive({
+          publicKey: this.publicKeyAdded,
+          derivedPublicKey: this.derivedPublicKeyParam,
+          transactionSpendingLimit: { GlobalDESOLimit: 0 },
+          expirationDays: 0,
+          blockHeight: this.globalVars.blockHeight,
+        });
+      } else {
+        this.router.navigate(['/', RouteNames.DERIVE], {
+          queryParams: { publicKey: this.publicKeyAdded },
+          queryParamsHandling: 'merge',
+        });
+      }
     } else {
       this.login();
     }

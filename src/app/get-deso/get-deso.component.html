@@ -50,7 +50,7 @@
       </div>
       <button
         *ngIf="this.globalVars.showSkip"
-        (click)="finishFlow()"
+        (click)="finishFlow(true)"
         [ngStyle]="{
           width: '40%',
           'min-width': '300px',
