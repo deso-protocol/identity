@@ -35,7 +35,7 @@ import { AppRoutingModule, RouteNames } from 'src/app/app-routing.module';
 import { Network } from '../../../types/identity';
 import { BuyDeSoCompletePageComponent } from '../buy-deso-complete-page/buy-deso-complete-page.component';
 import { BuyDesoPageComponent } from '../buy-deso-page/buy-deso-page.component';
-import { BuyDeSoMegaSwapComponent } from '../buy-deso-megaswap/buy-deso-megaswap.component';
+import { BuyDeSoHeroSwapComponent } from '../buy-deso-heroswap/buy-deso-heroswap.component';
 
 class Messages {
   static INCORRECT_PASSWORD = `The password you entered was incorrect.`;
@@ -56,7 +56,7 @@ class Messages {
 export class BuyDeSoComponent implements OnInit {
   static BUY_WITH_USD = 'Buy with Credit Card';
   static BUY_ON_CB = 'Buy on Coinbase';
-  static BUY_WITH_MEGASWAP = 'Buy with Crypto';
+  static BUY_WITH_HEROSWAP = 'Buy with Crypto';
   static CB_LINK = 'https://www.coinbase.com/price/decentralized-social';
 
   appData: GlobalVarsService;
@@ -71,10 +71,10 @@ export class BuyDeSoComponent implements OnInit {
   keyIsCopied = false;
 
   BuyDeSoComponent = BuyDeSoComponent;
-  defaultBuyTabs = [BuyDeSoComponent.BUY_WITH_MEGASWAP, BuyDeSoComponent.BUY_WITH_USD, BuyDeSoComponent.BUY_ON_CB];
+  defaultBuyTabs = [BuyDeSoComponent.BUY_WITH_HEROSWAP, BuyDeSoComponent.BUY_WITH_USD, BuyDeSoComponent.BUY_ON_CB];
   buyTabs = this.defaultBuyTabs;
-  activeTab = BuyDeSoComponent.BUY_WITH_MEGASWAP;
-  linkTabs = { [BuyDeSoComponent.BUY_ON_CB]: BuyDeSoComponent.CB_LINK };
+  activeTab = BuyDeSoComponent.BUY_WITH_HEROSWAP;
+  linkTabs = {[BuyDeSoComponent.BUY_ON_CB]: BuyDeSoComponent.CB_LINK};
 
   satoshisPerDeSoExchangeRate = 0;
   ProtocolUSDCentsPerBitcoinExchangeRate = 0;
@@ -209,7 +209,7 @@ export class BuyDeSoComponent implements OnInit {
     window.scroll(0, 0);
 
     // Add extra tabs
-    this.activeTab = BuyDeSoComponent.BUY_WITH_MEGASWAP;
+    this.activeTab = BuyDeSoComponent.BUY_WITH_HEROSWAP;
 
     if (!isNil(this.activeTabInput)) {
       this.activeTab = this.activeTabInput;
@@ -237,7 +237,7 @@ export class BuyDeSoComponent implements OnInit {
     TabSelectorComponent,
     BuyDeSoCompleteComponent,
     BuyDeSoUSDComponent,
-    BuyDeSoMegaSwapComponent,
+    BuyDeSoHeroSwapComponent,
     SignUpBuyDesoComponent,
   ],
   imports: [
@@ -252,4 +252,5 @@ export class BuyDeSoComponent implements OnInit {
   exports: [BuyDeSoComponent, BuyDeSoCompleteComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class BuyDeSoComponentWrapper {}
+export class BuyDeSoComponentWrapper {
+}
