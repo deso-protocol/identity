@@ -19,8 +19,8 @@
           <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD">
             <buy-deso-usd [parentComponent]="this"></buy-deso-usd>
           </div>
-          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_MEGASWAP">
-            <buy-deso-megaswap [publicKey]='publicKey' [parentComponent]='this'></buy-deso-megaswap>
+          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_HEROSWAP">
+            <buy-deso-heroswap [publicKey]='publicKey' [parentComponent]='this'></buy-deso-heroswap>
           </div>
         </div>
       </div>
@@ -55,8 +55,8 @@
     <div class="d-flex justify-content-center">
       The public key provided was not found in identity and we cannot support
       buying DESO.
-      <br />
-      <br />
+      <br/>
+      <br/>
       Please close this window and try again with a public key with which you
       are logged in.
     </div>

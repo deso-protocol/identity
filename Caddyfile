@@ -102,5 +102,5 @@ header @html Content-Security-Policy "
     https://fonts.gstatic.com
     https://ka-f.fontawesome.com;
   frame-src 'self'
-    megaswap.xyz
+    heroswap.com
     https://iframe.videodelivery.net;"
