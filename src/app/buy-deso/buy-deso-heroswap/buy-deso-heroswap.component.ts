@@ -37,7 +37,7 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
     this.iframeURL = this.sanitizer.bypassSecurityTrustResourceUrl(
       [
         environment.heroswapURL,
-        '/#/iframe/v1?',
+        '/widget?',
         `network=${this.globalVars.network}`,
         '&destinationTickers=DESO',
         '&destinationTicker=DESO',

@@ -54,7 +54,7 @@ class Messages {
   styleUrls: ['./buy-deso.component.scss'],
 })
 export class BuyDeSoComponent implements OnInit {
-  static BUY_WITH_USD = 'Buy with Credit Card';
+  // static BUY_WITH_USD = 'Buy with Credit Card';
   static BUY_ON_CB = 'Buy on Coinbase';
   static BUY_WITH_HEROSWAP = 'Buy with Crypto';
   static CB_LINK = 'https://www.coinbase.com/price/decentralized-social';
@@ -71,7 +71,7 @@ export class BuyDeSoComponent implements OnInit {
   keyIsCopied = false;
 
   BuyDeSoComponent = BuyDeSoComponent;
-  defaultBuyTabs = [BuyDeSoComponent.BUY_WITH_HEROSWAP, BuyDeSoComponent.BUY_WITH_USD, BuyDeSoComponent.BUY_ON_CB];
+  defaultBuyTabs = [BuyDeSoComponent.BUY_WITH_HEROSWAP, /*BuyDeSoComponent.BUY_WITH_USD, */BuyDeSoComponent.BUY_ON_CB];
   buyTabs = this.defaultBuyTabs;
   activeTab = BuyDeSoComponent.BUY_WITH_HEROSWAP;
   linkTabs = {[BuyDeSoComponent.BUY_ON_CB]: BuyDeSoComponent.CB_LINK};
