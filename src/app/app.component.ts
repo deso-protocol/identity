@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { GlobalVarsService } from './global-vars.service';
-import { IdentityService } from './identity.service';
+import { setupInteractionEventListener } from 'src/app/interaction-event-helpers';
 import { AccessLevel, Network } from '../types/identity';
+import { AccountService } from './account.service';
 import { getStateParamsFromGoogle } from './auth/google/google.component';
 import { BackendAPIService } from './backend-api.service';
-import { AccountService } from './account.service';
+import { GlobalVarsService } from './global-vars.service';
+import { IdentityService } from './identity.service';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,9 @@ export class AppComponent implements OnInit {
     private globalVars: GlobalVarsService,
     private identityService: IdentityService,
     private backendApiService: BackendAPIService
-  ) {}
+  ) {
+    setupInteractionEventListener();
+  }
 
   ngOnInit(): void {
     // load params
@@ -75,10 +78,15 @@ export class AppComponent implements OnInit {
       }
     }
 
-    if (
-      params.get('derive') === 'true' ||
-      stateParamsFromGoogle.derive
-    ) {
+    this.globalVars.redirectURI = params.get('redirect_uri') ?? stateParamsFromGoogle.redirect_uri ?? '';
+
+    const showSkip = params.get('showSkip');
+    this.globalVars.showSkip =
+      (showSkip && JSON.parse(showSkip)) ??
+      stateParamsFromGoogle.showSkip ??
+      false;
+
+    if (params.get('derive') === 'true' || stateParamsFromGoogle.derive) {
       this.globalVars.derive = true;
     }
 
@@ -148,9 +156,10 @@ export class AppComponent implements OnInit {
       console.error(e);
     }
 
-    if (this.globalVars.callback) {
-      // If callback is set, we won't be sending the initialize message.
-      this.globalVars.hostname = 'localhost';
+    if (this.globalVars.callback || this.globalVars.redirectURI) {
+      if (this.globalVars.callback) {
+        this.globalVars.hostname = 'localhost';
+      }
       this.finishInit();
     } else if (
       this.globalVars.webview ||

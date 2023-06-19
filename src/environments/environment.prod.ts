@@ -15,5 +15,5 @@ export const environment = {
   ],
   noAccessHostnames: [''],
   jumioSupported: false,
-  megaswapURL: 'https://heroswap.com',
+  heroswapURL: 'https://heroswap.com',
 };

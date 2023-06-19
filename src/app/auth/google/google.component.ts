@@ -227,6 +227,8 @@ export const getStateParamsFromGoogle = (
     deleteKey: false,
     derivedPublicKey: '',
     expirationDays: 0,
+    redirect_uri: '',
+    showSkip: false,
   };
 
   try {

@@ -1,19 +1,19 @@
-
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { GlobalVarsService } from 'src/app/global-vars.service';
-import { environment } from 'src/environments/environment';
-import { RouteNames } from '../../app-routing.module';
 import { Router } from '@angular/router';
-import { IdentityService } from '../../identity.service';
+import { GlobalVarsService } from 'src/app/global-vars.service';
+import { logInteractionEvent } from 'src/app/interaction-event-helpers';
+import { environment } from 'src/environments/environment';
 import { AccountService } from '../../account.service';
+import { RouteNames } from '../../app-routing.module';
+import { IdentityService } from '../../identity.service';
 
 @Component({
-  selector: 'buy-deso-megaswap',
-  templateUrl: './buy-deso-megaswap.component.html',
-  styleUrls: ['./buy-deso-megaswap.component.scss'],
+  selector: 'buy-deso-heroswap',
+  templateUrl: './buy-deso-heroswap.component.html',
+  styleUrls: ['./buy-deso-heroswap.component.scss'],
 })
-export class BuyDeSoMegaSwapComponent implements OnInit {
+export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
   iframeURL: SafeResourceUrl = '';
 
   RouteNames = RouteNames;
@@ -25,17 +25,18 @@ export class BuyDeSoMegaSwapComponent implements OnInit {
     private router: Router,
     private identityService: IdentityService,
     private accountService: AccountService,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     window.scroll(0, 0);
-    if (!environment.megaswapURL) {
+    if (!environment.heroswapURL) {
       return;
     }
 
     this.iframeURL = this.sanitizer.bypassSecurityTrustResourceUrl(
       [
-        environment.megaswapURL,
+        environment.heroswapURL,
         '/widget?',
         `network=${this.globalVars.network}`,
         '&destinationTickers=DESO',
@@ -44,12 +45,18 @@ export class BuyDeSoMegaSwapComponent implements OnInit {
         `&now=${Date.now()}`,
       ].join('')
     );
+
+    window.addEventListener("message", this.#heroswapMessageListener);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener("message", this.#heroswapMessageListener);
   }
 
   finishFlow(): void {
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+        queryParams: {publicKey: this.publicKey},
         queryParamsHandling: 'merge',
       });
     } else {
@@ -63,5 +70,10 @@ export class BuyDeSoMegaSwapComponent implements OnInit {
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });
+  }
+
+  #heroswapMessageListener = (event: MessageEvent) => {
+    if (event.origin !== environment.heroswapURL) return;
+    logInteractionEvent("heroswap-iframe", "message", event.data);
   }
 }

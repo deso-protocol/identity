@@ -5,10 +5,12 @@ import {
   ChunkBuffer,
   Enum,
   FixedBuffer,
+  Optional,
   Record,
+  TransactionNonceTranscoder,
   Uint8,
   Uvarint64,
-  VarBuffer,
+  VarBuffer
 } from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {
@@ -25,6 +27,14 @@ export class TransactionOutput extends BinaryRecord {
 
   @Transcode(Uvarint64)
   amountNanos: number = 0;
+}
+
+export class TransactionNonce extends BinaryRecord {
+  @Transcode(Uvarint64)
+  expirationBlockHeight: number = 0;
+
+  @Transcode(Uvarint64)
+  partialId: number = 0;
 }
 
 export class TransactionExtraDataKV extends BinaryRecord {
@@ -459,6 +469,118 @@ export class TransactionMetadataDAOCoinLimitOrder extends BinaryRecord {
   bidderInputs: DeSoInputsByTransactor[] = [];
 }
 
+export class TransactionMetadataCreateUserAssociation extends BinaryRecord {
+  @Transcode(VarBuffer)
+  targetUserPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  appPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationType: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationValue: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataDeleteUserAssociation extends BinaryRecord {
+  @Transcode(VarBuffer)
+  associationID: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataCreatePostAssociation extends BinaryRecord {
+  @Transcode(VarBuffer)
+  postHash: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  appPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationType: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  associationValue: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataDeletePostAssociation extends BinaryRecord {
+  @Transcode(VarBuffer)
+  associationID: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataAccessGroup extends BinaryRecord {
+  @Transcode(VarBuffer)
+  accessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  accessGroupOperationType: number = 0;
+}
+
+export class AccessGroupMember extends BinaryRecord {
+  @Transcode(VarBuffer)
+  accessGroupMemberPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupMemberKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  encryptedKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Record(TransactionExtraData))
+  extraData: TransactionExtraData | null = null;
+}
+
+export class TransactionMetadataAccessGroupMembers extends BinaryRecord {
+  @Transcode(VarBuffer)
+  accessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  accessGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(ArrayOf(AccessGroupMember))
+  accessGroupMembersList: AccessGroupMember[] = [];
+
+  @Transcode(Uint8)
+  accessGroupMemberOperationType: number = 0;
+}
+
+export class TransactionMetadataNewMessage extends BinaryRecord {
+  @Transcode(VarBuffer)
+  senderAccessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  senderAccessGroupKeyName: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  senderAccessGroupPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientAccessGroupOwnerPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientAccessGroupKeyname: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientAccessGroupPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  encryptedText: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uvarint64)
+  timestampNanos: number = 0;
+
+  @Transcode(Uint8)
+  newMessageType: number = 0;
+
+  @Transcode(Uint8)
+  newMessageOperation: number = 0;
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -485,9 +607,47 @@ export const TransactionTypeMetadataMap = {
   24: TransactionMetadataDAOCoin,
   25: TransactionMetadataTransferDAOCoin,
   26: TransactionMetadataDAOCoinLimitOrder,
+  27: TransactionMetadataCreateUserAssociation,
+  28: TransactionMetadataDeleteUserAssociation,
+  29: TransactionMetadataCreatePostAssociation,
+  30: TransactionMetadataDeletePostAssociation,
+  31: TransactionMetadataAccessGroup,
+  32: TransactionMetadataAccessGroupMembers,
+  33: TransactionMetadataNewMessage,
 };
 
 export class Transaction extends BinaryRecord {
+  @Transcode(ArrayOf(TransactionInput))
+  inputs: TransactionInput[] = [];
+
+  @Transcode(ArrayOf(TransactionOutput))
+  outputs: TransactionOutput[] = [];
+
+  @Transcode(Enum(TransactionTypeMetadataMap))
+  metadata: TransactionMetadata | null = null;
+
+  @Transcode(VarBuffer)
+  publicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Record(TransactionExtraData))
+  extraData: TransactionExtraData | null = null;
+
+  @Transcode(VarBuffer)
+  signature: Buffer | null = null;
+
+  // TODO: figure out how to deal with versioning. I don't LOVE
+  // this optional field, but it's the best I can think of for now.
+  @Transcode(Optional(Uvarint64))
+  version: number = 0;
+
+  @Transcode(Optional(Uvarint64))
+  feeNanos: number = 0;
+
+  @Transcode(Optional(TransactionNonceTranscoder))
+  nonce: TransactionNonce | null = null;
+}
+
+export class TransactionV0 extends BinaryRecord {
   @Transcode(ArrayOf(TransactionInput))
   inputs: TransactionInput[] = [];
 

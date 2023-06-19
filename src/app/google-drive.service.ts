@@ -1,8 +1,8 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { RouteNames } from './app-routing.module';
 import { GoogleAuthState, Network } from '../types/identity';
+import { RouteNames } from './app-routing.module';
 import { GlobalVarsService } from './global-vars.service';
 
 @Injectable({
@@ -95,6 +95,8 @@ export class GoogleDriveService {
       derivedPublicKey: this.globalVars.derivedPublicKey,
       deleteKey: this.globalVars.deleteKey,
       expirationDays: this.globalVars.expirationDays,
+      redirect_uri: this.globalVars.redirectURI,
+      showSkip: this.globalVars.showSkip,
     };
 
     const stateString = btoa(JSON.stringify(stateParams));

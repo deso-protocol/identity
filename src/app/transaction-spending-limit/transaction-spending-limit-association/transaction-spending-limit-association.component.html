@@ -1,0 +1,12 @@
+<div class="d-flex flex-column border br-12px border-primary p-1">
+  <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-start align-items-center py-10px col-12">
+        {{ getOperationString() }}
+        {{ globalVars.formatTxCountLimit(associationLimitMapItem?.OpCount) }}
+        {{ associationLimitMapItem?.AssociationClass }}
+        {{ associationLimitMapItem?.AssociationType }}
+        associations on
+        {{ (appUser?.ProfileEntryResponse?.Username || associationLimitMapItem?.AppPublicKeyBase58Check | truncateAddressOrUsername) || 'any app' }}.
+      </div>
+  </div>
+</div>

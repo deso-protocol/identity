@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { RouteNames } from 'src/app/app-routing.module';
+import { SwalHelper } from '../../lib/helpers/swal-helper';
+import { UserProfile } from '../../types/identity';
 import { AccountService } from '../account.service';
-import { DerivePayload, IdentityService } from '../identity.service';
 import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { UserProfile } from '../../types/identity';
-import { ActivatedRoute, Params } from '@angular/router';
-import { Observable } from 'rxjs';
-import { SwalHelper } from '../../lib/helpers/swal-helper';
+import { IdentityService } from '../identity.service';
 type Accounts = { [key: string]: UserProfile } | {};
 type DeriveParams = {
   publicKey?: string;
@@ -39,12 +41,15 @@ export class DeriveComponent implements OnInit {
   isSingleAccount = false;
   validationErrors = false;
   blockHeight = 0;
+  onApproveClick = () => this.approveDerivedKey(this.publicKeyBase58Check);
+
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
     public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -114,6 +119,20 @@ export class DeriveComponent implements OnInit {
       });
       return;
     }
+    if (this.transactionSpendingLimitResponse?.AccessGroupLimitMap) {
+      this.transactionSpendingLimitResponse.AccessGroupLimitMap.forEach((agl) => {
+        if (!agl.AccessGroupOwnerPublicKeyBase58Check) {
+          agl.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+        }
+      })
+    }
+    if (this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap) {
+      this.transactionSpendingLimitResponse.AccessGroupMemberLimitMap.forEach((agml) => {
+        if (!agml.AccessGroupOwnerPublicKeyBase58Check) {
+          agml.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+        }
+      })
+    }
     this.identityService.derive({
       publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
@@ -148,6 +167,27 @@ export class DeriveComponent implements OnInit {
     catch (e) {
       return Promise.reject('Error getting messaing group derivation');
     }
+  }
+
+  onAccountSelected(publicKey: string): void {
+    // first check if this user has a balance. If not, push them to the get-deso flow
+    this.backendApi
+      .GetUsersStateless(
+        [publicKey],
+        true /*SkipForLeaderboard*/,
+        true /*IncludeBalance*/
+      )
+      .pipe(take(1))
+      .subscribe((res) => {
+        if (res.UserList?.[0]?.BalanceNanos === 0) {
+          this.router.navigate(['/', RouteNames.GET_DESO], {
+            queryParams: { publicKey },
+            queryParamsHandling: 'merge',
+          });
+          return;
+        }
+        this.publicKeyBase58Check = publicKey;
+      });
   }
 
   private getParameterValidationErrors(params: Params): boolean {

@@ -56,6 +56,13 @@ export class GlobalVarsService {
   deleteKey = false;
   expirationDays = 0;
 
+  redirectURI = '';
+
+  /**
+   * If true, the "Skip" button will be shown on the get deso page.
+   */
+  showSkip: boolean = false;
+
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
   }
@@ -150,5 +157,11 @@ export class GlobalVarsService {
           : token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
       )
       .join(' ');
+  }
+
+  // If the count is 1 billion or more, it will be displayed as "UNLIMITED"
+  // Otherwise, it will be displayed as a delimited number based on the user's locale.
+  formatTxCountLimit(count: number = 0): string {
+    return count >= 1e9 ? 'UNLIMITED' : count.toLocaleString();
   }
 }

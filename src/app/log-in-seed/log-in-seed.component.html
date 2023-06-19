@@ -2,7 +2,7 @@
 
 <div
   class="page-container"
-  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback"
+  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
 >
   <div class="title-text">Log in to {{ globalVars.hostname }}</div>
 
@@ -47,13 +47,14 @@
     ></textarea>
   </div>
 
-  <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link mb-30px">
+  <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link mb-30px" data-control-name="log-in-with-seed-advanced-toggle-button">
     <u>Advanced</u>
   </div>
-  <div *ngIf="advancedOpen" (click)="advancedOpen = false" class="link mb-30px">
+  <div *ngIf="advancedOpen" (click)="advancedOpen = false" class="link mb-30px" data-control-name="log-in-with-seed-simple-toggle-button">
     <u>Simple</u>
   </div>
   <button
+    data-control-name="log-in-with-seed-load-account-button"
     (click)="clickLoadAccount()"
     class="button button-primary button-large"
   >

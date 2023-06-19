@@ -16,18 +16,25 @@ import {
   Transaction,
   TransactionMetadataAcceptNFTBid,
   TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataAccessGroup,
+  TransactionMetadataAccessGroupMembers,
   TransactionMetadataAuthorizeDerivedKey,
   TransactionMetadataBasicTransfer,
   TransactionMetadataBitcoinExchange,
   TransactionMetadataBurnNFT,
   TransactionMetadataCreateNFT,
+  TransactionMetadataCreatePostAssociation,
+  TransactionMetadataCreateUserAssociation,
   TransactionMetadataCreatorCoin,
   TransactionMetadataCreatorCoinTransfer,
   TransactionMetadataDAOCoin,
   TransactionMetadataDAOCoinLimitOrder,
+  TransactionMetadataDeletePostAssociation,
+  TransactionMetadataDeleteUserAssociation,
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataMessagingGroup,
+  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
   TransactionMetadataPrivateMessage,
@@ -443,6 +450,136 @@ export class ApproveComponent implements OnInit {
           }
         }
         break;
+      case TransactionMetadataCreateUserAssociation:
+        const createUserAssociationMetadata = this.transaction.metadata as TransactionMetadataCreateUserAssociation;
+        const targetPublicKey = this.base58KeyCheck(createUserAssociationMetadata.targetUserPublicKey);
+        publicKeys = [targetPublicKey];
+        let userAssociationAppDisplayName = 'the global';
+        if (!this.isZeroByteArray(createUserAssociationMetadata.appPublicKey)) {
+          const appPublicKey = this.base58KeyCheck(createUserAssociationMetadata.appPublicKey);
+          userAssociationAppDisplayName = appPublicKey + '\'s';
+          publicKeys.push(appPublicKey);
+        }
+        const userAssociationType = createUserAssociationMetadata.associationType.toString();
+        const userAssociationValue = createUserAssociationMetadata.associationValue.toString();
+        description = `create a ${userAssociationType} association on ${targetPublicKey} with value ` +
+          `${userAssociationValue} in ${userAssociationAppDisplayName} app namespace`;
+        break;
+      case TransactionMetadataDeleteUserAssociation:
+        // TODO: do we want to fetch the association from the API and display more information?
+        const deleteUserAssociationMetadata = this.transaction.metadata as TransactionMetadataDeleteUserAssociation;
+        description = `delete user association with ID ${deleteUserAssociationMetadata.associationID.toString()}`;
+        break;
+      case TransactionMetadataCreatePostAssociation:
+        const createPostAssociationMetadata = this.transaction.metadata as TransactionMetadataCreateUserAssociation;
+        // TODO: do we want to fetch the post so we can have more information?
+        const targetPostHash = createPostAssociationMetadata.targetUserPublicKey.toString('hex');
+        publicKeys = [];
+        let postAssociationAppDisplayName = 'the global';
+        if (!this.isZeroByteArray(createPostAssociationMetadata.appPublicKey)) {
+          const appPublicKey = this.base58KeyCheck(createPostAssociationMetadata.appPublicKey);
+          postAssociationAppDisplayName = appPublicKey + '\'s';
+          publicKeys.push(appPublicKey);
+        }
+        const postAssociationType = createPostAssociationMetadata.associationType.toString();
+        const postAssociationValue = createPostAssociationMetadata.associationValue.toString();
+        description = `create a ${postAssociationType} association on post ${targetPostHash} with value ` +
+          `${postAssociationValue} in ${postAssociationAppDisplayName} app namespace`;
+        break;
+      case TransactionMetadataDeletePostAssociation:
+        // TODO: do we want to fetch the association from the API and display more information?
+        const deletePostAssociationMetadata = this.transaction.metadata as TransactionMetadataDeletePostAssociation;
+        description = `delete post association with ID ${deletePostAssociationMetadata.associationID.toString()}`;
+        break;
+      case TransactionMetadataAccessGroup:
+        const accessGroupMetadata = this.transaction
+          .metadata as TransactionMetadataAccessGroup;
+        let accessGroupOperation: string;
+        switch (accessGroupMetadata.accessGroupOperationType) {
+          case 2:
+            accessGroupOperation = 'create';
+            break;
+          case 3:
+            accessGroupOperation = 'update';
+            break;
+          default:
+            accessGroupOperation = 'take unknown action on'
+        }
+        description = `${accessGroupOperation} access group with name "${accessGroupMetadata.accessGroupKeyName.toString()}"`;
+        break;
+      case TransactionMetadataAccessGroupMembers:
+        const accessGroupMembersMetadata = this.transaction
+          .metadata as TransactionMetadataAccessGroupMembers;
+        const numMembers = accessGroupMembersMetadata.accessGroupMembersList.length;
+        const pluralSuffix = numMembers > 1 ? 's' : '';
+        let accessGroupMemberOperation: string;
+        switch (accessGroupMembersMetadata.accessGroupMemberOperationType) {
+          case 2:
+            accessGroupMemberOperation = `add ${numMembers} member${pluralSuffix} to`;
+            break;
+          case 3:
+            accessGroupMemberOperation = `remove ${numMembers} member${pluralSuffix} from`;
+            break;
+          case 4:
+            accessGroupMemberOperation = `update ${numMembers} member${pluralSuffix} of`;
+            break;
+          default:
+            accessGroupMemberOperation = `take unknown action on ${numMembers} member${pluralSuffix} of`;
+        }
+        publicKeys = [
+          this.base58KeyCheck(accessGroupMembersMetadata.accessGroupOwnerPublicKey),
+          ...accessGroupMembersMetadata.accessGroupMembersList
+            .map(
+              (member) =>
+                this.base58KeyCheck(member.accessGroupMemberPublicKey)
+            )];
+        description = `
+        ${accessGroupMemberOperation} group with name ${accessGroupMembersMetadata.accessGroupKeyName.toString()}.\n
+        ${accessGroupMembersMetadata.accessGroupMembersList.map((member) => {
+          return `${
+            this.base58KeyCheck(member.accessGroupMemberPublicKey)
+          } - key name: ${
+            member.accessGroupMemberKeyName.toString()
+          }, encrypted key:${
+            member.encryptedKey.toString()
+          }\n`
+        })}
+         `
+        break;
+      case TransactionMetadataNewMessage:
+        const newMessageMetadata = this.transaction
+          .metadata as TransactionMetadataNewMessage;
+        let messageType: string;
+        let recipient: string;
+        switch (newMessageMetadata.newMessageType) {
+          case 0:
+            messageType = 'dm';
+            recipient = this.base58KeyCheck(newMessageMetadata.recipientAccessGroupPublicKey);
+            publicKeys = [recipient];
+            break;
+          case 1:
+            messageType = 'message';
+            const groupOwnerPublicKey = this.base58KeyCheck(newMessageMetadata.recipientAccessGroupOwnerPublicKey);
+            recipient = `${groupOwnerPublicKey}'s group with name ${
+              newMessageMetadata.recipientAccessGroupKeyname.toString()
+            }`;
+            publicKeys = [groupOwnerPublicKey];
+            break;
+          default:
+            recipient = 'unknown recipient';
+            messageType = 'unknown message type';
+        }
+        switch (newMessageMetadata.newMessageOperation) {
+          case 0:
+            description = `send new ${messageType} to ${recipient}`;
+            break;
+          case 1:
+            description = `update existing ${messageType} to ${recipient}`;
+            break;
+          default:
+            description = `unknown messaging action on ${messageType} to ${recipient}`;
+        }
+        break;
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -486,7 +623,7 @@ export class ApproveComponent implements OnInit {
   }
 
   isZeroByteArray(buffer: Buffer): boolean {
-    return parseInt(buffer.toString('hex'), 16) == 0;
+    return parseInt(buffer.toString('hex'), 16) === 0;
   }
 
   // Fetch Usernames from API and replace public keys in description with Username
@@ -498,6 +635,7 @@ export class ApproveComponent implements OnInit {
     if (publicKeys.length === 0) {
       return of(description);
     }
+    // TODO: make a get usernames for public key endpoint
     // Otherwise, we hit get-users-stateless to fetch profiles.
     return this.backendApi.GetUsersStateless(publicKeys, true).pipe(
       map((res) => {

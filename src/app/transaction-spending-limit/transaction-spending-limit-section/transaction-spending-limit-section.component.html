@@ -46,7 +46,7 @@
           <div>
             {{ globalVars.cleanSpendingLimitOperationName(txnLimitItem.key) }}
           </div>
-          <div>{{ txnLimitItem.value }}</div>
+          <div>{{ globalVars.formatTxCountLimit(txnLimitItem.value) }}</div>
         </div>
       </ng-container>
       <ng-container
@@ -151,6 +151,72 @@
             [buyingUser]="userMap[daoCoinLimitOrderLimitItem.BuyingPublicKey]"
             [sellingUser]="userMap[daoCoinLimitOrderLimitItem.SellingPublicKey]"
           ></app-transaction-spending-limit-dao-coin-limit-order>
+        </div>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.AssociationSection
+        "
+      >
+        <div
+          *ngFor="
+            let associationLimitMapItem of associationLimitMap
+              | slice
+                : 0
+                : (showAll
+                    ? associationLimitMap.length
+                    : defaultNumShown)
+          "
+          class="d-flex flex-column pb-15px"
+        >
+          <app-transaction-spending-limit-association
+            [associationLimitMapItem]="associationLimitMapItem"
+            [appUser]="userMap[associationLimitMapItem.AppPublicKeyBase58Check]"
+          ></app-transaction-spending-limit-association>
+        </div>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.AccessGroupSection
+        "
+      >
+        <div
+          *ngFor="
+            let accessGroupLimitMapItem of accessGroupLimitMap
+              | slice
+                : 0
+                : (showAll
+                    ? accessGroupLimitMap.length
+                    : defaultNumShown)
+          "
+          class="d-flex flex-column pb-15px"
+        >
+          <app-transaction-spending-limit-access-group
+            [accessGroupLimitMapItem]="accessGroupLimitMapItem"
+            [appUser]="userMap[accessGroupLimitMapItem.AccessGroupOwnerPublicKeyBase58Check]"
+          ></app-transaction-spending-limit-access-group>
+        </div>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.AccessGroupMemberSection
+        "
+      >
+        <div
+          *ngFor="
+            let accessGroupMemberLimitMapItem of accessGroupMemberLimitMap
+              | slice
+                : 0
+                : (showAll
+                    ? accessGroupMemberLimitMap.length
+                    : defaultNumShown)
+          "
+          class="d-flex flex-column pb-15px"
+        >
+          <app-transaction-spending-limit-access-group-member
+            [accessGroupMemberLimitMapItem]="accessGroupMemberLimitMapItem"
+            [appUser]="userMap[accessGroupMemberLimitMapItem.AccessGroupOwnerPublicKeyBase58Check]"
+          ></app-transaction-spending-limit-access-group-member>
         </div>
       </ng-container>
     </div>

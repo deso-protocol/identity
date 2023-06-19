@@ -7,6 +7,7 @@ import { GlobalVarsService } from './global-vars.service';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
 import { ec } from 'elliptic';
+import { TransactionV0 } from '../lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root',
@@ -56,25 +57,20 @@ export class SigningService {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
+    const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [TransactionV0, Buffer];
+    const signatureIndex = v1FieldsBuffer.length ? transactionBytes.indexOf(v1FieldsBuffer) -1 : -1;
+    const v0FieldsWithoutSignature = transactionBytes.slice(0, signatureIndex);
     const transactionHash = new Buffer(sha256.x2(transactionBytes), 'hex');
     const signature = privateKey.sign(transactionHash, { canonical: true });
     const signatureBytes = new Buffer(signature.toDER());
-    const signatureLength = uvarint64ToBuf(signatureBytes.length);
+    const signatureLength = new Buffer(uvarint64ToBuf(signatureBytes.length));
 
     // If transaction is signed with a derived key, use DeSo-DER recoverable signature encoding.
     if (isDerivedKey) {
       signatureBytes[0] += 1 + (signature.recoveryParam as number);
     }
 
-    const signedTransactionBytes = Buffer.concat([
-      // This slice is bad. We need to remove the existing signature length field prior to appending the new one.
-      // Once we have frontend transaction construction we won't need to do this.
-      transactionBytes.slice(0, -1),
-      signatureLength,
-      signatureBytes,
-    ]);
-
-    return signedTransactionBytes.toString('hex');
+    return Buffer.concat([v0FieldsWithoutSignature, signatureLength, signatureBytes, v1FieldsBuffer]).toString('hex');
   }
 
   signHashes(seedHex: string, unsignedHashes: string[]): string[] {

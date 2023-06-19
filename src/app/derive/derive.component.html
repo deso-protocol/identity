@@ -14,7 +14,7 @@
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
         [allUsers]="allUsers"
-        (onAccountSelect)="publicKeyBase58Check = $event"
+        (onAccountSelect)="this.onAccountSelected($event)"
       ></app-account-select>
       <div class="mb-2">or</div>
       <app-log-in-options></app-log-in-options>
@@ -41,17 +41,9 @@
   <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="mb-40px">
     <app-transaction-spending-limit
       [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
+      [onApproveClick]="this.onApproveClick"
     ></app-transaction-spending-limit>
   </div>
-  <div></div>
-  <button
-    [disabled]="!publicKeyBase58Check"
-    class="button btn-primary button-large mb-20px text-white font-weight-bold"
-    (click)="approveDerivedKey(publicKeyBase58Check)"
-    *ngIf="publicKeyBase58Check"
-  >
-    Approve
-  </button>
 </div>
 <div class="container home-container" *ngIf="deleteKey">
   <div class="fs-18px mt-30px">

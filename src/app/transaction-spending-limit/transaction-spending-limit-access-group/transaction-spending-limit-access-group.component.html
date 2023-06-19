@@ -1,0 +1,14 @@
+<div class="d-flex flex-column border br-12px border-primary p-1">
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-start align-items-center py-10px col-12">
+      {{ getOperationString() }}{{ !isScoped() ? ' any of' : '' }}
+      {{
+        appUser?.ProfileEntryResponse?.Username || accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check ?
+        (appUser?.ProfileEntryResponse?.Username || accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check | truncateAddressOrUsername) + "'s"
+        : 'your'
+      }}
+      access group{{ isScoped() ? ' "' + accessGroupLimitMapItem?.AccessGroupKeyName + '"' : 's' }}
+      ({{ globalVars.formatTxCountLimit(accessGroupLimitMapItem?.OpCount) }} times).
+    </div>
+  </div>
+</div>

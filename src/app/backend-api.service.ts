@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { logInteractionEvent } from 'src/app/interaction-event-helpers';
 import { environment } from '../environments/environment';
-import { SigningService } from './signing.service';
+import { DerivedKey, Network, UserProfile } from '../types/identity';
 import { AccountService } from './account.service';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
-import { DerivedKey, Network, UserProfile } from '../types/identity';
+import { SigningService } from './signing.service';
 
 export interface MetamaskSignInRequest {
   AmountNanos: number;
@@ -141,7 +142,10 @@ export type OperationToCountMap<T extends LimitOperationString> = {
 export type LimitOperationString =
   | DAOCoinLimitOperationString
   | CreatorCoinLimitOperationString
-  | NFTLimitOperationString;
+  | NFTLimitOperationString
+  | AssociationOperationString
+  | AccessGroupOperationString
+  | AccessGroupMemberOperationString;
 export type CreatorCoinOperationLimitMap =
   CoinOperationLimitMap<CreatorCoinLimitOperationString>;
 export type DAOCoinOperationLimitMap =
@@ -170,6 +174,65 @@ export type NFTOperationLimitMap = {
   };
 };
 
+export enum AssociationClass {
+  USER = 'User',
+  POST = 'Post',
+}
+
+export enum AssociationAppScopeType {
+  ANY = 'Any',
+  SCOPED = 'Scoped',
+}
+
+export enum AssociationOperationString {
+  ANY = 'Any',
+  CREATE = 'Create',
+  DELETE = 'Delete',
+}
+
+export type AssociationLimitMapItem = {
+  AssociationClass: AssociationClass;
+  AssociationType: string;
+  AppScopeType: AssociationAppScopeType;
+  AppPublicKeyBase58Check: string;
+  AssociationOperation: AssociationOperationString;
+  OpCount: number;
+}
+
+export enum AccessGroupScopeType {
+  ANY = 'Any',
+  SCOPED = 'Scoped',
+}
+
+export enum AccessGroupOperationString {
+  ANY = 'Any',
+  CREATE = 'Create',
+  UPDATE = 'Update',
+}
+
+export type AccessGroupLimitMapItem = {
+  AccessGroupOwnerPublicKeyBase58Check: string;
+  ScopeType: AccessGroupScopeType;
+  AccessGroupKeyName: string;
+  OperationType: AccessGroupOperationString;
+  OpCount: number;
+}
+
+export enum AccessGroupMemberOperationString {
+  ANY = 'Any',
+  ADD = 'Add',
+  REMOVE = 'Remove',
+  UPDATE = 'Update',
+}
+
+export type AccessGroupMemberLimitMapItem = {
+  AccessGroupOwnerPublicKeyBase58Check: string;
+  ScopeType: AccessGroupScopeType;
+  AccessGroupKeyName: string;
+  OperationType: AccessGroupMemberOperationString;
+  OpCount: number;
+}
+
 export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
   // TODO: make enum for transaction type string
@@ -178,6 +241,9 @@ export interface TransactionSpendingLimitResponse {
   DAOCoinOperationLimitMap?: DAOCoinOperationLimitMap;
   NFTOperationLimitMap?: NFTOperationLimitMap;
   DAOCoinLimitOrderLimitMap?: DAOCoinLimitOrderLimitMap;
+  AssociationLimitMap?: AssociationLimitMapItem[];
+  AccessGroupLimitMap?: AccessGroupLimitMapItem[];
+  AccessGroupMemberLimitMap?: AccessGroupMemberLimitMapItem[];
   IsUnlimited?: boolean;
   DerivedKeyMemo?: string;
 }
@@ -223,6 +289,13 @@ export class BackendAPIService {
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
     const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
+    // NOTE: there are some cases where derived user's were not being sent phone number
+    // verification texts due to missing public user info. This is to log how often
+    // this is happening.
+    logInteractionEvent('backend-api', 'jwt-post', {
+      hasPublicUserInfo: !!publicUserInfo,
+    });
+
     if (!publicUserInfo) {
       return of(null);
     }

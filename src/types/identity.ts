@@ -138,4 +138,6 @@ export interface GoogleAuthState {
   deleteKey: boolean;
   derivedPublicKey: string;
   expirationDays: number;
+  redirect_uri?: string;
+  showSkip: boolean;
 }
