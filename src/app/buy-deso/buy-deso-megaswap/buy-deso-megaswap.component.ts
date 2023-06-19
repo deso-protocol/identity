@@ -36,7 +36,7 @@ export class BuyDeSoMegaSwapComponent implements OnInit {
     this.iframeURL = this.sanitizer.bypassSecurityTrustResourceUrl(
       [
         environment.megaswapURL,
-        '/#/iframe/v1?',
+        '/widget?',
         `network=${this.globalVars.network}`,
         '&destinationTickers=DESO',
         '&destinationTicker=DESO',
