@@ -56,13 +56,17 @@ export class SignUpMetamaskComponent implements OnInit {
   ) {}
   async ngOnInit(): Promise<void> {
     if (this.globalVars.isMobile()) {
-      // TODO: should we show a full page loader while this is happening?
+      this.currentScreen = SCREEN.LOADING;
       await this.metamaskService.connectWallet();
     }
 
     // grab the currently connected wallet if there is one
     this.existingConnectedWallet =
       await this.metamaskService.getUserEthAddress();
+
+    if (this.currentScreen === SCREEN.LOADING) {
+      this.currentScreen = SCREEN.CREATE_ACCOUNT;
+    }
 
     // if they change wallets then update the display
     this.metamaskService.onSignerChange((updatedAccount: string) => {
