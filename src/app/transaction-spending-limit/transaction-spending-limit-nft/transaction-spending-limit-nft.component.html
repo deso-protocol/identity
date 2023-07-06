@@ -37,7 +37,7 @@
             <div>
               {{
               post
-              ? post.ProfileEntryResponse.Username ||
+              ? post.ProfileEntryResponse?.Username ||
               post.PosterPublicKeyBase58Check
               : 'All NFTs:'
               }}

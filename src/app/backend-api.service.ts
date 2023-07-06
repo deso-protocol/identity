@@ -16,9 +16,11 @@ export interface MetamaskSignInRequest {
   Message: number[];
   Signature: number[];
 }
+
 export interface MetamaskSignInResponse {
   TxnHash: string;
 }
+
 export class ProfileEntryResponse {
   Username: string | null = null;
   Description: string | null = null;
@@ -69,7 +71,7 @@ export type PostEntryResponse = {
   // PostEntryResponse of the post that this post reposts.
   RepostedPostEntryResponse: PostEntryResponse;
   // The profile associated with this post.
-  ProfileEntryResponse: ProfileEntryResponse;
+  ProfileEntryResponse?: ProfileEntryResponse;
   // The comments associated with this post.
   Comments: PostEntryResponse[];
   LikeCount: number;
@@ -168,6 +170,7 @@ export enum NFTLimitOperationString {
   BURN = 'burn',
   ACCEPT_TRANSFER = 'accept_nft_transfer',
 }
+
 export type NFTOperationLimitMap = {
   [postHashHex: string]: {
     [serialNumber: number]: OperationToCountMap<NFTLimitOperationString>;
@@ -266,7 +269,8 @@ export class BackendAPIService {
     private signingService: SigningService,
     private accountService: AccountService,
     private globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
@@ -306,7 +310,7 @@ export class BackendAPIService {
       this.globalVars.hostname
     );
     const jwt = this.signingService.signJWT(seedHex, isDerived);
-    return this.post(path, { ...body, ...{ JWT: jwt } });
+    return this.post(path, {...body, ...{JWT: jwt}});
   }
 
   // Error parsing
@@ -425,15 +429,15 @@ export class BackendAPIService {
           if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
             derivedKeys[
               res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check
-            ] = {
+              ] = {
               derivedPublicKeyBase58Check:
-                res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
+              res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
               ownerPublicKeyBase58Check:
-                res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
+              res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
               expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
               isValid: res.DerivedKeys[derivedKey]?.IsValid,
               transactionSpendingLimit:
-                res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
+              res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
             };
           }
         }
@@ -833,7 +837,7 @@ export class BackendAPIService {
     });
 
     return req.pipe(
-    catchError((err) => {
+      catchError((err) => {
         console.error(JSON.stringify(err));
         return throwError(err);
       })
