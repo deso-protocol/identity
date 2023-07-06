@@ -284,7 +284,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
         this.publicKey /*UpdaterPublicKeyBase58Check*/,
         this.phoneNumber /*PhoneNumber*/,
         this.phoneNumberCountryCode /*PhoneNumberCountryCode*/,
-        (this.verificationCodeForm.value as any).verificationCode // TODO: check on this.
+        this.verificationCodeForm.value.verificationCode
       )
       .subscribe(
         (res) => {
