@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ethers } from 'ethers';
-import { GlobalVarsService } from './global-vars.service';
-import NodeWalletConnect from '@walletconnect/node';
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
-import { ec } from 'elliptic';
 import { WindowPostMessageStream } from '@metamask/post-message-stream';
 import { initializeProvider } from '@metamask/providers';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
+import { ec } from 'elliptic';
+import { ethers } from 'ethers';
+import { GlobalVarsService } from './global-vars.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,11 +12,7 @@ import { initializeProvider } from '@metamask/providers';
 export class MetamaskService {
   walletProvider: WalletProvider;
   constructor(private globalVars: GlobalVarsService) {
-    this.walletProvider = new WalletProvider(globalVars);
-    if ((window as any).ethereum || (window as any).web3) {
-      return;
-    }
-    if (navigator.userAgent.includes('Firefox')) {
+    if (!(window as any).ethereum && navigator.userAgent.includes('Firefox')) {
       // setup background connection
       const metamaskStream = new WindowPostMessageStream({
         name: 'metamask-inpage',
@@ -30,11 +25,14 @@ export class MetamaskService {
         shouldShimWeb3: true,
       });
     }
+
+    this.walletProvider = new WalletProvider(globalVars);
   }
 
   public connectWallet(): Promise<void> {
     return this.walletProvider.connectWallet();
   }
+
   public connectMetamaskMiddleware(): Promise<boolean> {
     return this.walletProvider.connectMetamaskMiddleware();
   }
@@ -66,14 +64,13 @@ export class MetamaskService {
       signature: string;
       publicEthAddress: string;
     }>((resolve, reject) => {
-
       this.walletProvider
         .signMessage(message)
         .then(async (signature) => {
           try {
             const publicEthAddress =
               await this.verifySignatureAndRecoverAddress(message, signature);
-            resolve({message, signature, publicEthAddress});
+            resolve({ message, signature, publicEthAddress });
           } catch (e) {
             reject(`signature error: ${e}`);
           }
@@ -108,9 +105,8 @@ export class MetamaskService {
     }
     return recoveredAddress;
   }
-  public async getUserEthAddress(): Promise<string> {
-    const publicEthAddress = await this.walletProvider.getUserEthAddress();
-    return publicEthAddress;
+  public getUserEthAddress(): Promise<string> {
+    return this.walletProvider.getUserEthAddress();
   }
   /**
    * Event listener for when a user switches their connected account
@@ -155,197 +151,113 @@ export class MetamaskService {
 }
 
 export class WalletProvider {
-  walletConnect: NodeWalletConnect | null = null;
-  walletConnectAddress: string | null = null;
+  #ethersWeb3Provider: ethers.providers.Web3Provider | null = null;
+  #metamaskDeepLink?: string;
 
-  constructor(
-    private globalVars: GlobalVarsService,
-  ) {}
-
-  private _isInitialized(): boolean {
-    return this.walletConnect !== null;
-  }
-
-  private _getEthersProvider(): ethers.providers.Web3Provider {
-    return new ethers.providers.Web3Provider((window as any).ethereum);
-  }
-
-  private _setupWalletConnect(): void {
-    if (this._isInitialized()) {
-      return;
+  get ethereumProvider() {
+    if (!this.#ethersWeb3Provider) {
+      throw new Error('Ethereum provider not initialized');
     }
+    return this.#ethersWeb3Provider;
+  }
 
-    this.walletConnect = new NodeWalletConnect(
-      {
-        bridge: 'https://bridge.walletconnect.org', // Required
-      },
-      {
-        clientMeta: {
-          description: 'WalletConnect NodeJS Client',
-          url: 'https://nodejs.org/en/',
-          icons: ['https://nodejs.org/static/images/logo.svg'],
-          name: 'WalletConnect',
-        },
-      }
-    );
-
-    // Subscribe to connection events
-    this.walletConnect.on('connect', (error: any, payload: any) => {
-      if (error) {
-        throw error;
-      }
-
-      // Close QR Code Modal
-      WalletConnectQRCodeModal.close();
-
-      // Get provided accounts and chainId
-      const { accounts, chainId } = payload.params[0];
-      if (accounts.length > 0) {
-        this.walletConnectAddress = accounts[0];
-      }
-    });
-
-    this.walletConnect.on('session_update', (error: any, payload: any) => {
-      if (error) {
-        throw error;
-      }
-
-      // Get updated accounts and chainId
-      const { accounts, chainId } = payload.params[0];
-      if (accounts.length > 0) {
-        this.walletConnectAddress = accounts[0];
-      }
-    });
-
-    this.walletConnect.on('disconnect', (error: any, payload: any) => {
-      if (error) {
-        throw error;
-      }
-
-      // Delete walletConnector
-      this.walletConnect = null;
-      this.walletConnectAddress = null;
-    });
+  constructor(private globalVars: GlobalVarsService) {
+    const ethereum = (window as any).ethereum;
+    if (ethereum) {
+      this.#ethersWeb3Provider = new ethers.providers.Web3Provider(ethereum);
+    }
   }
 
   async connectWallet(): Promise<void> {
-    if (this.globalVars.isMobile()) {
-      // Create a connector
-      this._setupWalletConnect();
+    if (!this.#ethersWeb3Provider && this.globalVars.isMobile()) {
+      const provider = await EthereumProvider.init({
+        projectId: 'bea679efaf1bb0481c4974e65c510200',
+        chains: [1],
+        optionalChains: [5],
+        optionalMethods: ['eth_requestAccounts'],
+        metadata: {
+          description: 'Account/wallet provider for the DeSo blockchain',
+          url: 'https://identity.deso.org',
+          icons: ['https://cryptologos.cc/logos/deso-deso-logo.svg'],
+          name: 'DeSo Identity',
+        },
+        // NOTE: We can bypass the wallet connect QR modal by opening the
+        // metamask deep link provided by the display_uri event.
+        showQrModal: false,
+      });
+
+      provider.on('display_uri', (uri) => {
+        this.#metamaskDeepLink = uri;
+        window.open(uri, '_self', 'noopener noreferrer');
+      });
+
+      await provider.connect();
+
+      this.#ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
+    }
+
+    const accounts = await this.listAccounts();
+    if (accounts.length === 0) {
       await this.connectMetamaskMiddleware();
-    } else {
-      const accounts = await this.listAccounts();
-      if (accounts.length === 0) {
-        await this.connectMetamaskMiddleware();
-      } else {
-        await this
-          .send('wallet_requestPermissions', [
-            {
-              eth_accounts: {},
-            },
-          ])
-          .catch((err) => {
-            if (err.code === 4001) {
-              throw new Error('user rejected the eth_requestPermissions');
-            } else {
-              throw new Error(
-                `error while sending eth_requestPermissions: ${err}`
-              );
-            }
-          });
-      }
+    } else if (!this.globalVars.isMobile()) {
+      // NOTE: wallet_requestPermissions is not currently supported on the metamask mobile app
+      // https://docs.metamask.io/wallet/reference/rpc-api/#wallet_requestpermissions
+      await this.send('wallet_requestPermissions', [
+        {
+          eth_accounts: {},
+        },
+      ]).catch((err) => {
+        if (err.code === 4001) {
+          throw new Error('user rejected the eth_requestPermissions');
+        } else {
+          throw new Error(`error while sending eth_requestPermissions: ${err}`);
+        }
+      });
     }
   }
 
   async connectMetamaskMiddleware(): Promise<boolean> {
-    if (this.globalVars.isMobile()) {
-      // Create a connector
-      this._setupWalletConnect();
-      if (!(this.walletConnect as NodeWalletConnect).connected) {
-        // create new session
-        await (this.walletConnect as NodeWalletConnect).createSession();
-        // get uri for QR Code modal
-        const uri = (this.walletConnect as NodeWalletConnect).uri;
-        // display QR Code modal
-        WalletConnectQRCodeModal.open(
-          uri,
-          () => {},
-          {
-            mobileLinks: ['metamask'],
+    const accounts = await this.listAccounts();
+    if (accounts.length === 0) {
+      await this.send('eth_requestAccounts', [])
+        .then()
+        .catch((err) => {
+          // EIP-1193 userRejectedRequest error.
+          if (err.code === 4001) {
+            throw new Error('user rejected the eth_requestAccounts request');
+          } else {
+            throw new Error(`error while sending eth_requestAccounts: ${err}`);
           }
-        );
-        const connectButton = document.getElementById('walletconnect-connect-button-Connect');
-        if (connectButton && connectButton.tagName === 'A' && connectButton.parentElement?.className === 'walletconnect-connect__buttons__wrapper__android') {
-          (connectButton as HTMLAnchorElement).target = '_self';
-        }
-      } else {
-        if ((this.walletConnect as NodeWalletConnect).accounts.length > 0) {
-          this.walletConnectAddress = (this.walletConnect as NodeWalletConnect).accounts[0];
-        }
-      }
-    } else {
-      const accounts = await this.listAccounts();
-      if (accounts.length === 0) {
-        await this
-          .send('eth_requestAccounts', [])
-          .then()
-          .catch((err) => {
-            // EIP-1193 userRejectedRequest error.
-            if (err.code === 4001) {
-              throw new Error('user rejected the eth_requestAccounts request');
-            } else {
-              throw new Error(`error while sending eth_requestAccounts: ${err}`);
-            }
-          });
-      }
+        });
     }
     return true;
   }
 
   listAccounts(): Promise<string[]> {
-    if (this.globalVars.isMobile()) {
-      throw new Error('send not supported on mobile');
-    }
-
-    return this._getEthersProvider().listAccounts();
+    return this.ethereumProvider.listAccounts();
   }
 
   send(method: string, params: any[]): Promise<any> {
-    if (this.globalVars.isMobile()) {
-      throw new Error('send not supported on mobile');
-    }
-
-    return this._getEthersProvider().send(method, params);
+    return this.ethereumProvider.send(method, params);
   }
 
   signMessage(message: number[]): Promise<string> {
-    if (this.globalVars.isMobile()) {
-      // Draft Message Parameters
+    const pendingSignature = this.ethereumProvider
+      .getSigner()
+      .signMessage(message);
 
-      const msgParams = [
-        this.walletConnectAddress,
-        Buffer.from(message).toString('hex')
-      ];
-
-      // Sign message
-      return (this.walletConnect as NodeWalletConnect)
-        .signPersonalMessage(msgParams);
-    } else {
-      return this._getEthersProvider().getSigner().signMessage(message);
+    // NOTE: We need to manually open the metamask app on mobile so the user can
+    // sign the message. Desktop uses the metamask extension which is triggered
+    // automatically by the signMessage() call. Once the user signs the message the
+    // pendingSignature promise will resolve and the flow will proceed.
+    if (this.#metamaskDeepLink) {
+      window.open(this.#metamaskDeepLink, '_self', 'noopener noreferrer');
     }
+
+    return pendingSignature;
   }
 
   getUserEthAddress(): Promise<string> {
-    if (this.globalVars.isMobile()) {
-      return new Promise((resolve, reject) => {
-        if (this.walletConnectAddress !== null) {
-          resolve(this.walletConnectAddress as string);
-        } else {
-          reject('no wallet connected');
-        }
-      });
-    } else {
-      return this._getEthersProvider().getSigner().getAddress();
-    }
+    return this.ethereumProvider.getSigner().getAddress();
   }
 }

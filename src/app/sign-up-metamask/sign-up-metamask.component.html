@@ -2,7 +2,7 @@
 
 <div
   class="container home-container text-center"
-  *ngIf="globalVars.inTab || globalVars.webview"
+  *ngIf="globalVars.inTab || globalVars.webview || globalVars.redirectURI"
 >
   <div *ngIf="this.currentScreen === SCREEN.CREATE_ACCOUNT">
     <div class="mb-20px">

@@ -1,19 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { ethers } from 'ethers';
+import { Router } from '@angular/router';
+import { LoginMethod } from '../../types/identity';
+import { AccountService } from '../account.service';
+import { RouteNames } from '../app-routing.module';
 import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
 } from '../backend-api.service';
-import { LoginMethod, Network } from '../../types/identity';
-import { ec } from 'elliptic';
 import { CryptoService } from '../crypto.service';
-import { AccountService } from '../account.service';
-import { IdentityService } from '../identity.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { SigningService } from '../signing.service';
+import { IdentityService } from '../identity.service';
 import { MetamaskService } from '../metamask.service';
-import { RouteNames } from '../app-routing.module';
-import { Router } from '@angular/router';
+import { SigningService } from '../signing.service';
 
 export const getSpendingLimitsForMetamask = () => {
   return {
@@ -58,11 +56,14 @@ export class SignUpMetamaskComponent implements OnInit {
   ) {}
   async ngOnInit(): Promise<void> {
     if (this.globalVars.isMobile()) {
+      // TODO: should we show a full page loader while this is happening?
       await this.metamaskService.connectWallet();
     }
+
     // grab the currently connected wallet if there is one
     this.existingConnectedWallet =
       await this.metamaskService.getUserEthAddress();
+
     // if they change wallets then update the display
     this.metamaskService.onSignerChange((updatedAccount: string) => {
       this.existingConnectedWallet = updatedAccount;
@@ -112,6 +113,7 @@ export class SignUpMetamaskComponent implements OnInit {
         this.metamaskState = METAMASK.ERROR;
         return;
       });
+
     if (!getAccessBytesResponse) {
       return;
     }
