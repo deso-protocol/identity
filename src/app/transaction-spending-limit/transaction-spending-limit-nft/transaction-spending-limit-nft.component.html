@@ -6,7 +6,7 @@
         <div
           *ngIf="
             loaded &&
-            !!(this.post?.ImageURLs?.length || this.post?.VideoURLs?.length)
+            !!(post?.ImageURLs?.length || post?.VideoURLs?.length)
           "
           class="d-flex position-relative justify-content-start align-items-center mt-5px mb-5px pr-10px"
           style="overflow: hidden; max-height: 100px; max-width: 100px"
@@ -15,12 +15,12 @@
             style="max-width: 100%; max-height: 100%"
             class="br-12px"
             *ngIf="post?.ImageURLs?.length"
-            [src]="(this.post?.ImageURLs || [''])[0]"
+            [src]="(post.ImageURLs || [''])[0]"
           />
 
           <!-- TODO: how to sanitize all of this stuff.... -->
           <iframe
-            [src]="(this.post?.VideoURLs || [''])[0] | sanitizeVideoUrl"
+            [src]="(post.VideoURLs || [''])[0] | sanitizeVideoUrl"
             *ngIf="!post?.ImageURLs?.length && post?.VideoURLs?.length"
             class="br-12px"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
@@ -36,10 +36,10 @@
             ></div>
             <div>
               {{
-                post
-                  ? post?.ProfileEntryResponse?.Username ||
-                    post.PosterPublicKeyBase58Check
-                  : 'All NFTs:'
+              post
+              ? post.ProfileEntryResponse.Username ||
+              post.PosterPublicKeyBase58Check
+              : 'All NFTs:'
               }}
             </div>
           </div>
@@ -47,7 +47,7 @@
           <div
             class="d-flex justify-content-start fs-14px py-10px"
             *ngIf="post?.Body"
-            [innerHTML]="post?.Body || '' | sanitizePostBody"
+            [innerHTML]="post.Body || '' | sanitizePostBody"
           ></div>
         </div>
       </ng-container>
@@ -84,9 +84,9 @@
     >
       <div class="fs-18px">
         {{
-          serialNumToOpMap.key === '0'
-            ? 'All Serial Numbers'
-            : '#' + serialNumToOpMap.key
+        serialNumToOpMap.key === '0'
+        ? 'All Serial Numbers'
+        : '#' + serialNumToOpMap.key
         }}
       </div>
       <div class="d-flex flex-column pt-15px pl-15px">

@@ -172,8 +172,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   }
 
   _sendPhoneNumberVerificationText(): void {
-    this.phoneNumber = this.phoneForm.value.phone?.e164Number;
-    this.phoneNumberCountryCode = this.phoneForm.value.phone?.countryCode;
+    this.phoneNumber = (this.phoneForm.value.phone as any)?.e164Number; // TODO: check on these.
+    this.phoneNumberCountryCode = (this.phoneForm.value.phone as any)?.countryCode; // TODO: check on these.
     if (!this.phoneNumberCountryCode) {
       return;
     }
@@ -253,7 +253,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
         this.publicKey /*UpdaterPublicKeyBase58Check*/,
         this.phoneNumber /*PhoneNumber*/,
         this.phoneNumberCountryCode /*PhoneNumberCountryCode*/,
-        this.verificationCodeForm.value.verificationCode
+        (this.verificationCodeForm.value as any).verificationCode // TODO: check on this.
       )
       .subscribe(
         (res) => {
