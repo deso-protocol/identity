@@ -197,10 +197,9 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     if (!this.intlPhoneInputInstance) {
       throw new Error('intlPhoneInputInstance must be defined');
     }
+    // NOTE: intlPhoneInputInstance.getNumber() returns an E.164 formatted phone number (e.g. +15555555555)
     this.phoneNumber = this.intlPhoneInputInstance.getNumber()
     this.phoneNumberCountryCode = this.intlPhoneInputInstance.getSelectedCountryData().iso2.toUpperCase();
-
-    console.log(this.phoneNumber, this.phoneNumberCountryCode, this.publicKey);
     if (!this.phoneNumberCountryCode) {
       return;
     }
