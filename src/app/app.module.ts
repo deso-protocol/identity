@@ -27,17 +27,24 @@ import { JumioErrorComponent } from './jumio/jumio-error/jumio-error.component';
 import { ErrorCallbackComponent } from './error-callback/error-callback.component';
 import { SharedSecretComponent } from './shared-secret/shared-secret.component';
 import { SignUpGetStarterDESOComponent } from './sign-up-get-starter-deso/sign-up-get-starter-deso.component';
-import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
 import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
-import { TransactionSpendingLimitSectionComponent } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
-import { TransactionSpendingLimitCoinComponent } from './transaction-spending-limit/transaction-spending-limit-coin/transaction-spending-limit-coin.component';
-import { TransactionSpendingLimitNftComponent } from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component';
+import {
+  TransactionSpendingLimitSectionComponent
+} from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
+import {
+  TransactionSpendingLimitCoinComponent
+} from './transaction-spending-limit/transaction-spending-limit-coin/transaction-spending-limit-coin.component';
+import {
+  TransactionSpendingLimitNftComponent
+} from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component';
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
-import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
+import {
+  TransactionSpendingLimitDaoCoinLimitOrderComponent
+} from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
 import { BuyDeSoComponentWrapper } from './buy-deso/buy-deso/buy-deso.component';
 import { IconsModule } from './icons/icons.module';
 import { GetDesoComponent } from './get-deso/get-deso.component';
@@ -51,9 +58,15 @@ import { ArrowToggleComponent } from './arrow-toggle/arrow-toggle.component';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
 import { LogInOptionsComponent } from './log-in-options/log-in-options.component';
 import { AccountSelectComponent } from './account-select/account-select.component';
-import { TransactionSpendingLimitAssociationComponent } from './transaction-spending-limit/transaction-spending-limit-association/transaction-spending-limit-association.component';
-import { TransactionSpendingLimitAccessGroupComponent } from './transaction-spending-limit/transaction-spending-limit-access-group/transaction-spending-limit-access-group.component';
-import { TransactionSpendingLimitAccessGroupMemberComponent } from './transaction-spending-limit/transaction-spending-limit-access-group-member/transaction-spending-limit-access-group-member.component';
+import {
+  TransactionSpendingLimitAssociationComponent
+} from './transaction-spending-limit/transaction-spending-limit-association/transaction-spending-limit-association.component';
+import {
+  TransactionSpendingLimitAccessGroupComponent
+} from './transaction-spending-limit/transaction-spending-limit-access-group/transaction-spending-limit-access-group.component';
+import {
+  TransactionSpendingLimitAccessGroupMemberComponent
+} from './transaction-spending-limit/transaction-spending-limit-access-group-member/transaction-spending-limit-access-group-member.component';
 
 @NgModule({
   declarations: [
@@ -107,7 +120,6 @@ import { TransactionSpendingLimitAccessGroupMemberComponent } from './transactio
     ReactiveFormsModule,
     MatFormFieldModule,
     MatTooltipModule,
-    NgxIntlTelInputModule,
     IconsModule,
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
@@ -122,4 +134,5 @@ import { TransactionSpendingLimitAccessGroupMemberComponent } from './transactio
 
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

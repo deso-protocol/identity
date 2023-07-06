@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CountryISO } from 'ngx-intl-tel-input';
 import { logInteractionEvent } from 'src/app/interaction-event-helpers';
 import { AccountService } from '../account.service';
 import { RouteNames } from '../app-routing.module';
@@ -39,7 +38,6 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     verificationCode: new FormControl(undefined, [Validators.required]),
   });
 
-  CountryISO = CountryISO;
   sendingPhoneNumberVerificationText = false;
   submittingPhoneNumberVerificationCode = false;
   screenToShow: string | null = null;
@@ -64,7 +62,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     private identityService: IdentityService,
     private accountService: AccountService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
@@ -274,7 +273,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     this.finishFlowEvent.emit();
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+        queryParams: {publicKey: this.publicKey},
         queryParamsHandling: 'merge',
       });
       return;
