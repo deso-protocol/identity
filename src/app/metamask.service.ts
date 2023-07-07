@@ -181,7 +181,7 @@ export class WalletProvider {
         optionalChains: [5 /* Goerli */],
         optionalMethods: ['eth_requestAccounts'],
         metadata: {
-          description: 'Account/wallet provider for the DeSo blockchain',
+          description: 'DeSo Identity: The official wallet provider supported by the DeSo Foundation',
           url: 'https://identity.deso.org',
           icons: ['https://cryptologos.cc/logos/deso-deso-logo.svg'],
           name: 'DeSo Identity',
@@ -195,7 +195,7 @@ export class WalletProvider {
       provider.on('display_uri', (uri) => {
         // We keep the metamask deep link so we can open it later for signing.
         this.#metamaskDeepLink = uri;
-        window.open(uri, '_self', 'noopener noreferrer');
+        openDeepLink(uri);
       });
 
       // Opens the metamask mobile app and requests the user to connect their wallet.
@@ -257,7 +257,7 @@ export class WalletProvider {
     // automatically by the signMessage() call. Once the user signs the message the
     // pendingSignature promise will resolve and the flow will proceed.
     if (this.#metamaskDeepLink) {
-      window.open(this.#metamaskDeepLink, '_self', 'noopener noreferrer');
+      openDeepLink(this.#metamaskDeepLink);
     }
 
     return pendingSignature;
@@ -266,4 +266,8 @@ export class WalletProvider {
   getUserEthAddress(): Promise<string> {
     return this.ethereumProvider.getSigner().getAddress();
   }
+}
+
+function openDeepLink(deepLink: string) {
+  window.open(deepLink, '_self', 'noopener,noreferrer');
 }

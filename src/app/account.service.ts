@@ -269,7 +269,7 @@ export class AccountService {
           const swalRes = await SwalHelper.fire({
             icon: 'info',
             title: 'Metamask connection',
-            html: `You'll need to connect your Metamask wallet to sign in.`,
+            html: `You'll need to connect your Metamask wallet to approve this login and sign your derived key.`,
             showConfirmButton: true,
             showCancelButton: false,
             allowEscapeKey: false,

@@ -1,51 +1,51 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, Subject, zip } from 'rxjs';
-import { v4 as uuid } from 'uuid';
-import { AccessLevel, PublicUserInfo } from '../types/identity';
-import { CryptoService } from './crypto.service';
-import { GlobalVarsService } from './global-vars.service';
-import { CookieService } from 'ngx-cookie';
-import { SigningService } from './signing.service';
 import { HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie';
+import { Observable, Subject } from 'rxjs';
+import { v4 as uuid } from 'uuid';
+import {
+  Transaction,
+  TransactionMetadataAcceptNFTBid,
+  TransactionMetadataAcceptNFTTransfer,
+  TransactionMetadataAccessGroup,
+  TransactionMetadataAccessGroupMembers,
+  TransactionMetadataAuthorizeDerivedKey,
+  TransactionMetadataBasicTransfer,
+  TransactionMetadataBitcoinExchange,
+  TransactionMetadataBurnNFT,
+  TransactionMetadataCreateNFT,
+  TransactionMetadataCreatePostAssociation,
+  TransactionMetadataCreateUserAssociation,
+  TransactionMetadataCreatorCoin,
+  TransactionMetadataCreatorCoinTransfer,
+  TransactionMetadataDAOCoin,
+  TransactionMetadataDAOCoinLimitOrder,
+  TransactionMetadataDeletePostAssociation,
+  TransactionMetadataDeleteUserAssociation,
+  TransactionMetadataFollow,
+  TransactionMetadataLike,
+  TransactionMetadataNewMessage,
+  TransactionMetadataNFTBid,
+  TransactionMetadataNFTTransfer,
+  TransactionMetadataPrivateMessage,
+  TransactionMetadataSubmitPost,
+  TransactionMetadataSwapIdentity,
+  TransactionMetadataTransferDAOCoin,
+  TransactionMetadataUpdateBitcoinUSDExchangeRate,
+  TransactionMetadataUpdateGlobalParams,
+  TransactionMetadataUpdateNFT,
+  TransactionMetadataUpdateProfile,
+} from '../lib/deso/transaction';
+import { SwalHelper } from '../lib/helpers/swal-helper';
+import { AccessLevel, PublicUserInfo } from '../types/identity';
+import { AccountService } from './account.service';
 import {
   BackendAPIService,
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
-import { AccountService } from './account.service';
-import {
-  Transaction,
-  TransactionMetadataBasicTransfer,
-  TransactionMetadataBitcoinExchange,
-  TransactionMetadataCreatorCoin,
-  TransactionMetadataCreatorCoinTransfer,
-  TransactionMetadataFollow,
-  TransactionMetadataLike,
-  TransactionMetadataPrivateMessage,
-  TransactionMetadataSubmitPost,
-  TransactionMetadataSwapIdentity,
-  TransactionMetadataUpdateBitcoinUSDExchangeRate,
-  TransactionMetadataUpdateGlobalParams,
-  TransactionMetadataUpdateProfile,
-  TransactionMetadataNFTTransfer,
-  TransactionMetadataAcceptNFTTransfer,
-  TransactionMetadataBurnNFT,
-  TransactionMetadataAuthorizeDerivedKey,
-  TransactionMetadataNFTBid,
-  TransactionMetadataAcceptNFTBid,
-  TransactionMetadataUpdateNFT,
-  TransactionMetadataCreateNFT,
-  TransactionMetadataDAOCoin,
-  TransactionMetadataTransferDAOCoin,
-  TransactionMetadataDAOCoinLimitOrder,
-  TransactionMetadataCreateUserAssociation,
-  TransactionMetadataDeleteUserAssociation,
-  TransactionMetadataCreatePostAssociation,
-  TransactionMetadataDeletePostAssociation,
-  TransactionMetadataAccessGroup,
-  TransactionMetadataAccessGroupMembers,
-  TransactionMetadataNewMessage,
-} from '../lib/deso/transaction';
-import { SwalHelper } from '../lib/helpers/swal-helper';
+import { CryptoService } from './crypto.service';
+import { GlobalVarsService } from './global-vars.service';
+import { SigningService } from './signing.service';
 
 export type DerivePayload = {
   publicKey: string;
@@ -140,8 +140,8 @@ export class IdentityService {
     }
   }
 
-  derive(payload: DerivePayload): void {
-    this.accountService
+  derive(payload: DerivePayload): Promise<void> {
+    return this.accountService
       .getDerivedPrivateUser(
         this.backendApi,
         payload.publicKey,
