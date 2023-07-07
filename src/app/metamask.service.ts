@@ -151,29 +151,30 @@ export class MetamaskService {
 }
 
 export class WalletProvider {
-  #ethersWeb3Provider: ethers.providers.Web3Provider | null = null;
+  #ethereumProvider: ethers.providers.Web3Provider | null = null;
   #metamaskDeepLink?: string;
 
   get ethereumProvider() {
-    if (!this.#ethersWeb3Provider) {
+    if (!this.#ethereumProvider) {
       throw new Error('Ethereum provider not initialized. Did you forget to call connectWallet()?');
     }
-    return this.#ethersWeb3Provider;
+    return this.#ethereumProvider;
   }
 
   constructor(private globalVars: GlobalVarsService) {
     const ethereum = (window as any).ethereum;
     if (ethereum) {
-      this.#ethersWeb3Provider = new ethers.providers.Web3Provider(ethereum);
+      this.#ethereumProvider = new ethers.providers.Web3Provider(ethereum);
     }
   }
 
   async connectWallet(): Promise<void> {
-    if (!this.#ethersWeb3Provider && this.globalVars.isMobile()) {
+    if (!this.#ethereumProvider && this.globalVars.isMobile()) {
+      // See: https://docs.walletconnect.com/2.0/web/providers/ethereum
       const provider = await EthereumProvider.init({
         projectId: 'bea679efaf1bb0481c4974e65c510200',
-        chains: [1],
-        optionalChains: [5],
+        chains: [1 /* Mainnet */],
+        optionalChains: [5 /* Goerli */],
         optionalMethods: ['eth_requestAccounts'],
         metadata: {
           description: 'Account/wallet provider for the DeSo blockchain',
@@ -182,18 +183,23 @@ export class WalletProvider {
           name: 'DeSo Identity',
         },
         // NOTE: We can bypass the wallet connect QR modal by opening the
-        // metamask deep link provided by the display_uri event.
+        // metamask deep link provided by the display_uri event. See
+        // `provider.on('display_uri', ...) below.
         showQrModal: false,
       });
 
       provider.on('display_uri', (uri) => {
+        // We keep the metamask deep link so we can open it later for signing.
         this.#metamaskDeepLink = uri;
         window.open(uri, '_self', 'noopener noreferrer');
       });
 
+      // Opens the metamask mobile app and requests the user to connect their wallet.
       await provider.connect();
 
-      this.#ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
+      // Wrap the wallet connect provider in ethersjs so we can use the same API
+      // to interact with the metamask wallet for both mobile and desktop.
+      this.#ethereumProvider = new ethers.providers.Web3Provider(provider);
     }
 
     const accounts = await this.listAccounts();
@@ -202,7 +208,7 @@ export class WalletProvider {
     } else if (!this.globalVars.isMobile()) {
       // NOTE: wallet_requestPermissions is not currently supported on the metamask mobile app
       // https://docs.metamask.io/wallet/reference/rpc-api/#wallet_requestpermissions
-      await this.send('wallet_requestPermissions', [
+      await this.ethereumProvider.send('wallet_requestPermissions', [
         {
           eth_accounts: {},
         },
@@ -219,7 +225,7 @@ export class WalletProvider {
   async connectMetamaskMiddleware(): Promise<boolean> {
     const accounts = await this.listAccounts();
     if (accounts.length === 0) {
-      await this.send('eth_requestAccounts', [])
+      await this.ethereumProvider.send('eth_requestAccounts', [])
         .then()
         .catch((err) => {
           // EIP-1193 userRejectedRequest error.
@@ -235,10 +241,6 @@ export class WalletProvider {
 
   listAccounts(): Promise<string[]> {
     return this.ethereumProvider.listAccounts();
-  }
-
-  send(method: string, params: any[]): Promise<any> {
-    return this.ethereumProvider.send(method, params);
   }
 
   signMessage(message: number[]): Promise<string> {
