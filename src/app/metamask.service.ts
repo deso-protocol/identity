@@ -154,6 +154,10 @@ export class WalletProvider {
   #ethereumProvider: ethers.providers.Web3Provider | null = null;
   #metamaskDeepLink?: string;
 
+  get isConnected() {
+    return !!this.#ethereumProvider;
+  }
+
   get ethereumProvider() {
     if (!this.#ethereumProvider) {
       throw new Error('Ethereum provider not initialized. Did you forget to call connectWallet()?');
