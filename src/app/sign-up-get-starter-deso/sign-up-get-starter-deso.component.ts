@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CountryISO } from 'ngx-intl-tel-input';
+import intlTelInput from 'intl-tel-input';
 import { logInteractionEvent } from 'src/app/interaction-event-helpers';
 import { AccountService } from '../account.service';
 import { RouteNames } from '../app-routing.module';
@@ -31,6 +31,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   @Output() skipButtonClicked = new EventEmitter();
   @Output() finishFlowEvent = new EventEmitter();
   @Output() onCancelButtonClicked = new EventEmitter();
+  @ViewChild('phoneNumberInput') phoneNumberInput?: ElementRef<HTMLInputElement>;
+  intlPhoneInputInstance?: intlTelInput.Plugin
 
   phoneForm = new FormGroup({
     phone: new FormControl(undefined, [Validators.required]),
@@ -39,7 +41,6 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     verificationCode: new FormControl(undefined, [Validators.required]),
   });
 
-  CountryISO = CountryISO;
   sendingPhoneNumberVerificationText = false;
   submittingPhoneNumberVerificationCode = false;
   screenToShow: string | null = null;
@@ -64,7 +65,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     private identityService: IdentityService,
     private accountService: AccountService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
@@ -89,6 +91,19 @@ export class SignUpGetStarterDESOComponent implements OnInit {
                     SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN;
                 }
               }
+              // NOTE: we need to wait for the DOM to render before we can initialize the phone number input
+              setTimeout(() => {
+                if (this.phoneNumberInput?.nativeElement) {
+                 this.intlPhoneInputInstance = intlTelInput(this.phoneNumberInput?.nativeElement, {
+                    initialCountry: 'us',
+                    separateDialCode: true,
+                    // This is lazy loaded under the hood by the intl-tel-input
+                    // library. We just need the path to a publicly accessible
+                    // file so it can load it.
+                    utilsScript: 'assets/scripts/intl-tel-input/utils.js',
+                  })
+                }
+              }, 1)
             },
             (err) => {
               console.error(err);
@@ -118,6 +133,12 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     logInteractionEvent('get-starter-deso', 'send-verification-text');
 
     this._sendPhoneNumberVerificationText();
+  }
+
+  checkIsValidPhoneNumber() {
+    this.phoneForm.controls.phone.setErrors(
+      !!this.intlPhoneInputInstance?.isValidNumber() ? null : { invalid: true }
+    );
   }
 
   resendVerificationCode(event: Event): boolean {
@@ -173,8 +194,12 @@ export class SignUpGetStarterDESOComponent implements OnInit {
   }
 
   _sendPhoneNumberVerificationText(): void {
-    this.phoneNumber = this.phoneForm.value.phone?.e164Number;
-    this.phoneNumberCountryCode = this.phoneForm.value.phone?.countryCode;
+    if (!this.intlPhoneInputInstance) {
+      throw new Error('intlPhoneInputInstance must be defined');
+    }
+    // NOTE: intlPhoneInputInstance.getNumber() returns an E.164 formatted phone number (e.g. +15555555555)
+    this.phoneNumber = this.intlPhoneInputInstance.getNumber()
+    this.phoneNumberCountryCode = this.intlPhoneInputInstance.getSelectedCountryData().iso2.toUpperCase();
     if (!this.phoneNumberCountryCode) {
       return;
     }
@@ -249,6 +274,11 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       return;
     }
     this.submittingPhoneNumberVerificationCode = true;
+
+    if (!this.verificationCodeForm.value.verificationCode) {
+      throw new Error('Verification code is required');
+    }
+
     this.backendApi
       .SubmitPhoneNumberVerificationCode(
         this.publicKey /*UpdaterPublicKeyBase58Check*/,
@@ -274,7 +304,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     this.finishFlowEvent.emit();
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+        queryParams: {publicKey: this.publicKey},
         queryParamsHandling: 'merge',
       });
       return;

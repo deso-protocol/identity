@@ -1,32 +1,61 @@
 <div *ngIf="transactionSpendingLimitResponse">
   <div>
-    <div *ngIf="!transactionSpendingLimitResponse?.IsUnlimited" class="d-flex justify-content-between px-20px fs-18px">
+    <div
+      *ngIf="!transactionSpendingLimitResponse?.IsUnlimited"
+      class="d-flex justify-content-between px-20px fs-18px"
+    >
       <div class="text-left">Cumulative Spending Limit</div>
       <div>
-        {{ globalVars.nanosToDeSo(transactionSpendingLimitResponse.GlobalDESOLimit || 0, 4) }} DESO
+        {{
+          globalVars.nanosToDeSo(
+            transactionSpendingLimitResponse.GlobalDESOLimit || 0,
+            4
+          )
+        }}
+        DESO
       </div>
     </div>
 
     <div class="mt-3">
       <button
         data-control-name="tx-spending-limit-approve-button"
-        [attr.data-control-is-unlimited]="this.transactionSpendingLimitResponse.IsUnlimited"
-        [attr.data-control-is-full-access-host]="this.globalVars.isFullAccessHostname()"
-        [attr.data-control-tx-memo]="this.transactionSpendingLimitResponse.DerivedKeyMemo"
+        [attr.data-control-is-unlimited]="
+          this.transactionSpendingLimitResponse.IsUnlimited
+        "
+        [attr.data-control-is-full-access-host]="
+          this.globalVars.isFullAccessHostname()
+        "
+        [attr.data-control-tx-memo]="
+          this.transactionSpendingLimitResponse.DerivedKeyMemo
+        "
         class="button btn-primary button-large text-white font-weight-bold"
-        (click)="this.onApproveClick()"
+        (click)="this.onApproveClickWrapper()"
+        [disabled]="this.isPendingApprove"
       >
-        Approve
+        <span *ngIf="!this.isPendingApprove; else loadingSpinner">Approve</span>
+        <ng-template #loadingSpinner>
+          <div
+            class="spinner-border ml-3"
+            style="width: 25px; height: 25px"
+          ></div>
+        </ng-template>
       </button>
     </div>
 
-    <div class="mt-3 text-center" *ngIf="transactionSpendingLimitResponse?.IsUnlimited">
+    <div
+      class="mt-3 text-center"
+      *ngIf="transactionSpendingLimitResponse?.IsUnlimited"
+    >
       <div *ngIf="this.globalVars.isFullAccessHostname(); else elseBlock">
-        By clicking approve, you are granting <strong>{{ globalVars.hostname }}</strong> unlimited signing access for your account.
+        By clicking approve, you are granting
+        <strong>{{ globalVars.hostname }}</strong> unlimited signing access for
+        your account.
       </div>
       <ng-template #elseBlock>
         <div class="warning-text">
-          By clicking approve, you are granting <strong>{{ globalVars.hostname }}</strong> unlimited signing access for your account.
+          By clicking approve, you are granting
+          <strong>{{ globalVars.hostname }}</strong> unlimited signing access
+          for your account.
         </div>
       </ng-template>
     </div>
@@ -41,12 +70,18 @@
 
     <app-transaction-spending-limit-section
       [sectionMap]="transactionSpendingLimitResponse.TransactionCountLimitMap"
-      [sectionTitle]="TransactionSpendingLimitComponent.TransactionLimitsSection"
+      [sectionTitle]="
+        TransactionSpendingLimitComponent.TransactionLimitsSection
+      "
       *ngIf="transactionSpendingLimitResponse.TransactionCountLimitMap"
     ></app-transaction-spending-limit-section>
     <app-transaction-spending-limit-section
-      [sectionMap]="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
-      [sectionTitle]="TransactionSpendingLimitComponent.CreatorCoinLimitsSection"
+      [sectionMap]="
+        transactionSpendingLimitResponse.CreatorCoinOperationLimitMap
+      "
+      [sectionTitle]="
+        TransactionSpendingLimitComponent.CreatorCoinLimitsSection
+      "
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.CreatorCoinOperationLimitMap"
     ></app-transaction-spending-limit-section>
@@ -65,8 +100,8 @@
     <app-transaction-spending-limit-section
       [sectionMap]="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
       [sectionTitle]="
-      TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
-    "
+        TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
+      "
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.DAOCoinLimitOrderLimitMap"
     >
@@ -76,18 +111,20 @@
       [sectionTitle]="TransactionSpendingLimitComponent.AssociationSection"
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.AssociationLimitMap"
-      ></app-transaction-spending-limit-section>
+    ></app-transaction-spending-limit-section>
     <app-transaction-spending-limit-section
       [sectionMap]="transactionSpendingLimitResponse.AccessGroupLimitMap"
       [sectionTitle]="TransactionSpendingLimitComponent.AccessGroupSection"
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.AccessGroupLimitMap"
-      ></app-transaction-spending-limit-section>
+    ></app-transaction-spending-limit-section>
     <app-transaction-spending-limit-section
       [sectionMap]="transactionSpendingLimitResponse.AccessGroupMemberLimitMap"
-      [sectionTitle]="TransactionSpendingLimitComponent.AccessGroupMemberSection"
+      [sectionTitle]="
+        TransactionSpendingLimitComponent.AccessGroupMemberSection
+      "
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.AccessGroupMemberLimitMap"
-      ></app-transaction-spending-limit-section>
+    ></app-transaction-spending-limit-section>
   </div>
 </div>

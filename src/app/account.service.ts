@@ -1,6 +1,19 @@
 import { Injectable } from '@angular/core';
-import { CryptoService } from './crypto.service';
-import { GlobalVarsService } from './global-vars.service';
+import assert from 'assert';
+import bs58check from 'bs58check';
+import { ec as EC } from 'elliptic';
+import HDKey from 'hdkey';
+import * as jsonwebtoken from 'jsonwebtoken';
+import KeyEncoder from 'key-encoder';
+import { CookieService } from 'ngx-cookie';
+import sha256 from 'sha256';
+import { uint64ToBufBigEndian } from '../lib/bindata/util';
+import {
+  Transaction,
+  TransactionMetadataAuthorizeDerivedKey,
+} from '../lib/deso/transaction';
+import * as ecies from '../lib/ecies';
+import { SwalHelper } from '../lib/helpers/swal-helper';
 import {
   AccessLevel,
   DefaultKeyPrivateInfo,
@@ -12,29 +25,17 @@ import {
   PrivateUserVersion,
   PublicUserInfo,
 } from '../types/identity';
-import { CookieService } from 'ngx-cookie';
-import HDKey from 'hdkey';
-import { EntropyService } from './entropy.service';
-import { SigningService } from './signing.service';
-import sha256 from 'sha256';
-import { uint64ToBufBigEndian } from '../lib/bindata/util';
-import * as ecies from '../lib/ecies';
-import { ec as EC } from 'elliptic';
 import {
   BackendAPIService,
   GetAccessBytesResponse,
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
-import { MetamaskService } from './metamask.service';
-import {
-  Transaction,
-  TransactionMetadataAuthorizeDerivedKey,
-} from '../lib/deso/transaction';
-import KeyEncoder from 'key-encoder';
-import * as jsonwebtoken from 'jsonwebtoken';
-import assert from 'assert';
+import { CryptoService } from './crypto.service';
+import { EntropyService } from './entropy.service';
+import { GlobalVarsService } from './global-vars.service';
 import { MessagingGroup } from './identity.service';
-import bs58check from 'bs58check';
+import { MetamaskService } from './metamask.service';
+import { SigningService } from './signing.service';
 
 export const ERROR_USER_NOT_FOUND = 'User not found';
 
@@ -80,7 +81,10 @@ export class AccountService {
       );
       let encryptedMessagingKeyRandomness: string | undefined;
       if (privateUser.messagingKeyRandomness) {
-        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(privateUser.messagingKeyRandomness, hostname);
+        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(
+          privateUser.messagingKeyRandomness,
+          hostname
+        );
       }
       const accessLevelHmac = this.cryptoService.accessLevelHmac(
         accessLevel,
@@ -116,8 +120,9 @@ export class AccountService {
       console.error('private user not found');
       throw new Error('private user not found');
     }
-    return this.isMetamaskAccount(privateUser) &&
-      !privateUser.messagingKeyRandomness;
+    return (
+      this.isMetamaskAccount(privateUser) && !privateUser.messagingKeyRandomness
+    );
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -260,6 +265,23 @@ export class AccountService {
       // TODO: if we want to allow generic log-in with derived keys, we should error because a derived key can't produce a
       //  valid access signature. For now, we ignore this because the only derived key log-in is coming through Metamask signup.
       try {
+        if (!this.metamaskService.walletProvider.isConnected) {
+          const swalRes = await SwalHelper.fire({
+            icon: 'info',
+            title: 'Metamask connection',
+            html: `You'll need to connect your Metamask wallet to approve this login and sign your derived key.`,
+            showConfirmButton: true,
+            showCancelButton: false,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+          });
+          if (!swalRes.isConfirmed) {
+            throw new Error(
+              'Something went wrong while producing Metamask signature. Please try again.'
+            );
+          }
+          await this.metamaskService.connectWallet();
+        }
         const { signature } =
           await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
             accessBytesHex
@@ -267,6 +289,7 @@ export class AccountService {
         // Slice the '0x' prefix from the signature.
         accessSignature = signature.slice(2);
       } catch (e) {
+        console.error(e);
         throw new Error(
           'Something went wrong while producing Metamask signature. Please try again.'
         );
@@ -640,8 +663,15 @@ export class AccountService {
     return Buffer.from(randomnessString, 'utf8').toString('hex');
   }
 
-  getMessagingKeyForSeed(seedHex: string, keyName: string, messagingRandomness: string | undefined): Buffer {
-    return this.cryptoService.deriveMessagingKey(messagingRandomness ? messagingRandomness : seedHex, keyName);
+  getMessagingKeyForSeed(
+    seedHex: string,
+    keyName: string,
+    messagingRandomness: string | undefined
+  ): Buffer {
+    return this.cryptoService.deriveMessagingKey(
+      messagingRandomness ? messagingRandomness : seedHex,
+      keyName
+    );
   }
 
   // Compute messaging private key as sha256x2( sha256x2(userSecret) || sha256x2(key name) )
@@ -710,7 +740,7 @@ export class AccountService {
     senderGroupKeyName: string,
     recipientPublicKey: string,
     message: string,
-    messagingKeyRandomness: string | undefined,
+    messagingKeyRandomness: string | undefined
   ): any {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
@@ -724,7 +754,7 @@ export class AccountService {
       privateEncryptionKey = this.getMessagingKeyForSeed(
         seedHex,
         senderGroupKeyName,
-        messagingKeyRandomness,
+        messagingKeyRandomness
       );
     }
 
@@ -769,11 +799,16 @@ export class AccountService {
     encryptedMessages: EncryptedMessage[],
     messagingGroups: MessagingGroup[],
     messagingKeyRandomness: string | undefined,
-    ownerPublicKeyBase58Check: string | undefined,
+    ownerPublicKeyBase58Check: string | undefined
   ): Promise<{ [key: string]: any }> {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
-    const myPublicKey = ownerPublicKeyBase58Check || this.cryptoService.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
+    const myPublicKey =
+      ownerPublicKeyBase58Check ||
+      this.cryptoService.privateKeyToDeSoPublicKey(
+        privateKey,
+        this.globalVars.network
+      );
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedMessage of encryptedMessages) {
@@ -870,7 +905,7 @@ export class AccountService {
                       this.getMessagingKeyForSeed(
                         seedHex,
                         myMessagingGroupMemberEntry.GroupMemberKeyName,
-                        messagingKeyRandomness,
+                        messagingKeyRandomness
                       );
                     privateEncryptionKey = this.signingService
                       .decryptGroupMessagingPrivateKeyToMember(
@@ -893,7 +928,7 @@ export class AccountService {
               privateEncryptionKey = this.getMessagingKeyForSeed(
                 seedHex,
                 this.globalVars.defaultMessageKeyName,
-                messagingKeyRandomness,
+                messagingKeyRandomness
               );
             }
           } catch (e: any) {
@@ -943,22 +978,36 @@ export class AccountService {
     // In the case of a metamask login, we generate a new derived key and
     // deposit addresses for the user. In order to recover funds sent to an old
     // deposit address, we keep a record of the old derived info.
-    if (privateUsers[publicKey]?.derivedPublicKeyBase58Check && privateUsers[publicKey]?.derivedPublicKeyBase58Check !== userInfo.derivedPublicKeyBase58Check) {
+    if (
+      privateUsers[publicKey]?.derivedPublicKeyBase58Check &&
+      privateUsers[publicKey]?.derivedPublicKeyBase58Check !==
+        userInfo.derivedPublicKeyBase58Check
+    ) {
       const previousUserInfo = privateUsers[publicKey];
-      const archivedUserData = JSON.parse(window.localStorage.getItem("archivedUserData") ?? "{}");
+      const archivedUserData = JSON.parse(
+        window.localStorage.getItem('archivedUserData') ?? '{}'
+      );
 
       if (Array.isArray(archivedUserData[publicKey])) {
         archivedUserData[publicKey].push(previousUserInfo);
 
         // messagingKeyRandomness is deterministic, so if they've generated it at least once before, we can just use that for any new login attempts.
-        const existingMessagingKeyRandomness = archivedUserData[publicKey].find((u: any) => !!u.messagingKeyRandomness)?.messagingKeyRandomness;
-        if (existingMessagingKeyRandomness && !userInfo.messagingKeyRandomness) {
+        const existingMessagingKeyRandomness = archivedUserData[publicKey].find(
+          (u: any) => !!u.messagingKeyRandomness
+        )?.messagingKeyRandomness;
+        if (
+          existingMessagingKeyRandomness &&
+          !userInfo.messagingKeyRandomness
+        ) {
           userInfo.messagingKeyRandomness = existingMessagingKeyRandomness;
         }
       } else {
         archivedUserData[publicKey] = [previousUserInfo];
       }
-      window.localStorage.setItem("archivedUserData", JSON.stringify(archivedUserData));
+      window.localStorage.setItem(
+        'archivedUserData',
+        JSON.stringify(archivedUserData)
+      );
     }
 
     privateUsers[publicKey] = userInfo;
@@ -1006,10 +1055,12 @@ export class AccountService {
   }
 
   encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex: string): string {
-    return this.seedHexToPublicKeyBase58Check(this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
-      this.globalVars.hostname
-    ));
+    return this.seedHexToPublicKeyBase58Check(
+      this.cryptoService.decryptSeedHex(
+        encryptedSeedHex,
+        this.globalVars.hostname
+      )
+    );
   }
 
   seedHexToPublicKeyBase58Check(seedHex: string): string {

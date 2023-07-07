@@ -41,7 +41,7 @@ export class DeriveComponent implements OnInit {
   isSingleAccount = false;
   validationErrors = false;
   blockHeight = 0;
-  onApproveClick = () => this.approveDerivedKey(this.publicKeyBase58Check);
+  onApproveClick = async () => this.approveDerivedKey(this.publicKeyBase58Check);
 
   constructor(
     private accountService: AccountService,
@@ -133,7 +133,7 @@ export class DeriveComponent implements OnInit {
         }
       })
     }
-    this.identityService.derive({
+    return this.identityService.derive({
       publicKey,
       derivedPublicKey: this.derivedPublicKeyBase58Check,
       transactionSpendingLimit: this.transactionSpendingLimitResponse,

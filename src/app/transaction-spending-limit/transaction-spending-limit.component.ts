@@ -26,7 +26,7 @@ export class TransactionSpendingLimitComponent implements OnInit {
   hasUsers = false;
   userMap: { [k: string]: User } = {};
   showTransactions: boolean = false;
-
+  isPendingApprove = false;
   static TransactionLimitsSection = 'Transaction Limits';
   static CreatorCoinLimitsSection = 'Creator Coins';
   static DAOCoinLimitsSection = 'DAOs';
@@ -130,5 +130,11 @@ export class TransactionSpendingLimitComponent implements OnInit {
     let allPublicKeys = new Set<string>();
     accessGroupLimitMap.forEach((item) => allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check));
     return Array.from(allPublicKeys);
+  }
+
+  async onApproveClickWrapper() {
+    this.isPendingApprove = true;
+    await this.onApproveClick();
+    this.isPendingApprove = false;
   }
 }

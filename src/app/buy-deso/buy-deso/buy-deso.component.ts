@@ -28,7 +28,6 @@ import { TabSelectorComponent } from '../tab-selector/tab-selector.component';
 import { BuyDeSoCompleteComponent } from '../buy-deso-complete/buy-deso-complete.component';
 import { BuyDeSoUSDComponent } from '../buy-deso-usd/buy-deso-usd.component';
 import { IconsModule } from '../../icons/icons.module';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CryptoService } from '../../crypto.service';
 import { SignUpBuyDesoComponent } from '../sign-up-buy-deso.component';
 import { AppRoutingModule, RouteNames } from 'src/app/app-routing.module';
@@ -247,7 +246,6 @@ export class BuyDeSoComponent implements OnInit {
     CommonModule,
     IconsModule,
     AppRoutingModule,
-    BsDropdownModule.forRoot(),
   ],
   exports: [BuyDeSoComponent, BuyDeSoCompleteComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -9,7 +9,8 @@
     >
       <div *ngIf="globalVars.callback; else elseBlock">Continue</div>
       <ng-template #elseBlock
-        >Continue {{ !globalVars.derive ? "to " + globalVars.hostname : ""}}</ng-template
+      >Continue {{ !globalVars.derive ? "to " + globalVars.hostname : ""}}
+      </ng-template
       >
     </button>
   </div>
@@ -70,24 +71,18 @@
     </div>
 
     <form #f="ngForm" [formGroup]="phoneForm" class="form-group mt-15px">
-      <ngx-intl-tel-input
-        style="font-size: 15px !important"
-        [cssClass]="'form-control sign-up__phone-input'"
-        [separateDialCode]="true"
-        [enableAutoCountrySelect]="true"
-        [enablePlaceholder]="true"
-        [searchCountryFlag]="true"
-        [selectFirstCountry]="false"
-        [selectedCountryISO]="CountryISO.UnitedStates"
-        maxLength="15"
-        [phoneValidation]="true"
-        (ngModelChange)="onPhoneNumberInputChanged()"
+      <input
+        #phoneNumberInput
+        type="tel"
+        class="form-control sign-up__phone-input"
+        maxlength="15"
         name="phone"
         formControlName="phone"
-      ></ngx-intl-tel-input>
+        (blur)="this.checkIsValidPhoneNumber()"
+        (ngModelChange)="this.onPhoneNumberInputChanged()"
+      />
 
       <div class="fc-red fs-15px">
-        <!-- TODO: kinda obnoxious how this displays an error as soon as I start typing-->
         <div
           *ngIf="f.form.value.phone && f.form.controls.phone.invalid"
           class="mt-10px"
@@ -163,7 +158,7 @@
           style="cursor: pointer"
           (click)="cancelButtonClicked()"
           *ngIf="displayForSignupFlow"
-          >Cancel</a
+        >Cancel</a
         >
         <button
           data-control-name="get-starter-deso-next-button"
