@@ -192,10 +192,13 @@ export class WalletProvider {
         showQrModal: false,
       });
 
-      provider.on('display_uri', (uri) => {
+      // Wallet connect doesn't provide any specific examples for how to do this.
+      // At the time this was written, their docs just hand wave and say "custom logic..." https://docs.walletconnect.com/2.0/web/providers/ethereum#use-without-walletconnectmodal
+      // The specific way this is done was taken from the example in this issue: https://github.com/WalletConnect/walletconnect-monorepo/issues/2930
+      provider.once('display_uri', (uri) => {
         // We keep the metamask deep link so we can open it later for signing.
-        this.#metamaskDeepLink = uri;
-        openDeepLink(uri);
+        this.#metamaskDeepLink = `metamask://wc?uri=${encodeURIComponent(uri)}`;
+        openDeepLink(this.#metamaskDeepLink);
       });
 
       // Opens the metamask mobile app and requests the user to connect their wallet.
