@@ -256,9 +256,10 @@ export class WalletProvider {
     // sign the message. Desktop uses the metamask extension which is triggered
     // automatically by the signMessage() call. Once the user signs the message the
     // pendingSignature promise will resolve and the flow will proceed.
-    if (this.#metamaskDeepLink) {
-      openDeepLink(this.#metamaskDeepLink);
-    }
+    // TODO: temporarily disable this and see if it fixes the mobile bug
+    // if (this.#metamaskDeepLink) {
+    //   openDeepLink(this.#metamaskDeepLink);
+    // }
 
     return pendingSignature;
   }
