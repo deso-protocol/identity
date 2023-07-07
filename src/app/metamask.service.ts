@@ -156,7 +156,7 @@ export class WalletProvider {
 
   get ethereumProvider() {
     if (!this.#ethersWeb3Provider) {
-      throw new Error('Ethereum provider not initialized');
+      throw new Error('Ethereum provider not initialized. Did you forget to call connectWallet()?');
     }
     return this.#ethersWeb3Provider;
   }

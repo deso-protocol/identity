@@ -1,6 +1,18 @@
 import { Injectable } from '@angular/core';
-import { CryptoService } from './crypto.service';
-import { GlobalVarsService } from './global-vars.service';
+import assert from 'assert';
+import bs58check from 'bs58check';
+import { ec as EC } from 'elliptic';
+import HDKey from 'hdkey';
+import * as jsonwebtoken from 'jsonwebtoken';
+import KeyEncoder from 'key-encoder';
+import { CookieService } from 'ngx-cookie';
+import sha256 from 'sha256';
+import { uint64ToBufBigEndian } from '../lib/bindata/util';
+import {
+  Transaction,
+  TransactionMetadataAuthorizeDerivedKey,
+} from '../lib/deso/transaction';
+import * as ecies from '../lib/ecies';
 import {
   AccessLevel,
   DefaultKeyPrivateInfo,
@@ -12,29 +24,17 @@ import {
   PrivateUserVersion,
   PublicUserInfo,
 } from '../types/identity';
-import { CookieService } from 'ngx-cookie';
-import HDKey from 'hdkey';
-import { EntropyService } from './entropy.service';
-import { SigningService } from './signing.service';
-import sha256 from 'sha256';
-import { uint64ToBufBigEndian } from '../lib/bindata/util';
-import * as ecies from '../lib/ecies';
-import { ec as EC } from 'elliptic';
 import {
   BackendAPIService,
   GetAccessBytesResponse,
   TransactionSpendingLimitResponse,
 } from './backend-api.service';
-import { MetamaskService } from './metamask.service';
-import {
-  Transaction,
-  TransactionMetadataAuthorizeDerivedKey,
-} from '../lib/deso/transaction';
-import KeyEncoder from 'key-encoder';
-import * as jsonwebtoken from 'jsonwebtoken';
-import assert from 'assert';
+import { CryptoService } from './crypto.service';
+import { EntropyService } from './entropy.service';
+import { GlobalVarsService } from './global-vars.service';
 import { MessagingGroup } from './identity.service';
-import bs58check from 'bs58check';
+import { MetamaskService } from './metamask.service';
+import { SigningService } from './signing.service';
 
 export const ERROR_USER_NOT_FOUND = 'User not found';
 
@@ -260,6 +260,11 @@ export class AccountService {
       // TODO: if we want to allow generic log-in with derived keys, we should error because a derived key can't produce a
       //  valid access signature. For now, we ignore this because the only derived key log-in is coming through Metamask signup.
       try {
+        // On mobile, make sure we have a connection to metamask. If we already
+        // have the connection, this will be a no-op.
+        if (this.globalVars.isMobile()) {
+          await this.metamaskService.connectWallet();
+        }
         const { signature } =
           await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
             accessBytesHex
@@ -267,6 +272,7 @@ export class AccountService {
         // Slice the '0x' prefix from the signature.
         accessSignature = signature.slice(2);
       } catch (e) {
+        console.error(e);
         throw new Error(
           'Something went wrong while producing Metamask signature. Please try again.'
         );
