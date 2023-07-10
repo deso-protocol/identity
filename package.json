@@ -38,6 +38,7 @@
     "@types/sha256": "^0.2.0",
     "@types/sprintf-js": "^1.1.2",
     "@walletconnect/ethereum-provider": "^2.9.0",
+    "@walletconnect/modal": "^2.5.9",
     "angular-feather": "^6.5.0",
     "assert": "^2.0.0",
     "base58check": "^2.0.0",
