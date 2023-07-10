@@ -22,7 +22,8 @@ export class TransactionSpendingLimitComponent implements OnInit {
     {
       GlobalDESOLimit: 0,
     };
-  @Input() onApproveClick: () => void = () => {};
+  @Input() onApproveClick: () => Promise<void> = async () => {
+  };
   hasUsers = false;
   userMap: { [k: string]: User } = {};
   showTransactions: boolean = false;
@@ -37,10 +38,12 @@ export class TransactionSpendingLimitComponent implements OnInit {
   static AccessGroupMemberSection = 'Access Group Members';
 
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
+
   constructor(
     private backendApi: BackendAPIService,
     public globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     const publicKeysToFetch = [
@@ -134,7 +137,6 @@ export class TransactionSpendingLimitComponent implements OnInit {
 
   async onApproveClickWrapper() {
     this.isPendingApprove = true;
-    await this.onApproveClick();
-    this.isPendingApprove = false;
+    await this.onApproveClick().finally(() => this.isPendingApprove = false);
   }
 }
