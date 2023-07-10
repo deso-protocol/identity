@@ -40,12 +40,9 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending-limit-hex-string
     {$DOMAIN:https://node.deso.org}/api/v0/get-transaction-spending-limit-response-from-hex/
     {$DOMAIN:https://node.deso.org}/api/v0/get-single-post
-    {$DOMAIN:https://node.deso.org}/api/v0/get-wyre-wallet-order-quotation
-    {$DOMAIN:https://node.deso.org}/api/v0/get-wyre-wallet-order-reservation
     {$DOMAIN:https://node.deso.org}/api/v0/get-exchange-rate
     {$DOMAIN:https://node.deso.org}/api/v0/query-eth-rpc
     {$DOMAIN:https://node.deso.org}/api/v0/submit-eth-tx
-    {$DOMAIN:https://node.deso.org}/api/v0/exchange-bitcoin
     {$DOMAIN:https://node.deso.org}/api/v0/get-access-bytes
     {$DOMAIN:https://node.deso.org}/api/v0/send-starter-deso-for-metamask-account
     {$DOMAIN:https://node.deso.org}/api/v0/authorize-derived-key
@@ -64,12 +61,9 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/get-transaction-spending-limit-hex-string
     https://test.deso.org/api/v0/get-transaction-spending-limit-response-from-hex/
     https://test.deso.org/api/v0/get-single-post
-    https://test.deso.org/api/v0/get-wyre-wallet-order-quotation
-    https://test.deso.org/api/v0/get-wyre-wallet-order-reservation
     https://test.deso.org/api/v0/get-exchange-rate
     https://test.deso.org/api/v0/query-eth-rpc
     https://test.deso.org/api/v0/submit-eth-tx
-    https://test.deso.org/api/v0/exchange-bitcoin
     https://test.deso.org/api/v0/get-access-bytes
     https://test.deso.org/api/v0/send-starter-deso-for-metamask-account
     https://test.deso.org/api/v0/authorize-derived-key
