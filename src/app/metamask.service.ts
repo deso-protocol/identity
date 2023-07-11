@@ -189,14 +189,18 @@ export class WalletProvider {
         // NOTE: We can bypass the wallet connect QR modal by opening the
         // metamask deep link provided by the display_uri event. See
         // `provider.on('display_uri', ...) below.
-        showQrModal: false,
+        showQrModal: true,
+        qrModalOptions: {
+          explorerRecommendedWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
+          explorerExcludedWalletIds: 'ALL',
+        }
       });
 
-      provider.on('display_uri', (uri) => {
-        // We keep the metamask deep link so we can open it later for signing.
-        this.#metamaskDeepLink = uri;
-        openDeepLink(uri);
-      });
+      // provider.on('display_uri', (uri) => {
+      //   // We keep the metamask deep link so we can open it later for signing.
+      //   this.#metamaskDeepLink = uri;
+      //   openDeepLink(uri);
+      // });
 
       // Opens the metamask mobile app and requests the user to connect their wallet.
       await provider.connect();
