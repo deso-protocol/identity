@@ -42,6 +42,7 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
         '&destinationTickers=DESO',
         '&destinationTicker=DESO',
         `&destinationAddress=${this.publicKey || ''}`,
+        `&affiliateAddress=BC1YLgHhMFnUrzQRpZCpK7TDxVGoGnAk539JqpYWgJ8uW9R7zCCdGHK`,
         `&now=${Date.now()}`,
       ].join('')
     );
