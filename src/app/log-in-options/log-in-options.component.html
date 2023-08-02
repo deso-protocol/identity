@@ -2,19 +2,19 @@
   <button
     data-control-name="log-in-cta"
     data-control-login-option="metamask"
-    class="button button-large mb-20px bg-dark text-white"
+    class="button--primary button--medium margin-bottom--medium"
     (click)="navigateToMetamaskSignup()"
     queryParamsHandling="merge"
     *ngIf="globalVars.showMetamask()"
   >
     <img src="assets/metamask.png" height="32px" width="32px" class="mr-10px" />
 
-    <span class="font-weight-bold">Sign up / log in with MetaMask</span>
+    Sign up / log in with MetaMask
   </button>
   <button
     data-control-name="log-in-cta"
     data-control-login-option="google"
-    class="button button-large button-primary mb-20px"
+    class="button--primary button--medium margin-bottom--medium"
     (click)="launchGoogle()"
     *ngIf="!globalVars.hideGoogle"
   >
@@ -24,16 +24,16 @@
       width="32px"
       class="mr-10px"
     />
-    <span class="font-weight-bold">Sign up / log in with Google</span>
+    Sign up / log in with Google
   </button>
   <button
     data-control-name="log-in-cta"
     data-control-login-option="sign-up-with-deso-seed"
-    class="button button-large button-secondary mb-20px"
+    class="button--primary button--medium margin-bottom--medium"
     [routerLink]="['/sign-up']"
     queryParamsHandling="merge"
   >
-    <span class="font-weight-normal">Sign up with DeSo seed</span>
+    Sign up with DeSo seed
   </button>
   <a
     data-control-name="log-in-cta"

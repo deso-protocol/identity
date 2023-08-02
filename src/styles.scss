@@ -1,3 +1,7 @@
+//-------------------------------
+// COLOR VARIABLES
+//-------------------------------
+
 $primary: #0059f7;
 $danger: #e63946;
 $secondary: #ecf0f1;
@@ -20,55 +24,6 @@ $banner-font-color: #292941;
 $red-font-color: #ff3434;
 $green-font-color: #19b028;
 
-//-------------------------------
-// FONTS
-//-------------------------------
-$font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-
-html,
-body {
-  font-family: $font-primary;
-  height: 100%;
-  width: 100%;
-}
-
-h1 {
-  margin: 0;
-}
-
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  margin: 0;
-  font-family: $font-primary;
-  font-weight: normal;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.cursor-auto {
-  cursor: auto;
-}
-
-.cursor-inherit {
-  cursor: inherit;
-}
-
-@font-face {
-  font-family: 'color-emoji';
-  src: local('Apple Color Emoji'), local('Segoe UI Emoji'),
-    local('Segoe UI Symbol'), local('Noto Color Emoji');
-}
-
-.font-emoji {
-  font-family: 'color-emoji';
-}
-
 $text: #000000;
 $text-secondary: #545656;
 $text-muted: #999999;
@@ -82,7 +37,192 @@ $highlight-secondary: #e5f2ff;
 $success: #2cc99a;
 $error: #ff6939;
 
-// Custom font classes.
+//-------------------------------
+// FONTS
+//-------------------------------
+$font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+@font-face {
+  font-family: 'color-emoji';
+  src: local('Apple Color Emoji'), local('Segoe UI Emoji'),
+    local('Segoe UI Symbol'), local('Noto Color Emoji');
+}
+
+.font-emoji {
+  font-family: 'color-emoji';
+}
+
+//-------------------------------
+// COLORS
+//-------------------------------
+$colors: (
+  "neutral": (
+    "white": #FFF,
+    "black": #000,
+  ),
+  "blue": (
+    "lighter": lighten(#1d40b0, 40%),
+    "light": lighten(#1d40b0, 20%),
+    "base": #1d40b0,
+    "dark": darken(#1d40b0, 20%),
+    "darker": darken(#1d40b0, 40%),
+  ),
+  "red": (
+    "lighter": #faa7a1,
+    "light": #e84a49,
+    "base": #c03230,
+    "dark": #8a1c1b,
+    "darker": #460a09,
+  ),
+  "yellow": (
+    "lighter": #ffffe0,
+    "light": #ffff00,
+    "base": #ffd700,
+    "dark": #ff8c00,
+    "darker": #ff4500,
+  ),
+  "green": (
+    "lighter": #90ee90,
+    "light": #32cd32,
+    "base": #008000,
+    "dark": #006400,
+    "darker": #004f00,
+  ),
+);
+
+@mixin color($color, $tone: 'base', $property: 'color') {
+  $color-map: map-get($colors, $color);
+  @if $color-map {
+    $tone-value: map-get($color-map, $tone);
+    @if $tone-value {
+      #{$property}: $tone-value;
+    } @else {
+      @warn "No tone '#{$tone}' found in color map for '#{$color}'";
+    }
+  } @else {
+    @warn "No color '#{$color}' found in colors map.";
+  }
+}
+
+@each $color, $tones in $colors {
+  @each $tone, $value in $tones {
+    .bg--#{$color}-#{$tone} {
+      background-color: $value;
+    }
+    .text--#{$color}-#{$tone} {
+      color: $value;
+    }
+  }
+}
+
+//-------------------------------
+// SPACING UNITS
+//-------------------------------
+$spacing-units: (
+  "none": 0px,
+  "xsmall": 4px, 
+  "small": 8px,
+  "medium": 16px,
+  "large": 32px,
+  "xlarge": 64px,
+  "2xlarge": 128px,
+  "3xlarge": 256px,
+  "4xlarge": 512px
+);
+
+$directions: (
+  "padding": ( "left", "right", "top", "bottom" ),
+  "margin": ( "left", "right", "top", "bottom" )
+);
+
+@mixin spacing($property, $values...) {
+  $result: ();
+  @each $value in $values {
+    $result: append($result, map-get($spacing-units, $value), space);
+  }
+  #{$property}: $result;
+}
+
+@each $space, $directions in $directions {
+  @each $dir in $directions {
+    @each $size, $value in $spacing-units {
+      .#{$space}-#{$dir}--#{$size} {
+        #{if($dir == 'all', $space, $space + '-' + $dir)}: $value;
+      }
+    }
+  }
+}
+
+//-------------------------------
+// HTML & BODY
+//-------------------------------
+html,
+body {
+  font-family: $font-primary;
+  height: 100%;
+  width: 100%;
+  color: #93c5fd99;
+  background-color: #040609;
+  background-image: linear-gradient(0deg,#040609,#040609 10%,#050e1d 90%,#050e1d);
+}
+
+//-------------------------------
+// TYPOGRAPHY
+//-------------------------------
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  @include spacing('margin', 'none');
+  font-weight: normal;
+}
+
+//-------------------------------
+// BUTTONS = Variant (Styles)
+//-------------------------------
+%button {
+  border: 0;
+  border-radius: 100px;
+  width: 100%;
+}
+
+.button--primary {
+  @extend %button;
+  @include color('blue', 'base', 'background-color');
+  @include color('neutral', 'white', 'color');
+  &:hover {
+    @include color('blue', 'dark', 'background-color');
+  }
+}
+
+//-------------------------------
+// BUTTONS = Sizes (Styles)
+//-------------------------------
+.button--medium {
+  @include spacing('padding', 'medium'); 
+}
+
+//-------------------------------
+// UTILITY = Cursors
+//-------------------------------
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-auto {
+  cursor: auto;
+}
+
+.cursor-inherit {
+  cursor: inherit;
+}
+
+//-------------------------------
+// UTILITY = Font Colors
+//-------------------------------
 .fc-title {
   color: $title-font-color;
 }
@@ -247,463 +387,6 @@ $error: #ff6939;
   background-color: lightpink;
 }
 
-// Custom padding classes.
-.p-35px {
-  padding: 35px;
-}
-.pt-35px {
-  padding-top: 35px;
-}
-.pr-35px {
-  padding-right: 35px;
-}
-.pb-35px {
-  padding-bottom: 35px;
-}
-.pl-35px {
-  padding-left: 35px;
-}
-.py-35px {
-  padding-top: 35px;
-  padding-bottom: 35px;
-}
-.px-35px {
-  padding-left: 35px;
-  padding-right: 35px;
-}
-
-.p-30px {
-  padding: 30px;
-}
-.pt-30px {
-  padding-top: 30px;
-}
-.pr-30px {
-  padding-right: 30px;
-}
-.pb-30px {
-  padding-bottom: 30px;
-}
-.pl-30px {
-  padding-left: 30px;
-}
-.py-30px {
-  padding-top: 30px;
-  padding-bottom: 30px;
-}
-.px-30px {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
-.p-30px {
-  padding: 30px;
-}
-.pt-30px {
-  padding-top: 30px;
-}
-.pr-30px {
-  padding-right: 30px;
-}
-.pb-30px {
-  padding-bottom: 30px;
-}
-.pl-30px {
-  padding-left: 30px;
-}
-.py-30px {
-  padding-top: 30px;
-  padding-bottom: 30px;
-}
-.px-30px {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
-.p-25px {
-  padding: 25px;
-}
-.pt-25px {
-  padding-top: 25px;
-}
-.pr-25px {
-  padding-right: 25px;
-}
-.pb-25px {
-  padding-bottom: 25px;
-}
-.pl-25px {
-  padding-left: 25px;
-}
-.py-25px {
-  padding-top: 25px;
-  padding-bottom: 25px;
-}
-.px-25px {
-  padding-left: 25px;
-  padding-right: 25px;
-}
-
-.p-20px {
-  padding: 20px;
-}
-.pt-20px {
-  padding-top: 20px;
-}
-.pr-20px {
-  padding-right: 20px;
-}
-.pb-20px {
-  padding-bottom: 20px;
-}
-.pl-20px {
-  padding-left: 20px;
-}
-.py-20px {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-.px-20px {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.p-16px {
-  padding: 16px;
-}
-.pt-16px {
-  padding-top: 16px;
-}
-.pr-16px {
-  padding-right: 16px;
-}
-.pb-16px {
-  padding-bottom: 16px;
-}
-.pl-16px {
-  padding-left: 16px;
-}
-.py-16px {
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-.px-16px {
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-.p-15px {
-  padding: 15px;
-}
-.pt-15px {
-  padding-top: 15px;
-}
-.pr-15px {
-  padding-right: 15px;
-}
-.pb-15px {
-  padding-bottom: 15px;
-}
-.pl-15px {
-  padding-left: 15px;
-}
-.py-15px {
-  padding-top: 15px;
-  padding-bottom: 15px;
-}
-.px-15px {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-.p-10px {
-  padding: 10px;
-}
-.pt-10px {
-  padding-top: 10px;
-}
-.pr-10px {
-  padding-right: 10px;
-}
-.pb-10px {
-  padding-bottom: 10px;
-}
-.pl-10px {
-  padding-left: 10px;
-}
-.py-10px {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.px-10px {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.p-5px {
-  padding: 5px;
-}
-.pt-5px {
-  padding-top: 5px;
-}
-.pr-5px {
-  padding-right: 5px;
-}
-.pb-5px {
-  padding-bottom: 5px;
-}
-.pl-5px {
-  padding-left: 5px;
-}
-.py-5px {
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-.px-5px {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.p-2px {
-  padding: 2px;
-}
-.pt-2px {
-  padding-top: 2px;
-}
-.pr-2px {
-  padding-right: 2px;
-}
-.pb-2px {
-  padding-bottom: 2px;
-}
-.pl-2px {
-  padding-left: 5px;
-}
-.py-2px {
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-.px-2px {
-  padding-left: 2px;
-  padding-right: 2px;
-}
-
-// Zero padding classes are useful for things like bootstrap columns that have padding added.
-.p-0px {
-  padding: 0px;
-}
-.pt-0px {
-  padding-top: 0px;
-}
-.pr-0px {
-  padding-right: 0px;
-}
-.pb-0px {
-  padding-bottom: 0px;
-}
-.pl-0px {
-  padding-left: 0px;
-}
-.py-0px {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-.px-0px {
-  padding-left: 0px;
-  padding-right: 0px;
-}
-
-// Custom margin classes.
-.mt-2px {
-  margin-top: 2px;
-}
-.mt-7px {
-  margin-top: 7px;
-}
-
-.m-5px {
-  margin: 5px;
-}
-.mt-5px {
-  margin-top: 5px;
-}
-.mr-5px {
-  margin-right: 5px;
-}
-.mb-5px {
-  margin-bottom: 5px;
-}
-.ml-5px {
-  margin-left: 5px;
-}
-
-.m-10px {
-  margin: 10px;
-}
-.mt-10px {
-  margin-top: 10px;
-}
-.mr-10px {
-  margin-right: 10px;
-}
-.mb-10px {
-  margin-bottom: 10px;
-}
-.ml-10px {
-  margin-left: 10px;
-}
-
-.m-12px {
-  margin: 12px;
-}
-.mt-12px {
-  margin-top: 12px;
-}
-.mr-12px {
-  margin-right: 12px;
-}
-.mb-12px {
-  margin-bottom: 12px;
-}
-.ml-12px {
-  margin-left: 12px;
-}
-
-.m-15px {
-  margin: 15px;
-}
-.mt-15px {
-  margin-top: 15px;
-}
-.mr-15px {
-  margin-right: 15px;
-}
-.mb-15px {
-  margin-bottom: 15px;
-}
-.ml-15px {
-  margin-left: 15px;
-}
-
-.m-16px {
-  margin: 16px;
-}
-.mt-16px {
-  margin-top: 16px;
-}
-.mr-16px {
-  margin-right: 16px;
-}
-.mb-16px {
-  margin-bottom: 16px;
-}
-.ml-16px {
-  margin-left: 16px;
-}
-.mx-16px {
-  margin-left: 16px;
-  margin-right: 16px;
-}
-
-.m-20px {
-  margin: 20px;
-}
-.mt-20px {
-  margin-top: 20px;
-}
-.mr-20px {
-  margin-right: 20px;
-}
-.mb-20px {
-  margin-bottom: 20px;
-}
-.ml-20px {
-  margin-left: 20px;
-}
-.mx-20px {
-  margin-left: 20px;
-  margin-right: 20px;
-}
-.my-20px {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.m-25px {
-  margin: 25px;
-}
-.mt-25px {
-  margin-top: 25px;
-}
-.mr-25px {
-  margin-right: 25px;
-}
-.mb-25px {
-  margin-bottom: 25px;
-}
-.ml-25px {
-  margin-left: 25px;
-}
-.mx-25px {
-  margin-left: 25px;
-  margin-right: 25px;
-}
-.my-25px {
-  margin-top: 25px;
-  margin-bottom: 25px;
-}
-
-.m-30px {
-  margin: 30px;
-}
-.mt-30px {
-  margin-top: 30px;
-}
-.mr-30px {
-  margin-right: 30px;
-}
-.mb-30px {
-  margin-bottom: 30px;
-}
-.ml-30px {
-  margin-left: 30px;
-}
-.mx-30px {
-  margin-left: 30px;
-  margin-right: 30px;
-}
-.my-30px {
-  margin-top: 30px;
-  margin-bottom: 30px;
-}
-
-.m-40px {
-  margin: 40px;
-}
-.mt-40px {
-  margin-top: 40px;
-}
-.mr-40px {
-  margin-right: 40px;
-}
-.mb-40px {
-  margin-bottom: 40px;
-}
-.ml-40px {
-  margin-left: 40px;
-}
-.mx-40px {
-  margin-left: 40px;
-  margin-right: 40px;
-}
-.my-40px {
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
-
-.m-0auto {
-  margin: 0 auto;
-}
 
 .br-3px {
   border-radius: 3px;

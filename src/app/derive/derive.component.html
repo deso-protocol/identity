@@ -7,16 +7,16 @@
   class="container home-container text-center d-flex flex-column"
 >
   <div>
-    <div class="title-text">
+    <h3 class="text--neutral-white margin-bottom--medium">
       Grant signing access
       <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
-    </div>
+    </h3>
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
         [allUsers]="allUsers"
         (onAccountSelect)="this.onAccountSelected($event)"
       ></app-account-select>
-      <div class="mb-2">or</div>
+      <div class="margin-bottom--medium">or</div>
       <app-log-in-options></app-log-in-options>
     </ng-container>
     <div
