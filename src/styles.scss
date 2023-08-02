@@ -38,7 +38,7 @@ $success: #2cc99a;
 $error: #ff6939;
 
 //-------------------------------
-// FONTS
+// FONTS = Families
 //-------------------------------
 $font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
@@ -53,12 +53,43 @@ $font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
 }
 
 //-------------------------------
+// FONTS = Sizes
+//-------------------------------
+$font-sizes: (
+  "xs": 12px,
+  "small": 14px,
+  "medium": 16px,
+  "large": 22px,
+  "xlarge": 28px,
+  "2xlarge": 34px,
+  "3xlarge": 48px,
+  "4xlarge": 60px
+);
+
+@mixin font-size($size-key) {
+  $size-value: map-get($font-sizes, $size-key);
+  @if $size-value {
+    font-size: $size-value;
+  } @else {
+    @warn "No size key '#{$size-key}' found in font sizes map.";
+  }
+}
+
+// Generate classes
+@each $size-key, $size-value in $font-sizes {
+  .text--#{$size-key} {
+    @include font-size($size-key);
+  }
+}
+
+//-------------------------------
 // COLORS
 //-------------------------------
 $colors: (
   "neutral": (
     "white": #FFF,
     "black": #000,
+    "transparent": transparent,
   ),
   "blue": (
     "lighter": lighten(#1d40b0, 40%),
@@ -86,7 +117,7 @@ $colors: (
     "light": #32cd32,
     "base": #008000,
     "dark": #006400,
-    "darker": #004f00,
+    "darker": #002800,
   ),
 );
 
@@ -154,6 +185,38 @@ $directions: (
 }
 
 //-------------------------------
+// BREAKPOINTS
+//-------------------------------
+$breakpoints: (
+  "mobile": 320px,
+  "tablet": 640px,
+  "desktop": 960px,
+  "desktop-large": 1280px,
+  "desktop-xlarge": 1440px,
+  "desktop-2xlarge": 1600px
+);
+
+@mixin media($breakpoint) {
+  $breakpoint-value: map-get($breakpoints, $breakpoint);
+  @if $breakpoint-value {
+    @media (min-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+  }
+}
+
+@mixin width($breakpoint) {
+  $width-value: map-get($breakpoints, $breakpoint);
+  @if $width-value {
+    width: $width-value;
+  } @else {
+    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+  }
+}
+
+//-------------------------------
 // HTML & BODY
 //-------------------------------
 html,
@@ -180,8 +243,12 @@ p {
   font-weight: normal;
 }
 
+a:hover {
+  text-decoration: underline;
+}
+
 //-------------------------------
-// BUTTONS = Variant (Styles)
+// BUTTONS = Styles
 //-------------------------------
 %button {
   border: 0;
@@ -197,13 +264,176 @@ p {
     @include color('blue', 'dark', 'background-color');
   }
 }
+.button--primary--outline {
+  @extend %button;
+  border: 1px solid;
+  @include color('blue', 'dark', 'border-color');
+  @include color('neutral', 'transparent', 'background-color');
+  @include color('neutral', 'white', 'color');
+  &:hover {
+    @include color('blue', 'dark', 'background-color');
+  }
+}
 
 //-------------------------------
-// BUTTONS = Sizes (Styles)
+// BUTTONS = Sizes 
 //-------------------------------
 .button--medium {
   @include spacing('padding', 'medium'); 
 }
+
+//-------------------------------
+// DISPLAY
+//-------------------------------
+.display--inline-block {
+  display: inline-block;
+}
+.display--flex {
+  display: flex;
+}
+.display--block {
+  display: block;
+}
+
+//-------------------------------
+// FLEXBOX STUFF
+//-------------------------------
+.justify--start {
+  justify-content: start;
+}
+.justify--between {
+  justify-content: between;
+}
+.justify--end {
+  justify-content: end;
+}
+.items--start {
+  align-items: start;
+}
+.items--center {
+  align-items: center;
+}
+.items--end {
+  align-items: end;
+}
+
+//-------------------------------
+// LAYOUT
+//-------------------------------
+.container {
+  @include width(tablet);
+  margin: 0 auto;
+}
+
+//-------------------------------
+// SECTION = Header
+//-------------------------------
+.section--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid;
+  @include color('blue', 'dark', 'border-color');
+  @include spacing('padding', 'medium');
+  @include spacing('margin-bottom', 'xlarge');
+}
+.section--header__left {
+  display: flex;
+  align-items: center;
+
+  .section--header__logo {
+    width: 100px;
+    height: auto;
+    @include spacing('margin-right', 'small');
+  }
+}
+.section--header__right {
+  display: flex;
+  align-items: center;
+  @include spacing('gap', 'small');
+
+  .section--header__verify {
+    display: flex;
+    align-items: center;
+    border-radius: 100px;
+    @include font-size('small');
+    @include spacing('padding-left', 'medium');
+    @include spacing('padding-right', 'medium');
+    @include spacing('padding-top', 'small');
+    @include spacing('padding-bottom', 'small');
+    @include color('green', 'lighter', 'color');
+    @include color('green', 'darker', 'background-color');
+  }
+}
+//-------------------------------
+// SECTION = Login Options
+//-------------------------------
+.section--login {
+  width: 60%;
+  margin: 0 auto;
+} 
+.section--login__common {
+  @include spacing('margin-bottom', 'medium')
+}
+.section--login__advanced {
+  border-radius: 12px;
+  border: 1px solid;
+  @include color('blue', 'dark', 'border-color');
+  @include spacing('padding', 'large');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //-------------------------------
 // UTILITY = Cursors
@@ -219,6 +449,64 @@ p {
 .cursor-inherit {
   cursor: inherit;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //-------------------------------
 // UTILITY = Font Colors
@@ -463,21 +751,6 @@ i-feather[name='check-circle'] {
   width: 90px !important;
 }
 
-.home-container {
-  max-width: 515px;
-  padding-bottom: 50px;
-}
-
-.page-container {
-  max-width: 610px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0px 10px 50px 10px;
-}
-
-.home-logo {
-  height: 35px;
-}
 
 .identity-banner {
   background-color: white;
