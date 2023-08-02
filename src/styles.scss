@@ -1,5 +1,5 @@
 //-------------------------------
-// COLOR VARIABLES
+// OLD VARIABLES // REMOVE LATER
 //-------------------------------
 
 $primary: #0059f7;
@@ -56,7 +56,7 @@ $font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
 // FONTS = Sizes
 //-------------------------------
 $font-sizes: (
-  "xs": 12px,
+  "xsmall": 12px,
   "small": 14px,
   "medium": 16px,
   "large": 22px,
@@ -75,10 +75,36 @@ $font-sizes: (
   }
 }
 
-// Generate classes
 @each $size-key, $size-value in $font-sizes {
   .text--#{$size-key} {
     @include font-size($size-key);
+  }
+}
+
+
+//-------------------------------
+// FONTS = Weights
+//-------------------------------
+$font-weights: (
+  "light": 200,
+  "regular": 400,
+  "medium": 500,
+  "semibold": 600,
+  "bold": 800,
+);
+
+@mixin font-weight($weight-key) {
+  $weight-value: map-get($font-weights, $weight-key);
+  @if $weight-value {
+    font-weight: $weight-value;
+  } @else {
+    @warn "No weight key '#{$weight-key}' found in font weights map.";
+  }
+}
+
+@each $weight-key, $weight-value in $font-weights {
+  .text--#{$weight-key} {
+    @include font-weight($weight-key);
   }
 }
 
@@ -154,6 +180,7 @@ $spacing-units: (
   "xsmall": 4px, 
   "small": 8px,
   "medium": 16px,
+  "base": 24px,
   "large": 32px,
   "xlarge": 64px,
   "2xlarge": 128px,
@@ -247,6 +274,12 @@ a:hover {
   text-decoration: underline;
 }
 
+ul {
+  list-style-type: none;
+  @include spacing('margin', 'none');
+  @include spacing('padding', 'none');
+}
+
 //-------------------------------
 // BUTTONS = Styles
 //-------------------------------
@@ -302,7 +335,7 @@ a:hover {
   justify-content: start;
 }
 .justify--between {
-  justify-content: between;
+  justify-content: space-between;
 }
 .justify--end {
   justify-content: end;
@@ -376,141 +409,83 @@ a:hover {
   @include spacing('margin-bottom', 'medium')
 }
 .section--login__advanced {
-  border-radius: 12px;
+  border-radius: 20px;
   border: 1px solid;
   @include color('blue', 'dark', 'border-color');
   @include spacing('padding', 'large');
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //-------------------------------
-// UTILITY = Cursors
+// SECTION = Logged-In Accounts
 //-------------------------------
-.cursor-pointer {
-  cursor: pointer;
+.section--accounts {
+  width: 100%;
+  border-radius: 20px;
+  text-align: left;
+  @include color('neutral', 'white', 'background-color');
+  @include spacing('padding', 'medium');
+  @include spacing('margin-bottom', 'medium');
+}
+.section--accounts__header {
+  text-align: center;
+  @include color('neutral', 'black', 'color');
+  @include font-weight('semibold');
+}
+.section--accounts__list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.section--accounts__item {
+  width: 100%;
+  border: 1px solid;
+  border-radius: 100px;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+  @include spacing('padding-left', 'small');
+  @include spacing('padding-right', 'medium');
+  @include spacing('padding-top', 'small');
+  @include spacing('padding-bottom', 'small');
+  @include color('neutral', 'black', 'color');
+  @include font-weight('semibold');
+
+  &:hover {
+    @include color('blue', 'lighter', 'border-color');
+    cursor: pointer;
+  }
+}
+//-------------------------------
+// AVATARS = Shapes
+//-------------------------------
+.avatar--rounded {
+  border-radius: 100%;
+}
+.avatar--medium {
+  @include spacing('width', 'medium');
+  @include spacing('height', 'medium');
+}
+.avatar--large {
+  @include spacing('width', 'large');
+  @include spacing('height', 'large');
+}
+.avatar--xlarge {
+  @include spacing('width', 'xlarge');
+  @include spacing('height', 'xlarge');
 }
 
-.cursor-auto {
-  cursor: auto;
-}
-
-.cursor-inherit {
-  cursor: inherit;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //-------------------------------
-// UTILITY = Font Colors
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
+// OLD CSS BELOW // REMOVE LATER
 //-------------------------------
+
 .fc-title {
   color: $title-font-color;
 }

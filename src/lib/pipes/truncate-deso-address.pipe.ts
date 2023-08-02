@@ -9,8 +9,8 @@ export class TruncateAddressOrUsernamePipe implements PipeTransform {
     if (key.length <= 12) {
       return key;
     }
-    return `${key.substring(0, 7)}....${key.substring(
-      key.length - 4,
+    return `${key.substring(0, 7)}...${key.substring(
+      key.length - 8,
       key.length
     )}`;
   }

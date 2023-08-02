@@ -1,42 +1,37 @@
-<div class="d-flex flex-column" *ngIf="hasUsers">
-  <ul class="list-group mt-7px mb-30px saved-seeds-list">
-    <span class="saved-seeds-header d-flex align-items-center"
-      ><span>{{componentTitle}}</span></span
+<div class="section--accounts" *ngIf="hasUsers">
+  <div class="section--accounts__header margin-bottom--medium">
+    {{componentTitle}}
+  </div>
+  <ul class="section--accounts__list margin-bottom--small">
+    <li
+      *ngFor="let item of allUsers | async | keyvalue; let i = index"
+      class="section--accounts__item"
+      (click)="onAccountSelect.emit(item.key)"
+      data-control-name="account-select-item"
     >
-    <div class="saved-seeds-scroll">
-      <li
-        *ngFor="let item of allUsers | async | keyvalue; let i = index"
-        class="list-group-item list-group-item-action cursor-pointer saved-seed"
-        (click)="onAccountSelect.emit(item.key)"
-        data-control-name="account-select-item"
-      >
-        <div class="w-100 d-flex justify-content-between">
-          <div *ngIf="!item.value.username" class="text-left">
-            <div class="my-1">
-              <img
-                class="avatar mr-15px"
-                src="assets/placeholder-account-image.png"
-              />
-              {{ item.key | truncateAddressOrUsername }}
-            </div>
-          </div>
-          <div *ngIf="item.value.username" class="d-flex align-items-center">
-            <div class="avatar mr-15px" [appAvatar]="item.key"></div>
-            <div>{{ item.value.username | truncateAddressOrUsername }}</div>
-          </div>
+      <div>
+        <div *ngIf="!item.value.username">
           <img
-            *ngIf="!hideLoginMethod"
-            [src]="
-              getLoginIcon(
-                accountService.getLoginMethodWithPublicKeyBase58Check(item.key)
-              )
-            "
-            height="32px"
-            width="32px"
-            class="mr-10px"
+            class="avatar--rounded avatar--large margin-right--xsmall"
+            src="assets/placeholder-account-image.png"
           />
+          {{ item.key | truncateAddressOrUsername }}
         </div>
-      </li>
-    </div>
+        <div *ngIf="item.value.username" class="d-flex align-items-center">
+          <div [appAvatar]="item.key"></div>
+          <div>{{ item.value.username | truncateAddressOrUsername }}</div>
+        </div>        
+      </div>
+      <img
+        *ngIf="!hideLoginMethod"
+        [src]="
+          getLoginIcon(
+            accountService.getLoginMethodWithPublicKeyBase58Check(item.key)
+          )
+        "
+        width="22px"
+        height="auto"
+      />
+    </li>
   </ul>
 </div>
