@@ -13,7 +13,6 @@ $blue: #007bff;
 $light-blue: #e5f2ff;
 $input-background: #f7f7fc;
 
-// Font colors.
 $light-font-color: #8d8f8f;
 $normal-font-color: #626480;
 $title-font-color: #0e0e23;
@@ -21,27 +20,14 @@ $banner-font-color: #292941;
 $red-font-color: #ff3434;
 $green-font-color: #19b028;
 
-@font-face {
-  font-family: 'Eina01';
-  src: url('./assets/fonts/Eina01-Bold.ttf') format('truetype');
-  font-weight: bold;
-}
-
-@font-face {
-  font-family: 'Eina01';
-  src: url('./assets/fonts/Eina01-SemiBold.ttf') format('truetype');
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: 'Eina01';
-  src: url('./assets/fonts/Eina01-Regular.ttf') format('truetype');
-  font-weight: normal;
-}
+//-------------------------------
+// FONTS
+//-------------------------------
+$font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
 html,
 body {
-  font-family: Eina01, Arial, SansSerif;
+  font-family: $font-primary;
   height: 100%;
   width: 100%;
 }
@@ -57,7 +43,7 @@ h5,
 h6,
 p {
   margin: 0;
-  font-family: Eina01, Arial, SansSerif;
+  font-family: $font-primary;
   font-weight: normal;
 }
 
