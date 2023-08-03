@@ -76,11 +76,10 @@ $font-sizes: (
 }
 
 @each $size-key, $size-value in $font-sizes {
-  .text--#{$size-key} {
+  .font-size--#{$size-key} {
     @include font-size($size-key);
   }
 }
-
 
 //-------------------------------
 // FONTS = Weights
@@ -103,7 +102,7 @@ $font-weights: (
 }
 
 @each $weight-key, $weight-value in $font-weights {
-  .text--#{$weight-key} {
+  .font-weight--#{$weight-key} {
     @include font-weight($weight-key);
   }
 }
@@ -112,6 +111,10 @@ $font-weights: (
 // COLORS
 //-------------------------------
 $colors: (
+  "text": (
+    "lighter": #93c5fdcc,
+    "base": #93c5fd99
+  ),
   "neutral": (
     "white": #FFF,
     "black": #000,
@@ -121,15 +124,15 @@ $colors: (
     "lighter": lighten(#1d40b0, 40%),
     "light": lighten(#1d40b0, 20%),
     "base": #1d40b0,
-    "dark": darken(#1d40b0, 20%),
-    "darker": darken(#1d40b0, 40%),
+    "dark": #1b3561,
+    "darker": #0b183a,
   ),
   "red": (
-    "lighter": #faa7a1,
+    "lighter": #ffc2be,
     "light": #e84a49,
     "base": #c03230,
     "dark": #8a1c1b,
-    "darker": #460a09,
+    "darker": #460a0997,
   ),
   "yellow": (
     "lighter": #ffffe0,
@@ -176,7 +179,7 @@ $colors: (
 // SPACING UNITS
 //-------------------------------
 $spacing-units: (
-  "none": 0px,
+  "none": 0,
   "xsmall": 4px, 
   "small": 8px,
   "medium": 16px,
@@ -244,6 +247,34 @@ $breakpoints: (
 }
 
 //-------------------------------
+// BORDER RADIUS = Sizes
+//-------------------------------
+$border-radius: (
+  "xsmall": 4px,
+  "small": 8px,
+  "medium": 12px,
+  "base": 20px,
+  "pill": 100px,
+  "circle": 100%,
+);
+
+@mixin border-radius($size-key) {
+  $size-value: map-get($border-radius, $size-key);
+  @if $size-value {
+    border-radius: $size-value;
+  } @else {
+    @warn "No size key '#{$size-key}' found in border radius map.";
+  }
+}
+
+@each $size-key, $size-value in $border-radius {
+  .border-radius--#{$size-key} {
+    @include border-radius($size-key);
+  }
+}
+
+
+//-------------------------------
 // HTML & BODY
 //-------------------------------
 html,
@@ -251,9 +282,9 @@ body {
   font-family: $font-primary;
   height: 100%;
   width: 100%;
-  color: #93c5fd99;
   background-color: #040609;
   background-image: linear-gradient(0deg,#040609,#040609 10%,#050e1d 90%,#050e1d);
+  @include color('text', 'base', 'color');
 }
 
 //-------------------------------
@@ -270,23 +301,41 @@ p {
   font-weight: normal;
 }
 
-a:hover {
-  text-decoration: underline;
-}
-
 ul {
   list-style-type: none;
   @include spacing('margin', 'none');
   @include spacing('padding', 'none');
 }
 
+
+//-------------------------------
+// LINKS = Styles
+//-------------------------------
+a, a.link--primary {
+  @include color('text', 'lighter', 'color');
+  text-decoration: underline;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.link--secondary {
+  @include color('blue', 'light', 'color');
+  text-decoration: underline;
+  &:hover {
+    @include color('blue', 'base', 'color');
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
 //-------------------------------
 // BUTTONS = Styles
 //-------------------------------
 %button {
   border: 0;
-  border-radius: 100px;
   width: 100%;
+  @include border-radius('pill');
 }
 
 .button--primary {
@@ -294,7 +343,7 @@ ul {
   @include color('blue', 'base', 'background-color');
   @include color('neutral', 'white', 'color');
   &:hover {
-    @include color('blue', 'dark', 'background-color');
+    @include color('blue', 'darker', 'background-color');
   }
 }
 .button--primary--outline {
@@ -302,15 +351,52 @@ ul {
   border: 1px solid;
   @include color('blue', 'dark', 'border-color');
   @include color('neutral', 'transparent', 'background-color');
+  @include color('text', 'lighter', 'color');
+  &:hover {
+    @include color('blue', 'darker', 'background-color');
+  }
+}
+
+.button--secondary {
+  @extend %button;
+  @include color('blue', 'darker', 'background-color');
   @include color('neutral', 'white', 'color');
   &:hover {
-    @include color('blue', 'dark', 'background-color');
+    @include color('blue', 'base', 'background-color');
+  }
+}
+.button--secondary--outline {
+  @extend %button;
+  border: 1px solid;
+  @include color('blue', 'darker', 'border-color');
+  @include color('neutral', 'transparent', 'background-color');
+  @include color('blue', 'darker', 'color');
+  &:hover {
+    @include color('blue', 'darker', 'background-color');
+    @include color('neutral', 'white', 'color');
+  }
+}
+.button--disabled {
+  @extend %button;
+  @include color('blue', 'dark', 'background-color');
+  @include color('blue', 'lighter', 'color');
+  opacity: 0.4;
+  &:hover {
+    @include color('blue', 'base', 'background-color');
+    cursor: not-allowed;
   }
 }
 
 //-------------------------------
 // BUTTONS = Sizes 
 //-------------------------------
+.button--small {
+  @include font-size('small');
+  @include spacing('padding-top', 'small'); 
+  @include spacing('padding-bottom', 'small'); 
+  @include spacing('padding-left', 'medium'); 
+  @include spacing('padding-right', 'medium'); 
+}
 .button--medium {
   @include spacing('padding', 'medium'); 
 }
@@ -375,7 +461,7 @@ ul {
   align-items: center;
 
   .section--header__logo {
-    width: 100px;
+    width: 80px;
     height: auto;
     @include spacing('margin-right', 'small');
   }
@@ -388,7 +474,7 @@ ul {
   .section--header__verify {
     display: flex;
     align-items: center;
-    border-radius: 100px;
+    @include border-radius('pill');
     @include font-size('small');
     @include spacing('padding-left', 'medium');
     @include spacing('padding-right', 'medium');
@@ -402,64 +488,126 @@ ul {
 // SECTION = Login Options
 //-------------------------------
 .section--login {
-  width: 60%;
+  width: 100%;
   margin: 0 auto;
 } 
 .section--login__common {
   @include spacing('margin-bottom', 'medium')
 }
 .section--login__advanced {
-  border-radius: 20px;
-  border: 1px solid;
   @include color('blue', 'dark', 'border-color');
-  @include spacing('padding', 'large');
 }
 //-------------------------------
 // SECTION = Logged-In Accounts
 //-------------------------------
 .section--accounts {
   width: 100%;
-  border-radius: 20px;
   text-align: left;
-  @include color('neutral', 'white', 'background-color');
-  @include spacing('padding', 'medium');
-  @include spacing('margin-bottom', 'medium');
+  @include border-radius('base');
+}
+.section--accounts__illustration {
+  margin-bottom: 30px;
+  position: relative;
+  margin-top: -70px;
 }
 .section--accounts__header {
   text-align: center;
-  @include color('neutral', 'black', 'color');
-  @include font-weight('semibold');
+  @include font-weight('base');
+  @include font-size('small');
+}
+.section--accounts__icon {
+  height: 22px;
 }
 .section--accounts__list {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 245px;
+  overflow: scroll;
+  border: 1px solid;
+  @include spacing('padding', 'medium');
+  @include spacing('padding-top', 'small');
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
 }
 .section--accounts__item {
   width: 100%;
   border: 1px solid;
-  border-radius: 100px;
   justify-content: space-between;
   display: flex;
   align-items: center;
+  @include border-radius('pill');
   @include spacing('padding-left', 'small');
   @include spacing('padding-right', 'medium');
   @include spacing('padding-top', 'small');
   @include spacing('padding-bottom', 'small');
-  @include color('neutral', 'black', 'color');
-  @include font-weight('semibold');
+  @include spacing('margin-top', 'small');
+  @include color('text', 'lighter', 'color');
+  @include color('blue', 'darker', 'background-color');
+  @include color('blue', 'dark', 'border-color');
+  @include font-weight('medium');
+  @include font-size('small');
 
   &:hover {
-    @include color('blue', 'lighter', 'border-color');
+    @include color('blue', 'light', 'border-color');
     cursor: pointer;
   }
+}
+//-------------------------------
+// SECTION = Create Seed
+//-------------------------------
+.section--seed {
+  text-align: center;
+}
+.section--seed__container {
+  background: $input-background;
+  color: $normal-font-color;
+  width: 100%;
+  height: 100%;
+  @include border-radius('base');
+  @include font-size('medium');
+  @include spacing('padding', 'large');
+}
+.section--seed__phrase {
+  text-align: left;
+  @include font-size('medium');
+  @include spacing('line-height', 'large');
+  @include spacing('word-spacing', 'large');
+}
+.section--seed__actions {
+  display: flex;
+  align-items: center;
+  @include spacing('gap', 'small');
+}
+.section--seed__advanced {
+  border-top: 1px solid;
+  @include spacing('margin-top', 'large');
+  @include spacing('padding-top', 'large');
+  @include color('blue', 'dark', 'border-top-color')
+}
+//-------------------------------
+// FORMS = Input
+//-------------------------------
+.input--textarea {
+  width: 100%;
+  border: 1px solid;
+  @include border-radius('small');
+  @include font-size('medium');
+  @include spacing('padding', 'medium');
+  @include color('blue', 'dark', 'border-color');
+}
+.input--seed {
+  &::placeholder {
+    @include spacing('word-spacing', 'none');  
+  }
+  @include spacing('word-spacing', 'medium');
 }
 //-------------------------------
 // AVATARS = Shapes
 //-------------------------------
 .avatar--rounded {
-  border-radius: 100%;
+  @include border-radius('circle');
 }
 .avatar--medium {
   @include spacing('width', 'medium');
@@ -473,6 +621,60 @@ ul {
   @include spacing('width', 'xlarge');
   @include spacing('height', 'xlarge');
 }
+//-------------------------------
+// TEXT = Styles
+//-------------------------------
+.text--divider {
+  width: 100%;
+  position: relative;
+  &:after, &:before {
+    content: '';
+    border-bottom: 1px solid;
+    width: 45%;
+    height: 1px;
+    top: 12px;
+    position: absolute;
+    @include color('blue', 'dark', 'border-color');
+  }
+  &:after {
+    content: '';
+    left: 0;
+  }
+  &:before {
+    content: '';
+    right: 0;
+  }
+}
+//-------------------------------
+// TEXT = Alignment
+//-------------------------------
+.text--left {
+  text-align: left;
+}
+.text--right {
+  text-align: right;
+}
+.text--center {
+  text-align: center;
+}
+//-------------------------------
+// WARNING = ALERT BANNERS
+//-------------------------------
+.warning--error {
+  text-align: center;
+  @include border-radius('base');
+  @include font-size('small');
+  @include spacing('padding', 'small');
+  @include color('red', 'darker', 'background-color');  
+  @include color('red', 'lighter', 'color');  
+}
+//-------------------------------
+// IMAGES = FILTERS
+//-------------------------------
+.image--invert {
+  filter: invert(1);
+}
+
 
 //-------------------------------
 // OLD CSS BELOW // REMOVE LATER

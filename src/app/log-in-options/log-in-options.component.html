@@ -1,40 +1,38 @@
 <div class="section--login">
+  <div class="section--login__advanced">
+    <button
+      data-control-name="log-in-cta"
+      data-control-login-option="sign-up-with-deso-seed"
+      class="button--primary button--medium margin-bottom--medium"
+      [routerLink]="['/sign-up']"
+      queryParamsHandling="merge"
+    >
+      <img src="assets/logo-deso-mark.svg" class="margin-right--small" height="26px" />
+      Sign up with DeSo Seed
+    </button>
+  </div>
   <div class="section--login__common">
     <button
       data-control-name="log-in-cta"
+      data-control-login-option="google"
+      class="button--primary--outline button--medium margin-bottom--medium"
+      (click)="launchGoogle()"
+      *ngIf="!globalVars.hideGoogle"
+    >
+      <img src="assets/google_logo.svg" class="margin-right--small" width="26px" height="26px" />
+      Sign up / Log in with Google
+    </button>
+    <button
+      data-control-name="log-in-cta"
       data-control-login-option="metamask"
-      class="button--primary button--medium margin-bottom--medium"
+      class="button--primary--outline button--medium margin-bottom--medium"
       (click)="navigateToMetamaskSignup()"
       queryParamsHandling="merge"
       *ngIf="globalVars.showMetamask()"
     >
-      <img src="assets/metamask.png" width="32px" class="mr-10px" />
+      <img src="assets/metamask.png" class="margin-right--small" width="26px" height="26px" />
       Sign up / Log in with MetaMask
-    </button>
-    <button
-      data-control-name="log-in-cta"
-      data-control-login-option="google"
-      class="button--primary button--medium margin-bottom--medium"
-      (click)="launchGoogle()"
-      *ngIf="!globalVars.hideGoogle"
-    >
-      <img src="assets/google_logo.svg" width="32px" />
-      Sign up / Log in with Google
-    </button>
-  </div>
-  <div class="section--login__advanced">
-    <div class="margin-bottom--medium">
-      For advanced users only:
-    </div>
-    <button
-      data-control-name="log-in-cta"
-      data-control-login-option="sign-up-with-deso-seed"
-      class="button--primary--outline button--medium margin-bottom--medium"
-      [routerLink]="['/sign-up']"
-      queryParamsHandling="merge"
-    >
-      Sign up with DeSo seed
-    </button>
+    </button>   
     <a
       data-control-name="log-in-cta"
       data-control-login-option="log-in-with-deso-seed"

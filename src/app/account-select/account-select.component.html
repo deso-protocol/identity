@@ -1,5 +1,5 @@
 <div class="section--accounts" *ngIf="hasUsers">
-  <div class="section--accounts__header margin-bottom--medium">
+  <div class="section--accounts__header margin-bottom--small">
     {{componentTitle}}
   </div>
   <ul class="section--accounts__list margin-bottom--small">
@@ -17,7 +17,7 @@
           />
           {{ item.key | truncateAddressOrUsername }}
         </div>
-        <div *ngIf="item.value.username" class="d-flex align-items-center">
+        <div *ngIf="item.value.username" class="display-flex align-items-center">
           <div [appAvatar]="item.key"></div>
           <div>{{ item.value.username | truncateAddressOrUsername }}</div>
         </div>        
@@ -29,8 +29,7 @@
             accountService.getLoginMethodWithPublicKeyBase58Check(item.key)
           )
         "
-        width="22px"
-        height="auto"
+        class="section--accounts__icon"
       />
     </li>
   </ul>

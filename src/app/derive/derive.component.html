@@ -7,6 +7,7 @@
   class="container text-center"
 >
   <div>
+    <img src="assets/image-head.svg" width="60" class="section--accounts__illustration"/>
     <h3 class="text--neutral-white text--large margin-bottom--base">
       Grant signing access
       <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
@@ -16,7 +17,7 @@
         [allUsers]="allUsers"
         (onAccountSelect)="this.onAccountSelected($event)"
       ></app-account-select>
-      <div class="margin-bottom--medium">or</div>
+      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
       <app-log-in-options></app-log-in-options>
     </ng-container>
     <div
@@ -24,7 +25,7 @@
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
       *ngIf="publicKeyBase58Check"
     >
-      <div class="pl-20px text-left d-flex justify-content-between">
+      <div class="text-left display-flex justify-content-between">
         Public Key
         <span class="font-weight-normal pr-20px pb-15px text-left">{{
           publicKeyBase58Check | truncateAddressOrUsername
