@@ -1,52 +1,49 @@
 <app-banner></app-banner>
 
 <div
-  class="page-container"
+  class="container"
   *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
 >
   <!-- Step 3 -->
   <!-- Get Starter $DESO. -->
   <div *ngIf="stepScreen === GetDesoComponent.STEP_GET_STARTER_DESO">
-    <div class="w-100 text-center fs-32px font-weight-bold">
-      Get Starter $DESO
+    <div class="section--starter text--center margin-bottom--large">
+      <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
+      <h3 class="text--neutral-white">Get starter $DESO</h3>
     </div>
-    <div class="w-100 text-center mt-20px fs-20px font-weight-bold">
-      Enter your phone number or buy your first $DESO.
-    </div>
-    <div class="w-100 d-flex align-items-center flex-column">
-      <div
-        style="max-width: 500px"
-        class="w-100 text-center fs-18px mt-5px mb-30px text-muted fc-secondary"
-      >
-        This is the cryptocurrency that fuels the DeSo blockchain and allows you
-        to post to the decentralized social network.
+    <div class="margin-bottom--large text--center">      
+      <div class="section--starter__option">
+        <div class="font-size--small margin-bottom--medium">
+          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+            1. Get DESO for free by verifying your phone number
+          </h6>
+          <p>We'll send you a small amount of $DESO that will last<br/>you up to thousands of on-chain transactions.</p>
+        </div>
+        <button
+          (click)="stepThreeNextPhone()"
+          class="button--primary button--medium"
+          data-control-name="get-deso-button"
+          data-control-get-deso-option="phone"
+        >
+          Get $DESO with Phone Number
+        </button>
       </div>
-      <div
-        class="w-100 text-center fs-18px mt-20px mb-10px font-weight-bold mb-10px"
-      >
-        Choose an option
-      </div>
-      <button
-        (click)="stepThreeNextPhone()"
-        [ngStyle]="{ width: '40%', 'min-width': '300px' }"
-        class="styled-primary-button mb-10px"
-        data-control-name="get-deso-button"
-        data-control-get-deso-option="phone"
-      >
-        Get $DESO with Phone Number
-      </button>
-      <div class="fs-16px fc-muted">Get $DESO for free</div>
-      <button
-        (click)="stepThreeNextBuy()"
-        [ngStyle]="{ width: '40%', 'min-width': '300px' }"
-        class="styled-secondary-button mt-30px mb-10px"
-        data-control-name="get-deso-button"
-        data-control-get-deso-option="anon"
-      >
-        Buy or Send $DESO Anonymously
-      </button>
-      <div class="fs-16px fc-muted">
-        Transfer from an exchange or a DeSo account
+      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
+      <div class="section--starter__option">
+        <div class="font-size--small margin-bottom--medium">
+          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+            2. Buy DESO anonymously, in under 10 seconds!
+          </h6>
+          <p>Get DESO directly via HeroSwap, anonymously and instantly<br/>using BTC, ETH, SOL, USDT, USDC and more.
+        </div>
+        <button
+          (click)="stepThreeNextBuy()"
+          class="button--secondary button--medium"
+          data-control-name="get-deso-button"
+          data-control-get-deso-option="anon"
+        >
+          Buy or Send $DESO Anonymously
+        </button>
       </div>
       <button
         *ngIf="this.globalVars.showSkip"

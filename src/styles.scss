@@ -112,6 +112,7 @@ $font-weights: (
 //-------------------------------
 $colors: (
   "text": (
+    "lightest": #ccdff3fb,
     "lighter": #93c5fdcc,
     "base": #93c5fd99
   ),
@@ -311,7 +312,7 @@ ul {
 //-------------------------------
 // LINKS = Styles
 //-------------------------------
-a, a.link--primary {
+a, .link--primary {
   @include color('text', 'lighter', 'color');
   text-decoration: underline;
   &:hover {
@@ -337,7 +338,14 @@ a, a.link--primary {
   width: 100%;
   @include border-radius('pill');
 }
-
+.button--link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
+  }
+}
 .button--primary {
   @extend %button;
   @include color('blue', 'base', 'background-color');
@@ -506,7 +514,7 @@ a, a.link--primary {
   @include border-radius('base');
 }
 .section--accounts__illustration {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   position: relative;
   margin-top: -70px;
 }
@@ -555,7 +563,7 @@ a, a.link--primary {
   }
 }
 //-------------------------------
-// SECTION = Create Seed
+// SECTION = Create Seed Phrase
 //-------------------------------
 .section--seed {
   text-align: center;
@@ -585,6 +593,43 @@ a, a.link--primary {
   @include spacing('margin-top', 'large');
   @include spacing('padding-top', 'large');
   @include color('blue', 'dark', 'border-top-color')
+}
+//-------------------------------
+// SECTION = Get Starter DeSo
+//-------------------------------
+.section--starter {
+  text-align: center;
+}
+.section--starter__option {
+  border: 1px solid;
+  @include spacing('padding', 'large');
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
+}
+//-------------------------------
+// SECTION = Phone Page
+//-------------------------------
+.section--phone {
+  text-align: center;
+}
+.section--phone__option {
+  @include spacing('padding', 'large');
+  @include color('neutral', 'black', 'color');
+  @include color('neutral', 'white', 'background-color');
+  @include border-radius('base');
+}
+//-------------------------------
+// SECTION = Login Page
+//-------------------------------
+.section--login {
+  text-align: center;
+}
+.section--login__option {
+  border: 1px solid;
+  @include spacing('padding', 'large');
+  @include color('neutral', 'black', 'color');
+  @include color('neutral', 'white', 'background-color');
+  @include border-radius('base');
 }
 //-------------------------------
 // FORMS = Input
@@ -634,7 +679,7 @@ a, a.link--primary {
     height: 1px;
     top: 12px;
     position: absolute;
-    @include color('blue', 'dark', 'border-color');
+    @include color('blue', 'darker', 'border-color');
   }
   &:after {
     content: '';

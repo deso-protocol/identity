@@ -15,6 +15,7 @@
     </button>
   </div>
 </ng-template>
+
 <div class="page-container" *ngIf="loading">
   <div class="google-wrapper">
     <div class="google-ball blue"></div>
@@ -23,6 +24,7 @@
     <div class="google-ball green"></div>
   </div>
 </div>
+
 <div class="page-container" *ngIf="!loading && !user">
   <div class="fs-18px mb-5px">
     We were unable to locate a user associated with the public key provided.
@@ -48,7 +50,7 @@
   <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
 </div>
 <div
-  class="page-container"
+  class="container"
   *ngIf="
     (globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI) &&
     !loading &&
@@ -62,84 +64,88 @@
       SignUpGetStarterDESOComponent.CREATE_PHONE_NUMBER_VERIFICATION_SCREEN
     "
   >
-    <div class="w-100 text-center mb-20px fs-20px font-weight-bold">
-      Get Starter $DESO with Phone Number
+    <div class="section--phone text--center margin-bottom--large">
+      <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
+      <h3 class="text--neutral-white">Get free $DESO with a phone number</h3>
+      <p class="font-size--small margin-top--small">We'll send you a small amount of $DESO that will last<br/>you up to thousands of on-chain transactions.</p>
     </div>
-    <div class="fs-18px">
-      Enter your phone number for free $DESO. Your phone number will never be
-      shared with anyone. We only check it to prevent spam.
+    <div class="section--phone__option margin-bottom--medium">
+      <p class="margin-bottom--medium">
+        <span class="font-weight--semibold">Enter your phone number for free $DESO.</span> Your phone number will never be
+        shared with anyone. We only check it to prevent spam.
+      </p>
+
+      <form #f="ngForm" [formGroup]="phoneForm">
+        <input
+          #phoneNumberInput
+          type="tel"
+          class="form-control sign-up__phone-input"
+          maxlength="15"
+          name="phone"
+          formControlName="phone"
+          (blur)="this.checkIsValidPhoneNumber()"
+          (ngModelChange)="this.onPhoneNumberInputChanged()"
+        />
+
+        <div class="fc-red fs-15px">
+          <div
+            *ngIf="f.form.value.phone && f.form.controls.phone.invalid"
+            class="margin-top--small font-size--small"
+          >
+            Please enter a valid phone number
+          </div>
+
+          <div
+            *ngIf="
+              sendPhoneNumberVerificationTextServerErrors.phoneNumberAlreadyInUse
+            "
+            class="margin-top--small font-size--small"
+          >
+            This phone number is being used by another account. Please use a
+            different phone number or sign into your other account.
+          </div>
+
+          <div
+            *ngIf="
+              sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached
+            "
+            class="margin-top--small font-size--small"
+          >
+            You've requested too many verification codes. Please wait 10 minutes
+            and try again.
+          </div>
+
+          <div
+            *ngIf="
+              sendPhoneNumberVerificationTextServerErrors.voipNumberNotAllowed
+            "
+            class="margin-top--small font-size--small"
+          >
+            This phone number is a VOIP number, which isn't allowed (to prevent
+            spam). Please try again with a different phone number.
+          </div>
+
+          <div
+            *ngIf="
+              sendPhoneNumberVerificationTextServerErrors.chineseNumberNotAllowed
+            "
+            class="margin-top--small font-size--small"
+          >
+            Currently we can't send text messages to China. If you have a
+            non-Chinese number, please try that. If not, click "skip" below. You
+            can still use the site by buying DeSo.
+          </div>
+          <div
+            *ngIf="sendPhoneNumberVerificationTextServerErrors.unknownError"
+            class="margin-top--small font-size--small"
+          >
+            {{ sendPhoneNumberVerificationTextServerErrors.unknownError }}
+          </div>
+        </div>
+      </form>
     </div>
 
-    <form #f="ngForm" [formGroup]="phoneForm" class="form-group mt-15px">
-      <input
-        #phoneNumberInput
-        type="tel"
-        class="form-control sign-up__phone-input"
-        maxlength="15"
-        name="phone"
-        formControlName="phone"
-        (blur)="this.checkIsValidPhoneNumber()"
-        (ngModelChange)="this.onPhoneNumberInputChanged()"
-      />
-
-      <div class="fc-red fs-15px">
-        <div
-          *ngIf="f.form.value.phone && f.form.controls.phone.invalid"
-          class="mt-10px"
-        >
-          Please enter a valid phone number
-        </div>
-
-        <div
-          *ngIf="
-            sendPhoneNumberVerificationTextServerErrors.phoneNumberAlreadyInUse
-          "
-          class="mt-10px"
-        >
-          This phone number is being used by another account. Please use a
-          different phone number or sign into your other account.
-        </div>
-
-        <div
-          *ngIf="
-            sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached
-          "
-          class="mt-10px"
-        >
-          You've requested too many verification codes. Please wait 10 minutes
-          and try again.
-        </div>
-
-        <div
-          *ngIf="
-            sendPhoneNumberVerificationTextServerErrors.voipNumberNotAllowed
-          "
-          class="mt-10px"
-        >
-          This phone number is a VOIP number, which isn't allowed (to prevent
-          spam). Please try again with a different phone number.
-        </div>
-
-        <div
-          *ngIf="
-            sendPhoneNumberVerificationTextServerErrors.chineseNumberNotAllowed
-          "
-          class="mt-10px"
-        >
-          Currently we can't send text messages to China. If you have a
-          non-Chinese number, please try that. If not, click "skip" below. You
-          can still use the site by buying DeSo.
-        </div>
-        <div
-          *ngIf="sendPhoneNumberVerificationTextServerErrors.unknownError"
-          class="mt-10px"
-        >
-          {{ sendPhoneNumberVerificationTextServerErrors.unknownError }}
-        </div>
-      </div>
-    </form>
-
-    <div class="fs-10px">
+    <div class="font-size--small margin-bottom--small">
       By proceeding, you agree to receive text messages from deso.org (standard
       rates apply)
     </div>
@@ -148,18 +154,10 @@
       <div
         class="full-screen"
         [ngClass]="{
-          ' d-flex align-items-center justify-content-between':
+          'margin-top--small':
             displayForSignupFlow
         }"
       >
-        <a
-          data-control-name="get-starter-deso-cancel-button"
-          class="fc-muted cursor-pointer"
-          style="cursor: pointer"
-          (click)="cancelButtonClicked()"
-          *ngIf="displayForSignupFlow"
-        >Cancel</a
-        >
         <button
           data-control-name="get-starter-deso-next-button"
           (click)="sendVerificationText()"
@@ -167,10 +165,18 @@
             disabled: !phoneForm.valid,
             'btn-loading': sendingPhoneNumberVerificationText
           }"
-          class="button button-primary button-small font-weight-bold fs-15px ml-10px floatr"
+          class="button--primary button--medium margin-bottom--medium"
         >
           Next
         </button>
+        <a
+          data-control-name="get-starter-deso-cancel-button"
+          class="button--link button--primary--outline button--medium"
+          (click)="cancelButtonClicked()"
+          *ngIf="displayForSignupFlow"
+        >Cancel</a
+        >
+       
       </div>
     </div>
   </div>
@@ -213,7 +219,7 @@
       <div class="fc-red fs-15px">
         <div
           *ngIf="submitPhoneNumberVerificationCodeServerErrors.invalidCode"
-          class="mt-10px"
+          class="margin-top--small font-size--small"
         >
           The code you entered is invalid. Please try again.
         </div>
@@ -221,14 +227,14 @@
           *ngIf="
             submitPhoneNumberVerificationCodeServerErrors.maxCheckAttemptsReached
           "
-          class="mt-10px"
+          class="margin-top--small font-size--small"
         >
           You've checked too many codes and hit a rate limit. Please wait 10
           minutes and try again.
         </div>
         <div
           *ngIf="submitPhoneNumberVerificationCodeServerErrors.unknownError"
-          class="mt-10px"
+          class="margin-top--small font-size--small"
         >
           {{ submitPhoneNumberVerificationCodeServerErrors.unknownError }}
         </div>
