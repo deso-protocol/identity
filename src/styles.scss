@@ -288,6 +288,23 @@ body {
   @include color('text', 'base', 'color');
 }
 
+body {
+  overflow-x: hidden !important;
+}
+body::-webkit-scrollbar {
+  width: 0.3rem;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(254, 208, 0, 1);
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
 //-------------------------------
 // TYPOGRAPHY
 //-------------------------------
@@ -308,6 +325,17 @@ ul {
   @include spacing('padding', 'none');
 }
 
+code {
+  font-family: monospace;
+  @include border-radius('base');
+  @include spacing('padding-left', 'medium');
+  @include spacing('padding-right', 'medium');
+  @include spacing('padding-top', 'xsmall');
+  @include spacing('padding-bottom', 'xsmall');
+  @include color('blue', 'lighter', 'color');
+  @include color('blue', 'dark', 'background');
+  @include font-size('small');
+}
 
 //-------------------------------
 // LINKS = Styles
@@ -451,6 +479,44 @@ a, .link--primary {
   @include width(tablet);
   margin: 0 auto;
 }
+.container--scrollbar {
+  overflow-x: hidden !important;
+}
+.container--scrollbar::-webkit-scrollbar {
+  width: 0.3rem;
+}
+.container--scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.container--scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(254, 208, 0, 1);
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+//-------------------------------
+// BOX
+//-------------------------------
+.box--rounded {
+  @include border-radius('base');
+}
+.box--border {
+  border: 1px solid;
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
+}
+.box--small {
+  @include spacing('padding', 'small');
+}
+.box--base {
+  @include spacing('padding', 'base');
+}
+.box--medium {
+  @include spacing('padding', 'medium');
+}
+.box--large {
+  @include spacing('padding', 'large');
+}
 
 //-------------------------------
 // SECTION = Header
@@ -503,6 +569,22 @@ a, .link--primary {
   @include spacing('margin-bottom', 'medium')
 }
 .section--login__advanced {
+  @include color('blue', 'dark', 'border-color');
+}
+//-------------------------------
+// SECTION = Login Options
+//-------------------------------
+.section--verify {
+  width: 100%;
+  margin: 0 auto;
+} 
+.section--verify__option {
+  @include spacing('padding', 'large');
+  @include color('neutral', 'black', 'color');
+  @include color('neutral', 'white', 'background-color');
+  @include border-radius('base');
+}
+.section--verify__advanced {
   @include color('blue', 'dark', 'border-color');
 }
 //-------------------------------
@@ -642,11 +724,29 @@ a, .link--primary {
   @include spacing('padding', 'medium');
   @include color('blue', 'dark', 'border-color');
 }
+.input--phone {
+  width: 100%;
+  border: 1px solid;
+  @include border-radius('small');
+  @include font-size('medium');
+  @include spacing('text-indent', 'medium');
+  @include spacing('padding', 'medium');
+  @include color('blue', 'dark', 'border-color');
+}
 .input--seed {
   &::placeholder {
     @include spacing('word-spacing', 'none');  
   }
   @include spacing('word-spacing', 'medium');
+}
+//---------------------------------------------
+// FORMS = Input Overrides for Phone Number
+//---------------------------------------------
+.iti__selected-flag {
+  margin-right: 10px !important;
+}
+.iti {
+  width: 100% !important;
 }
 //-------------------------------
 // AVATARS = Shapes
@@ -679,7 +779,8 @@ a, .link--primary {
     height: 1px;
     top: 12px;
     position: absolute;
-    @include color('blue', 'darker', 'border-color');
+    opacity: 0.5;
+    @include color('blue', 'light', 'border-color');
   }
   &:after {
     content: '';
@@ -689,6 +790,16 @@ a, .link--primary {
     content: '';
     right: 0;
   }
+}
+.section--divider {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid;
+  height: 1px;
+  opacity: 0.5;
+  @include color('blue', 'light', 'border-color');
+  @include spacing('margin-top', 'base');
+  @include spacing('margin-bottom', 'base');
 }
 //-------------------------------
 // TEXT = Alignment
@@ -718,6 +829,15 @@ a, .link--primary {
 //-------------------------------
 .image--invert {
   filter: invert(1);
+}
+
+//-------------------------------
+// SECTIOn = HEROSWAP IFRAME
+//-------------------------------
+.section--heroswap__iframe {
+  width: 100%;
+  border: 0;
+  height: 450px;
 }
 
 
@@ -988,8 +1108,9 @@ i-feather[name='check-circle'] {
 }
 
 .full-screen {
-  height: 100%;
-  width: 100%;
+  min-height: 100%;
+  background-color: #040609;
+  background-image: linear-gradient(0deg, #040609, #040609 10%, #050e1d 90%, #050e1d);
 }
 
 .avatar {

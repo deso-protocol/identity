@@ -2,7 +2,7 @@
   <div class="section--accounts__header margin-bottom--medium">
     {{componentTitle}}
   </div>
-  <ul class="section--accounts__list margin-bottom--small">
+  <ul class="section--accounts__list container--scrollbar margin-bottom--small">
     <li
       *ngFor="let item of allUsers | async | keyvalue; let i = index"
       class="section--accounts__item"
