@@ -335,6 +335,9 @@ code {
   @include color('blue', 'lighter', 'color');
   @include color('blue', 'dark', 'background');
   @include font-size('small');
+  &:hover {
+    @include color('neutral', 'white', 'color');
+  }
 }
 
 //-------------------------------
@@ -470,6 +473,18 @@ a, .link--primary {
 }
 .items--end {
   align-items: end;
+}
+.flex--column {
+  flex-direction: column;
+}
+.flex--row {
+  flex-direction: row;
+}
+.flex--column-reverse {
+  flex-direction: column-reverse;
+}
+.flex--row-reverse {
+  flex-direction: row-reverse;
 }
 
 //-------------------------------
@@ -800,6 +815,26 @@ a, .link--primary {
   @include color('blue', 'light', 'border-color');
   @include spacing('margin-top', 'base');
   @include spacing('margin-bottom', 'base');
+}
+.section--divider--small {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid;
+  height: 1px;
+  opacity: 0.5;
+  @include color('blue', 'light', 'border-color');
+  @include spacing('margin-top', 'small');
+  @include spacing('margin-bottom', 'small');
+}
+.section--divider--medium {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid;
+  height: 1px;
+  opacity: 0.5;
+  @include color('blue', 'light', 'border-color');
+  @include spacing('margin-top', 'medium');
+  @include spacing('margin-bottom', 'medium');
 }
 //-------------------------------
 // TEXT = Alignment

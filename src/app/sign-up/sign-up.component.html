@@ -15,9 +15,6 @@
     <div class="font-size--small text--center margin-bottom--large">
       Write, download, print, or copy it somewhere safe.
     </div>
-    <div class="warning--error margin-bottom--medium">
-      If you lose your DeSo seed phrase your account will be lost forever.
-    </div>
     <div class="section--seed__container">
       <div
         *ngIf="!entropyService.advancedOpen"
@@ -202,6 +199,9 @@
         </div>
       </div>
     </div>
+    <div class="warning--error margin-top--medium">
+      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of https://identity.deso.org
+    </div>
     <div class="margin-top--medium padding-bottom--xlarge">
       <button
         *ngIf="!hasEntropyError()"
@@ -225,16 +225,13 @@
   <!-- Verify seed phrase. -->
   <div *ngIf="stepScreen === SignUpComponent.STEP_VERIFY_SEED">
     <div class="section--seed margin-bottom--small">
+      <img src="assets/image-logomark.svg" width="60" class="section--accounts__illustration"/>
       <div class="font-size--small margin-bottom--small text--text-lighter">Step 2 of {{ stepTotal }}</div>
       <h3 class="text--neutral-white">Verify your DeSo seed phrase</h3>
     </div>
     <div class="font-size--small text--center margin-bottom--large">
       Never share your DeSo seed phrase with anyone.
-    </div>
-    <div class="warning--error margin-bottom--medium">
-      If you lose your DeSo seed phrase your account will be lost forever.
-    </div>
-
+    </div>  
     <div class="section--seed__container">
       <p class="font-size--medium font-weight--semibold margin-bottom--small text--neutral-black">
         Verify:
@@ -272,6 +269,9 @@
           data-control-name="sign-up-with-seed-tos-link"
         >Terms of Service</a>.
       </div>
+    </div>
+    <div class="warning--error margin-top--medium">
+      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of https://identity.deso.org
     </div>
     <div class="margin-top--medium">     
       <div>

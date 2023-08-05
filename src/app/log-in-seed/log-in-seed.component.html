@@ -6,7 +6,7 @@
 >
   <div class="section--login text--center margin-bottom--small">
     <img src="assets/image-lock.svg" width="60" class="section--accounts__illustration"/>
-    <div class="font-size--small margin-bottom--small text--text-lighter">Advanced Import</div>
+    <div class="font-size--small margin-bottom--small text--text-lighter">For Advanced Users</div>
     <h3 class="text--neutral-white">Import account to access {{ globalVars.hostname }}</h3>
   <div class="font-size--small margin-top--small text--center margin-bottom--large">
     <p class="margin-bottom--xsmall">Safely add your DeSo seed phrase to import your existing account.</p>
@@ -14,7 +14,7 @@
       Please make sure you are on: <span class="text--green-lighter">https://identity.deso.org</span>
     </p>
   </div>
-  <div *ngIf="loginError" class="alert alert-danger mt-15px">
+  <div *ngIf="loginError" class="warning--error margin-bottom--medium">
     {{ loginError }}
   </div>
 </div>

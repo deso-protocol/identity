@@ -1,5 +1,5 @@
 <div class="d-flex flex-column">
-  <div class="d-flex justify-content-between flex-grow-1">
+  <div class="d-flex justify-content-between flex-grow-1 text--text-lightest">
     <div class="d-flex justify-content-start align-items-center">
       <app-arrow-toggle (click)="expandCreator = !expandCreator">
       </app-arrow-toggle>
@@ -24,23 +24,20 @@
       </div>
     </div>
   </div>
-  <div class="d-flex flex-column pt-15px mt-15px" *ngIf="expandCreator">
-    <div class="d-flex fs-14px justify-content-between">
+  <div class="display--flex flex--column margin-top--small" *ngIf="expandCreator">
+    <div 
+      class="display--flex justify--between items--center margin-bottom--small"
+      *ngFor="let opLimit of coinOperationMap | keyvalue; let ii = index"
+    >
       <div>Operation Type</div>
-      <div>Operation Limit</div>
+      <code>{{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}</code>
     </div>
     <div
-      class="d-flex fs-16px justify-content-between py-10px"
+      class="display--flex justify--between items--center"
       *ngFor="let opLimit of coinOperationMap | keyvalue; let ii = index"
-      [ngStyle]="{
-        'border-bottom':
-          ii < globalVars.ObjectKeyLength(coinOperationMap) - 1
-            ? '1px dotted darkgray'
-            : 'none'
-      }"
     >
-      <div>{{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}</div>
-      <div>{{ globalVars.formatTxCountLimit(opLimit.value) }}</div>
+      <div>Operation Limit</div>
+      <code>{{ globalVars.formatTxCountLimit(opLimit.value) }}</code>
     </div>
   </div>
 </div>

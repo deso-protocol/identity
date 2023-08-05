@@ -21,25 +21,22 @@
       <app-log-in-options></app-log-in-options>
     </ng-container>
     <div
-      class="fs-18px pt-15px pb-5px"
+      class="box--border box--base box--rounded"
       style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
       *ngIf="publicKeyBase58Check"
     >
-      <div class="text-left display-flex justify-content-between">
-        Public Key
-        <span class="font-weight-normal pr-20px pb-15px text-left">{{
-          publicKeyBase58Check | truncateAddressOrUsername
-        }}</span>
+      <div class="display--flex justify--between items--center">
+        Public Key: 
+        <code>{{ publicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
-      <div class="pl-20px text-left d-flex justify-content-between" *ngIf="derivedPublicKeyBase58Check">
+      <div class="section--divider--medium"></div>
+      <div class="display--flex justify--between items--center" *ngIf="derivedPublicKeyBase58Check">
         Derived Public Key
-        <span class="font-weight-normal pr-20px">{{
-          derivedPublicKeyBase58Check | truncateAddressOrUsername
-        }}</span>
+        <code>{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
     </div>
   </div>
-  <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="mb-40px">
+  <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="padding-bottom--xlarge">
     <app-transaction-spending-limit
       [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       [onApproveClick]="this.onApproveClick"
@@ -68,6 +65,6 @@
 <div *ngIf="globalVars.callbackInvalid">
   <app-error-callback></app-error-callback>
 </div>
-<div *ngIf="validationErrors" class="text-center text-danger title-text">
+<div *ngIf="validationErrors" class="warning--error container">
   There was an issue rendering this page, are the query parameters correct?
 </div>
