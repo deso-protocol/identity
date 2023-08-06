@@ -310,6 +310,21 @@ body::-webkit-scrollbar-thumb {
 }
 
 //-------------------------------
+// Images
+//-------------------------------
+img {
+  vertical-align: middle;
+}
+
+//-------------------------------
+// IMAGES = FILTERS
+//-------------------------------
+.image--invert {
+  filter: invert(1);
+}
+
+
+//-------------------------------
 // TYPOGRAPHY
 //-------------------------------
 h1,
@@ -321,7 +336,16 @@ h6,
 p {
   @include spacing('margin', 'none');
   font-weight: normal;
+  line-height: 1.5;
 }
+
+h1 { @include font-size('4xlarge'); }
+h2 { @include font-size('3xlarge'); }
+h3 { @include font-size('2xlarge'); }
+h4 { @include font-size('xlarge'); }
+h5 { @include font-size('large'); }
+h6 { @include font-size('medium'); }
+
 
 ul {
   list-style-type: none;
@@ -372,6 +396,9 @@ a, .link--primary {
   border: 0;
   width: 100%;
   @include border-radius('pill');
+  &:hover {
+    cursor: pointer;
+  }
 }
 .button--link {
   display: block;
@@ -460,6 +487,7 @@ a, .link--primary {
   @include spacing('padding-right', 'medium'); 
 }
 .button--medium {
+  @include font-size('medium');
   @include spacing('padding', 'medium'); 
 }
 
@@ -760,6 +788,7 @@ a, .link--primary {
 .input--textarea {
   width: 100%;
   border: 1px solid;
+  font-family: $font-primary;
   @include border-radius('small');
   @include font-size('medium');
   @include spacing('padding', 'medium');
@@ -880,17 +909,12 @@ a, .link--primary {
 //-------------------------------
 .warning--error {
   text-align: center;
+  line-height: 1.5;
   @include border-radius('base');
   @include font-size('small');
   @include spacing('padding', 'small');
   @include color('red', 'darker', 'background-color');  
   @include color('red', 'lighter', 'color');  
-}
-//-------------------------------
-// IMAGES = FILTERS
-//-------------------------------
-.image--invert {
-  filter: invert(1);
 }
 
 //-------------------------------
