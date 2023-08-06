@@ -4,13 +4,13 @@
   *ngIf="
     !globalVars.callbackInvalid && !deleteKey && validationErrors === false
   "
-  class="container text-center"
+  class="container text--center"
 >
   <div>
     <img src="assets/image-head.svg" width="60" class="section--accounts__illustration"/>
     <h3 class="text--neutral-white text--large margin-top--medium margin-bottom--base">
-      Grant signing access
-      <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
+      Grant signing access to
+      <span *ngIf="!globalVars.callback" class="text--green-lighter">{{ globalVars.hostname }}</span>
     </h3>
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
@@ -26,13 +26,13 @@
       *ngIf="publicKeyBase58Check"
     >
       <div class="display--flex justify--between items--center">
-        Public Key: 
-        <code>{{ publicKeyBase58Check | truncateAddressOrUsername }}</code>
+        Public Key
+        <code class="font-size--medium">{{ publicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
       <div class="section--divider--medium"></div>
       <div class="display--flex justify--between items--center" *ngIf="derivedPublicKeyBase58Check">
         Derived Public Key
-        <code>{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code>
+        <code class="font-size--medium">{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
     </div>
   </div>
@@ -43,23 +43,22 @@
     ></app-transaction-spending-limit>
   </div>
 </div>
-<div class="container home-container" *ngIf="deleteKey">
-  <div class="fs-18px mt-30px">
-    <span class="fs-underline mb-2"
-      ><b
-        >You're about to revoke signing access for a Derived Public Key</b
-      ></span
-    ><br />
-    This means
-    <b>{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</b> will no
-    longer be able to make transactions on your behalf.
+<div class="container" *ngIf="deleteKey">
+  <div class="margin-bottom--base">
+    <h4 class="text--neutral-white margin-bottom--small">Would you like to revoke derived key access?</h4>
+    <span class="text--text-lighter">
+      You're about to revoke signing access for a Derived Public Key. 
+    </span>
+    <span class="text--text-lighter">
+      This means <code>Derived Key: {{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code> will no longer be able to make transactions on your behalf.
+    </span>
   </div>
   <button
     [disabled]="!publicKeyBase58Check"
-    class="button button-large btn-warning mb-20px text-black font-weight-bold mt-2"
+    class="button--red button--medium"
     (click)="approveDerivedKey(publicKeyBase58Check)"
   >
-    Revoke
+    Yes, Revoke Access
   </button>
 </div>
 <div *ngIf="globalVars.callbackInvalid">

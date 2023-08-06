@@ -5,7 +5,7 @@
       class="box--rounded box--border box--base margin-top--medium display--flex items--center justify--between"
     >
       <div class="text-left">Cumulative Spending Limit</div>
-      <code>
+      <code class="font-size--medium">
         {{
           globalVars.nanosToDeSo(
             transactionSpendingLimitResponse.GlobalDESOLimit || 0,
@@ -36,7 +36,7 @@
         <span *ngIf="!this.isPendingApprove; else loadingSpinner">Yes, I Approve</span>
         <ng-template #loadingSpinner>
           <div
-            class="spinner-border ml-3"
+            class="spinner-border margin-left--xsmall"
             style="width: 25px; height: 25px"
           ></div>
         </ng-template>

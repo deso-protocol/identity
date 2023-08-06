@@ -34,14 +34,14 @@
             doesn't cost ETH gas fees so creating an account only requires proof
             of identity.
           </p>
-          <div *ngIf="metamaskState === METAMASK.ERROR" class="mt-20px">
-            <div class="text-danger">
+          <div *ngIf="metamaskState === METAMASK.ERROR" class="margin-top--medium">
+            <div class="warning--error">
               {{ errorMessage }}
               <span
                 *ngIf="showAlternative"
                 class="fc-blue cursor-pointer fs-underline-hover"
               >
-                <a (click)="redirectToLogIn()"
+                <a (click)="redirectToLogIn()" class="link--primary"
                   >Alternatively, you can sign up with other methods.</a
                 >
               </span>
@@ -74,13 +74,13 @@
       </div>
 
       <ng-container *ngIf="existingConnectedWallet">
-        <div class="fc-secondary">
-          Detected account:
-          {{ existingConnectedWallet | truncateAddressOrUsername }}
+        <div class="margin-top--large margin-bottom--medium">
+          <p class="margin-bottom--medium">Detected Account:</p>
+          <code class="font-size--large">{{ existingConnectedWallet | truncateAddressOrUsername }}</code>
         </div>
-        <div class="fc-muted fs-14px">
-          If this is not the account you want to connect please open MetaMask,
-          pick the correct account and click connect.
+        <div class="margin-top-small">
+          If this is not the account you want to connect, please open MetaMask again and
+          choose the correct account, and then click connect.
         </div>
       </ng-container>
     </div>

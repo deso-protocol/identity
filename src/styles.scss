@@ -230,7 +230,7 @@ $breakpoints: (
 @mixin media($breakpoint) {
   $breakpoint-value: map-get($breakpoints, $breakpoint);
   @if $breakpoint-value {
-    @media (min-width: $breakpoint-value) {
+    @media (max-width: $breakpoint-value) {
       @content;
     }
   } @else {
@@ -278,6 +278,10 @@ $border-radius: (
 //-------------------------------
 // HTML & BODY
 //-------------------------------
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   font-family: $font-primary;
@@ -415,6 +419,25 @@ a, .link--primary {
     @include color('neutral', 'white', 'color');
   }
 }
+.button--red {
+  @extend %button;
+  @include color('red', 'base', 'background-color');
+  @include color('neutral', 'white', 'color');
+  &:hover {
+    @include color('red', 'darker', 'background-color');
+  }
+}
+.button--red--outline {
+  @extend %button;
+  border: 1px solid;
+  @include color('red', 'dark', 'border-color');
+  @include color('neutral', 'transparent', 'background-color');
+  @include color('text', 'lighter', 'color');
+  &:hover {
+    @include color('red', 'darker', 'background-color');
+  }
+}
+
 .button--disabled {
   @extend %button;
   @include color('blue', 'dark', 'background-color');
@@ -493,6 +516,9 @@ a, .link--primary {
 .container {
   @include width(tablet);
   margin: 0 auto;
+  @include media(mobile) {
+    @include width(mobile);
+  }
 }
 .container--scrollbar {
   overflow-x: hidden !important;
@@ -787,6 +813,7 @@ a, .link--primary {
 .text--divider {
   width: 100%;
   position: relative;
+  text-align: center;
   &:after, &:before {
     content: '';
     border-bottom: 1px solid;
