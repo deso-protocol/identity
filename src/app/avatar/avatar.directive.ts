@@ -13,7 +13,8 @@ export class AvatarDirective implements OnChanges {
     private globalVars: GlobalVarsService,
     private backendApi: BackendAPIService,
     private el: ElementRef
-  ) {}
+  ) {
+  }
 
   setAvatar(): void {
     if (!this.appAvatar) {
@@ -50,5 +51,8 @@ export class AvatarDirective implements OnChanges {
 
   setURLOnElement(profilePicURL: string) {
     this.el.nativeElement.style.backgroundImage = `url(${profilePicURL})`;
+    this.el.nativeElement.style.backgroundPosition = 'center';
+    this.el.nativeElement.style.backgroundSize = 'cover';
+    this.el.nativeElement.style.backgroundRepeat = 'no-repeat';
   }
 }
