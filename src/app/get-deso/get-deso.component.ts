@@ -170,6 +170,7 @@ export class GetDesoComponent implements OnInit {
   }
 
   ////// FINISH FLOW ///////
+  // TODO: decide what the condition should truly be here.
   isFinishFlowDisabled = this.globalVars.derive ? this.userBalanceNanos > 1e4 : false;
 
   finishFlow(): void {

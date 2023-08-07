@@ -59,7 +59,6 @@
                 (click)="refreshBalanceCooldown ? null : refreshBalance()">
           {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
         </button>
-        <!-- TODO: Condition to prevent user from continuing w/o sufficient balance -->
         <button
           (click)="finishFlow()"
           [disabled]="isFinishFlowDisabled"
@@ -117,7 +116,6 @@
                   (click)="refreshBalanceCooldown ? null : refreshBalance()">
             {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
           </button>
-          <!-- TODO: Condition to prevent user from continuing w/o sufficient balance -->
           <button
             (click)="finishFlow()"
             [disabled]="isFinishFlowDisabled"
