@@ -42,15 +42,15 @@
     ></app-transaction-spending-limit>
   </div>
 </div>
-<div class="container" *ngIf="deleteKey">
+<div class="container text--center" *ngIf="deleteKey">
   <div class="margin-bottom--base">
-    <h4 class="text--neutral-white margin-bottom--small">Would you like to revoke derived key access?</h4>
-    <span class="text--text-lighter">
+    <h5 class="text--neutral-white margin-bottom--small">Would you like to revoke derived key access?</h5>
+    <p class="text--text-lighter margin-bottom--medium">
       You're about to revoke signing access for a Derived Public Key. 
-    </span>
-    <span class="text--text-lighter">
+    </p>
+    <p class="text--text-lighter">
       This means <code>Derived Key: {{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code> will no longer be able to make transactions on your behalf.
-    </span>
+    </p>
   </div>
   <button
     [disabled]="!publicKeyBase58Check"
