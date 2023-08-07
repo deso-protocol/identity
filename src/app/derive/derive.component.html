@@ -22,15 +22,14 @@
     </ng-container>
     <div
       class="box--border box--base box--rounded"
-      style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
       *ngIf="publicKeyBase58Check"
     >
-      <div class="display--flex justify--between items--center">
+      <div class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet">
         Public Key
         <code class="font-size--medium">{{ publicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
       <div class="section--divider--medium"></div>
-      <div class="display--flex justify--between items--center" *ngIf="derivedPublicKeyBase58Check">
+      <div class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet" *ngIf="derivedPublicKeyBase58Check">
         Derived Public Key
         <code class="font-size--medium">{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>

@@ -1,14 +1,14 @@
-<div class="d-flex flex-column">
-  <div class="d-flex justify-content-between flex-grow-1 text--text-lightest">
-    <div class="d-flex justify-content-start align-items-center">
+<div class="width--100 text--left">
+  <div class="display--flex justify--between text--text-lightest">
+    <div class="display--flex items--center">
       <app-arrow-toggle (click)="expandCreator = !expandCreator">
       </app-arrow-toggle>
       <div
-        class="avatar ml-5px mr-5px"
+        class="avatar--small"
         [appAvatar]="coinPublicKey"
         *ngIf="coinPublicKey"
       ></div>
-      <div class="d-block ml-15px" style="display: block; max-width: 200px">
+      <div class="display--block">
         {{
           coinPublicKey === ''
             ? 'All Creators'
@@ -18,22 +18,20 @@
       </div>
       <!-- TODO: Add verified check -->
     </div>
-    <div class="d-flex justify-content-end fs-14px">
-      <div class="d-flex align-items-center justify-content-center">
-        {{ getOperationsString(coinOperationMap) }}
-      </div>
+    <div class="display--flex justify--end items--center">
+      {{ getOperationsString(coinOperationMap) }}
     </div>
   </div>
-  <div class="display--flex flex--column margin-top--small" *ngIf="expandCreator">
+  <div class="display--flex justify--between flex--column items--center margin-top--small" *ngIf="expandCreator">
     <div 
-      class="display--flex justify--between items--center margin-bottom--small"
+      class="display--flex width--100 justify--between items--center margin-bottom--small"
       *ngFor="let opLimit of coinOperationMap | keyvalue; let ii = index"
     >
       <div>Operation Type</div>
       <code>{{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}</code>
     </div>
     <div
-      class="display--flex justify--between items--center"
+      class="display--flex width--100 justify--between items--center"
       *ngFor="let opLimit of coinOperationMap | keyvalue; let ii = index"
     >
       <div>Operation Limit</div>

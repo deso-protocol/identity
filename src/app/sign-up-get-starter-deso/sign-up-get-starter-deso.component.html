@@ -203,7 +203,7 @@
       <form
         #f="ngForm"
         [formGroup]="verificationCodeForm"
-        class="form-group pt-10px"
+        class="padding-top--medium"
       >
         <input
           class="input--textarea"
@@ -212,7 +212,7 @@
           (ngModelChange)="onVerificationCodeInputChanged()"
         />
 
-        <div class="fc-red fs-15px">
+        <div class="text--red-base font-size--xsmall">
           <div
             *ngIf="submitPhoneNumberVerificationCodeServerErrors.invalidCode"
             class="margin-top--small font-size--small"
@@ -236,7 +236,6 @@
           </div>
         </div>
       </form>
-
       <div class="text--right">
         <!--        Resend button will have a 60s cooldown indicated by resentVerificationCode and resentVerificationCodeTimeout -->
         <div *ngIf="!resentVerificationCode">
@@ -255,10 +254,8 @@
             class="far fa-check-circle fc-blue"
           ></i>
         </div>
-       
       </div>
     </div>
-
     <div class="margin-top--medium">
       <button
         data-control-name="get-starter-deso-confirm-code-button"
@@ -281,7 +278,6 @@
       </button>
     </div>
   </div>
-
   <div
     *ngIf="
       screenToShow ==

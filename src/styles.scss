@@ -37,6 +37,39 @@ $highlight-secondary: #e5f2ff;
 $success: #2cc99a;
 $error: #ff6939;
 
+
+//-------------------------------
+// BREAKPOINTS
+//-------------------------------
+$breakpoints: (
+  "mobile": 320px,
+  "tablet": 640px,
+  "desktop": 960px,
+  "desktop-large": 1280px,
+  "desktop-xlarge": 1440px,
+  "desktop-2xlarge": 1600px
+);
+
+@mixin media($breakpoint) {
+  $breakpoint-value: map-get($breakpoints, $breakpoint);
+  @if $breakpoint-value {
+    @media (max-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+  }
+}
+
+@mixin container($breakpoint) {
+  $width-value: map-get($breakpoints, $breakpoint);
+  @if $width-value {
+    width: $width-value;
+  } @else {
+    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+  }
+}
+
 //-------------------------------
 // FONTS = Families
 //-------------------------------
@@ -194,7 +227,7 @@ $spacing-units: (
 
 $directions: (
   "padding": ( "left", "right", "top", "bottom" ),
-  "margin": ( "left", "right", "top", "bottom" )
+  "margin": ( "left", "right", "top", "bottom" ),
 );
 
 @mixin spacing($property, $values...) {
@@ -216,34 +249,39 @@ $directions: (
 }
 
 //-------------------------------
-// BREAKPOINTS
+// WIDTH
 //-------------------------------
-$breakpoints: (
-  "mobile": 320px,
-  "tablet": 640px,
-  "desktop": 960px,
-  "desktop-large": 1280px,
-  "desktop-xlarge": 1440px,
-  "desktop-2xlarge": 1600px
+$sizes: (
+  0, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 33, 49
 );
 
-@mixin media($breakpoint) {
-  $breakpoint-value: map-get($breakpoints, $breakpoint);
-  @if $breakpoint-value {
-    @media (max-width: $breakpoint-value) {
-      @content;
-    }
-  } @else {
-    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+@mixin width($size) {
+  width: unquote($size + "%");
+}
+
+@mixin gap($size) {
+  gap: unquote($size + "px");
+}
+
+@each $size in $sizes {
+  .width--#{$size} {
+    @include width($size);
   }
 }
 
-@mixin width($breakpoint) {
-  $width-value: map-get($breakpoints, $breakpoint);
-  @if $width-value {
-    width: $width-value;
-  } @else {
-    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+@each $size in $sizes {
+  .gap--#{$size}--mobile {
+    @include media(mobile){
+       @include gap($size);
+    }
+  }
+}
+
+@each $size in $sizes {
+  .gap--#{$size}--tablet {
+    @include media(tablet){
+       @include gap($size);
+    }
   }
 }
 
@@ -287,26 +325,10 @@ body {
   font-family: $font-primary;
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
   background-color: #040609;
   background-image: linear-gradient(0deg,#040609,#040609 10%,#050e1d 90%,#050e1d);
   @include color('text', 'base', 'color');
-}
-
-body {
-  overflow-x: hidden !important;
-}
-body::-webkit-scrollbar {
-  width: 0.3rem;
-}
-
-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-body::-webkit-scrollbar-thumb {
-  background: rgba(254, 208, 0, 1);
-  border: 1px solid transparent;
-  border-radius: 4px;
 }
 
 //-------------------------------
@@ -327,25 +349,63 @@ img {
 //-------------------------------
 // TYPOGRAPHY
 //-------------------------------
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
+h1, h2, h3, h4, h5, h6{
+  @include spacing('margin', 'none');
+  font-weight: normal;
+  line-height: 1.5;
+  @include media(tablet) { 
+    line-height: 1.3;
+  }
+}
+
 p {
   @include spacing('margin', 'none');
   font-weight: normal;
   line-height: 1.5;
 }
 
-h1 { @include font-size('4xlarge'); }
-h2 { @include font-size('3xlarge'); }
-h3 { @include font-size('2xlarge'); }
-h4 { @include font-size('xlarge'); }
-h5 { @include font-size('large'); }
-h6 { @include font-size('medium'); }
+h1 { 
+  @include font-size('4xlarge');
+  @include media(tablet) { 
+    @include font-size('3xlarge');
+  } 
+}
+h2 { 
+  @include font-size('3xlarge');
+  @include media(tablet) { 
+    @include font-size('2xlarge');
+  } 
+}
+h3 { 
+  @include font-size('2xlarge');
+  @include media(tablet) { 
+    @include font-size('large');
+  } 
+}
+h4 { 
+  @include font-size('xlarge');
+  @include media(tablet) { 
+    @include font-size('large');
+  } 
+}
+h5 { 
+  @include font-size('large');
+  @include media(tablet) { 
+    @include font-size('large');
+  } 
+}
+h6 { 
+  @include font-size('medium');
+  @include media(tablet) { 
+    @include font-size('medium');
+  } 
+}
 
+br {
+  @include media(tablet) {
+    display: none;
+  }
+}
 
 ul {
   list-style-type: none;
@@ -355,6 +415,7 @@ ul {
 
 code {
   font-family: monospace;
+  word-break: break-all;
   @include border-radius('base');
   @include spacing('padding-left', 'medium');
   @include spacing('padding-right', 'medium');
@@ -537,15 +598,34 @@ a, .link--primary {
 .flex--row-reverse {
   flex-direction: row-reverse;
 }
-
+.flex--column--tablet {
+  @include media(tablet) { flex-direction: column; };
+}
+.flex--row--tablet {
+  @include media(tablet) { flex-direction: row; };
+}
+.flex--column-reverse--tablet {
+  @include media(tablet) { flex-direction: column-reverse; };
+}
+.flex--row-reverse--tablet {
+  @include media(tablet) { flex-direction: row-reverse; };
+}
 //-------------------------------
 // LAYOUT
 //-------------------------------
 .container {
-  @include width(tablet);
   margin: 0 auto;
+  @include spacing('padding-left', 'large');
+  @include spacing('padding-right', 'large');
+  @include container(tablet);
+
+  @include media(tablet) {
+    min-width: 100%;
+    width: 100%;
+  }
   @include media(mobile) {
-    @include width(mobile);
+    max-width: 100%;
+    width: 100%;
   }
 }
 .container--scrollbar {
@@ -598,6 +678,11 @@ a, .link--primary {
   @include color('blue', 'dark', 'border-color');
   @include spacing('padding', 'medium');
   @include spacing('margin-bottom', 'xlarge');
+  @include media(tablet) {
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: center;
+  }
 }
 .section--header__left {
   display: flex;
@@ -625,6 +710,13 @@ a, .link--primary {
     @include spacing('padding-bottom', 'small');
     @include color('green', 'lighter', 'color');
     @include color('green', 'darker', 'background-color');
+  }
+
+  @include media(tablet) {
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: center;
+    @include spacing('margin-top', 'base');
   }
 }
 //-------------------------------
