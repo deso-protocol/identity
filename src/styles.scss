@@ -214,7 +214,7 @@ $colors: (
 //-------------------------------
 $spacing-units: (
   "none": 0,
-  "xsmall": 4px, 
+  "xsmall": 4px,
   "small": 8px,
   "medium": 16px,
   "base": 24px,
@@ -353,7 +353,7 @@ h1, h2, h3, h4, h5, h6{
   @include spacing('margin', 'none');
   font-weight: normal;
   line-height: 1.5;
-  @include media(tablet) { 
+  @include media(tablet) {
     line-height: 1.3;
   }
 }
@@ -364,41 +364,41 @@ p {
   line-height: 1.5;
 }
 
-h1 { 
+h1 {
   @include font-size('4xlarge');
-  @include media(tablet) { 
+  @include media(tablet) {
     @include font-size('3xlarge');
-  } 
+  }
 }
-h2 { 
+h2 {
   @include font-size('3xlarge');
-  @include media(tablet) { 
+  @include media(tablet) {
     @include font-size('2xlarge');
-  } 
+  }
 }
-h3 { 
+h3 {
   @include font-size('2xlarge');
-  @include media(tablet) { 
+  @include media(tablet) {
     @include font-size('large');
-  } 
+  }
 }
-h4 { 
+h4 {
   @include font-size('xlarge');
-  @include media(tablet) { 
+  @include media(tablet) {
     @include font-size('large');
-  } 
+  }
 }
-h5 { 
+h5 {
   @include font-size('large');
-  @include media(tablet) { 
+  @include media(tablet) {
     @include font-size('large');
-  } 
+  }
 }
-h6 { 
+h6 {
   @include font-size('medium');
-  @include media(tablet) { 
+  @include media(tablet) {
     @include font-size('medium');
-  } 
+  }
 }
 
 br {
@@ -538,18 +538,18 @@ a, .link--primary {
 }
 
 //-------------------------------
-// BUTTONS = Sizes 
+// BUTTONS = Sizes
 //-------------------------------
 .button--small {
   @include font-size('small');
-  @include spacing('padding-top', 'small'); 
-  @include spacing('padding-bottom', 'small'); 
-  @include spacing('padding-left', 'medium'); 
-  @include spacing('padding-right', 'medium'); 
+  @include spacing('padding-top', 'small');
+  @include spacing('padding-bottom', 'small');
+  @include spacing('padding-left', 'medium');
+  @include spacing('padding-right', 'medium');
 }
 .button--medium {
   @include font-size('medium');
-  @include spacing('padding', 'medium'); 
+  @include spacing('padding', 'medium');
 }
 
 //-------------------------------
@@ -725,7 +725,7 @@ a, .link--primary {
 .section--login {
   width: 100%;
   margin: 0 auto;
-} 
+}
 .section--login__common {
   @include spacing('margin-bottom', 'medium')
 }
@@ -738,7 +738,7 @@ a, .link--primary {
 .section--verify {
   width: 100%;
   margin: 0 auto;
-} 
+}
 .section--verify__option {
   @include spacing('padding', 'large');
   @include color('neutral', 'black', 'color');
@@ -897,7 +897,7 @@ a, .link--primary {
 }
 .input--seed {
   &::placeholder {
-    @include spacing('word-spacing', 'none');  
+    @include spacing('word-spacing', 'none');
   }
   @include spacing('word-spacing', 'medium');
 }
@@ -1005,8 +1005,8 @@ a, .link--primary {
   @include border-radius('base');
   @include font-size('small');
   @include spacing('padding', 'small');
-  @include color('red', 'darker', 'background-color');  
-  @include color('red', 'lighter', 'color');  
+  @include color('red', 'darker', 'background-color');
+  @include color('red', 'lighter', 'color');
 }
 
 //-------------------------------
@@ -1288,6 +1288,11 @@ i-feather[name='check-circle'] {
 .full-screen {
   min-height: 100%;
   background-color: #040609;
+  background-image: linear-gradient(0deg, #040609, #040609 10%, #050e1d 90%, #050e1d);
+}
+
+.screen-background {
+background-color: #040609;
   background-image: linear-gradient(0deg, #040609, #040609 10%, #050e1d 90%, #050e1d);
 }
 

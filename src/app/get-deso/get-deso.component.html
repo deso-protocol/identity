@@ -11,7 +11,7 @@
       <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
       <h3 class="text--neutral-white">Get starter $DESO</h3>
     </div>
-    <div class="padding-bottom--2xlarge text--center">      
+    <div class="padding-bottom--2xlarge text--center">
       <div class="section--starter__option">
         <div class="font-size--small margin-bottom--medium">
           <span class="text--text-lighter margin-bottom--small display--block">FREE DESO</span>
@@ -29,7 +29,7 @@
           Get Free $DESO
         </button>
       </div>
-      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>      
+      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
       <div class="section--starter__option">
         <div class="font-size--small margin-bottom--medium">
           <span class="text--text-lighter margin-bottom--small display--block">ANONYMOUS & INSTANT</span>
@@ -37,58 +37,94 @@
             2. Buy DESO anonymously, in under 10 seconds!
           </h6>
           <p>Get DESO directly via HeroSwap, anonymously and instantly<br/>using BTC, ETH, SOL, USDT, USDC and more.
-        </div>      
-        <!-- @mossified: TODO = Replace with actual buy-hero-swap component -->
+        </div>
         <div class="display--flex justify-content--center">
-          <iframe src='https://heroswap.com/widget' class="section--heroswap__iframe"></iframe>
-        </div>        
+          <iframe [src]="heroswapIframeUrl" class="section--heroswap__iframe"
+                  *ngIf="heroswapIframeUrl; else elseBlockIframe"></iframe>
+          <ng-template #elseBlockIframe>
+            <p class="text--text-lightest text--center">
+              <i class="fas fa-exclamation-triangle"></i> Unable to render iFrame.<br/>Invalid HeroSwap URL.
+            </p>
+          </ng-template>
+        </div>
+        <div>
+          <p class="text--left text--text-lightest">
+            Check your DeSo balance:
+            <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
+              globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
+          </p>
+        </div>
+        <button class="button--secondary button--medium margin-top--large"
+                [disabled]="refreshBalanceCooldown"
+                (click)="refreshBalanceCooldown ? null : refreshBalance()">
+          {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+        </button>
+        <button
+          (click)="finishFlow()"
+          [disabled]="isFinishFlowDisabled"
+          [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
+          class="button--secondary button--medium margin-top--large"
+          data-control-name="get-deso-finish-flow-button"
+        >Continue
+        </button>
       </div>
-      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>      
+      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
       <div class="section--starter__option">
         <div class="font-size--small">
           <span class="text--text-lighter margin-bottom--small display--block">TRANSFER VIA WALLET</span>
           <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
             3. Transfer DESO from an exchange or external wallet
           </h6>
-          <p>You will need at least 0.01 $DESO to create your new account. This could be transferred from an exchange like Coinbase, or from a DeSo app like Diamond.</p>
+          <p>You will need at least 0.01 $DESO to create your new account. This could be transferred from an exchange
+            like Coinbase, or from a DeSo app like Diamond.</p>
           <div class=" box--base box--rounded box--border margin-top--base">
             <div class="text--left">
               <p class="margin-bottom--small text--text-lightest">
-                1. DeSo is listed across top exchanges, like: 
+                1. DeSo is listed across top exchanges, like:
               </p>
-              <p class="text--xsmall">            
-                <a target="_blank" href="https://exchange.coinbase.com/trade/DESO-USD" class="link--secondary display--inline-block margin-right--xsmall">Coinbase,</a>
-                <a target="_blank" href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710&invite_code=zh5i6223" class="link--secondary display--inline-block margin-right--xsmall">Huobi,</a>
-                <a target="_blank" href="https://gate.io/trade/deso_usdt?ref=12312805" class="link--secondary display--inline-block margin-right--xsmall">Gate.io,</a>
-                <a target="_blank" href="https://www.ascendex.com/en/basic/cashtrade-spottrading/usdt/deso" class="link--secondary display--inline-block margin-right--xsmall">Ascendex,</a>
-                <a target="_blank" href="https://www.lbank.com/en-US/trade/deso_usdt/" class="link--secondary display--inline-block margin-right--xsmall">LBank,</a>
-                <a target="_blank" href="https://p2pb2b.com/trade/DESO_USDT" class="link--secondary display--inline-block margin-right--xsmall">p2b,</a>and
+              <p class="text--xsmall">
+                <a target="_blank" href="https://exchange.coinbase.com/trade/DESO-USD"
+                   class="link--secondary display--inline-block margin-right--xsmall">Coinbase,</a>
+                <a target="_blank"
+                   href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710&invite_code=zh5i6223"
+                   class="link--secondary display--inline-block margin-right--xsmall">Huobi,</a>
+                <a target="_blank" href="https://gate.io/trade/deso_usdt?ref=12312805"
+                   class="link--secondary display--inline-block margin-right--xsmall">Gate.io,</a>
+                <a target="_blank" href="https://www.ascendex.com/en/basic/cashtrade-spottrading/usdt/deso"
+                   class="link--secondary display--inline-block margin-right--xsmall">Ascendex,</a>
+                <a target="_blank" href="https://www.lbank.com/en-US/trade/deso_usdt/"
+                   class="link--secondary display--inline-block margin-right--xsmall">LBank,</a>
+                <a target="_blank" href="https://p2pb2b.com/trade/DESO_USDT"
+                   class="link--secondary display--inline-block margin-right--xsmall">p2b,</a>and
                 <a target="_blank" href="https://coinmarketcap.com/currencies/deso/#Markets" class="link--secondary">more</a>.
               </p>
             </div>
             <div class="section--divider"></div>
-            <!-- @mossified: TODO = Add public key -->
             <p class="text--left text--text-lightest">
               2. Send DESO to your public key (wallet address):
-              <code class="display--block font-size--small margin-top--small">BC1YLgaEbWxotvjEGut6798nRH9MtUWa6VK7nqAkjEbgZhd5gSvgaQj</code>
+              <code class="display--block font-size--small margin-top--small">{{ publicKeyAdded }}</code>
             </p>
-            <!-- @mossified: TODO = Add DESO bolance and refresh button -->
             <div class="section--divider"></div>
             <p class="text--left text--text-lightest">
               3. Check your DeSo balance:
-              <code class="display--block font-size--medium margin-left--xsmall margin-top--small">0.000012 DESO</code>
+              <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
+                globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
             </p>
           </div>
-          <!-- @mossified: TODO = Add refresh button -->
-          <button class="button--secondary button--medium margin-top--large">Refresh Balance</button>
-          <!-- <button
-            (click)="stepThreeNextBuy()"
-            class="button--secondary button--medium"
-            data-control-name="get-deso-button"
-            data-control-get-deso-option="anon"
-          >go to buy page
-          </button> -->
-        </div>        
+          <button class="button--secondary button--medium margin-top--large"
+                  [disabled]="refreshBalanceCooldown"
+                  (click)="refreshBalanceCooldown ? null : refreshBalance()">
+            {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+          </button>
+          <button
+            (click)="finishFlow()"
+            [disabled]="isFinishFlowDisabled"
+            [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
+            class="button--secondary button--medium margin-top--large"
+            data-control-name="get-deso-finish-flow-button"
+          >Continue
+          </button>
+        </div>
       </div>
       <button
         *ngIf="this.globalVars.showSkip"
