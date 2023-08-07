@@ -170,7 +170,12 @@ export class GetDesoComponent implements OnInit {
   }
 
   ////// FINISH FLOW ///////
+  isFinishFlowDisabled = this.globalVars.derive ? this.userBalanceNanos > 1e4 : false;
+
   finishFlow(): void {
+    if (this.isFinishFlowDisabled) {
+      return;
+    }
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
         queryParams: {publicKey: this.publicKeyAdded},
