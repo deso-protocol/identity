@@ -55,7 +55,7 @@ export class SwalHelper {
 
     const escapedOptions = {
       icon: escapedIcon,
-      customClass: escapedCustomClass,
+      customClass: {...escapedCustomClass, popup: 'screen-background text--text-lightest box--border'}
     };
 
     for (const field of SwalHelper.UNESCAPED_FIELDS) {
