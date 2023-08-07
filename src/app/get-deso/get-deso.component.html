@@ -47,6 +47,13 @@
             </p>
           </ng-template>
         </div>
+        <!-- TODO: Condition to prevent user from continuing w/o sufficient balance -->
+        <button
+          (click)="finishFlow()"
+          class="button--secondary button--medium margin-top--large"
+          data-control-name="get-deso-finish-flow-button"
+        >Continue
+        </button>
       </div>
       <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
       <div class="section--starter__option">
@@ -96,13 +103,13 @@
                   (click)="refreshBalanceCooldown ? null : refreshBalance()">
             {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
           </button>
-          <!-- <button
-            (click)="stepThreeNextBuy()"
-            class="button--secondary button--medium"
-            data-control-name="get-deso-button"
-            data-control-get-deso-option="anon"
-          >go to buy page
-          </button> -->
+          <!-- TODO: Condition to prevent user from continuing w/o sufficient balance -->
+          <button
+            (click)="finishFlow()"
+            class="button--secondary button--medium margin-top--large"
+            data-control-name="get-deso-finish-flow-button"
+          >Continue
+          </button>
         </div>
       </div>
       <button
