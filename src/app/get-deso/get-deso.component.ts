@@ -64,6 +64,7 @@ export class GetDesoComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       if (queryParams.publicKey) {
         this.publicKeyAdded = queryParams.publicKey;
+        this.refreshBalance();
       }
     });
   }
@@ -156,6 +157,7 @@ export class GetDesoComponent implements OnInit {
         const user = res.UserList[0];
         if (user.BalanceNanos) {
           this.userBalanceNanos = user.BalanceNanos;
+          this.isFinishFlowDisabled = this.globalVars.derive ? this.userBalanceNanos < 1e4 : false;
         }
       });
 
