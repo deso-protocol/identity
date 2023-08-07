@@ -19,7 +19,7 @@ $input-background: #f7f7fc;
 
 $light-font-color: #8d8f8f;
 $normal-font-color: #626480;
-$title-font-color: #0e0e23;
+$title-font-color: #FFF;
 $banner-font-color: #292941;
 $red-font-color: #ff3434;
 $green-font-color: #19b028;
@@ -577,6 +577,9 @@ a, .link--primary {
 .justify--end {
   justify-content: end;
 }
+.justify--center {
+  justify-content: center;
+}
 .items--start {
   align-items: start;
 }
@@ -873,6 +876,18 @@ a, .link--primary {
   @include color('neutral', 'black', 'color');
   @include color('neutral', 'white', 'background-color');
   @include border-radius('base');
+}
+
+.section--access-level {
+  display: block;
+  position: relative;
+  font-size: 18px;
+  padding: 0 1.25rem;
+}
+
+.section--access-level-description {
+  @include font-size('small');
+  color: $normal-font-color;
 }
 //-------------------------------
 // FORMS = Input
