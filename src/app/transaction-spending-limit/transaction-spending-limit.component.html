@@ -2,10 +2,10 @@
   <div>
     <div
       *ngIf="!transactionSpendingLimitResponse?.IsUnlimited"
-      class="d-flex justify-content-between px-20px fs-18px"
+      class="box--rounded box--border box--base margin-top--medium display--flex items--center justify--between flex--column--tablet gap--15--tablet"
     >
       <div class="text-left">Cumulative Spending Limit</div>
-      <div>
+      <code class="font-size--medium">
         {{
           globalVars.nanosToDeSo(
             transactionSpendingLimitResponse.GlobalDESOLimit || 0,
@@ -13,10 +13,11 @@
           )
         }}
         DESO
-      </div>
+      </code>
     </div>
 
-    <div class="mt-3">
+    <div class="margin-top--large margin-bottom--large">
+      <p class="margin-bottom--small font-size--small text--text-lighter margin-bottom--base">By clicking approve, you are granting all of the listed permissions to {{globalVars.hostname}} </p>
       <button
         data-control-name="tx-spending-limit-approve-button"
         [attr.data-control-is-unlimited]="
@@ -28,14 +29,14 @@
         [attr.data-control-tx-memo]="
           this.transactionSpendingLimitResponse.DerivedKeyMemo
         "
-        class="button btn-primary button-large text-white font-weight-bold"
+        class="button--primary button--medium"
         (click)="this.onApproveClickWrapper()"
         [disabled]="this.isPendingApprove"
       >
-        <span *ngIf="!this.isPendingApprove; else loadingSpinner">Approve</span>
+        <span *ngIf="!this.isPendingApprove; else loadingSpinner">Yes, I Approve</span>
         <ng-template #loadingSpinner>
           <div
-            class="spinner-border ml-3"
+            class="spinner-border margin-left--xsmall"
             style="width: 25px; height: 25px"
           ></div>
         </ng-template>

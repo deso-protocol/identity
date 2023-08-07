@@ -37,6 +37,39 @@ $highlight-secondary: #e5f2ff;
 $success: #2cc99a;
 $error: #ff6939;
 
+
+//-------------------------------
+// BREAKPOINTS
+//-------------------------------
+$breakpoints: (
+  "mobile": 320px,
+  "tablet": 640px,
+  "desktop": 960px,
+  "desktop-large": 1280px,
+  "desktop-xlarge": 1440px,
+  "desktop-2xlarge": 1600px
+);
+
+@mixin media($breakpoint) {
+  $breakpoint-value: map-get($breakpoints, $breakpoint);
+  @if $breakpoint-value {
+    @media (max-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+  }
+}
+
+@mixin container($breakpoint) {
+  $width-value: map-get($breakpoints, $breakpoint);
+  @if $width-value {
+    width: $width-value;
+  } @else {
+    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+  }
+}
+
 //-------------------------------
 // FONTS = Families
 //-------------------------------
@@ -76,11 +109,10 @@ $font-sizes: (
 }
 
 @each $size-key, $size-value in $font-sizes {
-  .text--#{$size-key} {
+  .font-size--#{$size-key} {
     @include font-size($size-key);
   }
 }
-
 
 //-------------------------------
 // FONTS = Weights
@@ -103,7 +135,7 @@ $font-weights: (
 }
 
 @each $weight-key, $weight-value in $font-weights {
-  .text--#{$weight-key} {
+  .font-weight--#{$weight-key} {
     @include font-weight($weight-key);
   }
 }
@@ -112,6 +144,11 @@ $font-weights: (
 // COLORS
 //-------------------------------
 $colors: (
+  "text": (
+    "lightest": #ccdff3fb,
+    "lighter": #93c5fdcc,
+    "base": #93c5fd99
+  ),
   "neutral": (
     "white": #FFF,
     "black": #000,
@@ -121,15 +158,15 @@ $colors: (
     "lighter": lighten(#1d40b0, 40%),
     "light": lighten(#1d40b0, 20%),
     "base": #1d40b0,
-    "dark": darken(#1d40b0, 20%),
-    "darker": darken(#1d40b0, 40%),
+    "dark": #1b3561,
+    "darker": #0b183a,
   ),
   "red": (
-    "lighter": #faa7a1,
+    "lighter": #ffc2be,
     "light": #e84a49,
     "base": #c03230,
     "dark": #8a1c1b,
-    "darker": #460a09,
+    "darker": #460a0997,
   ),
   "yellow": (
     "lighter": #ffffe0,
@@ -176,8 +213,8 @@ $colors: (
 // SPACING UNITS
 //-------------------------------
 $spacing-units: (
-  "none": 0px,
-  "xsmall": 4px, 
+  "none": 0,
+  "xsmall": 4px,
   "small": 8px,
   "medium": 16px,
   "base": 24px,
@@ -190,7 +227,7 @@ $spacing-units: (
 
 $directions: (
   "padding": ( "left", "right", "top", "bottom" ),
-  "margin": ( "left", "right", "top", "bottom" )
+  "margin": ( "left", "right", "top", "bottom" ),
 );
 
 @mixin spacing($property, $values...) {
@@ -212,66 +249,162 @@ $directions: (
 }
 
 //-------------------------------
-// BREAKPOINTS
+// WIDTH
 //-------------------------------
-$breakpoints: (
-  "mobile": 320px,
-  "tablet": 640px,
-  "desktop": 960px,
-  "desktop-large": 1280px,
-  "desktop-xlarge": 1440px,
-  "desktop-2xlarge": 1600px
+$sizes: (
+  0, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 33, 49
 );
 
-@mixin media($breakpoint) {
-  $breakpoint-value: map-get($breakpoints, $breakpoint);
-  @if $breakpoint-value {
-    @media (min-width: $breakpoint-value) {
-      @content;
-    }
-  } @else {
-    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+@mixin width($size) {
+  width: unquote($size + "%");
+}
+
+@mixin gap($size) {
+  gap: unquote($size + "px");
+}
+
+@each $size in $sizes {
+  .width--#{$size} {
+    @include width($size);
   }
 }
 
-@mixin width($breakpoint) {
-  $width-value: map-get($breakpoints, $breakpoint);
-  @if $width-value {
-    width: $width-value;
-  } @else {
-    @warn "No breakpoint key '#{$breakpoint}' found in breakpoints map.";
+@each $size in $sizes {
+  .gap--#{$size}--mobile {
+    @include media(mobile){
+       @include gap($size);
+    }
   }
 }
+
+@each $size in $sizes {
+  .gap--#{$size}--tablet {
+    @include media(tablet){
+       @include gap($size);
+    }
+  }
+}
+
+//-------------------------------
+// BORDER RADIUS = Sizes
+//-------------------------------
+$border-radius: (
+  "xsmall": 4px,
+  "small": 8px,
+  "medium": 12px,
+  "base": 20px,
+  "pill": 100px,
+  "circle": 100%,
+);
+
+@mixin border-radius($size-key) {
+  $size-value: map-get($border-radius, $size-key);
+  @if $size-value {
+    border-radius: $size-value;
+  } @else {
+    @warn "No size key '#{$size-key}' found in border radius map.";
+  }
+}
+
+@each $size-key, $size-value in $border-radius {
+  .border-radius--#{$size-key} {
+    @include border-radius($size-key);
+  }
+}
+
 
 //-------------------------------
 // HTML & BODY
 //-------------------------------
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   font-family: $font-primary;
   height: 100%;
   width: 100%;
-  color: #93c5fd99;
+  overflow-x: hidden;
   background-color: #040609;
   background-image: linear-gradient(0deg,#040609,#040609 10%,#050e1d 90%,#050e1d);
+  @include color('text', 'base', 'color');
 }
+
+//-------------------------------
+// Images
+//-------------------------------
+img {
+  vertical-align: middle;
+}
+
+//-------------------------------
+// IMAGES = FILTERS
+//-------------------------------
+.image--invert {
+  filter: invert(1);
+}
+
 
 //-------------------------------
 // TYPOGRAPHY
 //-------------------------------
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
+h1, h2, h3, h4, h5, h6{
+  @include spacing('margin', 'none');
+  font-weight: normal;
+  line-height: 1.5;
+  @include media(tablet) {
+    line-height: 1.3;
+  }
+}
+
 p {
   @include spacing('margin', 'none');
   font-weight: normal;
+  line-height: 1.5;
 }
 
-a:hover {
-  text-decoration: underline;
+h1 {
+  @include font-size('4xlarge');
+  @include media(tablet) {
+    @include font-size('3xlarge');
+  }
+}
+h2 {
+  @include font-size('3xlarge');
+  @include media(tablet) {
+    @include font-size('2xlarge');
+  }
+}
+h3 {
+  @include font-size('2xlarge');
+  @include media(tablet) {
+    @include font-size('large');
+  }
+}
+h4 {
+  @include font-size('xlarge');
+  @include media(tablet) {
+    @include font-size('large');
+  }
+}
+h5 {
+  @include font-size('large');
+  @include media(tablet) {
+    @include font-size('large');
+  }
+}
+h6 {
+  @include font-size('medium');
+  @include media(tablet) {
+    @include font-size('medium');
+  }
+}
+
+br {
+  @include media(tablet) {
+    display: none;
+  }
 }
 
 ul {
@@ -280,21 +413,68 @@ ul {
   @include spacing('padding', 'none');
 }
 
+code {
+  font-family: monospace;
+  word-break: break-all;
+  @include border-radius('base');
+  @include spacing('padding-left', 'medium');
+  @include spacing('padding-right', 'medium');
+  @include spacing('padding-top', 'xsmall');
+  @include spacing('padding-bottom', 'xsmall');
+  @include color('blue', 'lighter', 'color');
+  @include color('blue', 'dark', 'background');
+  @include font-size('small');
+  &:hover {
+    @include color('neutral', 'white', 'color');
+  }
+}
+
+//-------------------------------
+// LINKS = Styles
+//-------------------------------
+a, .link--primary {
+  @include color('text', 'lighter', 'color');
+  text-decoration: underline;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.link--secondary {
+  @include color('blue', 'light', 'color');
+  text-decoration: underline;
+  &:hover {
+    @include color('blue', 'base', 'color');
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
 //-------------------------------
 // BUTTONS = Styles
 //-------------------------------
 %button {
   border: 0;
-  border-radius: 100px;
   width: 100%;
+  @include border-radius('pill');
+  &:hover {
+    cursor: pointer;
+  }
 }
-
+.button--link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
+  }
+}
 .button--primary {
   @extend %button;
   @include color('blue', 'base', 'background-color');
   @include color('neutral', 'white', 'color');
   &:hover {
-    @include color('blue', 'dark', 'background-color');
+    @include color('blue', 'darker', 'background-color');
   }
 }
 .button--primary--outline {
@@ -302,17 +482,74 @@ ul {
   border: 1px solid;
   @include color('blue', 'dark', 'border-color');
   @include color('neutral', 'transparent', 'background-color');
+  @include color('text', 'lighter', 'color');
+  &:hover {
+    @include color('blue', 'darker', 'background-color');
+  }
+}
+
+.button--secondary {
+  @extend %button;
+  @include color('blue', 'darker', 'background-color');
   @include color('neutral', 'white', 'color');
   &:hover {
-    @include color('blue', 'dark', 'background-color');
+    @include color('blue', 'base', 'background-color');
+  }
+}
+.button--secondary--outline {
+  @extend %button;
+  border: 1px solid;
+  @include color('blue', 'darker', 'border-color');
+  @include color('neutral', 'transparent', 'background-color');
+  @include color('blue', 'darker', 'color');
+  &:hover {
+    @include color('blue', 'darker', 'background-color');
+    @include color('neutral', 'white', 'color');
+  }
+}
+.button--red {
+  @extend %button;
+  @include color('red', 'base', 'background-color');
+  @include color('neutral', 'white', 'color');
+  &:hover {
+    @include color('red', 'darker', 'background-color');
+  }
+}
+.button--red--outline {
+  @extend %button;
+  border: 1px solid;
+  @include color('red', 'dark', 'border-color');
+  @include color('neutral', 'transparent', 'background-color');
+  @include color('text', 'lighter', 'color');
+  &:hover {
+    @include color('red', 'darker', 'background-color');
+  }
+}
+
+.button--disabled {
+  @extend %button;
+  @include color('blue', 'dark', 'background-color');
+  @include color('blue', 'lighter', 'color');
+  opacity: 0.4;
+  &:hover {
+    @include color('blue', 'base', 'background-color');
+    cursor: not-allowed;
   }
 }
 
 //-------------------------------
-// BUTTONS = Sizes 
+// BUTTONS = Sizes
 //-------------------------------
+.button--small {
+  @include font-size('small');
+  @include spacing('padding-top', 'small');
+  @include spacing('padding-bottom', 'small');
+  @include spacing('padding-left', 'medium');
+  @include spacing('padding-right', 'medium');
+}
 .button--medium {
-  @include spacing('padding', 'medium'); 
+  @include font-size('medium');
+  @include spacing('padding', 'medium');
 }
 
 //-------------------------------
@@ -349,13 +586,85 @@ ul {
 .items--end {
   align-items: end;
 }
-
+.flex--column {
+  flex-direction: column;
+}
+.flex--row {
+  flex-direction: row;
+}
+.flex--column-reverse {
+  flex-direction: column-reverse;
+}
+.flex--row-reverse {
+  flex-direction: row-reverse;
+}
+.flex--column--tablet {
+  @include media(tablet) { flex-direction: column; };
+}
+.flex--row--tablet {
+  @include media(tablet) { flex-direction: row; };
+}
+.flex--column-reverse--tablet {
+  @include media(tablet) { flex-direction: column-reverse; };
+}
+.flex--row-reverse--tablet {
+  @include media(tablet) { flex-direction: row-reverse; };
+}
 //-------------------------------
 // LAYOUT
 //-------------------------------
 .container {
-  @include width(tablet);
   margin: 0 auto;
+  @include spacing('padding-left', 'large');
+  @include spacing('padding-right', 'large');
+  @include container(tablet);
+
+  @include media(tablet) {
+    min-width: 100%;
+    width: 100%;
+  }
+  @include media(mobile) {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+.container--scrollbar {
+  overflow-x: hidden !important;
+}
+.container--scrollbar::-webkit-scrollbar {
+  width: 0.3rem;
+}
+.container--scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.container--scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(254, 208, 0, 1);
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+//-------------------------------
+// BOX
+//-------------------------------
+.box--rounded {
+  @include border-radius('base');
+}
+.box--border {
+  border: 1px solid;
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
+}
+.box--small {
+  @include spacing('padding', 'small');
+}
+.box--base {
+  @include spacing('padding', 'base');
+}
+.box--medium {
+  @include spacing('padding', 'medium');
+}
+.box--large {
+  @include spacing('padding', 'large');
 }
 
 //-------------------------------
@@ -369,13 +678,18 @@ ul {
   @include color('blue', 'dark', 'border-color');
   @include spacing('padding', 'medium');
   @include spacing('margin-bottom', 'xlarge');
+  @include media(tablet) {
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: center;
+  }
 }
 .section--header__left {
   display: flex;
   align-items: center;
 
   .section--header__logo {
-    width: 100px;
+    width: 80px;
     height: auto;
     @include spacing('margin-right', 'small');
   }
@@ -388,7 +702,7 @@ ul {
   .section--header__verify {
     display: flex;
     align-items: center;
-    border-radius: 100px;
+    @include border-radius('pill');
     @include font-size('small');
     @include spacing('padding-left', 'medium');
     @include spacing('padding-right', 'medium');
@@ -397,69 +711,210 @@ ul {
     @include color('green', 'lighter', 'color');
     @include color('green', 'darker', 'background-color');
   }
+
+  @include media(tablet) {
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: center;
+    @include spacing('margin-top', 'base');
+  }
 }
 //-------------------------------
 // SECTION = Login Options
 //-------------------------------
 .section--login {
-  width: 60%;
+  width: 100%;
   margin: 0 auto;
-} 
+}
 .section--login__common {
   @include spacing('margin-bottom', 'medium')
 }
 .section--login__advanced {
-  border-radius: 20px;
-  border: 1px solid;
   @include color('blue', 'dark', 'border-color');
+}
+//-------------------------------
+// SECTION = Login Options
+//-------------------------------
+.section--verify {
+  width: 100%;
+  margin: 0 auto;
+}
+.section--verify__option {
   @include spacing('padding', 'large');
+  @include color('neutral', 'black', 'color');
+  @include color('neutral', 'white', 'background-color');
+  @include border-radius('base');
+}
+.section--verify__advanced {
+  @include color('blue', 'dark', 'border-color');
 }
 //-------------------------------
 // SECTION = Logged-In Accounts
 //-------------------------------
 .section--accounts {
   width: 100%;
-  border-radius: 20px;
   text-align: left;
-  @include color('neutral', 'white', 'background-color');
-  @include spacing('padding', 'medium');
-  @include spacing('margin-bottom', 'medium');
+  @include border-radius('base');
+}
+.section--accounts__illustration {
+  margin-bottom: 20px;
+  position: relative;
+  margin-top: -70px;
 }
 .section--accounts__header {
   text-align: center;
-  @include color('neutral', 'black', 'color');
-  @include font-weight('semibold');
+  @include font-weight('base');
+  @include font-size('small');
+}
+.section--accounts__icon {
+  height: 22px;
 }
 .section--accounts__list {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 245px;
+  overflow: scroll;
+  border: 1px solid;
+  @include spacing('padding', 'medium');
+  @include spacing('padding-top', 'small');
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
 }
 .section--accounts__item {
   width: 100%;
   border: 1px solid;
-  border-radius: 100px;
   justify-content: space-between;
   display: flex;
   align-items: center;
+  @include border-radius('pill');
   @include spacing('padding-left', 'small');
   @include spacing('padding-right', 'medium');
   @include spacing('padding-top', 'small');
   @include spacing('padding-bottom', 'small');
-  @include color('neutral', 'black', 'color');
-  @include font-weight('semibold');
+  @include spacing('margin-top', 'small');
+  @include color('text', 'lighter', 'color');
+  @include color('blue', 'darker', 'background-color');
+  @include color('blue', 'dark', 'border-color');
+  @include font-weight('medium');
+  @include font-size('small');
 
   &:hover {
-    @include color('blue', 'lighter', 'border-color');
+    @include color('blue', 'light', 'border-color');
     cursor: pointer;
   }
+}
+//-------------------------------
+// SECTION = Create Seed Phrase
+//-------------------------------
+.section--seed {
+  text-align: center;
+}
+.section--seed__container {
+  background: $input-background;
+  color: $normal-font-color;
+  width: 100%;
+  height: 100%;
+  @include border-radius('base');
+  @include font-size('medium');
+  @include spacing('padding', 'large');
+}
+.section--seed__phrase {
+  text-align: left;
+  @include font-size('medium');
+  @include spacing('line-height', 'large');
+  @include spacing('word-spacing', 'large');
+}
+.section--seed__actions {
+  display: flex;
+  align-items: center;
+  @include spacing('gap', 'small');
+}
+.section--seed__advanced {
+  border-top: 1px solid;
+  @include spacing('margin-top', 'large');
+  @include spacing('padding-top', 'large');
+  @include color('blue', 'dark', 'border-top-color')
+}
+//-------------------------------
+// SECTION = Get Starter DeSo
+//-------------------------------
+.section--starter {
+  text-align: center;
+}
+.section--starter__option {
+  border: 1px solid;
+  @include spacing('padding', 'large');
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
+}
+//-------------------------------
+// SECTION = Phone Page
+//-------------------------------
+.section--phone {
+  text-align: center;
+}
+.section--phone__option {
+  @include spacing('padding', 'large');
+  @include color('neutral', 'black', 'color');
+  @include color('neutral', 'white', 'background-color');
+  @include border-radius('base');
+}
+//-------------------------------
+// SECTION = Login Page
+//-------------------------------
+.section--login {
+  text-align: center;
+}
+.section--login__option {
+  border: 1px solid;
+  @include spacing('padding', 'large');
+  @include color('neutral', 'black', 'color');
+  @include color('neutral', 'white', 'background-color');
+  @include border-radius('base');
+}
+//-------------------------------
+// FORMS = Input
+//-------------------------------
+.input--textarea {
+  width: 100%;
+  border: 1px solid;
+  font-family: $font-primary;
+  @include border-radius('small');
+  @include font-size('medium');
+  @include spacing('padding', 'medium');
+  @include color('blue', 'dark', 'border-color');
+}
+.input--phone {
+  width: 100%;
+  border: 1px solid;
+  @include border-radius('small');
+  @include font-size('medium');
+  @include spacing('text-indent', 'medium');
+  @include spacing('padding', 'medium');
+  @include color('blue', 'dark', 'border-color');
+}
+.input--seed {
+  &::placeholder {
+    @include spacing('word-spacing', 'none');
+  }
+  @include spacing('word-spacing', 'medium');
+}
+//---------------------------------------------
+// FORMS = Input Overrides for Phone Number
+//---------------------------------------------
+.iti__selected-flag {
+  margin-right: 10px !important;
+}
+.iti {
+  width: 100% !important;
 }
 //-------------------------------
 // AVATARS = Shapes
 //-------------------------------
 .avatar--rounded {
-  border-radius: 100%;
+  @include border-radius('circle');
 }
 .avatar--medium {
   @include spacing('width', 'medium');
@@ -473,6 +928,96 @@ ul {
   @include spacing('width', 'xlarge');
   @include spacing('height', 'xlarge');
 }
+//-------------------------------
+// TEXT = Styles
+//-------------------------------
+.text--divider {
+  width: 100%;
+  position: relative;
+  text-align: center;
+  &:after, &:before {
+    content: '';
+    border-bottom: 1px solid;
+    width: 45%;
+    height: 1px;
+    top: 12px;
+    position: absolute;
+    opacity: 0.5;
+    @include color('blue', 'light', 'border-color');
+  }
+  &:after {
+    content: '';
+    left: 0;
+  }
+  &:before {
+    content: '';
+    right: 0;
+  }
+}
+.section--divider {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid;
+  height: 1px;
+  opacity: 0.5;
+  @include color('blue', 'light', 'border-color');
+  @include spacing('margin-top', 'base');
+  @include spacing('margin-bottom', 'base');
+}
+.section--divider--small {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid;
+  height: 1px;
+  opacity: 0.5;
+  @include color('blue', 'light', 'border-color');
+  @include spacing('margin-top', 'small');
+  @include spacing('margin-bottom', 'small');
+}
+.section--divider--medium {
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid;
+  height: 1px;
+  opacity: 0.5;
+  @include color('blue', 'light', 'border-color');
+  @include spacing('margin-top', 'medium');
+  @include spacing('margin-bottom', 'medium');
+}
+//-------------------------------
+// TEXT = Alignment
+//-------------------------------
+.text--left {
+  text-align: left;
+}
+.text--right {
+  text-align: right;
+}
+.text--center {
+  text-align: center;
+}
+//-------------------------------
+// WARNING = ALERT BANNERS
+//-------------------------------
+.warning--error {
+  text-align: center;
+  line-height: 1.5;
+  @include border-radius('base');
+  @include font-size('small');
+  @include spacing('padding', 'small');
+  @include color('red', 'darker', 'background-color');
+  @include color('red', 'lighter', 'color');
+}
+
+//-------------------------------
+// SECTIOn = HEROSWAP IFRAME
+//-------------------------------
+.section--heroswap__iframe {
+  width: 100%;
+  border: 0;
+  height: 450px;
+}
+
 
 //-------------------------------
 // OLD CSS BELOW // REMOVE LATER
@@ -741,8 +1286,14 @@ i-feather[name='check-circle'] {
 }
 
 .full-screen {
-  height: 100%;
-  width: 100%;
+  min-height: 100%;
+  background-color: #040609;
+  background-image: linear-gradient(0deg, #040609, #040609 10%, #050e1d 90%, #050e1d);
+}
+
+.screen-background {
+background-color: #040609;
+  background-image: linear-gradient(0deg, #040609, #040609 10%, #050e1d 90%, #050e1d);
 }
 
 .avatar {

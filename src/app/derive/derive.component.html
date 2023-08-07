@@ -4,69 +4,65 @@
   *ngIf="
     !globalVars.callbackInvalid && !deleteKey && validationErrors === false
   "
-  class="container text-center"
+  class="container text--center"
 >
   <div>
-    <h3 class="text--neutral-white text--large margin-bottom--base">
-      Grant signing access
-      <span *ngIf="!globalVars.callback">to {{ globalVars.hostname }}</span>
+    <img src="assets/image-head.svg" width="60" class="section--accounts__illustration"/>
+    <h3 class="text--neutral-white text--large margin-top--medium margin-bottom--base">
+      Grant signing access to
+      <span *ngIf="!globalVars.callback" class="text--green-lighter">{{ globalVars.hostname }}</span>
     </h3>
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
         [allUsers]="allUsers"
         (onAccountSelect)="this.onAccountSelected($event)"
       ></app-account-select>
-      <div class="margin-bottom--medium">or</div>
+      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
       <app-log-in-options></app-log-in-options>
     </ng-container>
     <div
-      class="fs-18px pt-15px pb-5px"
-      style="overflow: hidden; overflow-wrap: anywhere; word-break: break-all"
+      class="box--border box--base box--rounded"
       *ngIf="publicKeyBase58Check"
     >
-      <div class="pl-20px text-left d-flex justify-content-between">
+      <div class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet">
         Public Key
-        <span class="font-weight-normal pr-20px pb-15px text-left">{{
-          publicKeyBase58Check | truncateAddressOrUsername
-        }}</span>
+        <code class="font-size--medium">{{ publicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
-      <div class="pl-20px text-left d-flex justify-content-between" *ngIf="derivedPublicKeyBase58Check">
+      <div class="section--divider--medium"></div>
+      <div class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet" *ngIf="derivedPublicKeyBase58Check">
         Derived Public Key
-        <span class="font-weight-normal pr-20px">{{
-          derivedPublicKeyBase58Check | truncateAddressOrUsername
-        }}</span>
+        <code class="font-size--medium">{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code>
       </div>
     </div>
   </div>
-  <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="mb-40px">
+  <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="padding-bottom--xlarge">
     <app-transaction-spending-limit
       [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       [onApproveClick]="this.onApproveClick"
     ></app-transaction-spending-limit>
   </div>
 </div>
-<div class="container home-container" *ngIf="deleteKey">
-  <div class="fs-18px mt-30px">
-    <span class="fs-underline mb-2"
-      ><b
-        >You're about to revoke signing access for a Derived Public Key</b
-      ></span
-    ><br />
-    This means
-    <b>{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</b> will no
-    longer be able to make transactions on your behalf.
+<div class="container text--center" *ngIf="deleteKey">
+  <div class="margin-bottom--base">
+    <h5 class="text--neutral-white margin-bottom--small">Would you like to revoke derived key access?</h5>
+    <p class="text--text-lighter margin-bottom--medium">
+      You're about to revoke signing access for a Derived Public Key. 
+    </p>
+    <p class="text--text-lighter">
+      This means <code>Derived Key: {{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code> will no longer be able to make transactions on your behalf.
+    </p>
   </div>
   <button
     [disabled]="!publicKeyBase58Check"
-    class="button button-large btn-warning mb-20px text-black font-weight-bold mt-2"
+    class="button--red button--medium"
     (click)="approveDerivedKey(publicKeyBase58Check)"
   >
-    Revoke
+    Yes, Revoke Access
   </button>
 </div>
 <div *ngIf="globalVars.callbackInvalid">
   <app-error-callback></app-error-callback>
 </div>
-<div *ngIf="validationErrors" class="text-center text-danger title-text">
+<div *ngIf="validationErrors" class="warning--error container">
   There was an issue rendering this page, are the query parameters correct?
 </div>

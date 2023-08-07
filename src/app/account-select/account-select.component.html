@@ -2,7 +2,7 @@
   <div class="section--accounts__header margin-bottom--medium">
     {{componentTitle}}
   </div>
-  <ul class="section--accounts__list margin-bottom--small">
+  <ul class="section--accounts__list container--scrollbar margin-bottom--small">
     <li
       *ngFor="let item of allUsers | async | keyvalue; let i = index"
       class="section--accounts__item"
@@ -17,10 +17,10 @@
           />
           {{ item.key | truncateAddressOrUsername }}
         </div>
-        <div *ngIf="item.value.username" class="d-flex align-items-center">
-          <div [appAvatar]="item.key"></div>
-          <div>{{ item.value.username | truncateAddressOrUsername }}</div>
-        </div>        
+        <div *ngIf="item.value.username">
+          <img class="avatar--rounded avatar--large margin-right--xsmall" [appAvatar]="item.key"/>
+          {{ item.value.username | truncateAddressOrUsername }}
+        </div>
       </div>
       <img
         *ngIf="!hideLoginMethod"
@@ -29,8 +29,7 @@
             accountService.getLoginMethodWithPublicKeyBase58Check(item.key)
           )
         "
-        width="22px"
-        height="auto"
+        class="section--accounts__icon"
       />
     </li>
   </ul>
