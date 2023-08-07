@@ -47,9 +47,22 @@
             </p>
           </ng-template>
         </div>
-        <!-- TODO: Condition to prevent user from continuing w/o sufficient balance -->
+        <div>
+          <p class="text--left text--text-lightest">
+            Check your DeSo balance:
+            <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
+              globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
+          </p>
+        </div>
+        <button class="button--secondary button--medium margin-top--large"
+                [disabled]="refreshBalanceCooldown"
+                (click)="refreshBalanceCooldown ? null : refreshBalance()">
+          {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+        </button>
         <button
           (click)="finishFlow()"
+          [disabled]="isFinishFlowDisabled"
+          [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
           class="button--secondary button--medium margin-top--large"
           data-control-name="get-deso-finish-flow-button"
         >Continue
@@ -95,7 +108,7 @@
             <p class="text--left text--text-lightest">
               3. Check your DeSo balance:
               <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
-                globalVars.nanosToDeSo(userBalanceNanos) }} $DESO</code>
+                globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
             </p>
           </div>
           <button class="button--secondary button--medium margin-top--large"
@@ -103,9 +116,10 @@
                   (click)="refreshBalanceCooldown ? null : refreshBalance()">
             {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
           </button>
-          <!-- TODO: Condition to prevent user from continuing w/o sufficient balance -->
           <button
             (click)="finishFlow()"
+            [disabled]="isFinishFlowDisabled"
+            [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
             class="button--secondary button--medium margin-top--large"
             data-control-name="get-deso-finish-flow-button"
           >Continue
