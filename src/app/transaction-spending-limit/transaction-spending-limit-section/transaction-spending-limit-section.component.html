@@ -52,7 +52,8 @@
             TransactionSpendingLimitComponent.DAOCoinLimitsSection
         "
       >
-        <div *ngIf="anyCreatorItem" class="mb-15px px-5px py-15px">
+        <div *ngIf="anyCreatorItem"
+             class="margin-bottom--medium">
           <app-transaction-spending-limit-coin
             coinPublicKey=""
             [coinOperationMap]="anyCreatorItem"
@@ -68,7 +69,7 @@
                     ? globalVars.ObjectKeyLength(sectionMap)
                     : defaultNumShown)
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-coin
             [coinPublicKey]="coinLimitItem.key"
@@ -83,7 +84,8 @@
           sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection
         "
       >
-        <div *ngIf="anyNFTItem" class="mb-15px px-5px py-15px">
+        <div *ngIf="anyNFTItem"
+             class="margin-bottom--medium">
           <app-transaction-spending-limit-nft
             nftPostHashHex=""
             [nftSerialNumToOperationMap]="anyNFTItem"
@@ -100,12 +102,12 @@
                     : defaultNumShown);
             let ii = index
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--small"
         >
           <app-transaction-spending-limit-nft
             [nftPostHashHex]="nftLimitItem.key"
             [nftSerialNumToOperationMap]="nftLimitItem.value"
-            class="pb-15px"
+            class="padding-bottom--small"
           ></app-transaction-spending-limit-nft>
           <div
             class="flex-grow-1 transaction-spending-limit-separator"
@@ -125,10 +127,10 @@
           TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
         "
       >
-        <div class="d-flex pb-10px">
-          <div class="col-5">Buying</div>
-          <div class="col-5">Selling</div>
-          <div class="col-2">Count</div>
+        <div class="display--flex padding-bottom--small">
+          <div class="width--40">Buying</div>
+          <div class="width--40">Selling</div>
+          <div class="width--20">Count</div>
         </div>
         <div
           *ngFor="
@@ -219,7 +221,7 @@
 
   <div
     *ngIf="showDetails"
-    class="d-flex justify-content-center mr-15px ml-15px"
+    class="display--flex justify--center margin-right--medium margin-left--medium"
     (click)="
       showDetails = !showAll;
       showAll = !showAll || getSectionMapLength() <= defaultNumShown
