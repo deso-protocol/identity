@@ -46,6 +46,7 @@ export class TransactionSpendingLimitComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.transactionSpendingLimitResponse);
     const publicKeysToFetch = [
       ...new Set<string>(
         this.getPublicKeysFromCoinOperationLimitMap(

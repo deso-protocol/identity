@@ -7,17 +7,18 @@
       <div class="text-left">Cumulative Spending Limit</div>
       <code class="font-size--medium">
         {{
-          globalVars.nanosToDeSo(
-            transactionSpendingLimitResponse.GlobalDESOLimit || 0,
-            4
-          )
+        globalVars.nanosToDeSo(
+        transactionSpendingLimitResponse.GlobalDESOLimit || 0,
+        4
+        )
         }}
         DESO
       </code>
     </div>
 
     <div class="margin-top--large margin-bottom--large">
-      <p class="margin-bottom--small font-size--small text--text-lighter margin-bottom--base">By clicking approve, you are granting all of the listed permissions to {{globalVars.hostname}} </p>
+      <p class="margin-bottom--small font-size--small text--text-lighter margin-bottom--base">By clicking approve, you
+        are granting all of the listed permissions to {{globalVars.hostname}} </p>
       <button
         data-control-name="tx-spending-limit-approve-button"
         [attr.data-control-is-unlimited]="
@@ -62,9 +63,9 @@
     </div>
 
     <div *ngIf="transactionSpendingLimitResponse.DerivedKeyMemo">
-      <div class="flex-grow-1 pt-15px"></div>
-      <div class="py-15px mb-2">
-        <div class="fs-18px">Memo</div>
+      <div class="flex-grow-1 padding-top-medium"></div>
+      <div class="padding-bottom--medium margin-bottom--small">
+        <div class="font-size--medium">Memo</div>
         <div>{{ transactionSpendingLimitResponse.DerivedKeyMemo }}</div>
       </div>
     </div>
