@@ -33,7 +33,7 @@
     "@ethereumjs/tx": "^3.5.1",
     "@ethereumjs/vm": "^5.9.0",
     "@metamask/post-message-stream": "^6.1.2",
-    "@metamask/providers": "^11.1.0",
+    "@metamask/providers": "^11.1.1",
     "@types/lodash": "^4.14.182",
     "@types/sha256": "^0.2.0",
     "@types/sprintf-js": "^1.1.2",
