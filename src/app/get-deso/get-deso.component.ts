@@ -157,7 +157,7 @@ export class GetDesoComponent implements OnInit {
         const user = res.UserList[0];
         if (user.BalanceNanos) {
           this.userBalanceNanos = user.BalanceNanos;
-          this.isFinishFlowDisabled = this.globalVars.derive ? this.userBalanceNanos < 1e4 : false;
+          this.isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
         }
       });
 
@@ -172,7 +172,7 @@ export class GetDesoComponent implements OnInit {
   }
 
   ////// FINISH FLOW ///////
-  isFinishFlowDisabled = this.globalVars.derive ? this.userBalanceNanos < 1e4 : false;
+  isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
 
   finishFlow(): void {
     if (this.isFinishFlowDisabled) {
