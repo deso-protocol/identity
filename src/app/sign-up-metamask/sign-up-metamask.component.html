@@ -5,7 +5,7 @@
   class="d-flex justify-content-center align-items-center"
 >
   <div
-    class="spinner-border mr-3"
+    class="spinner-border"
     style="width: 12rem; height: 12rem">
   </div>
 </div>
@@ -17,7 +17,7 @@
     <div *ngIf="this.currentScreen === SCREEN.CREATE_ACCOUNT">
       <img src="assets/image-metamask.svg" width="140px" class="section--accounts__illustration"/>
       <div class="margin-bottom--medium">
-          <h3 class="text--neutral-white margin-bottom--large">
+        <h3 class="text--neutral-white margin-bottom--large">
           Create an account using<br/>your MetaMask wallet
         </h3>
         <div class="box--border box--rounded box--large margin-bottom--large text--text-lighter">
@@ -29,7 +29,7 @@
             control your funds. <strong class="text--text-lightest">Your keys = your content.</strong>
           </p>
           <p class="margin-top--medium">
-            When you click  <strong class="text--text-lightest">"Connect"</strong> below, you will be asked to sign a
+            When you click <strong class="text--text-lightest">"Connect"</strong> below, you will be asked to sign a
             transaction to create an account on the DeSo blockchain. Using DeSo
             doesn't cost ETH gas fees so creating an account only requires proof
             of identity.
@@ -42,14 +42,14 @@
                 class="fc-blue cursor-pointer fs-underline-hover"
               >
                 <a (click)="redirectToLogIn()" class="link--primary"
-                  >Alternatively, you can sign up with other methods.</a
+                >Alternatively, you can sign up with other methods.</a
                 >
               </span>
             </div>
           </div>
         </div>
         <button
-          class="button--primary button--medium"
+          class="button--primary button--medium display--flex items--center justify--center"
           (click)="launchMetamask()"
         >
           <img
@@ -66,9 +66,9 @@
             *ngIf="metamaskState === METAMASK.CONNECT"
           ></div>
           <span class="font-weight-bold"
-            >Connect<span *ngIf="metamaskState === METAMASK.CONNECT"
-              >ing</span
-            ></span
+          >Connect<span *ngIf="metamaskState === METAMASK.CONNECT"
+          >ing</span
+          ></span
           >
         </button>
       </div>
