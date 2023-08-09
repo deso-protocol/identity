@@ -54,8 +54,11 @@
               globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
           </p>
         </div>
-        <button class="button--secondary button--medium margin-top--large"
+        <button class="button--secondary button--medium margin-top--large display--flex items--center justify--center"
                 (click)="refreshBalance()">
+          <div
+            class="spinner-border margin-right--small"
+            *ngIf="refreshingBalance"></div>
           Refresh Balance
         </button>
         <button
@@ -110,8 +113,11 @@
                 globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
             </p>
           </div>
-          <button class="button--secondary button--medium margin-top--large"
+          <button class="button--secondary button--medium margin-top--large display--flex items--center justify--center"
                   (click)="refreshBalance()">
+            <div
+              class="spinner-border margin-right--small"
+              *ngIf="refreshingBalance"></div>
             Refresh Balance
           </button>
           <button
