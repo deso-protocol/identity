@@ -55,9 +55,8 @@
           </p>
         </div>
         <button class="button--secondary button--medium margin-top--large"
-                [disabled]="refreshBalanceCooldown"
-                (click)="refreshBalanceCooldown ? null : refreshBalance()">
-          {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+                (click)="refreshBalance()">
+          Refresh Balance
         </button>
         <button
           (click)="finishFlow()"
@@ -112,9 +111,8 @@
             </p>
           </div>
           <button class="button--secondary button--medium margin-top--large"
-                  [disabled]="refreshBalanceCooldown"
-                  (click)="refreshBalanceCooldown ? null : refreshBalance()">
-            {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+                  (click)="refreshBalance()">
+            Refresh Balance
           </button>
           <button
             (click)="finishFlow()"

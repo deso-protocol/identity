@@ -53,7 +53,7 @@
               height="16px"
               class="margin-right--small image--invert"
             />
-            <img *ngIf="!seedCopied" src="assets/copy.svg" class="margin-right--small image--invert" />
+            <img *ngIf="!seedCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
             <span>Copy</span>
           </button>
           <button
@@ -62,7 +62,7 @@
             data-control-name="sign-up-with-seed-copy-button"
             data-control-option="download"
           >
-            <img src="assets/download.svg" class="margin-right--small image--invert" />
+            <img src="assets/download.svg" class="margin-right--small image--invert"/>
             <span>Download</span>
           </button>
           <button
@@ -71,7 +71,7 @@
             data-control-name="sign-up-with-seed-copy-button"
             data-control-option="print"
           >
-            <img src="assets/print.svg" class="margin-right--small image--invert" />
+            <img src="assets/print.svg" class="margin-right--small image--invert"/>
             <span>Print</span>
           </button>
         </div>
@@ -100,37 +100,42 @@
           <div class="font-size--small">
             <h4 class="font-size--medium font-weight--semibold text--neutral-black margin-bottom--small">Advanced</h4>
             <p>
-              The following displays the entropy (random numbers) used to
-              generate the "DeSo seed phrase" above. The entropy below was
-              generated using a random number generator, but you can edit the
-              fields below to use your own randomness to generate the DeSo seed
-              phrase (you can't go wrong with a set of dice). You can also enter
-              your own DeSo seed phrase directly if you prefer.
+              Every DeSo wallet consists of a public/private keypair generated using the same key derivation standard
+              used by Bitcoin, namely
+              <a target="_blank" class="link--secondary"
+                 href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a> under the under the
+              m/44'/0'/0'/0/n derivation path.
             </p>
             <p class="padding-top--medium">
-              Because there is a standard for generating seed phrases for
-              Bitcoin (called
-              <a
-                target="_blank"
-                class="link--secondary"
-                href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
-                >BIP39</a
-              >), and because we use this same standard to generate DeSo seed
-              phrases, DeSo seed phrases can also be used with any Bitcoin
-              wallet that implements this standard under the m/44'/0'/0'/0/0
-              derivation path (e.g.
-              <a target="_blank" class="link--secondary" href="https://wallet.mycelium.com/">Mycelium</a
-              >, <a target="_blank" class="link--secondary" href="https://electrum.org">Electrum</a>).
+              Because of this, you can verify that the wallet is behaving as it should using a standard tool like the
+              <a target="_blank" class="link--secondary" href="https://iancoleman.io/bip39/">Ian Coleman mnemonic
+                generator</a>. To do this, simply click "show entropy details" on Ian Coleman, enter the
+              entropy hex you see below into Ian Coleman, and verify that the seed phrases match.
             </p>
             <p class="padding-top--medium">
-              Similarly, any standard Bitcoin seed phrase you have can also be
-              used as a DeSo seed phrase. Of course, all of this can be verified
-              using a tool like the
-              <a target="_blank" class="link--secondary" href="https://iancoleman.io/bip39/"
-                >Ian Coleman mnemonic generator</a
-              >
-              (must click "show entropy details") so you know this generator is
-              doing what it says it is.
+              The BIP39 standard very precisely defines how entropy bytes are converted to a seed phrase, and how that
+              seed phrase is converted into public/private keypairs so that your keys can be recovered on any wallet,
+              not just ours. As a result, DeSo seed phrases can also be used with any Bitcoin wallet that implements
+              this standard under the m/44'/0'/0'/0/n derivation path (e.g.
+              <a target="_blank" class="link--secondary" href="https://wallet.mycelium.com/">Mycelium</a>,
+              <a target="_blank" class="link--secondary" href="https://electrum.org/">Electrum</a>).
+            </p>
+            <p class="padding-top--medium">
+              Note that Ethereum wallets like MetaMask use a different derivation path, namely
+              <a target="_blank" class="link--secondary"
+                 href="https://community.metamask.io/t/configurable-derivation-path-for-custom-rpcs/1242">m/44'/60'/0'/0/n</a>,
+              so they will NOT produce the same keypairs given the same seed phrase. If you'd like to use MetaMask as
+              your DeSo wallet, please use the login with MetaMask option, which uses MetaMask as your master key to
+              sign a transaction issuing a
+              <a target="_blank" class="link--secondary" href="https://blog.deso.com/blog/how-metamask-works">derived
+                key</a> that is then used as your DeSo key. The approach of issuing a derived key allows you to use DeSo
+              apps without having to confirm/sign every transaction in MetaMask.
+            </p>
+            <p class="padding-top--medium">
+              The entropy below was randomly generated, but you can edit the fields below to use your own randomness to
+              generate the DeSo seed phrase. You can also, alternatively, use a tool like
+              <a target="_blank" class="link--secondary" href="https://iancoleman.io/bip39/">Ian Coleman</a> to generate
+              a seed phrase using dice rolls, and then enter that seed phrase here.
             </p>
           </div>
 
@@ -141,7 +146,7 @@
                 target="_blank"
                 class="link--secondary"
                 href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
-                >BIP39</a
+              >BIP39</a
               >
               mnemonic):
             </p>
@@ -200,7 +205,8 @@
       </div>
     </div>
     <div class="warning--error margin-top--medium">
-      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of https://identity.deso.org
+      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of
+      https://identity.deso.org
     </div>
     <div class="margin-top--medium padding-bottom--xlarge">
       <button
@@ -231,7 +237,7 @@
     </div>
     <div class="font-size--small text--center margin-bottom--large">
       Never share your DeSo seed phrase with anyone.
-    </div>  
+    </div>
     <div class="section--seed__container">
       <p class="font-size--medium font-weight--semibold margin-bottom--small text--neutral-black">
         Verify:
@@ -271,9 +277,10 @@
       </div>
     </div>
     <div class="warning--error margin-top--medium">
-      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of https://identity.deso.org
+      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of
+      https://identity.deso.org
     </div>
-    <div class="margin-top--medium">     
+    <div class="margin-top--medium">
       <div>
         <button
           *ngIf="
