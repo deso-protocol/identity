@@ -38,9 +38,6 @@ export class GetDesoComponent implements OnInit {
 
   // user balance
   userBalanceNanos = 0;
-  refreshBalanceCooldown = false;
-  refreshBalanceRetryTime = 0;
-  refreshBalanceInterval: any;
 
   heroswapIframeUrl: SafeResourceUrl = '';
 
@@ -142,12 +139,6 @@ export class GetDesoComponent implements OnInit {
   }
 
   refreshBalance(): void {
-    if (this.refreshBalanceCooldown) {
-      return;
-    }
-    this.refreshBalanceCooldown = true;
-    this.refreshBalanceRetryTime = 30;
-
     this.backendAPIService
       .GetUsersStateless([this.publicKeyAdded], true, true)
       .subscribe((res) => {
@@ -160,15 +151,6 @@ export class GetDesoComponent implements OnInit {
           this.isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
         }
       });
-
-    this.refreshBalanceInterval = setInterval(() => {
-      if (this.refreshBalanceRetryTime === 0) {
-        this.refreshBalanceCooldown = false;
-        clearInterval(this.refreshBalanceInterval);
-      } else {
-        this.refreshBalanceRetryTime--;
-      }
-    }, 1000);
   }
 
   ////// FINISH FLOW ///////
