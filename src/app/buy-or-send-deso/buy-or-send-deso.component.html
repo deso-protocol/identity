@@ -1,11 +1,11 @@
 <app-banner></app-banner>
 
 <div
-  class="page-container"
+  class="container"
   *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
 >
   <div class="onboarding-buy-deso-container p-16px">
-    <div class="fs-20px  pb-10px margin-bottom--small">
+    <div class="font-size--large  padding-bottom--small margin-bottom--small">
       Easily transfer $DESO or purchase some directly
     </div>
     <div class="border-bottom w-100 margin-bottom--large"></div>
@@ -120,7 +120,7 @@
             <div *ngIf="refreshBalanceCooldown">
               <div class="ml-10px">
                 <span class=""
-                  >Refresh in {{ refreshBalanceRetryTime }}s</span
+                >Refresh in {{ refreshBalanceRetryTime }}s</span
                 >
               </div>
             </div>
@@ -147,7 +147,7 @@
       class=" ml-25px cursor-pointer"
       style="cursor: pointer"
       (click)="cancelButtonClicked()"
-      >Cancel</a
+    >Cancel</a
     >
   </div>
 </div>

@@ -6,9 +6,8 @@
 >
   <div class="margin-bottom--medium">
     <h3 class="text--neutral-white">Log in to {{ globalVars.hostname }}</h3>
-  </div>  
-  <!-- <div *ngIf="showAccessLevels"> -->
-  <div>
+  </div>
+  <div *ngIf="showAccessLevels">
     <div class="font-size--large margin-top--base text--center">
       Logging in grants <b>{{ globalVars.hostname }}</b> access to:
     </div>
@@ -17,7 +16,7 @@
       <li class="section--access__item display--flex">
         <div>
           <span *ngIf="globalVars.accessLevelRequest >= 2">
-            <img src="assets/image-check.svg" width="30px" />
+            <img src="assets/image-check.svg" width="30px"/>
           </span>
           <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
         </div>
@@ -33,7 +32,7 @@
       </li>
       <li class="section--access__item display--flex">
         <div>
-          <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px" /></span>
+          <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px"/></span>
           <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
         </div>
         <div class="margin-left--medium">
@@ -58,7 +57,7 @@
       </li>
       <li class="section--access__item display--flex">
         <div>
-          <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px" /></span>
+          <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px"/></span>
           <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
         </div>
         <div class="margin-left--medium">
@@ -82,10 +81,10 @@
         </div>
       </li>
     </ul>
-    <div class="padding-bottom--xlarge">
-      <app-account-select (onAccountSelect)="onAccountSelect($event)"></app-account-select>
-      <div class="text--divider margin-top--large margin-bottom--large">or</div>
-      <app-log-in-options></app-log-in-options>
-    </div>
+  </div>
+  <div class="padding-bottom--xlarge">
+    <app-account-select (onAccountSelect)="onAccountSelect($event)"></app-account-select>
+    <div class="text--divider margin-top--large margin-bottom--large">or</div>
+    <app-log-in-options></app-log-in-options>
   </div>
 </div>

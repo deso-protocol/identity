@@ -16,15 +16,15 @@
               (tabClick)="_handleTabClick($event)"
             ></tab-selector>
           </div>
-<!--          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD">-->
-<!--            <buy-deso-usd [parentComponent]="this"></buy-deso-usd>-->
-<!--          </div>-->
+          <!--          <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_USD">-->
+          <!--            <buy-deso-usd [parentComponent]="this"></buy-deso-usd>-->
+          <!--          </div>-->
           <div *ngIf="activeTab === BuyDeSoComponent.BUY_WITH_HEROSWAP">
             <buy-deso-heroswap [publicKey]='publicKey' [parentComponent]='this'></buy-deso-heroswap>
           </div>
         </div>
       </div>
-      <div *ngIf="waitingOnTxnConfirmation" class="px-5">
+      <div *ngIf="waitingOnTxnConfirmation" class="padding-right--small padding-left--small">
         <div
           class="display--flex flex--column items--center justify--center container"
           style="height: 400px"
