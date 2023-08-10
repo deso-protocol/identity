@@ -2,7 +2,7 @@
 <div class="buy-deso__container p-16px" style="padding-top: 0px">
   <span class="buy-deso__title margin-bottom--xsmall">Buy Complete</span>
   <div class="w-100 border-bottom"></div>
-  <div class="font-size--medium pt-16px pb-30px">
+  <div class="font-size--medium padding-top--medium padding-bottom--large">
     <div class="buy-deso__title" style="font-size: 20px">
       New balance:
       {{ globalVars.nanosToDeSo(this.totalDeSoOwned, 9) }}
@@ -14,7 +14,7 @@
       <span
         class="font-size--medium margin-left--medium cursor-pointer text--text-base"
         (click)="buyMoreDeSoClicked.emit()"
-        >Buy more DESO</span
+      >Buy more DESO</span
       >
     </div>
   </div>

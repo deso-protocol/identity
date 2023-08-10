@@ -25,12 +25,12 @@
   </div>
 </div>
 
-<div class="page-container" *ngIf="!loading && !user">
-  <div class="fs-18px margin-bottom--xsmall">
+<div class="container" *ngIf="!loading && !user">
+  <div class="font-size--medium margin-bottom--xsmall">
     We were unable to locate a user associated with the public key provided.
     Please exit and try again.
   </div>
-  <div class="font-size--medium mb-15px ">
+  <div class="font-size--medium margin-bottom--medium">
     Public Key provided: {{ publicKey }}
   </div>
   <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
@@ -67,11 +67,13 @@
     <div class="section--phone text--center margin-bottom--large">
       <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
       <h3 class="text--neutral-white">Get free $DESO</h3>
-      <p class="font-size--small margin-top--small">We'll send you a small amount of $DESO that will last<br/>you up to thousands of on-chain transactions.</p>
+      <p class="font-size--small margin-top--small">We'll send you a small amount of $DESO that will last<br/>you up to
+        thousands of on-chain transactions.</p>
     </div>
     <div class="section--phone__option margin-bottom--medium">
       <p class="margin-bottom--medium">
-        <span class="font-weight--semibold">Verify your phone number for free $DESO.</span> Your phone number will never be shared or used for any marketing purpose. Only to prevent spam.
+        <span class="font-weight--semibold">Verify your phone number for free $DESO.</span> Your phone number will never
+        be shared or used for any marketing purpose. Only to prevent spam.
       </p>
 
       <form #f="ngForm" [formGroup]="phoneForm">
@@ -170,7 +172,7 @@
           *ngIf="displayForSignupFlow"
         >Cancel</a
         >
-       
+
       </div>
     </div>
   </div>
@@ -185,7 +187,8 @@
     <div class="text--center margin-bottom--large">
       <img src="assets/image-lock.svg" width="60" class="section--accounts__illustration"/>
       <h3 class="text--neutral-white">Confirm your authentication code</h3>
-      <p class="font-size--small margin-top--small">Please verify your number by entering the 6 digit code that was sent to you.</p>
+      <p class="font-size--small margin-top--small">Please verify your number by entering the 6 digit code that was sent
+        to you.</p>
     </div>
     <div class="section--verify__option padding--large bg--neutral-white text--neutral-black">
       <div class="font-size--medium font-weight--medium margin-bottom--small">

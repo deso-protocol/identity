@@ -75,7 +75,7 @@
             [coinPublicKey]="coinLimitItem.key"
             [coinOperationMap]="coinLimitItem.value"
             [user]="userMap[coinLimitItem.key]"
-            class="pb-15px"
+            class="padding-bottom--small"
           ></app-transaction-spending-limit-coin>
         </div>
       </ng-container>
@@ -141,7 +141,7 @@
                     ? daoCoinLimitOrderLimitItems.length
                     : defaultNumShown)
           "
-          class="display--flex flex--column pb-15px"
+          class="display--flex flex--column padding-bottom--small"
         >
           <app-transaction-spending-limit-dao-coin-limit-order
             [daoCoinLimitOrderLimitItem]="daoCoinLimitOrderLimitItem"
@@ -164,7 +164,7 @@
                     ? associationLimitMap.length
                     : defaultNumShown)
           "
-          class="display--flex flex--column pb-15px"
+          class="display--flex flex--column padding-bottom--small"
         >
           <app-transaction-spending-limit-association
             [associationLimitMapItem]="associationLimitMapItem"
@@ -186,7 +186,7 @@
                     ? accessGroupLimitMap.length
                     : defaultNumShown)
           "
-          class="display--flex flex--column pb-15px"
+          class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-access-group
             [accessGroupLimitMapItem]="accessGroupLimitMapItem"
@@ -208,7 +208,7 @@
                     ? accessGroupMemberLimitMap.length
                     : defaultNumShown)
           "
-          class="display--flex flex--column pb-15px"
+          class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-access-group-member
             [accessGroupMemberLimitMapItem]="accessGroupMemberLimitMapItem"
