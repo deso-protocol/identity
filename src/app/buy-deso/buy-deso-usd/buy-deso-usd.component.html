@@ -4,16 +4,16 @@
       <div class="buy-deso__sub-title" style="margin-top: 0px">
         Amount to exchange
       </div>
-      <div class="d-flex">
+      <div class="display--flex">
         <div
-          class="d-flex"
+          class="display--flex"
           dropdown
           (click)="$event.stopPropagation()"
           container="body"
           style="align-items: center"
         >
           <button
-            class="buy-deso__dropdown-btn d-flex align-content-between"
+            class="buy-deso__dropdown-display--flex align-content-between"
             role="button"
             dropdownToggle
           >
@@ -53,8 +53,8 @@
         Amount you receive
       </div>
 
-      <div class="d-flex">
-        <div class="d-flex" container="body" style="align-items: center">
+      <div class="display--flex">
+        <div class="display--flex" container="body" style="align-items: center">
           <div class="buy-deso__dropdown-btn">$DESO</div>
         </div>
         <div class="position-relative w-100">
@@ -66,10 +66,10 @@
 
       <div class="buy-deso__sub-title" style="margin-top: 30px">Country</div>
 
-      <div class="d-flex" style="align-items: center">
+      <div class="display--flex" style="align-items: center">
         <div dropdown (click)="$event.stopPropagation()" container="body">
           <button
-            class="d-flex justify-content-between buy-deso__country-selector"
+            class="display--flex justify-content-between buy-deso__country-selector"
             role="button"
             dropdownToggle
           >
@@ -93,8 +93,8 @@
         </div>
       </div>
     </div>
-    <div class="w-100 border-bottom mt-15px"></div>
-    <div class="fs-15px fc-red pb-15px" *ngIf="quotationError">
+    <div class="w-100 border-bottom margin-top--medium"></div>
+    <div class="font-size--medium text--red-base padding-bottom--medium" *ngIf="quotationError">
       {{ quotationError }}
     </div>
     <div class="m-16px">
@@ -107,9 +107,9 @@
         Buy $DESO
       </button>
       <a
-        class="fc-muted ml-25px cursor-pointer"
+        class=" ml-25px cursor-pointer"
         (click)="parentComponent.cancelButtonClicked()"
-        >Cancel</a
+      >Cancel</a
       >
     </div>
   </div>
