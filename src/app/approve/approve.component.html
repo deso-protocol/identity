@@ -1,9 +1,9 @@
 <app-banner></app-banner>
 
-<div class="page-container">
-  <div class="title-text">Approve a transaction</div>
-  <div class="main-text">
-    <p class="pb-15px">
+<div class="container">
+  <h3 class="text--neutral-white">Approve a transaction</h3>
+  <div class="box--border box--rounded box--large">
+    <p class="padding-bottom--medium">
       {{ globalVars.hostname }} wants to {{ transactionDescription }}
     </p>
     <div *ngIf="derivedKeyMemo">Memo: {{ derivedKeyMemo }}</div>
@@ -14,23 +14,23 @@
     </div>
     <br />
     <div *ngIf="transactionDeSoSpent">
-      <p class="pb-15px">Total Cost: {{ transactionDeSoSpent }} $DESO</p>
+      <p>Total Cost: <code>{{ transactionDeSoSpent }} $DESO</code></p>
     </div>
-    <div class="d-flex align-items-end justify-content-between">
+    <div class="margin-top--large">
       <button
         type="button"
-        class="button button-small button-secondary"
-        (click)="onCancel()"
-      >
-        Deny
-      </button>
-      <button
-        type="button"
-        class="button button-small button-primary"
+        class="button--primary button--medium"
         (click)="onSubmit()"
       >
         Allow
       </button>
+      <button
+        type="button"
+        class="button--primary--outline button--medium"
+        (click)="onCancel()"
+      >
+        Deny
+      </button>      
     </div>
   </div>
 </div>

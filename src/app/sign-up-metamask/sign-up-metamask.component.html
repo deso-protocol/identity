@@ -2,7 +2,7 @@
 
 <div
   *ngIf="this.currentScreen === this.SCREEN.LOADING; else mainContent"
-  class="d-flex justify-content-center align-items-center"
+  class="display--flex justify--center items--center"
 >
   <div
     class="spinner-border"
@@ -39,7 +39,7 @@
               {{ errorMessage }}
               <span
                 *ngIf="showAlternative"
-                class="fc-blue cursor-pointer fs-underline-hover"
+                class="text--blue-base cursor-pointer fs-underline-hover"
               >
                 <a (click)="redirectToLogIn()" class="link--primary"
                 >Alternatively, you can sign up with other methods.</a
@@ -78,15 +78,15 @@
           <p class="margin-bottom--medium">Detected Account:</p>
           <code class="font-size--large">{{ existingConnectedWallet | truncateAddressOrUsername }}</code>
         </div>
-        <div class="margin-top-small">
+        <div class="margin-top--small">
           If this is not the account you want to connect, please open MetaMask again and
           choose the correct account, and then click connect.
         </div>
       </ng-container>
     </div>
     <div *ngIf="this.currentScreen === SCREEN.AUTHORIZE_MESSAGES">
-      <span class="title-text">Authorize Derived Key</span>
-      <div class="main-text mb-2">
+      <span class="text--text-lightest">Authorize Derived Key</span>
+      <div class="margin-bottom--base">
         Ask metamask for permission to generate your account
       </div>
       <p>

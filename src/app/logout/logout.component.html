@@ -1,32 +1,31 @@
 <app-banner></app-banner>
 
-<div class="container">
-  <div class="title-text">Log out of {{ globalVars.hostname }}</div>
-  <div class="main-text">
+<div class="container text--center">
+  <h4 class="text--neutral-white margin-bottom--medium">Log out of {{ globalVars.hostname }}</h4>
+  <div class="box--border box--rounded box--large">
     <p class="padding-bottom--medium">
       Logging out revokes any permissions you've granted on
-      {{ globalVars.hostname }}.
+      <span class="text--text-lightest">{{ globalVars.hostname }}</span>
     </p>
-    <p class="padding-bottom--medium">
-      Your account will stay logged in on {{ globalVars.environment.hostname }}.
+    <p>
+      Your account will stay logged in on <span class="text--text-lightest">{{ globalVars.environment.hostname }}</span>
     </p>
-    <div
-      class="display--flex justify--center">
-      <div class="display--flex width--50 items--center">
-        <button
-          type="button"
-          class="button--primary button--medium margin-right--xlarge"
-          (click)="onSubmit()"
-          data-control-name="logout-button"
-        >
-          Logout
-        </button>
-        <a
-          class="font-size--medium button--link cursor-pointer"
-          (click)="onCancel()"
-          data-control-name="cancel-logout-button"
-        >Cancel</a>
-      </div>
-    </div>
+  </div>
+  <div class="margin-top--medium">
+    <button
+      type="button"
+      class="button--red button--medium margin-bottom--medium"
+      (click)="onSubmit()"
+      data-control-name="logout-button"
+    >
+      Logout
+    </button>
+    <a
+      class="button--primary--outline button--medium button--link"
+      (click)="onCancel()"
+      data-control-name="cancel-logout-button"
+    >
+      Cancel
+  </a>
   </div>
 </div>

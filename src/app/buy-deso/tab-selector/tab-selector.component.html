@@ -1,20 +1,20 @@
 <div
-  class="d-flex w-100 tab-selector__container"
+  class="display--flex w-100 tab-selector__container"
   style="cursor: pointer; height: 50px"
   [ngClass]="{ 'tab-selector-links': !buttonSelector }"
 >
   <div
     *ngFor="let tab of tabs"
     (click)="_tabClicked(tab)"
-    class="d-flex flex-column align-items-center h-100 pl-15px pr-15px"
+    class="display--flex flex--column items--center h-100 pl-15px pr-15px"
   >
-    <div class="d-flex h-100 align-items-center">
+    <div class="display--flex h-100 items--center">
       <div
-        class="d-flex h-100 align-items-center fs-15px"
+        class="display--flex h-100 items--center font-size--medium"
         *ngIf="tab !== activeTab || !buttonSelector"
         [ngClass]="{
           'active-tab': tab === activeTab,
-          'fc-secondary': tab !== activeTab
+          'text--text-base': tab !== activeTab
         }"
       >
         {{ tab }}
@@ -28,7 +28,7 @@
       >
         <span>{{ 'tab_selector.new' }}</span>
       </div>
-      <div *ngIf="isLink(tab)" class="d-flex align-items-center ml-5px">
+      <div *ngIf="isLink(tab)" class="display--flex items--center ml-5px">
         <i-feather
           class="feather-small fs-0px"
           name="external-link"

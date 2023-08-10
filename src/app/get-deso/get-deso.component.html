@@ -48,13 +48,13 @@
           </ng-template>
         </div>
         <div>
-          <p class="text--left text--text-lightest">
+          <p class="text--left font-size--small text--text-lightest">
             Check your DeSo balance:
             <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
               globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
           </p>
         </div>
-        <button class="button--secondary button--medium margin-top--large"
+        <button class="button--secondary button--medium margin-top--medium"
                 [disabled]="refreshBalanceCooldown"
                 (click)="refreshBalanceCooldown ? null : refreshBalance()">
           {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
@@ -63,7 +63,7 @@
           (click)="finishFlow()"
           [disabled]="isFinishFlowDisabled"
           [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
-          class="button--secondary button--medium margin-top--large"
+          class="button--secondary button--medium margin-top--medium"
           data-control-name="get-deso-finish-flow-button"
         >Continue
         </button>
@@ -86,7 +86,7 @@
                 <a target="_blank" href="https://exchange.coinbase.com/trade/DESO-USD"
                    class="link--secondary display--inline-block margin-right--xsmall">Coinbase,</a>
                 <a target="_blank"
-                   href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710&invite_code=zh5i6223"
+                   href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710"
                    class="link--secondary display--inline-block margin-right--xsmall">Huobi,</a>
                 <a target="_blank" href="https://gate.io/trade/deso_usdt?ref=12312805"
                    class="link--secondary display--inline-block margin-right--xsmall">Gate.io,</a>
@@ -111,7 +111,7 @@
                 globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
             </p>
           </div>
-          <button class="button--secondary button--medium margin-top--large"
+          <button class="button--secondary button--medium margin-top--base"
                   [disabled]="refreshBalanceCooldown"
                   (click)="refreshBalanceCooldown ? null : refreshBalance()">
             {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
@@ -120,7 +120,7 @@
             (click)="finishFlow()"
             [disabled]="isFinishFlowDisabled"
             [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
-            class="button--secondary button--medium margin-top--large"
+            class="button--secondary button--medium margin-top--medium"
             data-control-name="get-deso-finish-flow-button"
           >Continue
           </button>

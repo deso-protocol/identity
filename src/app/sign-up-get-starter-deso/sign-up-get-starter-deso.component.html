@@ -26,11 +26,11 @@
 </div>
 
 <div class="page-container" *ngIf="!loading && !user">
-  <div class="fs-18px mb-5px">
+  <div class="fs-18px margin-bottom--xsmall">
     We were unable to locate a user associated with the public key provided.
     Please exit and try again.
   </div>
-  <div class="fs-15px mb-15px fc-muted">
+  <div class="font-size--medium mb-15px ">
     Public Key provided: {{ publicKey }}
   </div>
   <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
@@ -87,7 +87,7 @@
           (ngModelChange)="this.onPhoneNumberInputChanged()"
         />
 
-        <div class="fc-red fs-15px">
+        <div class="text--red-base font-size--medium">
           <div
             *ngIf="f.form.value.phone && f.form.controls.phone.invalid"
             class="margin-top--small font-size--small"
@@ -194,7 +194,7 @@
           *ngIf="
             sendPhoneNumberVerificationTextServerErrors.maxSendAttemptsReached
           "
-          class="mt-5px fc-red fs-15px"
+          class="margin-top--xsmall text--red-base font-size--medium"
         >
           You've requested too many verification codes. Please wait 10 minutes and
           try again.
@@ -251,7 +251,7 @@
             Resend: {{ resentVerificationCodeTimeout }}s
           </div>
           <i
-            class="far fa-check-circle fc-blue"
+            class="far fa-check-circle text--blue-base"
           ></i>
         </div>
       </div>

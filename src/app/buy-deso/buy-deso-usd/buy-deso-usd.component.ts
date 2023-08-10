@@ -90,8 +90,8 @@ export class BuyDeSoUSDComponent implements OnInit {
           showCancelButton: true,
           reverseButtons: true,
           customClass: {
-            confirmButton: 'btn btn-light',
-            cancelButton: 'btn btn-light no',
+            confirmButton: 'btn-light',
+            cancelButton: 'btn-light no',
           },
           confirmButtonText: 'Continue to Feed ',
           cancelButtonText: 'Buy More',
@@ -135,8 +135,8 @@ export class BuyDeSoUSDComponent implements OnInit {
               showConfirmButton: true,
               confirmButtonText: 'Buy',
               customClass: {
-                confirmButton: 'btn btn-light',
-                cancelButton: 'btn btn-light no',
+                confirmButton: 'btn-light',
+                cancelButton: 'btn-light no',
               },
               reverseButtons: true,
             }).then((res: any) => {

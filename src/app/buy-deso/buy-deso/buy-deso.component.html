@@ -1,10 +1,10 @@
 <app-banner></app-banner>
 <div class="buy-deso__container">
   <div *ngIf="!publicKeyNotInIdentity; else showPublicKeyNotInIdentity">
-    <div *ngIf="!waitingOnTxnConfirmation" class="buy-deso__title mx-16px">
+    <div *ngIf="!waitingOnTxnConfirmation" class="buy-deso__title">
       Buy $DESO
     </div>
-    <div class="d-flex flex-column">
+    <div class="display--flex flex--column">
       <div style="flex-grow: 1">
         <div class="disable-scrollbars" *ngIf="!waitingOnTxnConfirmation">
           <div>
@@ -26,21 +26,21 @@
       </div>
       <div *ngIf="waitingOnTxnConfirmation" class="px-5">
         <div
-          class="d-flex flex-column align-items-center justify-content-center loading-container"
+          class="display--flex flex--column items--center justify--center container"
           style="height: 400px"
         >
           <img
-            class="fc-secondary"
+            class="text--text-base"
             src="/assets/loader.svg"
             height="150px"
             width="150px"
           />
-          <div class="mt-12px fc-secondary">
-            <div class="fc-secondary fs-24px text-center">
+          <div class="margin-top--medium text--text-base">
+            <div class="font-size--large text-center">
               <div>Waiting for confirmation</div>
             </div>
             <div>
-              <div class="fc-secondary fs-15px text-center">
+              <div class="font-size--medium text-center">
                 We are broadcasting your transaction to the blockchain. This can
                 take up to a minute.
               </div>
@@ -52,7 +52,7 @@
   </div>
 
   <ng-template #showPublicKeyNotInIdentity>
-    <div class="d-flex justify-content-center">
+    <div class="display--flex justify--center">
       The public key provided was not found in identity and we cannot support
       buying DESO.
       <br/>
