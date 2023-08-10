@@ -54,10 +54,12 @@
               globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
           </p>
         </div>
-        <button class="button--secondary button--medium margin-top--medium"
-                [disabled]="refreshBalanceCooldown"
-                (click)="refreshBalanceCooldown ? null : refreshBalance()">
-          {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+        <button class="button--secondary button--medium margin-top--medium display--flex items--center justify--center"
+                (click)="refreshBalance()">
+          <div
+            class="spinner-border margin-right--small"
+            *ngIf="refreshingBalance"></div>
+          Refresh Balance
         </button>
         <button
           (click)="finishFlow()"
@@ -111,10 +113,12 @@
                 globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
             </p>
           </div>
-          <button class="button--secondary button--medium margin-top--base"
-                  [disabled]="refreshBalanceCooldown"
-                  (click)="refreshBalanceCooldown ? null : refreshBalance()">
-            {{ refreshBalanceCooldown ? "Refresh in " + refreshBalanceRetryTime+"s" : "Refresh Balance" }}
+          <button class="button--secondary button--medium margin-top--base display--flex items--center justify--center"
+                  (click)="refreshBalance()">
+            <div
+              class="spinner-border margin-right--small"
+              *ngIf="refreshingBalance"></div>
+            Refresh Balance
           </button>
           <button
             (click)="finishFlow()"
