@@ -5,24 +5,24 @@
   <div class="google-ball green"></div>
 </div>
 
-<div>
+<div *ngIf="!loading">
   <app-banner></app-banner>
   <div class="container">
     <h4 class="text--neutral-white">Save your recovery code</h4>
-    <div class="margin-top--small">
+    <div class="margin-top--small margin-bottom--small">
       You can use this DeSo seed phrase to login if you lose access to your
       Google account.
     </div>
-    <div class="warning--error">Do not share this with anyone.</div>
+    <div class="warning--error margin-bottom--small">Do not share this with anyone.</div>
     <div class="section--seed__container">
       <div class="section--seed__phrase">{{ mnemonic }}</div>
       <div
         class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet">
-      >
+        >
         <div class="section--seed__actions">
           <button
             (click)="copySeed()"
-            class="seed-phrase-button display--flex items--center"
+            class="button--secondary button--small seed-phrase-button display--flex items--center"
           >
             <img
               *ngIf="seedCopied"
@@ -31,30 +31,30 @@
               height="16px"
               class="margin-right--small image--invert"
             />
-            <img *ngIf="!seedCopied" src="assets/copy.svg" class="margin-right--small image--invert" />
+            <img *ngIf="!seedCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
             <span>Copy</span>
           </button>
           <button
             (click)="downloadSeed()"
             class="button--secondary button--small display--flex items--center"
           >
-          <img src="assets/download.svg" class="margin-right--small image--invert" />
+            <img src="assets/download.svg" class="margin-right--small image--invert"/>
             <span>Download</span>
           </button>
           <button
             (click)="printSeed()"
             class="button--secondary button--small display--flex items--center"
           >
-            <img src="assets/print.svg" class="margin-right--small image--invert" />
+            <img src="assets/print.svg" class="margin-right--small image--invert"/>
             <span>Print</span>
           </button>
         </div>
       </div>
     </div>
-    <div class="display--flex pt-15px justify--end">
+    <div class="display--flex padding-top--medium justify--end">
       <button
         (click)="finishFlow(true)"
-        class="button button-primary button-large"
+        class="button--primary button--medium button-large"
       >
         Continue to get $DESO!
       </button>

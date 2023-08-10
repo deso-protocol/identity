@@ -997,6 +997,12 @@ a, .link--primary {
 //-------------------------
 // LOADING ICON
 //-------------------------
+@keyframes bounce {
+  50% {
+    transform: translateY(25px);
+  }
+}
+
 .google-wrapper {
   display: flex;
   justify-content: center;
