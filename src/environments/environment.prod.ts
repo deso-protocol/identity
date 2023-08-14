@@ -12,6 +12,7 @@ export const environment = {
     'node.deso.org',
     'signup.deso.org',
     'signup.deso.com',
+    'openfund.com',
   ],
   noAccessHostnames: [''],
   jumioSupported: false,
