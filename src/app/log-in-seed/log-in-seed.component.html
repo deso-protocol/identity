@@ -7,9 +7,9 @@
   <div class="section--login text--center margin-bottom--small">
     <img src="assets/image-lock.svg" width="60" class="section--accounts__illustration"/>
     <div class="font-size--small margin-bottom--small text--text-lighter">For Advanced Users</div>
-    <h3 class="text--neutral-white">Import account to access {{ globalVars.hostname }}</h3>
+    <h4 class="text--neutral-white">Import account to access {{ globalVars.hostname }}</h4>
   <div class="font-size--small margin-top--small text--center margin-bottom--large">
-    <p class="margin-bottom--xsmall">Safely add your DeSo seed phrase to import your existing account.</p>
+    <p class="margin-bottom--xsmall">Safely add your DeSo seed (mnemonic) to import your existing account.</p>
     <p class="font-weight--medium">
       Please make sure you are on: <span class="text--green-lighter">https://identity.deso.org</span>
     </p>
@@ -24,7 +24,7 @@
       [(ngModel)]="mnemonic"
       class="input--textarea input--seed"
       rows="2"
-      placeholder="Enter your DeSo seed phrase"
+      placeholder="Enter your DeSo seed only!"
     ></textarea>
     <div class="margin-top--small text--right">
       <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link--secondary" data-control-name="log-in-with-seed-advanced-toggle-button">
@@ -51,7 +51,7 @@
 
     <div *ngIf="advancedOpen" class="margin-top--medium">
       <div class="font-size--medium font-weight--semibold">
-        If you have a seed hex instead of a seed phrase, enter it below.
+        If you have a seed hex instead of a DeSo seed phrase, enter it below.
       </div>
     </div>
     <div *ngIf="advancedOpen" class="margin-top--small">
@@ -69,5 +69,8 @@
     >
       Load DeSo Account
     </button>
+  </div>
+  <div class="warning--error warning--error--medium margin-top--base">
+    Never share these details with anyone!<br/> Keep it safe and secure at all times.
   </div>
 </div>

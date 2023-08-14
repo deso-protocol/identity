@@ -35,16 +35,6 @@ $breakpoints: (
 //-------------------------------
 $font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
-@font-face {
-  font-family: 'color-emoji';
-  src: local('Apple Color Emoji'), local('Segoe UI Emoji'),
-    local('Segoe UI Symbol'), local('Noto Color Emoji');
-}
-
-.font-emoji {
-  font-family: 'color-emoji';
-}
-
 //-------------------------------
 // FONTS = Sizes
 //-------------------------------
@@ -666,6 +656,7 @@ a, .link--primary {
   .section--header__verify {
     display: flex;
     align-items: center;
+    letter-spacing: 0.05em;
     @include border-radius('pill');
     @include font-size('small');
     @include spacing('padding-left', 'medium');
@@ -789,6 +780,7 @@ a, .link--primary {
   @include font-size('medium');
   @include spacing('line-height', 'large');
   @include spacing('word-spacing', 'large');
+  @include color('neutral', 'black', 'color')
 }
 .section--seed__actions {
   display: flex;
@@ -872,6 +864,7 @@ a, .link--primary {
   @include color('blue', 'dark', 'border-color');
 }
 .input--seed {
+  line-height: 1.7;
   &::placeholder {
     @include spacing('word-spacing', 'none');
   }
@@ -985,8 +978,12 @@ a, .link--primary {
   @include color('red', 'lighter', 'color');
 }
 
+.warning--error--medium {
+  @include spacing('padding', 'medium');
+}
+
 //-------------------------------
-// SECTIOn = HEROSWAP IFRAME
+// SECTION = HEROSWAP IFRAME
 //-------------------------------
 .section--heroswap__iframe {
   width: 100%;
@@ -997,12 +994,6 @@ a, .link--primary {
 //-------------------------
 // LOADING ICON
 //-------------------------
-@keyframes bounce {
-  50% {
-    transform: translateY(25px);
-  }
-}
-
 .google-wrapper {
   display: flex;
   justify-content: center;

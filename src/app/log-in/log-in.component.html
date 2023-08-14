@@ -5,11 +5,11 @@
   *ngIf="globalVars.inTab || globalVars.webview || globalVars.redirectURI"
 >
   <div class="margin-bottom--medium">
-    <h3 class="text--neutral-white">Log in to {{ globalVars.hostname }}</h3>
+    <img src="assets/image-head.svg" width="60" class="section--accounts__illustration"/>
   </div>
   <div *ngIf="showAccessLevels">
-    <div class="font-size--large margin-top--base text--center">
-      Logging in grants <b>{{ globalVars.hostname }}</b> access to:
+    <div class="font-size--large margin-top--base text--center text--neutral-white">
+      You are granting <b>{{ globalVars.hostname }}</b> access to:
     </div>
     <ul
       class="margin-top--base box--border box--rounded text--left margin-bottom--base">
@@ -18,7 +18,7 @@
           <span *ngIf="globalVars.accessLevelRequest >= 2">
             <img src="assets/image-check.svg" width="30px"/>
           </span>
-          <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
+          <span *ngIf="globalVars.accessLevelRequest < 2"><img src="assets/image-close.svg" width="30px"/></span>
         </div>
         <div class="margin-left--medium">
           <p class="margin-bottom--xsmall font-size--medium text--text-lightest">
@@ -33,7 +33,7 @@
       <li class="section--access__item display--flex">
         <div>
           <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px"/></span>
-          <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
+          <span *ngIf="globalVars.accessLevelRequest < 3"><img src="assets/image-close.svg" width="30px"/></span>
         </div>
         <div class="margin-left--medium">
           <p class="margin-bottom--xsmall font-size--medium text--text-lightest">
@@ -58,7 +58,7 @@
       <li class="section--access__item display--flex">
         <div>
           <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px"/></span>
-          <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
+          <span *ngIf="globalVars.accessLevelRequest < 4"><img src="assets/image-close.svg" width="30px"/></span>
         </div>
         <div class="margin-left--medium">
           <p class="margin-bottom--xsmall font-size--medium text--text-lightest">
@@ -81,6 +81,10 @@
         </div>
       </li>
     </ul>
+    <div class="warning--error warning--error--medium margin-bottom--base" *ngIf="showAccessLevels && globalVars.accessLevelRequest === 4">
+      <h4 class="font-size--small font-weight--bold margin-bottom--small">Warning! This app could steal your funds.</h4>
+      <p>This app is requesting a wide scope of permissions, which is strongly discouraged. Apps should use derived keys with transaction limits instead.</p>
+    </div>
   </div>
   <div class="padding-bottom--xlarge">
     <app-account-select (onAccountSelect)="onAccountSelect($event)"></app-account-select>
