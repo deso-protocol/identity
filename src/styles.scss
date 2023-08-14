@@ -656,6 +656,7 @@ a, .link--primary {
   .section--header__verify {
     display: flex;
     align-items: center;
+    letter-spacing: 0.05em;
     @include border-radius('pill');
     @include font-size('small');
     @include spacing('padding-left', 'medium');
