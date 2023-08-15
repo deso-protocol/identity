@@ -1067,3 +1067,37 @@ a, .link--primary {
   -webkit-animation: 0.75s linear infinite spinner-border;
   animation: 0.75s linear infinite spinner-border;
 }
+
+//-------------------------
+// Sweet Alerts
+//-------------------------
+.swal2-container {
+  .swal2-icon {
+    display: none !important;
+  }
+  .swal2-popup {
+    @include spacing('padding-top','base');
+    @include spacing('padding-bottom','base');
+    @include spacing('padding-right','base');
+    @include spacing('padding-left','base');
+    @include color('blue', 'base', 'background-color');
+  }
+  .swal2-title {
+    @include color('text', 'lightest', 'color');
+    @include font-size('large');
+  }
+  .swal2-html-container {
+    line-height: 1.5;
+    @include color('text', 'lighter', 'color');
+    @include font-size('medium');
+  }
+  .swal2-confirm {
+    border: 1px solid;
+    @include color('neutral', 'white', 'border-color');
+    @include color('neutral', 'transparent', 'background-color');
+    @include color('neutral', 'white', 'color');
+  }
+  &.swal2-backdrop-show {
+    background-color: rgba(0,0,0,.8) !important;
+  }
+}

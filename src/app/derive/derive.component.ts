@@ -147,6 +147,7 @@ export class DeriveComponent implements OnInit {
         target: 'sign-messaging-randomness',
         icon: 'info',
         title: 'Generate Messaging Key',
+        confirmButtonText: 'Approve',
         html: `Metamask will open and request that you sign a message.
           This is used to generate a key pair that will be used to encrypt and decrypt messages on the DeSo Blockchain.
           Messaging keys are required for derived keys to properly encrypt and decrypt messages`,
