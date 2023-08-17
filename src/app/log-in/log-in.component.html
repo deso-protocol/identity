@@ -57,7 +57,7 @@
       </li>
       <li class="section--access__item display--flex">
         <div>
-          <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px"/></span>
+          <span *ngIf="globalVars.accessLevelRequest === 4"><img src="assets/image-check.svg" width="30px"/></span>
           <span *ngIf="globalVars.accessLevelRequest < 4"><img src="assets/image-close.svg" width="30px"/></span>
         </div>
         <div class="margin-left--medium">
