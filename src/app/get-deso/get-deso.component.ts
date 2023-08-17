@@ -11,6 +11,8 @@ import * as bip39 from 'bip39';
 import { RouteNames } from '../app-routing.module';
 import { BackendAPIService } from '../backend-api.service';
 import { Network } from 'src/types/identity';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { logInteractionEvent } from "../interaction-event-helpers";
 
 @Component({
   selector: 'app-get-deso',
@@ -36,9 +38,9 @@ export class GetDesoComponent implements OnInit {
 
   // user balance
   userBalanceNanos = 0;
-  refreshBalanceCooldown = false;
-  refreshBalanceRetryTime = 0;
-  refreshBalanceInterval: any;
+  refreshingBalance = false;
+  heroswapIframeUrl: SafeResourceUrl = '';
+
 
   constructor(
     public entropyService: EntropyService,
@@ -49,7 +51,8 @@ export class GetDesoComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
-    private backendAPIService: BackendAPIService
+    private backendAPIService: BackendAPIService,
+    private sanitizer: DomSanitizer,
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
@@ -58,11 +61,38 @@ export class GetDesoComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe((queryParams) => {
       if (queryParams.publicKey) {
         this.publicKeyAdded = queryParams.publicKey;
+        this.refreshBalance();
       }
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (!environment.heroswapURL) {
+      return;
+    }
+    this.heroswapIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      [
+        environment.heroswapURL,
+        '/widget?',
+        `network=${this.globalVars.network}`,
+        '&destinationTickers=DESO',
+        '&destinationTicker=DESO',
+        `&destinationAddress=${this.publicKeyAdded || ''}`, // TODO: confirm publicKeyAdded is correct.
+        `&affiliateAddress=BC1YLgHhMFnUrzQRpZCpK7TDxVGoGnAk539JqpYWgJ8uW9R7zCCdGHK`,
+        `&now=${Date.now()}`,
+      ].join('')
+    );
+    window.addEventListener("message", this.#heroswapMessageListener);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener("message", this.#heroswapMessageListener);
+  }
+
+  #heroswapMessageListener = (event: MessageEvent) => {
+    if (event.origin !== environment.heroswapURL) return;
+    logInteractionEvent("heroswap-iframe", "message", event.data);
+  }
 
   clickTos(): void {
     const h = 700;
@@ -81,7 +111,7 @@ export class GetDesoComponent implements OnInit {
 
   stepThreeNextPhone(): void {
     this.router.navigate(['/', RouteNames.VERIFY_PHONE_NUMBER], {
-      queryParams: { public_key: this.publicKeyAdded },
+      queryParams: {public_key: this.publicKeyAdded},
       queryParamsHandling: 'merge',
     });
   }
@@ -109,12 +139,7 @@ export class GetDesoComponent implements OnInit {
   }
 
   refreshBalance(): void {
-    if (this.refreshBalanceCooldown) {
-      return;
-    }
-    this.refreshBalanceCooldown = true;
-    this.refreshBalanceRetryTime = 30;
-
+    this.refreshingBalance = true;
     this.backendAPIService
       .GetUsersStateless([this.publicKeyAdded], true, true)
       .subscribe((res) => {
@@ -124,24 +149,21 @@ export class GetDesoComponent implements OnInit {
         const user = res.UserList[0];
         if (user.BalanceNanos) {
           this.userBalanceNanos = user.BalanceNanos;
+          this.isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
         }
-      });
-
-    this.refreshBalanceInterval = setInterval(() => {
-      if (this.refreshBalanceRetryTime === 0) {
-        this.refreshBalanceCooldown = false;
-        clearInterval(this.refreshBalanceInterval);
-      } else {
-        this.refreshBalanceRetryTime--;
-      }
-    }, 1000);
+      }).add(() => this.refreshingBalance = false);
   }
 
   ////// FINISH FLOW ///////
+  isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
+
   finishFlow(): void {
+    if (this.isFinishFlowDisabled) {
+      return;
+    }
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKeyAdded },
+        queryParams: {publicKey: this.publicKeyAdded},
         queryParamsHandling: 'merge',
       });
     } else {

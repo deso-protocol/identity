@@ -1,6 +1,9 @@
-<div class="d-flex flex-column">
-  <div class="d-flex">
-    <div class="d-flex w-50">
+<div class="display--flex flex--column">
+  <div class="display--flex">
+    <div class="display--flex w-50 text--text-lightest items--center">
+      <ng-container *ngIf="loaded">
+        <app-arrow-toggle (click)="expandNFT = !expandNFT" class="margin-right--small"></app-arrow-toggle>
+      </ng-container>
       <ng-container *ngIf="post">
         <!-- Media -->
         <div
@@ -8,7 +11,7 @@
             loaded &&
             !!(post?.ImageURLs?.length || post?.VideoURLs?.length)
           "
-          class="d-flex position-relative justify-content-start align-items-center mt-5px mb-5px pr-10px"
+          class="display--flex position-relative justify--start items--center margin-top--xsmall margin-bottom--xsmall padding-right--small"
           style="overflow: hidden; max-height: 100px; max-width: 100px"
         >
           <img
@@ -27,13 +30,13 @@
             style="width: 100%; max-height: 100%"
           ></iframe>
         </div>
-        <div class="d-flex flex-column" *ngIf="loaded">
-          <div class="d-flex justify-content-start align-items-center py-10px">
-            <div
-              class="avatar mr-15px"
+        <div class="display--flex flex--column" *ngIf="loaded">
+          <div class="display--flex justify--start items--center padding-top--medium padding-bottom--medium">
+            <img
+              class="avatar--rounded avatar--medium margin-right--small"
               [appAvatar]="post.PosterPublicKeyBase58Check"
               *ngIf="post"
-            ></div>
+            />
             <div>
               {{
               post
@@ -45,24 +48,22 @@
           </div>
           <!--TODO: Truncate post body -->
           <div
-            class="d-flex justify-content-start fs-14px py-10px"
+            class="display--flex justify--start font-size--small padding-bottom--small"
             *ngIf="post?.Body"
             [innerHTML]="post.Body || '' | sanitizePostBody"
           ></div>
         </div>
       </ng-container>
-      <ng-container *ngIf="!post && loaded">
-        <app-arrow-toggle (click)="expandNFT = !expandNFT"></app-arrow-toggle>
-
+      <ng-container *ngIf="!post">
         <div *ngIf="nftPostHashHex === ''">All NFTs</div>
         <div *ngIf="nftPostHashHex !== ''">NFT Post not found</div>
       </ng-container>
     </div>
     <div
-      class="d-flex fs-14px w-50 justify-content-end"
+      class="display--flex font-size--small w--50 justify--end"
       style="margin-left: auto"
     >
-      <div class="pr-5px">
+      <div class="text--text-lightest">
         {{ getOperationsString(nftSerialNumToOperationMap) }}
       </div>
     </div>
@@ -70,7 +71,7 @@
 
   <ng-container *ngIf="expandNFT">
     <div
-      class="d-flex flex-column m-15px"
+      class="display--flex flex--column margin--medium"
       *ngFor="
         let serialNumToOpMap of nftSerialNumToOperationMap
           | keyvalue
@@ -82,54 +83,49 @@
         let ii = index
       "
     >
-      <div class="fs-18px">
+      <div class="text--left margin-top--small margin-bottom--small">
         {{
         serialNumToOpMap.key === '0'
         ? 'All Serial Numbers'
         : '#' + serialNumToOpMap.key
         }}
       </div>
-      <div class="d-flex flex-column pt-15px pl-15px">
-        <div class="d-flex fs-14px justify-content-between">
+      <div class="margin-bottom--medium">
+        <div class="display--flex justify--between margin-bottom--small"
+             *ngFor="
+          let opLimit of serialNumToOpMap.value | keyvalue;
+          let ii = index
+          "
+        >
           <div>Operation Type</div>
-          <div>Operation Limit</div>
+          <code>
+            {{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}
+          </code>
         </div>
         <div
-          class="d-flex fs-18px justify-content-between py-10px"
+          class="display--flex justify--between margin-bottom--small"
           *ngFor="
             let opLimit of serialNumToOpMap.value | keyvalue;
             let ii = index
           "
-          [ngStyle]="{
-            'border-bottom':
-              ii < globalVars.ObjectKeyLength(serialNumToOpMap.value) - 1
-                ? '3px dotted darkgray'
-                : 'none'
-          }"
         >
-          <div>
-            {{ globalVars.cleanSpendingLimitOperationName(opLimit.key) }}
-          </div>
-          <div>{{ globalVars.formatTxCountLimit(opLimit.value) }}</div>
+          <div>Operation Limit</div>
+          <code>{{ globalVars.formatTxCountLimit(opLimit.value) }}</code>
         </div>
       </div>
     </div>
 
-    <div
+    <button
       *ngIf="
         globalVars.ObjectKeyLength(nftSerialNumToOperationMap) > defaultNumShown
       "
-      class="d-flex justify-content-center mr-15px ml-15px"
-      style="
-        background: lightgray;
-        border: 1px solid darkgray;
-        border-radius: 2px;
-      "
+      class="button--secondary button--medium display--flex justify--center margin-right--medium margin-left--medium"
+      style="align-self: center;"
       (click)="showAll = !showAll; expandNFT = showAll"
     >
       {{ showAll ? 'Hide' : 'Show all' }}
       {{ globalVars.ObjectKeyLength(nftSerialNumToOperationMap) }} serial
       numbers
-    </div>
+    </button>
   </ng-container>
 </div>

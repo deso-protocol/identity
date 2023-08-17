@@ -32,7 +32,7 @@ export class AccountSelectComponent implements OnInit {
 
   public getLoginIcon(loginMethod: LoginMethod) {
     return {
-      [LoginMethod.DESO]: 'assets/deso-logo.png',
+      [LoginMethod.DESO]: 'assets/logo-deso-mark.svg',
       [LoginMethod.GOOGLE]: 'assets/google_logo.svg',
       [LoginMethod.METAMASK]: 'assets/metamask.png',
     }[loginMethod];

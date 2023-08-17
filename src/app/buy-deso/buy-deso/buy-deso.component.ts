@@ -140,8 +140,8 @@ export class BuyDeSoComponent implements OnInit {
       showCancelButton: showBuyDeSo || showBuyCreatorCoin,
       focusConfirm: true,
       customClass: {
-        confirmButton: 'btn btn-light',
-        cancelButton: 'btn btn-light no',
+        confirmButton: 'btn-light',
+        cancelButton: 'btn-light no',
       },
       confirmButtonText: showBuyDeSo
         ? 'Buy DeSo'

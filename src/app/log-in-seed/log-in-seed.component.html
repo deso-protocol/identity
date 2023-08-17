@@ -1,63 +1,76 @@
 <app-banner></app-banner>
 
 <div
-  class="page-container"
+  class="container"
   *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
 >
-  <div class="title-text">Log in to {{ globalVars.hostname }}</div>
-
-  <p class="main-text mb-20px">
-    Enter your DeSo seed phrase to load your account
-  </p>
-
-  <div *ngIf="loginError" class="alert alert-danger mt-15px">
+  <div class="section--login text--center margin-bottom--small">
+    <img src="assets/image-lock.svg" width="60" class="section--accounts__illustration"/>
+    <div class="font-size--small margin-bottom--small text--text-lighter">For Advanced Users</div>
+    <h4 class="text--neutral-white">Import account to access {{ globalVars.hostname }}</h4>
+  <div class="font-size--small margin-top--small text--center margin-bottom--large">
+    <p class="margin-bottom--xsmall">Safely add your DeSo seed (mnemonic) to import your existing account.</p>
+    <p class="font-weight--medium">
+      Please make sure you are on: <span class="text--green-lighter">https://identity.deso.org</span>
+    </p>
+  </div>
+  <div *ngIf="loginError" class="warning--error margin-bottom--medium">
     {{ loginError }}
   </div>
+</div>
 
-  <div class="text-input-container">
+  <div class="section--login__option">
     <textarea
       [(ngModel)]="mnemonic"
-      class="text-input"
-      rows="4"
-      placeholder="Enter your DeSo seed phrase"
+      class="input--textarea input--seed"
+      rows="2"
+      placeholder="Enter your DeSo seed only!"
     ></textarea>
-  </div>
+    <div class="margin-top--small text--right">
+      <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link--secondary" data-control-name="log-in-with-seed-advanced-toggle-button">
+        <u>Show Advanced</u>
+      </div>
+      <div *ngIf="advancedOpen" (click)="advancedOpen = false" class="link--secondary" data-control-name="log-in-with-seed-simple-toggle-button">
+        <u>Hide Advanced</u>
+      </div>
+    </div>
 
-  <div *ngIf="advancedOpen" class="main-text mb-20px">
-    If you have a passphrase, enter it below.
-  </div>
-  <div *ngIf="advancedOpen" class="text-input-container">
-    <textarea
-      [(ngModel)]="extraText"
-      class="text-input"
-      rows="4"
-      placeholder="Enter your passphrase"
-    ></textarea>
-  </div>
+    <div *ngIf="advancedOpen" class="margin-top--medium">
+      <div class="font-size--medium font-weight--semibold">
+        If you have a passphrase, enter it below.
+      </div>
+    </div>
+    <div *ngIf="advancedOpen" class="margin-top--small">
+      <textarea
+        [(ngModel)]="extraText"
+        class="input--textarea"
+        rows="2"
+        placeholder="Enter your passphrase"
+      ></textarea>
+    </div>
 
-  <div *ngIf="advancedOpen" class="main-text mb-20px">
-    If you have a seed hex instead of a seed phrase, enter it below.
+    <div *ngIf="advancedOpen" class="margin-top--medium">
+      <div class="font-size--medium font-weight--semibold">
+        If you have a seed hex instead of a DeSo seed phrase, enter it below.
+      </div>
+    </div>
+    <div *ngIf="advancedOpen" class="margin-top--small">
+      <textarea
+        [(ngModel)]="seedHex"
+        class="input--textarea"
+        rows="2"
+        placeholder="Enter your seed hex"
+      ></textarea>   
+    </div>
+    <button
+      data-control-name="log-in-with-seed-load-account-button"
+      (click)="clickLoadAccount()"
+      class="button--primary button--medium margin-top--medium"
+    >
+      Load DeSo Account
+    </button>
   </div>
-  <div *ngIf="advancedOpen" class="text-input-container">
-    <textarea
-      [(ngModel)]="seedHex"
-      class="text-input"
-      rows="4"
-      placeholder="Enter your seed hex"
-    ></textarea>
+  <div class="warning--error warning--error--medium margin-top--base">
+    Never share these details with anyone!<br/> Keep it safe and secure at all times.
   </div>
-
-  <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link mb-30px" data-control-name="log-in-with-seed-advanced-toggle-button">
-    <u>Advanced</u>
-  </div>
-  <div *ngIf="advancedOpen" (click)="advancedOpen = false" class="link mb-30px" data-control-name="log-in-with-seed-simple-toggle-button">
-    <u>Simple</u>
-  </div>
-  <button
-    data-control-name="log-in-with-seed-load-account-button"
-    (click)="clickLoadAccount()"
-    class="button button-primary button-large"
-  >
-    Load Account
-  </button>
 </div>

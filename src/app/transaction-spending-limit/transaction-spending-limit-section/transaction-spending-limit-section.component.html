@@ -1,34 +1,30 @@
 <div
   *ngIf="getSectionMapLength() || anyCreatorItem || anyNFTItem"
-  class="px-20px transaction-spending-limit-separator"
+  class="box--border box--rounded box--base margin-bottom--medium"
 >
-  <div class="flex-grow-1 pt-15px"></div>
-  <div class="py-15px">
-    <div class="d-flex justify-content-between">
-      <div class="d-flex flex-column">
-        <div class="fs-18px text-left">
-          <app-arrow-toggle
-            (click)="showDetails = !showDetails"
-          ></app-arrow-toggle>
+  <div>
+    <div class="justify--between text--left">
+      <div class="items--center width--full">
+        <div class="font--small text--text-lightest">
+          <app-arrow-toggle (click)="showDetails = !showDetails"></app-arrow-toggle>
           {{ sectionTitle }}
         </div>
-        <div class="fs-14px text-left">
+        <div class="font--small paddin-top--small padding-left--large">
           {{ sectionSummary() }}
         </div>
       </div>
-      <div class="d-flex justify-content-end"></div>
     </div>
 
-    <div class="d-flex flex-column pt-15px" *ngIf="showDetails">
+    <div class="margin-top--medium" *ngIf="showDetails">
       <ng-container
         *ngIf="
           sectionTitle ===
           TransactionSpendingLimitComponent.TransactionLimitsSection
         "
       >
-        <div class="d-flex justify-content-between fs-14px py-5px">
-          <div>Txn Type</div>
-          <div>Txn Limit</div>
+        <div class="display--flex justify--between items--center">
+          <div class="text--text-lightest">Txn Type</div>
+          <div class="text--text-lightest">Txn Limit</div>
         </div>
         <div
           *ngFor="
@@ -40,13 +36,12 @@
                     ? globalVars.ObjectKeyLength(sectionMap)
                     : defaultNumShown)
           "
-          style="border-top: 1px dotted grey"
-          class="d-flex justify-content-between py-5px"
+          class="padding-top--small display--flex justify--between"
         >
           <div>
             {{ globalVars.cleanSpendingLimitOperationName(txnLimitItem.key) }}
           </div>
-          <div>{{ globalVars.formatTxCountLimit(txnLimitItem.value) }}</div>
+          <code>{{ globalVars.formatTxCountLimit(txnLimitItem.value) }}</code>
         </div>
       </ng-container>
       <ng-container
@@ -57,7 +52,8 @@
             TransactionSpendingLimitComponent.DAOCoinLimitsSection
         "
       >
-        <div *ngIf="anyCreatorItem" class="mb-15px px-5px py-15px">
+        <div *ngIf="anyCreatorItem"
+             class="margin-bottom--medium">
           <app-transaction-spending-limit-coin
             coinPublicKey=""
             [coinOperationMap]="anyCreatorItem"
@@ -73,13 +69,13 @@
                     ? globalVars.ObjectKeyLength(sectionMap)
                     : defaultNumShown)
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-coin
             [coinPublicKey]="coinLimitItem.key"
             [coinOperationMap]="coinLimitItem.value"
             [user]="userMap[coinLimitItem.key]"
-            class="pb-15px"
+            class="padding-bottom--small"
           ></app-transaction-spending-limit-coin>
         </div>
       </ng-container>
@@ -88,7 +84,8 @@
           sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection
         "
       >
-        <div *ngIf="anyNFTItem" class="mb-15px px-5px py-15px">
+        <div *ngIf="anyNFTItem"
+             class="margin-bottom--medium">
           <app-transaction-spending-limit-nft
             nftPostHashHex=""
             [nftSerialNumToOperationMap]="anyNFTItem"
@@ -105,12 +102,12 @@
                     : defaultNumShown);
             let ii = index
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--small"
         >
           <app-transaction-spending-limit-nft
             [nftPostHashHex]="nftLimitItem.key"
             [nftSerialNumToOperationMap]="nftLimitItem.value"
-            class="pb-15px"
+            class="padding-bottom--small"
           ></app-transaction-spending-limit-nft>
           <div
             class="flex-grow-1 transaction-spending-limit-separator"
@@ -130,10 +127,10 @@
           TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
         "
       >
-        <div class="d-flex pb-10px">
-          <div class="col-5">Buying</div>
-          <div class="col-5">Selling</div>
-          <div class="col-2">Count</div>
+        <div class="display--flex padding-bottom--small">
+          <div class="width--40">Buying</div>
+          <div class="width--40">Selling</div>
+          <div class="width--20">Count</div>
         </div>
         <div
           *ngFor="
@@ -144,7 +141,7 @@
                     ? daoCoinLimitOrderLimitItems.length
                     : defaultNumShown)
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--small"
         >
           <app-transaction-spending-limit-dao-coin-limit-order
             [daoCoinLimitOrderLimitItem]="daoCoinLimitOrderLimitItem"
@@ -167,7 +164,7 @@
                     ? associationLimitMap.length
                     : defaultNumShown)
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--small"
         >
           <app-transaction-spending-limit-association
             [associationLimitMapItem]="associationLimitMapItem"
@@ -189,7 +186,7 @@
                     ? accessGroupLimitMap.length
                     : defaultNumShown)
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-access-group
             [accessGroupLimitMapItem]="accessGroupLimitMapItem"
@@ -211,7 +208,7 @@
                     ? accessGroupMemberLimitMap.length
                     : defaultNumShown)
           "
-          class="d-flex flex-column pb-15px"
+          class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-access-group-member
             [accessGroupMemberLimitMapItem]="accessGroupMemberLimitMapItem"
@@ -224,7 +221,7 @@
 
   <div
     *ngIf="showDetails"
-    class="d-flex justify-content-center mr-15px ml-15px"
+    class="display--flex justify--center margin-right--medium margin-left--medium"
     (click)="
       showDetails = !showAll;
       showAll = !showAll || getSectionMapLength() <= defaultNumShown

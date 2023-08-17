@@ -1,74 +1,94 @@
 <app-banner></app-banner>
 
 <div
-  class="container home-container text-center"
+  class="container text--center"
   *ngIf="globalVars.inTab || globalVars.webview || globalVars.redirectURI"
 >
-  <div class="mb-20px">
-    <span class="title-text">Log in to {{ globalVars.hostname }}</span>
-    <div class="main-text">
-        Sign up with {{ globalVars.showMetamask() ? "MetaMask, Google," : "Google" }}<br />
-        or DeSo seed phrase!
-    </div>
+  <div class="margin-bottom--medium">
+    <img src="assets/image-head.svg" width="60" class="section--accounts__illustration"/>
   </div>
-  <app-account-select
-    (onAccountSelect)="onAccountSelect($event)"
-  ></app-account-select>
-  <app-log-in-options></app-log-in-options>
-
   <div *ngIf="showAccessLevels">
-    <div class="fs-18px mt-30px">
-      Logging in grants <b>{{ globalVars.hostname }}</b> access to:
+    <div class="font-size--large margin-top--base text--center text--neutral-white">
+      You are granting <b>{{ globalVars.hostname }}</b> access to:
     </div>
-
-    <ul class="list-group list-group-flush mt-15px">
-      <li class="list-group-item">
-        <span *ngIf="globalVars.accessLevelRequest >= 2">✅</span>
-        <span *ngIf="globalVars.accessLevelRequest < 2">❌</span>
-        My basic information
-        <div class="fs-14px text-muted">
-          <b>{{ globalVars.hostname }}</b> can access my public key and any
-          other public information
+    <ul
+      class="margin-top--base box--border box--rounded text--left margin-bottom--base">
+      <li class="section--access__item display--flex">
+        <div>
+          <span *ngIf="globalVars.accessLevelRequest >= 2">
+            <img src="assets/image-check.svg" width="30px"/>
+          </span>
+          <span *ngIf="globalVars.accessLevelRequest < 2"><img src="assets/image-close.svg" width="30px"/></span>
+        </div>
+        <div class="margin-left--medium">
+          <p class="margin-bottom--xsmall font-size--medium text--text-lightest">
+            My basic information
+          </p>
+          <p class="font-size--small">
+            <strong>{{ globalVars.hostname }}</strong> can access my public key and any
+            other public information
+          </p>
         </div>
       </li>
-      <li class="list-group-item">
-        <span *ngIf="globalVars.accessLevelRequest >= 3">✅</span>
-        <span *ngIf="globalVars.accessLevelRequest < 3">❌</span>
-        Post, message, like, and follow on my behalf
-        <div
-          class="fs-14px text-muted"
-          *ngIf="globalVars.accessLevelRequest < 3"
-        >
-          <b>{{ globalVars.hostname }}</b> will require approval to post,
-          message, like, and follow
+      <li class="section--access__item display--flex">
+        <div>
+          <span *ngIf="globalVars.accessLevelRequest >= 3"><img src="assets/image-check.svg" width="30px"/></span>
+          <span *ngIf="globalVars.accessLevelRequest < 3"><img src="assets/image-close.svg" width="30px"/></span>
         </div>
-        <div
-          class="fs-14px text-muted"
-          *ngIf="globalVars.accessLevelRequest >= 3"
-        >
-          <b>{{ globalVars.hostname }}</b> may post, message, like, and follow
-          without requiring approval
+        <div class="margin-left--medium">
+          <p class="margin-bottom--xsmall font-size--medium text--text-lightest">
+            Post, message, like, and follow on my behalf
+          </p>
+          <div
+            class="font-size--small"
+            *ngIf="globalVars.accessLevelRequest < 3"
+          >
+            <strong>{{ globalVars.hostname }}</strong> will require approval to post,
+            message, like, and follow
+          </div>
+          <div
+            class="font-size--small"
+            *ngIf="globalVars.accessLevelRequest >= 3"
+          >
+            <strong>{{ globalVars.hostname }}</strong> may post, message, like, and follow
+            without requiring approval
+          </div>
         </div>
       </li>
-      <li class="list-group-item">
-        <span *ngIf="globalVars.accessLevelRequest === 4">✅</span>
-        <span *ngIf="globalVars.accessLevelRequest < 4">❌</span>
-        Buy, sell, and send coins on my behalf
-        <div
-          class="fs-14px text-muted"
-          *ngIf="globalVars.accessLevelRequest < 4"
-        >
-          <b>{{ globalVars.hostname }}</b> will require approval to buy, sell,
-          or send coins
+      <li class="section--access__item display--flex">
+        <div>
+          <span *ngIf="globalVars.accessLevelRequest === 4"><img src="assets/image-check.svg" width="30px"/></span>
+          <span *ngIf="globalVars.accessLevelRequest < 4"><img src="assets/image-close.svg" width="30px"/></span>
         </div>
-        <div
-          class="fs-14px text-muted"
-          *ngIf="globalVars.accessLevelRequest === 4"
-        >
-          <b>{{ globalVars.hostname }}</b> may buy, sell, and send coins without
-          requiring approval
+        <div class="margin-left--medium">
+          <p class="margin-bottom--xsmall font-size--medium text--text-lightest">
+            Buy, sell, and send coins on my behalf
+          </p>
+          <div
+            class="font-size--small"
+            *ngIf="globalVars.accessLevelRequest < 4"
+          >
+            <strong>{{ globalVars.hostname }}</strong> will require approval to buy, sell,
+            or send coins
+          </div>
+          <div
+            class="font-size--small"
+            *ngIf="globalVars.accessLevelRequest === 4"
+          >
+            <strong>{{ globalVars.hostname }}</strong> may buy, sell, and send coins without
+            requiring approval
+          </div>
         </div>
       </li>
     </ul>
+    <div class="warning--error warning--error--medium margin-bottom--base" *ngIf="showAccessLevels && globalVars.accessLevelRequest === 4">
+      <h4 class="font-size--small font-weight--bold margin-bottom--small">Warning! This app could steal your funds.</h4>
+      <p>This app is requesting a wide scope of permissions, which is strongly discouraged. Apps should use derived keys with transaction limits instead.</p>
+    </div>
+  </div>
+  <div class="padding-bottom--xlarge">
+    <app-account-select (onAccountSelect)="onAccountSelect($event)"></app-account-select>
+    <div class="text--divider margin-top--large margin-bottom--large">or</div>
+    <app-log-in-options></app-log-in-options>
   </div>
 </div>

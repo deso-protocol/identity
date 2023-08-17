@@ -1,46 +1,44 @@
-<div class="d-flex align-items-center flex-column">
-  <button
-    data-control-name="log-in-cta"
-    data-control-login-option="metamask"
-    class="button button-large mb-20px bg-dark text-white"
-    (click)="navigateToMetamaskSignup()"
-    queryParamsHandling="merge"
-    *ngIf="globalVars.showMetamask()"
-  >
-    <img src="assets/metamask.png" height="32px" width="32px" class="mr-10px" />
-
-    <span class="font-weight-bold">Sign up / log in with MetaMask</span>
-  </button>
-  <button
-    data-control-name="log-in-cta"
-    data-control-login-option="google"
-    class="button button-large button-primary mb-20px"
-    (click)="launchGoogle()"
-    *ngIf="!globalVars.hideGoogle"
-  >
-    <img
-      src="assets/google_logo.svg"
-      height="32px"
-      width="32px"
-      class="mr-10px"
-    />
-    <span class="font-weight-bold">Sign up / log in with Google</span>
-  </button>
-  <button
-    data-control-name="log-in-cta"
-    data-control-login-option="sign-up-with-deso-seed"
-    class="button button-large button-secondary mb-20px"
-    [routerLink]="['/sign-up']"
-    queryParamsHandling="merge"
-  >
-    <span class="font-weight-normal">Sign up with DeSo seed</span>
-  </button>
-  <a
-    data-control-name="log-in-cta"
-    data-control-login-option="log-in-with-deso-seed"
-    class="link" [routerLink]="['/load-seed']" queryParamsHandling="merge"
-  >
-    <u>Log in with DeSo seed</u>
-  </a
-  >
+<div class="section--login">
+  <div class="section--login__advanced">
+    <button
+      data-control-name="log-in-cta"
+      data-control-login-option="sign-up-with-deso-seed"
+      class="button--primary button--medium margin-bottom--medium"
+      [routerLink]="['/sign-up']"
+      queryParamsHandling="merge"
+    >
+      <img src="assets/logo-deso-mark.svg" class="margin-right--small" height="26px" />
+      Sign up with DeSo Seed
+    </button>
+  </div>
+  <div class="section--login__common">
+    <button
+      data-control-name="log-in-cta"
+      data-control-login-option="google"
+      class="button--primary--outline button--medium margin-bottom--medium"
+      (click)="launchGoogle()"
+      *ngIf="!globalVars.hideGoogle"
+    >
+      <img src="assets/google_logo.svg" class="margin-right--small" width="26px" height="26px" />
+      Sign up / Log in with Google
+    </button>
+    <button
+      data-control-name="log-in-cta"
+      data-control-login-option="metamask"
+      class="button--primary--outline button--medium margin-bottom--medium"
+      (click)="navigateToMetamaskSignup()"
+      queryParamsHandling="merge"
+      *ngIf="globalVars.showMetamask()"
+    >
+      <img src="assets/metamask.png" class="margin-right--small" width="26px" height="26px" />
+      Sign up / Log in with MetaMask
+    </button>   
+    <a
+      data-control-name="log-in-cta"
+      data-control-login-option="log-in-with-deso-seed"
+      class="font-size--small" [routerLink]="['/load-seed']" queryParamsHandling="merge"
+    >
+      or import existing DeSo account
+    </a>
+  </div>
 </div>

@@ -5,33 +5,38 @@
   <div class="google-ball green"></div>
 </div>
 <div *ngIf="!autoOpenJumio">
-  <div class="fs-24px font-weight-bold pt-15px">
-    Earn <app-free-deso-message></app-free-deso-message> Free
+  <div class="font-size--large font-weight-bold padding-top--medium">
+    Earn
+    <app-free-deso-message></app-free-deso-message>
+    Free
   </div>
-  <div class="d-flex align-items-center">
+  <div class="display--flex items--center">
     <div>
-      <div class="fs-15px mt-15px">
+      <div class="font-size--medium margin-top--medium">
         Click the button below to prove you're not a robot and earn
-        <app-free-deso-message></app-free-deso-message> <b>free</b>!
+        <app-free-deso-message></app-free-deso-message>
+        <b>free</b>!
       </div>
     </div>
   </div>
-  <div class="d-flex pt-15px justify-content-end">
+  <div class="display--flex padding-top--medium justify--end">
     <button
       (click)="skip()"
-      class="btn btn-outline-primary font-weight-bold fs-15px sign-up-btn mr-2"
+      class="btn-outline-primary font-weight-bold font-size--medium sign-up-mr-2"
       *ngIf="showSkip"
     >
       Skip
     </button>
     <button
       (click)="openJumio()"
-      class="btn btn-primary font-weight-bold fs-15px sign-up-btn"
+      class="button--primary font-weight-bold font-size--medium sign-up-btn"
     >
-      Earn <app-free-deso-message></app-free-deso-message> <b>Free</b>
+      Earn
+      <app-free-deso-message></app-free-deso-message>
+      <b>Free</b>
     </button>
   </div>
-  <div class="pt-5px">
+  <div class="padding-top--small">
     <app-free-deso-disclaimer></app-free-deso-disclaimer>
   </div>
 </div>
