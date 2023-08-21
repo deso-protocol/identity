@@ -1,16 +1,20 @@
 <div
-  class="full-screen display--flex justify--center items--center flex--column"
+  class="display--flex justify--center items--center flex--column"
   (click)="tapToUnlock()"
 >
-  <div class="p-20px">
-    <img class="home-logo" src="/assets/camelcase_logo.svg" />
+  <div
+    class="display--flex justify--center padding-left--base padding-right--base padding-top--base padding-bottom--base">
+    <img class="width--80" src="/assets/logo-deso.svg"/>
   </div>
-  <div class="p-20px" *ngIf="identityService.browserSupported">
+  <div class="padding-left--base padding-right--base padding-top--base padding-bottom--base font-size--large"
+       *ngIf="identityService.browserSupported">
     Tap anywhere to unlock your wallet.
   </div>
-  <div class="p-20px text-center" *ngIf="!identityService.browserSupported">
+  <div
+    class="padding-left--base padding-right--base padding-top--base padding-bottom--base text--center font-size--large"
+    *ngIf="!identityService.browserSupported">
     Your browser is either in Incognito mode or it is not supported.
-    <br /><br />
+    <br/><br/>
     Please exit Incognito, allow third-party cookies, or use a different
     browser.
   </div>
