@@ -89,6 +89,7 @@ export class CryptoService {
         this.cookieService.put(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
           sameSite: 'none',
+          secure: true,
         });
       }
     } else {

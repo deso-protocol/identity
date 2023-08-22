@@ -479,6 +479,7 @@ export class IdentityService {
     // check for cookie access
     this.cookieService.put('deso-test-access', 'true', {
       sameSite: 'none',
+      secure: true,
     });
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
