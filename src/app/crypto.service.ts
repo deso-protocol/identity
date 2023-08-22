@@ -12,7 +12,7 @@ import {
   randomBytes,
   createHash,
 } from 'crypto';
-import {AccessLevel, Network} from '../types/identity';
+import { AccessLevel, Network } from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
 import { Keccak } from 'sha3';
 import * as sha256 from 'sha256';
@@ -24,7 +24,8 @@ export class CryptoService {
   constructor(
     private cookieService: CookieService,
     private globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -87,6 +88,7 @@ export class CryptoService {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.put(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
+          sameSite: 'none',
         });
       }
     } else {
