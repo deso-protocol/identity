@@ -98,4 +98,9 @@ header @html Content-Security-Policy "
   frame-src 'self'
     heroswap.com
     https://verify.walletconnect.com
-    https://iframe.videodelivery.net;"
+    https://iframe.videodelivery.net
+    https://hcaptcha.com/
+    https://*.hcaptcha.com/;
+  script-src 'self'
+    https://hcaptcha.com
+    https://*.hcaptcha.com;"
