@@ -100,5 +100,6 @@ header @html Content-Security-Policy "
     heroswap.com
     https://verify.walletconnect.com
     https://iframe.videodelivery.net
-    https://hcaptcha.com/
-    https://*.hcaptcha.com/;"
+    https://hcaptcha.com/;
+  script-src 'self'
+    https://hcaptcha.com;"
