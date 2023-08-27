@@ -70,6 +70,27 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/get-txn
     https://test.deso.org/api/v0/get-bulk-messaging-public-keys
     https://test.deso.org/api/v0/submit-transaction
+    https://z.deso.run/api/v0/get-users-stateless
+    https://z.deso.run/api/v0/get-app-state
+    https://z.deso.run/api/v0/jumio-begin
+    https://z.deso.run/api/v0/jumio-flow-finished
+    https://z.deso.run/api/v0/get-referral-info-for-referral-hash
+    https://z.deso.run/api/v0/get-user-derived-keys
+    https://z.deso.run/api/v0/get-transaction-spending
+    https://z.deso.run/api/v0/send-phone-number-verification-text
+    https://z.deso.run/api/v0/submit-phone-number-verification-code
+    https://z.deso.run/api/v0/get-transaction-spending-limit-hex-string
+    https://z.deso.run/api/v0/get-transaction-spending-limit-response-from-hex/
+    https://z.deso.run/api/v0/get-single-post
+    https://z.deso.run/api/v0/get-exchange-rate
+    https://z.deso.run/api/v0/query-eth-rpc
+    https://z.deso.run/api/v0/submit-eth-tx
+    https://z.deso.run/api/v0/get-access-bytes
+    https://z.deso.run/api/v0/send-starter-deso-for-metamask-account
+    https://z.deso.run/api/v0/authorize-derived-key
+    https://z.deso.run/api/v0/get-txn
+    https://z.deso.run/api/v0/get-bulk-messaging-public-keys
+    https://z.deso.run/api/v0/submit-transaction
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files
