@@ -67,6 +67,8 @@ import {
   TransactionSpendingLimitSectionComponent
 } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
+import { NgHcaptchaModule } from 'ng-hcaptcha';
+import {environment} from "../environments/environment";
 
 @NgModule({
   declarations: [
@@ -121,6 +123,9 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     MatFormFieldModule,
     MatTooltipModule,
     IconsModule,
+    NgHcaptchaModule.forRoot({
+      siteKey: environment.hCaptchaSitekey,
+    }),
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
   ],

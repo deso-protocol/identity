@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   hostname: 'https://identity.deso.org',
-  nodeURL: 'https://node.deso.org',
+  // nodeURL: 'https://node.deso.org',
+  nodeURL: 'http://localhost:18001',
   fullAccessHostnames: [
     'bitclout.com',
     'bitclout.green',
@@ -19,6 +20,7 @@ export const environment = {
   noAccessHostnames: [''],
   jumioSupported: false,
   heroswapURL: 'https://heroswap.com',
+  hCaptchaSitekey: 'b358821b-bf3d-4662-a202-001eb9a769e2',
 };
 
 /*

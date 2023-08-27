@@ -138,6 +138,23 @@ export class GetDesoComponent implements OnInit {
     }, 1000);
   }
 
+  onCaptchaVerify(token: string): void {
+    this.backendAPIService.VerifyHCaptcha(token, this.publicKeyAdded).subscribe((res) => {
+      if (res.Success) {
+        this.isFinishFlowDisabled = false;
+        this.finishFlow();
+      }
+    });
+  }
+
+  onCaptchaExpired(event: any): void {
+    return;
+  }
+
+  onCaptchaError(event: any): void {
+    return;
+  }
+
   refreshBalance(): void {
     this.refreshingBalance = true;
     this.backendAPIService

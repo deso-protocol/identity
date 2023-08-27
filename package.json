@@ -56,6 +56,7 @@
     "jsonwebtoken": "^8.5.1",
     "key-encoder": "^2.0.3",
     "lodash": "^4.17.21",
+    "ng-hcaptcha": "^2.2.0",
     "ngx-cookie": "^6.0.1",
     "process": "^0.11.10",
     "readable-stream": "^3.6.0",
