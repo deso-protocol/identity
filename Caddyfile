@@ -47,6 +47,7 @@ header @html Content-Security-Policy "
     https://z.deso.run/api/v0/send-starter-deso-for-metamask-account
     https://z.deso.run/api/v0/authorize-derived-key
     https://z.deso.run/api/v0/get-txn
+    https://z.deso.run/api/v0/verify-captcha
     https://z.deso.run/api/v0/get-bulk-messaging-public-keys
     https://z.deso.run/api/v0/submit-transaction
     https://test.deso.org/api/v0/get-users-stateless
@@ -100,7 +101,4 @@ header @html Content-Security-Policy "
     https://verify.walletconnect.com
     https://iframe.videodelivery.net
     https://hcaptcha.com/
-    https://*.hcaptcha.com/;
-  script-src 'self'
-    https://hcaptcha.com
-    https://*.hcaptcha.com;"
+    https://*.hcaptcha.com/;"
