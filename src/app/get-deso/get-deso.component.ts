@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { EntropyService } from '../entropy.service';
 import { CryptoService } from '../crypto.service';
 import { AccountService } from '../account.service';
@@ -41,6 +41,15 @@ export class GetDesoComponent implements OnInit {
   refreshingBalance = false;
   heroswapIframeUrl: SafeResourceUrl = '';
 
+  // Whether we show the captcha or the alternative options for earning deso.
+  alternativeOptionsEnabled = false;
+
+  // Whether the user has failed the captcha, or the captcha timed out, or there was an issue verifying the captcha token.
+  captchaFailed = false;
+  // Whether the backend is offering rewards for solving captchas.
+  captchaAvailable = true;
+
+  @ViewChild('captchaElem', { static: false }) captchaElem: any;
 
   constructor(
     public entropyService: EntropyService,
@@ -70,6 +79,11 @@ export class GetDesoComponent implements OnInit {
     if (!environment.heroswapURL) {
       return;
     }
+    if (this.globalVars.captchaDeSoNanos === 0) {
+      this.captchaAvailable = false;
+      this.alternativeOptionsEnabled = true;
+    }
+
     this.heroswapIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
       [
         environment.heroswapURL,
@@ -143,16 +157,33 @@ export class GetDesoComponent implements OnInit {
       if (res.Success) {
         this.isFinishFlowDisabled = false;
         this.finishFlow();
+      } else {
+        this.captchaFailed = true;
       }
+    }, (err) => {
+      this.captchaFailed = true;
     });
   }
 
   onCaptchaExpired(event: any): void {
+    this.captchaFailed = true;
     return;
   }
 
   onCaptchaError(event: any): void {
+    this.captchaFailed = true;
     return;
+  }
+
+  resetCaptcha(): void {
+    this.captchaFailed = false;
+    console.log('Here is the captcha elem: ', this.captchaElem);
+    this.captchaElem.reset();
+  }
+
+  setAlternativeEarnOptions(alternativeOptionsEnabled: boolean): void {
+    this.captchaFailed = false;
+    this.alternativeOptionsEnabled = alternativeOptionsEnabled;
   }
 
   refreshBalance(): void {
