@@ -133,6 +133,26 @@
               2. Send DESO to your public key (wallet address):
               <code class="display--block font-size--small margin-top--small">{{ publicKeyAdded }}</code>
             </p>
+            <div class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet">
+              <div class="section--seed__actions">
+                <button
+                  data-control-name="sign-up-with-seed-copy-button"
+                  data-control-option="copy"
+                  (click)="copyPublicKey()"
+                  class="button--primary--outline button--small display--flex items--center"
+                >
+                  <img
+                    *ngIf="publicKeyCopied"
+                    src="assets/check-square.svg"
+                    width="16px"
+                    height="16px"
+                    class="margin-right--small image--invert"
+                  />
+                  <img *ngIf="!publicKeyCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
+                  <span>Copy</span>
+                </button>
+              </div>
+            </div>
             <div class="section--divider"></div>
             <p class="text--left text--text-lightest">
               3. Check your DeSo balance:

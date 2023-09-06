@@ -49,6 +49,8 @@ export class GetDesoComponent implements OnInit {
   // Whether the backend is offering rewards for solving captchas.
   captchaAvailable = true;
 
+  publicKeyCopied = false;
+
   @ViewChild('captchaElem', { static: false }) captchaElem: any;
 
   constructor(
@@ -101,6 +103,11 @@ export class GetDesoComponent implements OnInit {
 
   ngOnDestroy(): void {
     window.removeEventListener("message", this.#heroswapMessageListener);
+  }
+
+  copyPublicKey(): void {
+    this.textService.copyText(this.publicKeyAdded);
+    this.publicKeyCopied = true;
   }
 
   #heroswapMessageListener = (event: MessageEvent) => {
