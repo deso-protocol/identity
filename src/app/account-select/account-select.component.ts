@@ -31,18 +31,22 @@ export class AccountSelectComponent implements OnInit {
   ngOnInit(): void {
     let visibleUsers: typeof this.visibleUsers = [];
 
-    this.allUsers.pipe(take(1)).subscribe((users) => {
+    this.allUsers.pipe(take(1)).subscribe((profiles) => {
+      const users = this.accountService.getUsers();
+
       for (const key of Object.keys(users)) {
-        if (!this.accountService.isUserHidden(key)) {
+        if (!users[key].isHidden) {
           visibleUsers.push({
             key,
-            ...users[key],
+            ...profiles[key],
           });
         }
       }
 
       this.visibleUsers = visibleUsers.sort((a, b) => {
-        return this.accountService.getLastLoginTimestamp(b.key) - this.accountService.getLastLoginTimestamp(a.key);
+        const timestampA = users[a.key]?.lastLoginTimestamp ?? 0;
+        const timestampB = users[b.key]?.lastLoginTimestamp ?? 0;
+        return timestampB - timestampA;
       });
     });
   }

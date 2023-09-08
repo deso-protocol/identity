@@ -60,12 +60,12 @@ export class AccountService {
   // Public Getters
 
   getPublicKeys(): any {
-    return Object.keys(this.getPrivateUsers());
+    return Object.keys(this.getUsers());
   }
 
   getEncryptedUsers(): { [key: string]: PublicUserInfo } {
     const hostname = this.globalVars.hostname;
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getUsers();
     const publicUsers: { [key: string]: PublicUserInfo } = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
@@ -115,7 +115,7 @@ export class AccountService {
   }
 
   requiresMessagingKeyRandomness(publicKey: string): boolean {
-    const privateUser = this.getPrivateUsers()[publicKey];
+    const privateUser = this.getUsers()[publicKey];
     if (!privateUser) {
       console.error('private user not found');
       throw new Error('private user not found');
@@ -153,11 +153,11 @@ export class AccountService {
     derivedPublicKeyBase58CheckInput?: string,
     expirationDays?: number
   ): Promise<DerivedPrivateUserInfo | undefined> {
-    if (!(publicKeyBase58Check in this.getPrivateUsers())) {
+    if (!(publicKeyBase58Check in this.getUsers())) {
       return undefined;
     }
 
-    const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
+    const privateUser = this.getUsers()[publicKeyBase58Check];
     const network = privateUser.network;
     const isMetamask = this.isMetamaskAccount(privateUser);
 
@@ -329,7 +329,7 @@ export class AccountService {
   }
 
   getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): any {
-    const privateUser = this.getPrivateUsers()[publicKey];
+    const privateUser = this.getUsers()[publicKey];
     const network = privateUser.network;
     // create jwt with private key and app public key
     const keyEncoder = new KeyEncoder('secp256k1');
@@ -590,7 +590,7 @@ export class AccountService {
     ownerPublicKeyBase58Check: string,
     publicKey: string
   ): string {
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       return '';
     }
@@ -607,7 +607,7 @@ export class AccountService {
     ownerPublicKeyBase58Check: string,
     messagingKeyName: string
   ): Promise<DefaultKeyPrivateInfo> {
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getUsers();
     if (!(ownerPublicKeyBase58Check in privateUsers)) {
       throw new Error(ERROR_USER_NOT_FOUND);
     }
@@ -1021,11 +1021,11 @@ export class AccountService {
   getLoginMethodWithPublicKeyBase58Check(
     publicKeyBase58Check: string
   ): LoginMethod {
-    const account = this.getPrivateUsers()[publicKeyBase58Check];
+    const account = this.getUsers()[publicKeyBase58Check];
     return account.loginMethod || LoginMethod.DESO;
   }
 
-  private getPrivateUsers(): { [key: string]: PrivateUserInfo } {
+  getUsers(): { [key: string]: PrivateUserInfo } {
     const privateUsers = this.getPrivateUsersRaw();
     const filteredPrivateUsers: { [key: string]: PrivateUserInfo } = {};
 
@@ -1096,15 +1096,6 @@ export class AccountService {
     });
   }
 
-  isUserHidden(publicKey: string): boolean {
-    const privateUsers = this.getPrivateUsersRaw();
-    const user = privateUsers[publicKey];
-
-    if (!user) return false;
-
-    return !!user.isHidden;
-  }
-
   setLastLoginTimestamp(publicKey: string): void {
     const privateUsers = this.getPrivateUsersRaw();
     const user = privateUsers[publicKey];
@@ -1118,10 +1109,5 @@ export class AccountService {
         lastLoginTimestamp: Date.now(),
       },
     });
-  }
-
-  getLastLoginTimestamp(publicKey: string): number {
-    const privateUsers = this.getPrivateUsersRaw();
-    return privateUsers[publicKey]?.lastLoginTimestamp ?? 0;
   }
 }
