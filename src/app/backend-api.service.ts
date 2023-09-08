@@ -336,6 +336,13 @@ export class BackendAPIService {
     });
   }
 
+  VerifyHCaptcha(token: string, publicKey: string): Observable<{Success: boolean, TxnHashHex: string}> {
+    return this.jwtPost('verify-captcha', publicKey, {
+      Token: token,
+      PublicKeyBase58Check: publicKey,
+    });
+  }
+
   GetUserProfiles(
     publicKeys: string[]
   ): Observable<{ [key: string]: UserProfile }> {

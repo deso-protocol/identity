@@ -185,6 +185,7 @@ export class AppComponent implements OnInit {
       this.globalVars.nanosPerUSDExchangeRate =
         1e9 / (res.USDCentsPerDeSoExchangeRate / 100);
       this.globalVars.blockHeight = res.BlockHeight;
+      this.globalVars.captchaDeSoNanos = res.CaptchaDeSoNanos;
     });
   }
 

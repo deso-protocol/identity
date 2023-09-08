@@ -38,6 +38,7 @@ export class GlobalVarsService {
 
   jumioUSDCents = 0;
   referralUSDCents = 0;
+  captchaDeSoNanos = 0;
 
   referralHashBase58 = '';
 

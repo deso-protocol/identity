@@ -11,7 +11,34 @@
       <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
       <h3 class="text--neutral-white">Get starter $DESO</h3>
     </div>
-    <div class="padding-bottom--2xlarge text--center">
+    <div *ngIf="!alternativeOptionsEnabled && captchaAvailable" class="padding-bottom--2xlarge text--center">
+      <div class="section--starter__option">
+        <div class="font-size--small margin-bottom--medium">
+          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+            Complete a captcha to get free $DESO
+          </h6>
+          <p>Prove you're not a robot 🤖 and we'll<br/>send you a small amount of $DESO that will last<br/>you up to thousands of on-chain transactions.</p>
+        </div>
+        <ng-hcaptcha #captchaElem
+                     data-theme="dark"
+                     (verify)="onCaptchaVerify($event)"
+                     (expired)="onCaptchaExpired($event)"
+                     (error)="onCaptchaError($event)">
+        </ng-hcaptcha>
+        <div *ngIf="captchaFailed" class="warning--error margin-top--small">
+          There was an issue verifying your captcha. Please <a (click)="resetCaptcha()">reset the captcha</a> and try again,
+          or <a (click)="setAlternativeEarnOptions(true)">try another method</a> to earn free $DESO.
+        </div>
+      </div>
+      <button
+        (click)="setAlternativeEarnOptions(true)"
+        class="margin-top--large button--primary--outline button--medium"
+        data-control-name="skip-get-deso-button"
+      >
+        Try Another Way
+      </button>
+    </div>
+    <div *ngIf="alternativeOptionsEnabled || !captchaAvailable" class="padding-bottom--2xlarge text--center">
       <div class="section--starter__option">
         <div class="font-size--small margin-bottom--medium">
           <span class="text--text-lighter margin-bottom--small display--block">FREE DESO</span>
@@ -106,6 +133,26 @@
               2. Send DESO to your public key (wallet address):
               <code class="display--block font-size--small margin-top--small">{{ publicKeyAdded }}</code>
             </p>
+            <div class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet">
+              <div class="section--seed__actions">
+                <button
+                  data-control-name="sign-up-with-seed-copy-button"
+                  data-control-option="copy"
+                  (click)="copyPublicKey()"
+                  class="button--primary--outline button--small display--flex items--center"
+                >
+                  <img
+                    *ngIf="publicKeyCopied"
+                    src="assets/check-square.svg"
+                    width="16px"
+                    height="16px"
+                    class="margin-right--small image--invert"
+                  />
+                  <img *ngIf="!publicKeyCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
+                  <span>Copy</span>
+                </button>
+              </div>
+            </div>
             <div class="section--divider"></div>
             <p class="text--left text--text-lightest">
               3. Check your DeSo balance:
@@ -130,6 +177,14 @@
           </button>
         </div>
       </div>
+      <button
+        *ngIf="captchaAvailable"
+        (click)="setAlternativeEarnOptions(false)"
+        class="margin-top--large button--primary--outline button--medium"
+        data-control-name="skip-get-deso-button"
+      >
+        Return To Captcha
+      </button>
       <button
         *ngIf="this.globalVars.showSkip"
         (click)="finishFlow()"

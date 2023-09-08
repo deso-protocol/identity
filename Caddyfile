@@ -47,6 +47,7 @@ header @html Content-Security-Policy "
     {$DOMAIN:https://node.deso.org}/api/v0/send-starter-deso-for-metamask-account
     {$DOMAIN:https://node.deso.org}/api/v0/authorize-derived-key
     {$DOMAIN:https://node.deso.org}/api/v0/get-txn
+    {$DOMAIN:https://node.deso.org}/api/v0/verify-captcha
     {$DOMAIN:https://node.deso.org}/api/v0/get-bulk-messaging-public-keys
     {$DOMAIN:https://node.deso.org}/api/v0/submit-transaction
     https://test.deso.org/api/v0/get-users-stateless
@@ -98,4 +99,9 @@ header @html Content-Security-Policy "
   frame-src 'self'
     heroswap.com
     https://verify.walletconnect.com
-    https://iframe.videodelivery.net;"
+    https://iframe.videodelivery.net
+    https://hcaptcha.com/
+    https://*.hcaptcha.com/;
+  script-src 'self'
+    https://hcaptcha.com
+    https://*.hcaptcha.com;"
