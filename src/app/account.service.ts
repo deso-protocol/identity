@@ -460,6 +460,7 @@ export class AccountService {
       network,
       loginMethod,
       version: PrivateUserVersion.V2,
+      lastLoginTimestamp: Date.now(),
     });
   }
 
@@ -1078,5 +1079,49 @@ export class AccountService {
       AccountService.USERS_STORAGE_KEY,
       JSON.stringify(privateUsers)
     );
+  }
+
+  hideUser(publicKey: string): void {
+    const privateUsers = this.getPrivateUsersRaw();
+    const userToDelete = privateUsers[publicKey];
+
+    if (!privateUsers[publicKey]) return;
+
+    this.setPrivateUsersRaw({
+      ...privateUsers,
+      [publicKey]: {
+        ...userToDelete,
+        isHidden: true,
+      },
+    });
+  }
+
+  isUserHidden(publicKey: string): boolean {
+    const privateUsers = this.getPrivateUsersRaw();
+    const user = privateUsers[publicKey];
+
+    if (!user) return false;
+
+    return !!user.isHidden;
+  }
+
+  setLastLoginTimestamp(publicKey: string): void {
+    const privateUsers = this.getPrivateUsersRaw();
+    const user = privateUsers[publicKey];
+
+    if (!privateUsers[publicKey]) return;
+
+    this.setPrivateUsersRaw({
+      ...privateUsers,
+      [publicKey]: {
+        ...user,
+        lastLoginTimestamp: Date.now(),
+      },
+    });
+  }
+
+  getLastLoginTimestamp(publicKey: string): number {
+    const privateUsers = this.getPrivateUsersRaw();
+    return privateUsers[publicKey]?.lastLoginTimestamp ?? 0;
   }
 }
