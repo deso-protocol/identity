@@ -10,7 +10,7 @@
     >
       <button
         class="section--accounts__item js-select-account margin-right--small"
-        (click)="onAccountSelect.emit(item.key)"
+        (click)="selectAccount(item.key)"
         role="button"
       >
         <div *ngIf="!item.username" [title]="item.key">

@@ -41,6 +41,7 @@ export class DeriveComponent implements OnInit {
   isSingleAccount = false;
   validationErrors = false;
   blockHeight = 0;
+  didSelectAccount = false;
   onApproveClick = async () => this.approveDerivedKey(this.publicKeyBase58Check);
 
   constructor(

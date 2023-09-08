@@ -55,6 +55,11 @@ export class AccountSelectComponent implements OnInit {
     }[loginMethod];
   }
 
+  selectAccount(publicKey: string) {
+    this.accountService.setLastLoginTimestamp(publicKey);
+    this.onAccountSelect.emit(publicKey);
+  }
+
   /**
    * NOTE: This performs a soft delete. The user's data is still stored in
    * localStorage and can be recovered.
