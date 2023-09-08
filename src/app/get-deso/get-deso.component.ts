@@ -184,7 +184,6 @@ export class GetDesoComponent implements OnInit {
 
   resetCaptcha(): void {
     this.captchaFailed = false;
-    console.log('Here is the captcha elem: ', this.captchaElem);
     this.captchaElem.reset();
   }
 
