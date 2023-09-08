@@ -24,9 +24,9 @@ import {
   TransactionMetadataDeleteUserAssociation,
   TransactionMetadataFollow,
   TransactionMetadataLike,
-  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
+  TransactionMetadataNewMessage,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
@@ -125,6 +125,9 @@ export class IdentityService {
     jumioSuccess?: boolean;
     phoneNumberSuccess?: boolean;
   }): void {
+    if (payload.publicKeyAdded) {
+      this.accountService.setLastLoginTimestamp(payload.publicKeyAdded);
+    }
     if (this.globalVars.callback) {
       // If callback is passed, we redirect to it with payload as URL parameters.
       let httpParams = new HttpParams();
@@ -151,6 +154,10 @@ export class IdentityService {
         payload.expirationDays
       )
       .then((derivedPrivateUserInfo) => {
+        if (derivedPrivateUserInfo?.publicKeyBase58Check) {
+          this.accountService.setLastLoginTimestamp(derivedPrivateUserInfo.publicKeyBase58Check);
+        }
+
         if (this.globalVars.callback) {
           // If callback is passed, we redirect to it with payload as URL parameters.
           const httpParams = this.parseTypeToHttpParams(

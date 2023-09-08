@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { LoginMethod, UserProfile } from 'src/types/identity';
-import { EventEmitter } from '@angular/core';
+import { SwalHelper } from '../../lib/helpers/swal-helper';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
@@ -18,7 +19,9 @@ export class AccountSelectComponent implements OnInit {
     this.backendApi.GetUserProfiles(this.accountService.getPublicKeys());
   @Input() componentTitle = 'Select an account';
   @Input() hideLoginMethod = false;
-  hasUsers = false;
+
+  visibleUsers: Array<UserProfile & { key: string }> = [];
+
   constructor(
     public accountService: AccountService,
     private backendApi: BackendAPIService,
@@ -26,8 +29,22 @@ export class AccountSelectComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const publicKeys = this.accountService.getPublicKeys();
-    this.hasUsers = publicKeys.length > 0;
+    let visibleUsers: typeof this.visibleUsers = [];
+
+    this.allUsers.pipe(take(1)).subscribe((users) => {
+      for (const key of Object.keys(users)) {
+        if (!this.accountService.isUserHidden(key)) {
+          visibleUsers.push({
+            key,
+            ...users[key],
+          });
+        }
+      }
+
+      this.visibleUsers = visibleUsers.sort((a, b) => {
+        return this.accountService.getLastLoginTimestamp(b.key) - this.accountService.getLastLoginTimestamp(a.key);
+      });
+    });
   }
 
   public getLoginIcon(loginMethod: LoginMethod) {
@@ -36,5 +53,24 @@ export class AccountSelectComponent implements OnInit {
       [LoginMethod.GOOGLE]: 'assets/google_logo.svg',
       [LoginMethod.METAMASK]: 'assets/metamask.png',
     }[loginMethod];
+  }
+
+  /**
+   * NOTE: This performs a soft delete. The user's data is still stored in
+   * localStorage and can be recovered.
+   */
+  removeAccount(publicKey: string) {
+    SwalHelper.fire({
+      title: 'Remove Account?',
+      text: 'Do you really want to remove this account? Your account will be irrecoverable if you lose your seed phrase or login credentials.',
+      showCancelButton: true,
+    }).then(({ isConfirmed }) => {
+      if (isConfirmed) {
+        this.accountService.hideUser(publicKey);
+        this.visibleUsers = this.visibleUsers.filter(
+          (user) => user.key !== publicKey
+        );
+      }
+    });
   }
 }

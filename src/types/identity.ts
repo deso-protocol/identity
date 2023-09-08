@@ -12,6 +12,8 @@ export interface PrivateUserInfo {
   version: PrivateUserVersion;
   messagingKeyRandomness?: string;
   derivedPublicKeyBase58Check?: string;
+  isHidden?: boolean;
+  lastLoginTimestamp?: number;
 
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;
