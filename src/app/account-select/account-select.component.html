@@ -20,7 +20,7 @@
           />
           {{ item.key | truncateAddressOrUsername }}
         </div>
-        <div *ngIf="item.username" [title]="" item.value.username>
+        <div *ngIf="item.username" [title]="item.username">
           <img
             class="avatar--rounded avatar--large margin-right--xsmall"
             [appAvatar]="item.key"
@@ -37,10 +37,7 @@
           class="section--accounts__icon"
         />
       </button>
-      <button
-        class="styleless-button"
-        (click)="removeAccount(item.key)"
-      >
+      <button class="styleless-button" (click)="removeAccount(item.key)">
         <i-feather name="power" class="text--blue-base"></i-feather>
       </button>
     </li>

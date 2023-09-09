@@ -7,35 +7,57 @@
   class="container text--center"
 >
   <div>
-    <img src="assets/image-head.svg" width="60" class="section--accounts__illustration"/>
-    <h4 class="text--neutral-white text--large margin-top--medium margin-bottom--base">
+    <img
+      src="assets/image-head.svg"
+      width="60"
+      class="section--accounts__illustration"
+    />
+    <h4
+      class="text--neutral-white text--large margin-top--medium margin-bottom--base"
+    >
       Grant signing access to
-      <span *ngIf="!globalVars.callback" class="text--green-lighter">{{ globalVars.hostname }}</span>
+      <span *ngIf="!globalVars.callback" class="text--green-lighter">{{
+        globalVars.hostname
+      }}</span>
     </h4>
     <ng-container *ngIf="!publicKeyBase58Check">
       <app-account-select
         [allUsers]="allUsers"
         (onAccountSelect)="this.onAccountSelected($event)"
       ></app-account-select>
-      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
+      <div class="text--divider margin-top--medium margin-bottom--medium">
+        or
+      </div>
       <app-log-in-options></app-log-in-options>
     </ng-container>
     <div
       class="box--border box--base box--rounded"
       *ngIf="publicKeyBase58Check"
     >
-      <div class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet">
+      <div
+        class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet"
+      >
         Public Key
-        <code class="font-size--medium">{{ publicKeyBase58Check | truncateAddressOrUsername }}</code>
+        <code class="font-size--medium">{{
+          publicKeyBase58Check | truncateAddressOrUsername
+        }}</code>
       </div>
       <div class="section--divider--medium"></div>
-      <div class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet" *ngIf="derivedPublicKeyBase58Check">
+      <div
+        class="display--flex justify--between items--center flex--row flex--column--tablet gap--15--tablet"
+        *ngIf="derivedPublicKeyBase58Check"
+      >
         Derived Public Key
-        <code class="font-size--medium">{{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code>
+        <code class="font-size--medium">{{
+          derivedPublicKeyBase58Check | truncateAddressOrUsername
+        }}</code>
       </div>
     </div>
   </div>
-  <div *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check" class="padding-bottom--xlarge">
+  <div
+    *ngIf="transactionSpendingLimitResponse && publicKeyBase58Check"
+    class="padding-bottom--xlarge"
+  >
     <app-transaction-spending-limit
       [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       [onApproveClick]="this.onApproveClick"
@@ -44,12 +66,19 @@
 </div>
 <div class="container text--center" *ngIf="deleteKey">
   <div class="margin-bottom--base">
-    <h5 class="text--neutral-white margin-bottom--small">Would you like to revoke derived key access?</h5>
+    <h5 class="text--neutral-white margin-bottom--small">
+      Would you like to revoke derived key access?
+    </h5>
     <p class="text--text-lighter margin-bottom--medium">
-      You're about to revoke signing access for a Derived Public Key. 
+      You're about to revoke signing access for a Derived Public Key.
     </p>
     <p class="text--text-lighter">
-      This means <code>Derived Key: {{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code> will no longer be able to make transactions on your behalf.
+      This means
+      <code
+        >Derived Key:
+        {{ derivedPublicKeyBase58Check | truncateAddressOrUsername }}</code
+      >
+      will no longer be able to make transactions on your behalf.
     </p>
   </div>
   <button
