@@ -107,7 +107,7 @@ export class AccountSelectV2Component implements OnInit {
   }
 
   selectAccount(publicKey: string) {
-    this.accountService.setLastLoginTimestamp(publicKey);
+    this.accountService.updateStoredUser(publicKey, { lastLoginTimestamp: Date.now() });
     this.onAccountSelect.emit(publicKey);
   }
 
@@ -119,7 +119,7 @@ export class AccountSelectV2Component implements OnInit {
       showCancelButton: true,
     }).then(({ isConfirmed }) => {
       if (isConfirmed) {
-        this.accountService.hideUser(publicKey);
+        this.accountService.updateStoredUser(publicKey, { isHidden: true });
         const rootKeyLookupMap = this.accountService.getSubAccountReverseLookupMap();
         const mapping = rootKeyLookupMap[publicKey];
         const rootPublicKey = mapping?.lookupKey;

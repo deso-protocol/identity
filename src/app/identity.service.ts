@@ -389,8 +389,8 @@ export class IdentityService {
       senderGroupKeyName,
       recipientPublicKey,
       message,
-      ownerPublicKeyBase58Check,
       {
+        ownerPublicKeyBase58Check,
         messagingKeyRandomness,
       }
     );
@@ -457,8 +457,10 @@ export class IdentityService {
           seedHex,
           encryptedMessages,
           data.payload.messagingGroups || [],
-          messagingKeyRandomness,
-          data.payload.ownerPublicKeyBase58Check
+          {
+            messagingKeyRandomness,
+            ownerPublicKeyBase58Check: data.payload.ownerPublicKeyBase58Check,
+          }
         )
         .then(
           (res) => this.respond(id, { decryptedHexes: res }),
