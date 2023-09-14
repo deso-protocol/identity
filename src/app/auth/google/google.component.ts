@@ -1,17 +1,17 @@
 import { Component, NgZone, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { RouteNames } from '../../app-routing.module';
+import { environment } from '../../../environments/environment';
+import { GoogleAuthState } from '../../../types/identity';
 import { AccountService } from '../../account.service';
-import { IdentityService } from '../../identity.service';
+import { RouteNames } from '../../app-routing.module';
+import { BackendAPIService } from '../../backend-api.service';
 import { CryptoService } from '../../crypto.service';
 import { EntropyService } from '../../entropy.service';
-import { GoogleDriveService } from '../../google-drive.service';
 import { GlobalVarsService } from '../../global-vars.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { GoogleDriveService } from '../../google-drive.service';
+import { IdentityService } from '../../identity.service';
 import { TextService } from '../../text.service';
-import { GoogleAuthState, PrivateUserInfo } from '../../../types/identity';
-import { environment } from '../../../environments/environment';
-import { BackendAPIService } from '../../backend-api.service';
 
 @Component({
   selector: 'app-google',
@@ -93,7 +93,9 @@ export class GoogleComponent implements OnInit {
             mnemonic,
             extraText,
             network,
-            true
+            {
+              google: true,
+            }
           );
         } catch (err) {
           console.error(err);
@@ -146,7 +148,9 @@ export class GoogleComponent implements OnInit {
           mnemonic,
           extraText,
           network,
-          true
+          {
+            google: true,
+          }
         );
         this.loading = false;
       });
@@ -164,7 +168,8 @@ export class GoogleComponent implements OnInit {
       this.router.navigate(['/', RouteNames.DERIVE], {
         queryParams: {
           publicKey: this.publicKey,
-          transactionSpendingLimitResponse: this.globalVars.transactionSpendingLimitResponse,
+          transactionSpendingLimitResponse:
+            this.globalVars.transactionSpendingLimitResponse,
           deleteKey: this.globalVars.deleteKey || undefined,
           derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
           expirationDays: this.globalVars.expirationDays || undefined,

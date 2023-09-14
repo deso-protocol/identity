@@ -69,6 +69,8 @@ import {
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
 import {environment} from "../environments/environment";
+import { AccountSelectV2Component } from './account-select-v2/account-select-v2.component';
+import { AccountListItemComponent } from './account-select-v2/account-list-item/account-list-item.component';
 
 @NgModule({
   declarations: [
@@ -112,6 +114,8 @@ import {environment} from "../environments/environment";
     TransactionSpendingLimitAssociationComponent,
     TransactionSpendingLimitAccessGroupComponent,
     TransactionSpendingLimitAccessGroupMemberComponent,
+    AccountSelectV2Component,
+    AccountListItemComponent,
   ],
   imports: [
     BrowserModule,

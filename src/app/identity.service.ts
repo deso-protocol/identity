@@ -24,9 +24,9 @@ import {
   TransactionMetadataDeleteUserAssociation,
   TransactionMetadataFollow,
   TransactionMetadataLike,
-  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
+  TransactionMetadataNewMessage,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
@@ -229,9 +229,13 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
+    // TODO: figure out if this payload contains the user's public key
+    // if we don't have it, we won't be able to find the user's account number.
+    // For now we just assume the user is burning from their root account by passing 0.
     const signedHashes = this.signingService.signHashes(
       seedHex,
-      unsignedHashes
+      unsignedHashes,
+      0
     );
 
     this.respond(id, {
@@ -246,15 +250,26 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes },
+      payload: { encryptedSeedHex, unsignedHashes, ownerPublicKeyBase58Check },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
+    let accountNumber = 0;
+
+    if (ownerPublicKeyBase58Check) {
+      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
+      if (!user) {
+        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
+      }
+      accountNumber = user.accountNumber;
+    }
+
     const signatures = this.signingService.signHashesETH(
       seedHex,
-      unsignedHashes
+      unsignedHashes,
+      accountNumber
     );
 
     this.respond(id, {
@@ -269,6 +284,7 @@ export class IdentityService {
         encryptedSeedHex,
         transactionHex,
         derivedPublicKeyBase58Check,
+        ownerPublicKeyBase58Check,
       },
     } = data;
 
@@ -299,10 +315,21 @@ export class IdentityService {
 
     const isDerived = !!derivedPublicKeyBase58Check;
 
+    let accountNumber = 0;
+
+    if (ownerPublicKeyBase58Check) {
+      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
+      if (!user) {
+        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
+      }
+      accountNumber = user.accountNumber;
+    }
+
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
       transactionHex,
-      isDerived
+      isDerived,
+      accountNumber
     );
 
     this.respond(id, {
@@ -362,7 +389,10 @@ export class IdentityService {
       senderGroupKeyName,
       recipientPublicKey,
       message,
-      messagingKeyRandomness
+      ownerPublicKeyBase58Check,
+      {
+        messagingKeyRandomness,
+      }
     );
 
     this.respond(id, { ...encryptedMessage });
@@ -408,7 +438,8 @@ export class IdentityService {
       try {
         const decryptedHexes = this.accountService.decryptMessagesLegacy(
           seedHex,
-          encryptedHexes
+          encryptedHexes,
+          data.payload.ownerPublicKeyBase58Check
         );
         this.respond(id, {
           decryptedHexes,
@@ -446,14 +477,24 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, derivedPublicKeyBase58Check },
+      payload: { encryptedSeedHex, derivedPublicKeyBase58Check, ownerPublicKeyBase58Check },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
+    let accountNumber = 0;
+
+    if (ownerPublicKeyBase58Check) {
+      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
+      if (!user) {
+        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
+      }
+      accountNumber = user.accountNumber;
+    }
+
     const isDerived = !!derivedPublicKeyBase58Check;
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
+    const jwt = this.signingService.signJWT(seedHex, accountNumber, isDerived);
 
     this.respond(id, {
       jwt,

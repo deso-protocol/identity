@@ -1,45 +1,36 @@
-<div class="section--accounts" *ngIf="visibleUsers.length > 0">
+<div class="section--accounts" *ngIf="hasUsers">
   <div class="section--accounts__header margin-bottom--medium">
-    {{ componentTitle }}
+    {{componentTitle}}
   </div>
   <ul class="section--accounts__list container--scrollbar margin-bottom--small">
     <li
-      *ngFor="let item of visibleUsers; let i = index"
+      *ngFor="let item of allUsers | async | keyvalue; let i = index"
+      class="section--accounts__item"
+      (click)="onAccountSelect.emit(item.key)"
       data-control-name="account-select-item"
-      class="display--flex items--center margin-top--small"
     >
-      <button
-        class="section--accounts__item margin-right--small"
-        (click)="selectAccount(item.key)"
-        role="button"
-      >
-        <div *ngIf="!item.username" [title]="item.key">
+      <div>
+        <div *ngIf="!item.value.username">
           <img
             class="avatar--rounded avatar--large margin-right--xsmall"
             src="assets/placeholder-account-image.png"
           />
           {{ item.key | truncateAddressOrUsername }}
         </div>
-        <div *ngIf="item.username" [title]="item.username">
-          <img
-            class="avatar--rounded avatar--large margin-right--xsmall"
-            [appAvatar]="item.key"
-          />
-          {{ item.username | truncateAddressOrUsername }}
+        <div *ngIf="item.value.username">
+          <img class="avatar--rounded avatar--large margin-right--xsmall" [appAvatar]="item.key"/>
+          {{ item.value.username | truncateAddressOrUsername }}
         </div>
-        <img
-          *ngIf="!hideLoginMethod"
-          [src]="
-            getLoginIcon(
-              accountService.getLoginMethodWithPublicKeyBase58Check(item.key)
-            )
-          "
-          class="section--accounts__icon"
-        />
-      </button>
-      <button class="styleless-button" (click)="removeAccount(item.key)">
-        <i-feather name="power" class="text--blue-base"></i-feather>
-      </button>
+      </div>
+      <img
+        *ngIf="!hideLoginMethod"
+        [src]="
+          getLoginIcon(
+            accountService.getLoginMethodWithPublicKeyBase58Check(item.key)
+          )
+        "
+        class="section--accounts__icon"
+      />
     </li>
   </ul>
 </div>

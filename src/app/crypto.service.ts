@@ -1,21 +1,20 @@
 import { Injectable } from '@angular/core';
-import HDNode from 'hdkey';
 import * as bip39 from 'bip39';
-import HDKey from 'hdkey';
-import { ec as EC } from 'elliptic';
 import bs58check from 'bs58check';
-import { CookieService } from 'ngx-cookie';
 import {
-  createHmac,
   createCipher,
   createDecipher,
-  randomBytes,
   createHash,
+  createHmac,
+  randomBytes,
 } from 'crypto';
-import {AccessLevel, Network} from '../types/identity';
-import { GlobalVarsService } from './global-vars.service';
-import { Keccak } from 'sha3';
+import { ec as EC } from 'elliptic';
+import { default as HDKey, default as HDNode } from 'hdkey';
+import { CookieService } from 'ngx-cookie';
 import * as sha256 from 'sha256';
+import { Keccak } from 'sha3';
+import { AccessLevel, Network } from '../types/identity';
+import { GlobalVarsService } from './global-vars.service';
 
 @Injectable({
   providedIn: 'root',
@@ -144,24 +143,47 @@ export class CryptoService {
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0', nonStandard);
+    return HDKey.fromMasterSeed(seed).derive(derivationPath(0), nonStandard);
+  }
+
+  getSubAccountKeys(masterSeedHex: string, accountIndex: number): HDNode {
+    const seedBytes = Buffer.from(masterSeedHex, 'hex');
+    return HDKey.fromMasterSeed(seedBytes).derive(derivationPath(accountIndex));
   }
 
   keychainToSeedHex(keychain: HDNode): string {
     return keychain.privateKey.toString('hex');
   }
 
-  seedHexToPrivateKey(seedHex: string): EC.KeyPair {
+  /**
+   * For a given parent seed hex and account number, return the corresponding private key. Public/private
+   * key pairs are independent and unique based on a combination of the seed hex and account number.
+   * @param parentSeedHex This is the seed hex used to generate multiple HD wallets/keys from a single seed.
+   * @param accountNumber This is the account number used to generate unique keys from the parent seed.
+   * @returns
+   */
+  seedHexToPrivateKey(parentSeedHex: string, accountNumber: number): EC.KeyPair {
     const ec = new EC('secp256k1');
+
+    if (accountNumber === 0) {
+      return ec.keyFromPrivate(parentSeedHex);
+    }
+
+    const hdKeys = this.getSubAccountKeys(
+      parentSeedHex,
+      accountNumber
+    );
+    const seedHex = this.keychainToSeedHex(hdKeys);
+
     return ec.keyFromPrivate(seedHex);
   }
 
-  encryptedSeedHexToPublicKey(encryptedSeedHex: string): string {
+  encryptedSeedHexToPublicKey(encryptedSeedHex: string, accountNumber: number): string {
     const seedHex = this.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const privateKey = this.seedHexToPrivateKey(seedHex);
+    const privateKey = this.seedHexToPrivateKey(seedHex, accountNumber);
     return this.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
   }
 
@@ -279,4 +301,13 @@ export class CryptoService {
 
     return ethAddressChecksum;
   }
+}
+
+/**
+ * We set the account according to the following derivation path scheme:
+ * m / purpose' / coin_type' / account' / change / address_index
+ * See for more details: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account
+ */
+function derivationPath(accountIndex: number = 0) {
+  return `m/44'/0'/${accountIndex}'/0/0`;
 }

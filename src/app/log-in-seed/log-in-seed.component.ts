@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../account.service';
-import { IdentityService } from '../identity.service';
+import { RouteNames } from '../app-routing.module';
+import { BackendAPIService } from '../backend-api.service';
 import { CryptoService } from '../crypto.service';
 import { EntropyService } from '../entropy.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { BackendAPIService } from '../backend-api.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import HDNode from 'hdkey';
-import { RouteNames } from '../app-routing.module';
+import { IdentityService } from '../identity.service';
 
 @Component({
   selector: 'app-log-in-seed',
@@ -92,7 +91,7 @@ export class LogInSeedComponent implements OnInit {
       // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
       if (keychain.publicKey !== keychainNonStandard.publicKey) {
         const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
-        const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+        const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex, 0);
         const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
           privateKey,
           network

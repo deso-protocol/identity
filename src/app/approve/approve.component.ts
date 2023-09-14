@@ -1,15 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CryptoService } from '../crypto.service';
-import { IdentityService } from '../identity.service';
-import { AccountService } from '../account.service';
-import { GlobalVarsService } from '../global-vars.service';
-import { SigningService } from '../signing.service';
-import {
-  BackendAPIService,
-  TransactionSpendingLimitResponse,
-  User,
-} from '../backend-api.service';
+import bs58check from 'bs58check';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
@@ -34,9 +25,9 @@ import {
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataMessagingGroup,
-  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
+  TransactionMetadataNewMessage,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
@@ -47,8 +38,17 @@ import {
   TransactionMetadataUpdateProfile,
   TransactionSpendingLimit,
 } from '../../lib/deso/transaction';
-import bs58check from 'bs58check';
 import { ExtraData } from '../../types/identity';
+import { AccountService } from '../account.service';
+import {
+  BackendAPIService,
+  TransactionSpendingLimitResponse,
+  User,
+} from '../backend-api.service';
+import { CryptoService } from '../crypto.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { IdentityService } from '../identity.service';
+import { SigningService } from '../signing.service';
 
 @Component({
   selector: 'app-approve',
@@ -100,12 +100,18 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const user = this.accountService.getEncryptedUsers()[this.publicKey];
+    const user = this.accountService.getStoredUserInfo(this.publicKey);
+
+    if (!user) {
+      throw new Error(`User not found for public key ${this.publicKey}`);
+    }
+
     const isDerived = this.accountService.isMetamaskAccount(user);
     const signedTransactionHex = this.signingService.signTransaction(
-      this.seedHex(),
+      user.seedHex,
       this.transactionHex,
-      isDerived
+      isDerived,
+      user.accountNumber
     );
     this.finishFlow(signedTransactionHex);
   }
@@ -115,15 +121,6 @@ export class ApproveComponent implements OnInit {
       users: this.accountService.getEncryptedUsers(),
       signedTransactionHex,
     });
-  }
-
-  seedHex(): string {
-    const encryptedSeedHex =
-      this.accountService.getEncryptedUsers()[this.publicKey].encryptedSeedHex;
-    return this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
-      this.globalVars.hostname
-    );
   }
 
   generateTransactionDescription(): void {

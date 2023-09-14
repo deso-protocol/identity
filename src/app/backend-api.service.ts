@@ -200,7 +200,7 @@ export type AssociationLimitMapItem = {
   AppPublicKeyBase58Check: string;
   AssociationOperation: AssociationOperationString;
   OpCount: number;
-}
+};
 
 export enum AccessGroupScopeType {
   ANY = 'Any',
@@ -219,7 +219,7 @@ export type AccessGroupLimitMapItem = {
   AccessGroupKeyName: string;
   OperationType: AccessGroupOperationString;
   OpCount: number;
-}
+};
 
 export enum AccessGroupMemberOperationString {
   ANY = 'Any',
@@ -234,7 +234,7 @@ export type AccessGroupMemberLimitMapItem = {
   AccessGroupKeyName: string;
   OperationType: AccessGroupMemberOperationString;
   OpCount: number;
-}
+};
 
 export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
@@ -269,8 +269,7 @@ export class BackendAPIService {
     private signingService: SigningService,
     private accountService: AccountService,
     private globalVars: GlobalVarsService
-  ) {
-  }
+  ) {}
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
@@ -292,25 +291,25 @@ export class BackendAPIService {
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
+    const userInfo = this.accountService.getStoredUserInfo(publicKey);
     // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
     // this is happening.
     logInteractionEvent('backend-api', 'jwt-post', {
-      hasPublicUserInfo: !!publicUserInfo,
+      hasPublicUserInfo: !!userInfo,
     });
 
-    if (!publicUserInfo) {
+    if (!userInfo) {
       return of(null);
     }
-    const isDerived = this.accountService.isMetamaskAccount(publicUserInfo);
+    const isDerived = this.accountService.isMetamaskAccount(userInfo);
 
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
+    const jwt = this.signingService.signJWT(
+      userInfo.seedHex,
+      userInfo.accountNumber,
+      isDerived
     );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
-    return this.post(path, {...body, ...{JWT: jwt}});
+    return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 
   // Error parsing
@@ -336,7 +335,10 @@ export class BackendAPIService {
     });
   }
 
-  VerifyHCaptcha(token: string, publicKey: string): Observable<{Success: boolean, TxnHashHex: string}> {
+  VerifyHCaptcha(
+    token: string,
+    publicKey: string
+  ): Observable<{ Success: boolean; TxnHashHex: string }> {
     return this.jwtPost('verify-captcha', publicKey, {
       Token: token,
       PublicKeyBase58Check: publicKey,
@@ -347,7 +349,7 @@ export class BackendAPIService {
     publicKeys: string[]
   ): Observable<{ [key: string]: UserProfile }> {
     const userProfiles: { [key: string]: any } = {};
-    const req = this.GetUsersStateless(publicKeys, true);
+    const req = this.GetUsersStateless(publicKeys, true, true);
     if (publicKeys.length > 0) {
       return req
         .pipe(
@@ -356,6 +358,7 @@ export class BackendAPIService {
               userProfiles[user.PublicKeyBase58Check] = {
                 username: user.ProfileEntryResponse?.Username,
                 profilePic: user.ProfileEntryResponse?.ProfilePic,
+                balanceNanos: user.BalanceNanos,
               };
             }
             return userProfiles;
@@ -374,7 +377,10 @@ export class BackendAPIService {
     }
   }
 
-  GetSingleProfilePictureURL(PublicKeyBase58Check: string, FallbackURL?: string): string {
+  GetSingleProfilePictureURL(
+    PublicKeyBase58Check: string,
+    FallbackURL?: string
+  ): string {
     return `${this.getRoute(
       'get-single-profile-picture'
     )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
@@ -436,15 +442,15 @@ export class BackendAPIService {
           if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
             derivedKeys[
               res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check
-              ] = {
+            ] = {
               derivedPublicKeyBase58Check:
-              res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
+                res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
               ownerPublicKeyBase58Check:
-              res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
+                res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
               expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
               isValid: res.DerivedKeys[derivedKey]?.IsValid,
               transactionSpendingLimit:
-              res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
+                res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
             };
           }
         }
@@ -836,7 +842,7 @@ export class BackendAPIService {
 
   GetBulkMessagingPublicKeys(
     GroupOwnerPublicKeysBase58Check: string[],
-    MessagingGroupKeyNames: string[],
+    MessagingGroupKeyNames: string[]
   ): Observable<any> {
     const req = this.post('get-bulk-messaging-public-keys', {
       GroupOwnerPublicKeysBase58Check,

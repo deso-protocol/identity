@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { LoginMethod, UserProfile } from 'src/types/identity';
-import { SwalHelper } from '../../lib/helpers/swal-helper';
+import { EventEmitter } from '@angular/core';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
@@ -19,9 +18,7 @@ export class AccountSelectComponent implements OnInit {
     this.backendApi.GetUserProfiles(this.accountService.getPublicKeys());
   @Input() componentTitle = 'Select an account';
   @Input() hideLoginMethod = false;
-
-  visibleUsers: Array<UserProfile & { key: string }> = [];
-
+  hasUsers = false;
   constructor(
     public accountService: AccountService,
     private backendApi: BackendAPIService,
@@ -29,26 +26,8 @@ export class AccountSelectComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    let visibleUsers: typeof this.visibleUsers = [];
-
-    this.allUsers.pipe(take(1)).subscribe((userProfiles) => {
-      const storedUsers = this.accountService.getUsers();
-
-      for (const key of Object.keys(userProfiles)) {
-        if (!storedUsers[key].isHidden) {
-          visibleUsers.push({
-            key,
-            ...userProfiles[key],
-          });
-        }
-      }
-
-      this.visibleUsers = visibleUsers.sort((a, b) => {
-        const timestampA = storedUsers[a.key]?.lastLoginTimestamp ?? 0;
-        const timestampB = storedUsers[b.key]?.lastLoginTimestamp ?? 0;
-        return timestampB - timestampA;
-      });
-    });
+    const publicKeys = this.accountService.getPublicKeys();
+    this.hasUsers = publicKeys.length > 0;
   }
 
   public getLoginIcon(loginMethod: LoginMethod) {
@@ -57,29 +36,5 @@ export class AccountSelectComponent implements OnInit {
       [LoginMethod.GOOGLE]: 'assets/google_logo.svg',
       [LoginMethod.METAMASK]: 'assets/metamask.png',
     }[loginMethod];
-  }
-
-  selectAccount(publicKey: string) {
-    this.accountService.setLastLoginTimestamp(publicKey);
-    this.onAccountSelect.emit(publicKey);
-  }
-
-  /**
-   * NOTE: This performs a soft delete. The user's data is still stored in
-   * localStorage and can be recovered.
-   */
-  removeAccount(publicKey: string) {
-    SwalHelper.fire({
-      title: 'Remove Account?',
-      text: 'Do you really want to remove this account? Your account will be irrecoverable if you lose your seed phrase or login credentials.',
-      showCancelButton: true,
-    }).then(({ isConfirmed }) => {
-      if (isConfirmed) {
-        this.accountService.hideUser(publicKey);
-        this.visibleUsers = this.visibleUsers.filter(
-          (user) => user.key !== publicKey
-        );
-      }
-    });
   }
 }

@@ -1,6 +1,15 @@
 import { TransactionSpendingLimit } from 'src/lib/deso/transaction';
 
-export interface PrivateUserInfo {
+export interface AccountMetadata {
+  isHidden?: boolean;
+  lastLoginTimestamp?: number;
+}
+
+export interface SubAccountMetadata extends AccountMetadata {
+  accountNumber: number;
+}
+
+export interface PrivateUserInfo extends AccountMetadata {
   seedHex: string;
   mnemonic: string;
   publicKeyHex?: string;
@@ -12,8 +21,12 @@ export interface PrivateUserInfo {
   version: PrivateUserVersion;
   messagingKeyRandomness?: string;
   derivedPublicKeyBase58Check?: string;
-  isHidden?: boolean;
-  lastLoginTimestamp?: number;
+  /**
+   * This is a list of the account numbers that this user has used to generate
+   * sub-accounts.  An account number plus the parent account seed is enough to
+   * generate or recover a unique sub-account.
+   */
+  subAccounts?: SubAccountMetadata[];
 
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;
@@ -84,7 +97,14 @@ export interface DefaultKeyPrivateInfo {
 export interface UserProfile {
   username: string;
   profilePic: any;
+  balanceNanos: number;
 }
+
+export type Account = UserProfile & {
+  publicKey: string;
+  accountNumber: number;
+};
+export type ParentAccount = Account & { subAccounts: Account[] };
 
 export interface DerivedKey {
   derivedPublicKeyBase58Check: string;

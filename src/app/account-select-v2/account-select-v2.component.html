@@ -1,0 +1,73 @@
+<div class="section--accounts" *ngIf="accountGroups.size > 0">
+  <div class="section--accounts__header margin-bottom--medium">
+    {{ componentTitle }}
+  </div>
+
+  <ng-container *ngFor="let group of accountGroups | keyvalue">
+    <div
+      *ngIf="group.value.accounts.length"
+      class="section--accounts__list container--scrollbar margin-bottom--small"
+    >
+      <ul>
+        <li
+          *ngFor="let account of group.value.accounts"
+          data-control-name="account-select-item"
+        >
+          <div class="display--flex items--center margin-top--small">
+            <button
+              class="section--accounts__item margin-right--small"
+              (click)="selectAccount(account.publicKey)"
+              role="button"
+            >
+              <div *ngIf="!account.username" [title]="account.publicKey">
+                <img
+                  class="avatar--rounded avatar--large margin-right--xsmall"
+                  src="assets/placeholder-account-image.png"
+                />
+                {{ account.publicKey | truncateAddressOrUsername }}
+              </div>
+              <div *ngIf="account.username" [title]="account.username">
+                <img
+                  class="avatar--rounded avatar--large margin-right--xsmall"
+                  [appAvatar]="account.publicKey"
+                />
+                {{ account.username | truncateAddressOrUsername }}
+              </div>
+              <img
+                *ngIf="account.publicKey === group.key"
+                [src]="
+                  getLoginMethodIcon(
+                    accountService.getLoginMethodWithPublicKeyBase58Check(
+                      account.publicKey
+                    )
+                  )
+                "
+                class="section--accounts__icon"
+              />
+            </button>
+            <button
+              class="styleless-button"
+              (click)="removeAccount(group.key, account.accountNumber)"
+            >
+              <i-feather name="power" class="text--blue-base"></i-feather>
+            </button>
+          </div>
+          <div class="font-size--xsmall margin-left--medium">
+            acct# {{ account.accountNumber }}
+          </div>
+        </li>
+      </ul>
+      <div>
+        <button (click)="addSubAccount(group.key)">Add account</button>
+        <button>Export Seed</button>
+        <button (click)="toggleRecoverSubAccountForm(group.key)">Recover account</button>
+        <form *ngIf="group.value.showRecoverSubAccountInput" (submit)="recoverSubAccount($event, group.key)">
+          <label for="account-number" class="display--block font-size--small">Account number:</label>
+          <input [(ngModel)]="accountNumberToRecover" name="account-number" id="account-number" type="number" step="1"/>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+  <button>Add new account group</button>
+</div>
