@@ -21,7 +21,8 @@ export class LogInComponent implements OnInit {
     private backendApi: BackendAPIService,
     public globalVars: GlobalVarsService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     // Set showAccessLevels
@@ -39,7 +40,7 @@ export class LogInComponent implements OnInit {
   navigateToGetDeso(publicKey: string): void {
     this.router.navigate(['/', RouteNames.GET_DESO], {
       queryParamsHandling: 'merge',
-      queryParams: { publicKey },
+      queryParams: {publicKey},
     });
   }
 
@@ -53,7 +54,7 @@ export class LogInComponent implements OnInit {
       this.login(publicKey);
     } else {
       this.backendApi
-        .GetUsersStateless([publicKey], true, true, true)
+        .GetUsersStateless([publicKey], true, true)
         .subscribe(
           (res) => {
             if (!res?.UserList.length || res.UserList[0].BalanceNanos === 0) {
