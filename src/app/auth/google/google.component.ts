@@ -38,7 +38,8 @@ export class GoogleComponent implements OnInit {
     private zone: NgZone,
     private route: ActivatedRoute,
     private backendApi: BackendAPIService
-  ) {}
+  ) {
+  }
 
   copySeed(): void {
     this.textService.copyText(this.mnemonic);
@@ -177,7 +178,7 @@ export class GoogleComponent implements OnInit {
       }
       if (!signedUp) {
         this.backendApi
-          .GetUsersStateless([this.publicKey], true, true, true)
+          .GetUsersStateless([this.publicKey], true, true, false)
           .subscribe((res) => {
             if (res?.UserList?.length) {
               if (res.UserList[0].BalanceNanos !== 0) {
@@ -186,13 +187,13 @@ export class GoogleComponent implements OnInit {
               }
             }
             this.router.navigate(['/', RouteNames.GET_DESO], {
-              queryParams: { publicKey: this.publicKey, signedUp },
+              queryParams: {publicKey: this.publicKey, signedUp},
               queryParamsHandling: 'merge',
             });
           });
       } else {
         this.router.navigate(['/', RouteNames.GET_DESO], {
-          queryParams: { publicKey: this.publicKey, signedUp },
+          queryParams: {publicKey: this.publicKey, signedUp},
           queryParamsHandling: 'merge',
         });
       }
