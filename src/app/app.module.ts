@@ -5,10 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgHcaptchaModule } from 'ng-hcaptcha';
 import { CookieModule } from 'ngx-cookie';
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
+import { environment } from "../environments/environment";
 import { AccountSelectComponent } from './account-select/account-select.component';
 import { AccountService } from './account.service';
 import { AppRoutingModule } from './app-routing.module';
@@ -29,6 +31,7 @@ import { ErrorCallbackComponent } from './error-callback/error-callback.componen
 import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component';
 import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
 import { GetDesoComponent } from './get-deso/get-deso.component';
+import { GroupedAccountSelectComponent } from './grouped-account-select/grouped-account-select.component';
 import { HomeComponent } from './home/home.component';
 import { IconsModule } from './icons/icons.module';
 import { IdentityService } from './identity.service';
@@ -67,10 +70,6 @@ import {
   TransactionSpendingLimitSectionComponent
 } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
-import { NgHcaptchaModule } from 'ng-hcaptcha';
-import {environment} from "../environments/environment";
-import { AccountSelectV2Component } from './account-select-v2/account-select-v2.component';
-import { AccountListItemComponent } from './account-select-v2/account-list-item/account-list-item.component';
 
 @NgModule({
   declarations: [
@@ -114,8 +113,7 @@ import { AccountListItemComponent } from './account-select-v2/account-list-item/
     TransactionSpendingLimitAssociationComponent,
     TransactionSpendingLimitAccessGroupComponent,
     TransactionSpendingLimitAccessGroupMemberComponent,
-    AccountSelectV2Component,
-    AccountListItemComponent,
+    GroupedAccountSelectComponent,
   ],
   imports: [
     BrowserModule,

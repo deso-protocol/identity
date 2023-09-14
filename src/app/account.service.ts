@@ -25,7 +25,6 @@ import {
   PublicUserInfo,
   SubAccountMetadata,
 } from '../types/identity';
-import { generateAccountNumber } from './account-select-v2/account-number';
 import {
   BackendAPIService,
   GetAccessBytesResponse,
@@ -34,6 +33,7 @@ import {
 import { CryptoService } from './crypto.service';
 import { EntropyService } from './entropy.service';
 import { GlobalVarsService } from './global-vars.service';
+import { generateAccountNumber } from './grouped-account-select/account-number';
 import { MessagingGroup } from './identity.service';
 import { MetamaskService } from './metamask.service';
 import { SigningService } from './signing.service';

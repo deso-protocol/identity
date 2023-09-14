@@ -22,9 +22,7 @@
     </h4>
     <ng-container *ngIf="!publicKeyBase58Check">
       <ng-container *ngIf="hasUsers">
-        <app-account-select-v2
-          (onAccountSelect)="this.onAccountSelected($event)"
-        ></app-account-select-v2>
+        <grouped-account-select (onAccountSelect)="this.onAccountSelected($event)" />
         <div class="text--divider margin-top--medium margin-bottom--medium">
           or
         </div>

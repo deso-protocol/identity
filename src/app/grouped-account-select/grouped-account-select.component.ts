@@ -1,20 +1,23 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { LoginMethod } from 'src/types/identity';
 import { SwalHelper } from '../../lib/helpers/swal-helper';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
+import { isValid32BitUnsignedInt } from './account-number';
 
 @Component({
-  selector: 'app-account-select-v2',
-  templateUrl: './account-select-v2.component.html',
-  styleUrls: ['./account-select-v2.component.scss'],
+  selector: 'grouped-account-select',
+  templateUrl: './grouped-account-select.component.html',
+  styleUrls: ['./grouped-account-select.component.scss'],
 })
-export class AccountSelectV2Component implements OnInit {
-  @Output() onAccountSelect: EventEmitter<string> =
-    new EventEmitter();
-  @Input() componentTitle = 'Select an account';
+export class GroupedAccountSelectComponent implements OnInit {
+  @Output() onAccountSelect: EventEmitter<string> = new EventEmitter();
 
+  /**
+   * Accounts are grouped by root public key. The root public key is the public
+   * key derived at account index 0 for a given seed phrase.
+   */
   accountGroups: Map<
     string,
     {
@@ -28,7 +31,10 @@ export class AccountSelectV2Component implements OnInit {
     }
   > = new Map();
 
-  accountNumberToRecover: string | null = null;
+  /**
+   * Bound to a UI text input and used to recover a sub account.
+   */
+  accountNumberToRecover: string = '';
 
   constructor(
     public accountService: AccountService,
@@ -36,6 +42,10 @@ export class AccountSelectV2Component implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initializeAccountGroups();
+  }
+
+  initializeAccountGroups() {
     const storedUsers = Object.entries(this.accountService.getPrivateUsers());
     const accountGroupsByRootKey = new Map<
       string,
@@ -59,10 +69,11 @@ export class AccountSelectV2Component implements OnInit {
           continue;
         }
 
-        const publicKeyBase58 = this.accountService.getAccountPublicKeyBase58Enc(
-          rootPublicKey,
-          subAccount.accountNumber
-        );
+        const publicKeyBase58 =
+          this.accountService.getAccountPublicKeyBase58Enc(
+            rootPublicKey,
+            subAccount.accountNumber
+          );
 
         accounts.push({
           publicKey: publicKeyBase58,
@@ -107,7 +118,9 @@ export class AccountSelectV2Component implements OnInit {
   }
 
   selectAccount(publicKey: string) {
-    this.accountService.updateStoredUser(publicKey, { lastLoginTimestamp: Date.now() });
+    this.accountService.updateStoredUser(publicKey, {
+      lastLoginTimestamp: Date.now(),
+    });
     this.onAccountSelect.emit(publicKey);
   }
 
@@ -120,7 +133,8 @@ export class AccountSelectV2Component implements OnInit {
     }).then(({ isConfirmed }) => {
       if (isConfirmed) {
         this.accountService.updateStoredUser(publicKey, { isHidden: true });
-        const rootKeyLookupMap = this.accountService.getSubAccountReverseLookupMap();
+        const rootKeyLookupMap =
+          this.accountService.getSubAccountReverseLookupMap();
         const mapping = rootKeyLookupMap[publicKey];
         const rootPublicKey = mapping?.lookupKey;
 
@@ -171,6 +185,9 @@ export class AccountSelectV2Component implements OnInit {
       });
   }
 
+  /**
+   * Shows and hides the "recover sub account" text input.
+   */
   toggleRecoverSubAccountForm(rootPublicKey: string) {
     const group = this.accountGroups.get(rootPublicKey);
     if (!group) {
@@ -182,15 +199,8 @@ export class AccountSelectV2Component implements OnInit {
 
   recoverSubAccount(event: SubmitEvent, rootPublicKey: string) {
     event.preventDefault();
-    // TODO: better validation.
-    const isValidIntegerValue = /^\d{1,7}$/g.test(
-      this.accountNumberToRecover ?? ''
-    );
-    // We arbitrarily cap the account number to max 8 digits. This is to prevent
-    // users from entering a string number value that is too large to fit into a
-    // 32-bit integer.
-    // TODO: figure out how to handle the case where the user enters the max value and then tries to add another account...
-    if (!isValidIntegerValue) {
+
+    if (!isValid32BitUnsignedInt(this.accountNumberToRecover)) {
       SwalHelper.fire({
         title: 'Invalid Account Number',
         html: `Please enter a valid account number.`,
@@ -198,8 +208,6 @@ export class AccountSelectV2Component implements OnInit {
       return;
     }
 
-    const accountNumber = parseInt(this.accountNumberToRecover ?? '', 10);
-
-    this.addSubAccount(rootPublicKey, { accountNumber });
+    this.addSubAccount(rootPublicKey, { accountNumber: parseInt(this.accountNumberToRecover, 10) });
   }
 }
