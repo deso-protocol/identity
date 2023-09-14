@@ -62,10 +62,7 @@ export class AccountService {
     private signingService: SigningService,
     private metamaskService: MetamaskService
   ) {
-    // This should not block anything during initial page load.
-    window.addEventListener('load', () => {
-      this.cleanupSubAccountReverseLookup();
-    });
+    this.cleanupSubAccountReverseLookup();
   }
 
   // Public Getters
