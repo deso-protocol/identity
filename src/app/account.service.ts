@@ -515,22 +515,19 @@ export class AccountService {
     mnemonic: string,
     extraText: string,
     network: Network,
+    accountNumber: number,
     options: {
       google?: boolean;
-      accountNumber?: number;
     } = {}
   ): string {
     // if the account number is provided, and it is greater than 0, this is a sub account.
-    if (
-      typeof options.accountNumber === 'number' &&
-      options.accountNumber > 0
-    ) {
+    if (typeof accountNumber === 'number' && accountNumber > 0) {
       // NOTE: we've already stored the sub account in the root user's subAccounts array,
       // so we can just return it's public key directly here.
       const seedHex = this.cryptoService.keychainToSeedHex(keychain);
       const keyPair = this.cryptoService.seedHexToPrivateKey(
         seedHex,
-        options.accountNumber
+        accountNumber
       );
       return this.cryptoService.publicKeyToDeSoPublicKey(keyPair, network);
     }
@@ -538,7 +535,7 @@ export class AccountService {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
     const keyPair = this.cryptoService.seedHexToPrivateKey(
       seedHex,
-      options.accountNumber ?? 0
+      accountNumber ?? 0
     );
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(
       // @ts-ignore TODO: add "identifier" to type definition
@@ -1218,10 +1215,47 @@ export class AccountService {
   private updateStoredUser(publicKey: string, attrs: PrivateUserInfo): void {
     const privateUsers = this.getPrivateUsersRaw();
 
-    privateUsers[publicKey] = {
-      ...privateUsers[publicKey],
-      ...attrs,
-    };
+    if (!privateUsers[publicKey]) {
+      // we could be dealing with a sub account.
+      const lookupMap = this.getSubAccountReverseLookupMap();
+      const mapping = lookupMap[publicKey];
+
+      if (!mapping) {
+        throw new Error(`User not found for public key: ${publicKey}`);
+      }
+
+      const rootUser = privateUsers[mapping.lookupKey];
+
+      if (!rootUser) {
+        throw new Error(`Root user not found for public key: ${publicKey}`);
+      }
+
+      const subAccounts = rootUser.subAccounts ?? [];
+      const subAccountIndex = subAccounts.findIndex(
+        (a) => a.accountNumber === mapping.accountNumber
+      );
+
+      if (subAccountIndex < 0) {
+        throw new Error(
+          `Sub account not found for root user public key: ${publicKey} with account number: ${mapping.accountNumber}}`
+        );
+      }
+
+      subAccounts[subAccountIndex] = {
+        ...subAccounts[subAccountIndex],
+        ...attrs,
+      };
+
+      privateUsers[mapping.lookupKey] = {
+        ...rootUser,
+        subAccounts,
+      };
+    } else {
+      privateUsers[publicKey] = {
+        ...privateUsers[publicKey],
+        ...attrs,
+      };
+    }
 
     this.setPrivateUsersRaw(privateUsers);
   }

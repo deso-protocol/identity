@@ -93,6 +93,7 @@ export class GoogleComponent implements OnInit {
             mnemonic,
             extraText,
             network,
+            0,
             {
               google: true,
             }
@@ -148,6 +149,7 @@ export class GoogleComponent implements OnInit {
           mnemonic,
           extraText,
           network,
+          0,
           {
             google: true,
           }

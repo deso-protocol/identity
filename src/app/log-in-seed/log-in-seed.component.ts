@@ -85,7 +85,8 @@ export class LogInSeedComponent implements OnInit {
         keychain,
         mnemonic,
         extraText,
-        network
+        network,
+        0
       );
 
       // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
@@ -113,7 +114,8 @@ export class LogInSeedComponent implements OnInit {
               keychainNonStandard,
               mnemonic,
               extraText,
-              network
+              network,
+              0
             );
           }
         });
