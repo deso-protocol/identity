@@ -5,7 +5,6 @@ import { ec as EC } from 'elliptic';
 import HDKey from 'hdkey';
 import * as jsonwebtoken from 'jsonwebtoken';
 import KeyEncoder from 'key-encoder';
-import { CookieService } from 'ngx-cookie';
 import sha256 from 'sha256';
 import { uint64ToBufBigEndian } from '../lib/bindata/util';
 import {
@@ -42,6 +41,11 @@ import { SigningService } from './signing.service';
 export const ERROR_USER_NOT_FOUND = 'User not found';
 const SUB_ACCOUNT_REVERSE_LOOKUP_KEY = 'subAccountReverseLookup';
 
+export interface SubAccountReversLookupEntry {
+  lookupKey: string;
+  accountNumber: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -54,12 +58,11 @@ export class AccountService {
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
-    private cookieService: CookieService,
     private entropyService: EntropyService,
     private signingService: SigningService,
     private metamaskService: MetamaskService
   ) {
-    this.fixupSubAccountReverseLookup();
+    this.cleanupSubAccountReverseLookup();
   }
 
   // Public Getters
@@ -84,14 +87,13 @@ export class AccountService {
 
     // If the user is not found, it *could* be a sub account public key.
     const lookup = this.getSubAccountReverseLookupMap();
+    const mapping = lookup[publicKey];
 
-    if (publicKey in lookup) {
-      const { lookupKey, accountNumber } = lookup[publicKey];
-      const rootUser = privateUsers[lookupKey];
+    if (mapping) {
+      const rootUser = privateUsers[mapping.lookupKey];
 
-      // TODO: figure out what needs to be included on this return...
       const foundAccount = rootUser.subAccounts?.find(
-        (a) => a.accountNumber === accountNumber
+        (a) => a.accountNumber === mapping.accountNumber
       );
 
       return foundAccount
@@ -105,7 +107,7 @@ export class AccountService {
     return null;
   }
 
-  getSubAccountReverseLookupMap() {
+  getSubAccountReverseLookupMap(): { [subAccountKey: string]: SubAccountReversLookupEntry | undefined } {
     const json = window.localStorage.getItem(SUB_ACCOUNT_REVERSE_LOOKUP_KEY);
     return json ? JSON.parse(json) : {};
   }
@@ -1212,7 +1214,10 @@ export class AccountService {
     );
   }
 
-  private updateStoredUser(publicKey: string, attrs: PrivateUserInfo): void {
+  private updateStoredUser(
+    publicKey: string,
+    attrs: Partial<PrivateUserInfo>
+  ): void {
     const privateUsers = this.getPrivateUsersRaw();
 
     if (!privateUsers[publicKey]) {
@@ -1269,81 +1274,22 @@ export class AccountService {
     );
   }
 
-  hideUser(rootPublicKey: string, accountNumber: number = 0): void {
-    const privateUsers = this.getPrivateUsersRaw();
-    const user = privateUsers[rootPublicKey];
-
-    if (!privateUsers[rootPublicKey]) return;
-
-    if (accountNumber > 0) {
-      const subAccounts = user.subAccounts ?? [];
-      const foundAccountIndex = subAccounts.findIndex(
-        (a) => a.accountNumber === accountNumber
-      );
-
-      if (foundAccountIndex === -1) {
-        throw new Error(
-          `Sub account not found for account number: ${accountNumber}`
-        );
-      }
-
-      subAccounts[foundAccountIndex].isHidden = true;
-
-      this.setPrivateUsersRaw({
-        ...privateUsers,
-        [rootPublicKey]: {
-          ...user,
-          subAccounts,
-        },
-      });
-    } else {
-      this.setPrivateUsersRaw({
-        ...privateUsers,
-        [rootPublicKey]: {
-          ...user,
-          isHidden: true,
-        },
-      });
-    }
+  hideUser(publicKey: string): void {
+    this.updateStoredUser(publicKey, { isHidden: true });
   }
 
   setLastLoginTimestamp(publicKey: string): void {
-    const user = this.getStoredUserInfo(publicKey);
-
-    if (!user) {
-      throw new Error(`User not found for public key: ${publicKey}`);
-    }
-
-    const lastLoginTimestamp = Date.now();
-
-    if (typeof user.accountNumber === 'number' && user.accountNumber > 0) {
-      const subAccounts = user.subAccounts ?? [];
-      const foundAccountIndex = subAccounts.findIndex(
-        (a) => a.accountNumber === user.accountNumber
-      );
-      const subAccount =
-        foundAccountIndex !== -1 ? subAccounts[foundAccountIndex] : null;
-
-      if (subAccount === null) {
-        throw new Error(
-          `Sub account not found for public key ${publicKey}, using account number: ${user.accountNumber}`
-        );
-      }
-
-      subAccounts[foundAccountIndex] = { ...subAccount, lastLoginTimestamp };
-      this.updateStoredUser(publicKey, { ...user, subAccounts });
-    } else {
-      this.updateStoredUser(publicKey, { ...user, lastLoginTimestamp });
-    }
+    this.updateStoredUser(publicKey, { lastLoginTimestamp: Date.now() });
   }
 
   addSubAccount(
     rootPublicKey: string,
     options: { accountNumber?: number } = {}
   ): number {
-    // The zeroth account represents the root account key so we don't allow it for sub-accounts.
-    // Note that the root account is simply a sub-account with accountNumber = 0, but because
-    // of the way we store the data, we don't keep track of it as a sub-account.
+    // The zeroth account represents the "root" account key so we don't allow it
+    // for sub-accounts.  There is nothing particularly special about the root
+    // account, but for historical reasons its public key is used to index the
+    // main users map in local storage.
     if (options.accountNumber === 0) {
       throw new Error('A sub-account index must be greater than 0');
     }
@@ -1432,11 +1378,11 @@ export class AccountService {
   }
 
   /**
-   * It's possible for the reverse lookup to get out of sync, especially during development
-   * or testing. This method will fix the reverse lookup map by iterating through all the
-   * accounts and adding any missing entries.
+   * It's possible for the reverse lookup to get out of sync, especially during
+   * development or testing. This method will fix any discrepancies by iterating
+   * through all the accounts and adding any missing entries.
    */
-  fixupSubAccountReverseLookup() {
+  cleanupSubAccountReverseLookup() {
     const lookupMap = this.getSubAccountReverseLookupMap();
     const allUsers = this.getPrivateUsersRaw();
 

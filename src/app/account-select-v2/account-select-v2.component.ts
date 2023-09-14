@@ -111,7 +111,7 @@ export class AccountSelectV2Component implements OnInit {
     this.onAccountSelect.emit(publicKey);
   }
 
-  removeAccount(rootPublicKey: string, accountNumber: number) {
+  removeAccount(publicKey: string) {
     SwalHelper.fire({
       title: 'Remove Account?',
       // TODO: revisit this copy and make sure it makes sense for both the main account and sub accounts
@@ -119,12 +119,20 @@ export class AccountSelectV2Component implements OnInit {
       showCancelButton: true,
     }).then(({ isConfirmed }) => {
       if (isConfirmed) {
-        this.accountService.hideUser(rootPublicKey, accountNumber);
+        this.accountService.hideUser(publicKey);
+        const rootKeyLookupMap = this.accountService.getSubAccountReverseLookupMap();
+        const mapping = rootKeyLookupMap[publicKey];
+        const rootPublicKey = mapping?.lookupKey;
+
+        if (!rootPublicKey) {
+          throw new Error(`Failed to find root public key for ${publicKey}`);
+        }
+
         const group = this.accountGroups.get(rootPublicKey) ?? {
           accounts: [],
         };
         group.accounts = group.accounts.filter(
-          (a) => a.accountNumber !== accountNumber
+          (a) => a.accountNumber !== mapping.accountNumber
         );
         this.accountGroups.set(rootPublicKey, group);
       }
