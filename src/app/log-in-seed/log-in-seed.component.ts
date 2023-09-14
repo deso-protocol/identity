@@ -41,9 +41,11 @@ export class LogInSeedComponent implements OnInit {
     private backendApi: BackendAPIService,
     private router: Router,
     private activatedRoute: ActivatedRoute
-  ) {}
+  ) {
+  }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   clickLoadAccount(): void {
     // Store mnemonic, seedHex and extraText locally because we clear them below and otherwise
@@ -99,7 +101,7 @@ export class LogInSeedComponent implements OnInit {
         );
 
         // We only want to add nonStandard derivations if the account is worth importing
-        this.backendApi.GetUsersStateless([publicKey]).subscribe((res) => {
+        this.backendApi.GetUsersStateless([publicKey], true, true).subscribe((res) => {
           if (!res.UserList.length) {
             return;
           }
@@ -128,7 +130,7 @@ export class LogInSeedComponent implements OnInit {
 
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: userPublicKey },
+        queryParams: {publicKey: userPublicKey},
         queryParamsHandling: 'merge',
       });
     } else {
