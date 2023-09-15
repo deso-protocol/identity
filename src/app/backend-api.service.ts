@@ -386,10 +386,6 @@ export class BackendAPIService {
     )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
   }
 
-  GetDefaultProfilePictureURL(): string {
-    return window.location.origin + '/assets/placeholder-account-image.png';
-  }
-
   JumioBegin(
     PublicKey: string,
     ReferralHashBase58: string,

@@ -3,6 +3,8 @@ import _ from 'lodash';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 
+const DEFAULT_PROFILE_PIC_URL = window.location.origin + '/assets/placeholder-account-image.png';
+
 @Directive({
   selector: '[appAvatar]',
 })
@@ -23,7 +25,7 @@ export class AvatarDirective implements OnChanges {
 
     if (!this.appAvatar) {
       this.setURLOnElement(
-        this.backendApi.GetDefaultProfilePictureURL()
+        DEFAULT_PROFILE_PIC_URL
       );
       return;
     }
@@ -33,7 +35,7 @@ export class AvatarDirective implements OnChanges {
     const profPicURL = _.escape(
       this.backendApi.GetSingleProfilePictureURL(
         this.appAvatar,
-        this.backendApi.GetDefaultProfilePictureURL()
+        DEFAULT_PROFILE_PIC_URL
       )
     );
 

@@ -201,6 +201,7 @@ export class GroupedAccountSelectComponent implements OnInit {
 
         // if the account is already in the list, don't add it again...
         if (!group.accounts.find((a) => a.accountNumber === accountNumber)) {
+          // TODO: should we sort here?
           group.accounts.push(account);
         }
 
