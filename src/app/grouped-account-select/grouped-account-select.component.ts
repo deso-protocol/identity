@@ -36,7 +36,7 @@ export class GroupedAccountSelectComponent implements OnInit {
   /**
    * Bound to a UI text input and used to recover a sub account.
    */
-  accountNumberToRecover: string = '';
+  accountNumberToRecover = 0;
 
   constructor(
     public accountService: AccountService,
@@ -183,7 +183,12 @@ export class GroupedAccountSelectComponent implements OnInit {
         const group = this.accountGroups.get(rootPublicKey) ?? {
           accounts: [],
         };
-        group.accounts.push(account);
+
+        // if the account is already in the list, don't add it again...
+        if (!group.accounts.find((a) => a.accountNumber === accountNumber)) {
+          group.accounts.push(account);
+        }
+
         this.accountGroups.set(rootPublicKey, group);
       });
   }
@@ -211,7 +216,7 @@ export class GroupedAccountSelectComponent implements OnInit {
       return;
     }
 
-    this.addSubAccount(rootPublicKey, { accountNumber: parseInt(this.accountNumberToRecover, 10) });
+    this.addSubAccount(rootPublicKey, { accountNumber: this.accountNumberToRecover });
   }
 
   getAccountDisplayName(account: { username?: string, publicKey: string }) {

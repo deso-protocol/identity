@@ -4,11 +4,10 @@
   </div>
 
   <ng-container *ngFor="let group of accountGroups | keyvalue">
-    <div
-      *ngIf="group.value.accounts.length"
-      class="section--accounts__list container--scrollbar margin-bottom--small"
-    >
-      <ul>
+    <div *ngIf="group.value.accounts.length" class="margin-bottom--large">
+      <ul
+        class="section--accounts__list container--scrollbar margin-bottom--small"
+      >
         <li
           *ngFor="let account of group.value.accounts"
           data-control-name="account-select-item"
@@ -28,7 +27,8 @@
               </div>
               <div class="display--flex items--center">
                 <div class="display--flex flex--column items--end">
-                  <span class="font-weight--bold font-size--xsmall margin-right--small"
+                  <span
+                    class="font-weight--bold font-size--xsmall margin-right--small"
                     >{{
                       globalVars.nanosToDeSo(account.balanceNanos)
                     }}
@@ -61,10 +61,10 @@
       </ul>
       <div>
         <button (click)="addSubAccount(group.key)">Add account</button>
-        <button>Export Seed</button>
         <button (click)="toggleRecoverSubAccountForm(group.key)">
           Recover account
         </button>
+        <button>Export Seed</button>
         <form
           *ngIf="group.value.showRecoverSubAccountInput"
           (submit)="recoverSubAccount($event, group.key)"

@@ -1242,29 +1242,18 @@ export class AccountService {
     const accountNumber =
       options.accountNumber ?? generateAccountNumber(accountNumbers);
 
-    if (foundAccountIndex > 0) {
+    let newSubAccounts: SubAccountMetadata[] = [];
+
+    if (foundAccountIndex !== -1) {
       // If accountNumber is provided and we already have it, we just make sure
       // the existing account is not hidden.
       subAccounts[foundAccountIndex].isHidden = false;
-
-      this.setPrivateUsersRaw({
-        ...privateUsers,
-        [rootPublicKey]: {
-          ...parentAccount,
-          subAccounts: subAccounts,
-        },
-      });
+      newSubAccounts = subAccounts;
     } else {
       // otherwise we create a new sub account
-      this.setPrivateUsersRaw({
-        ...privateUsers,
-        [rootPublicKey]: {
-          ...parentAccount,
-          subAccounts: subAccounts.concat({
-            accountNumber,
-            isHidden: false,
-          }),
-        },
+      newSubAccounts = subAccounts.concat({
+        accountNumber,
+        isHidden: false,
       });
 
       this.updateSubAccountReverseLookupMap({
@@ -1272,6 +1261,8 @@ export class AccountService {
         accountNumber,
       });
     }
+
+    this.updateAccountInfo(rootPublicKey, { subAccounts });
 
     return accountNumber;
   }

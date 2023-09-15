@@ -7,14 +7,8 @@
  */
 const MAX_32_BIT_UNSIGNED_INT = 4294967295; // 2^32 - 1
 
-/**
- * This is for validating UI input which is why it only accepts strings.
- */
-export function isValid32BitUnsignedInt(str: string) {
-  if (!str.match(/^(0|[1-9]\d*)$/)) return false;
-
-  const num = Number(str);
-  return num >= 0 && num <= MAX_32_BIT_UNSIGNED_INT;
+export function isValid32BitUnsignedInt(value: number) {
+  return Number.isInteger(value) && value >= 0 && value <= MAX_32_BIT_UNSIGNED_INT;
 }
 
 /**
