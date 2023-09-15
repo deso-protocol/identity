@@ -25,8 +25,8 @@ export function generateAccountNumber(accountNumbers: Set<number>): number {
   }
 
   const sorted = Array.from(accountNumbers).sort((a, b) => a - b);
-
-  const candidate = sorted[sorted.length - 1] + 1;
+  const currentHighestAccountNumber = sorted[sorted.length - 1];
+  const candidate = currentHighestAccountNumber + 1;
 
   if (candidate <= MAX_UNSIGNED_INT_VALUE) {
     return candidate;
@@ -35,12 +35,13 @@ export function generateAccountNumber(accountNumbers: Set<number>): number {
   // At most we look back 500 numbers. This is a bit arbitrary...  but the
   // number of values could *technically* be 2^32 - 1, so we just limit the
   // number of iterations to some reasonable value.
-  const maxLookBack = Math.max(sorted.length - 1001, 0);
-  for (let i = sorted.length - 1; i >= maxLookBack; i--) {
-    const expectedValueInSequence = i + 1;
-    if (expectedValueInSequence !== sorted[i]) {
-      return expectedValueInSequence;
+  const maxLookBack = Math.max(sorted.length - 500, 0);
+  let nextExpectedValueInSequence = currentHighestAccountNumber - 1;
+  for (let i = sorted.length - 2; i >= maxLookBack; i--) {
+    if (nextExpectedValueInSequence !== sorted[i]) {
+      return nextExpectedValueInSequence;
     }
+    nextExpectedValueInSequence--;
   }
 
   throw new Error('Cannot generate account number.');

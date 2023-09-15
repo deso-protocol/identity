@@ -1263,6 +1263,14 @@ export class AccountService {
       });
     }
 
+    // validate that we don't have any duplicate account numbers, before we save.
+    const accountNumbersSet = new Set(newSubAccounts.map((a) => a.accountNumber));
+    if (accountNumbersSet.size !== newSubAccounts.length) {
+      throw new Error(
+        `Duplicate account number ${accountNumber} found for root user public key: ${rootPublicKey}`
+      );
+    }
+
     this.updateAccountInfo(rootPublicKey, { subAccounts: newSubAccounts });
 
     return accountNumber;
