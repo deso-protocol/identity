@@ -103,10 +103,10 @@ export class GroupedAccountSelectComponent implements OnInit {
       .pipe(take(1))
       .subscribe((users) => {
         Array.from(accountGroupsByRootKey.entries()).forEach(
-          ([key, accounts]) => {
+          ([key, accounts], i) => {
             this.accountGroups.set(key, {
               showRecoverSubAccountInput: false,
-              accounts: accounts.map((account) => ({
+              accounts: accounts.map((account, j) => ({
                 ...account,
                 ...users[account.publicKey],
               })).sort((a, b) => {
