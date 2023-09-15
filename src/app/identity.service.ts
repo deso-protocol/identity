@@ -229,13 +229,9 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-
-    let accountNumber = 0;
-    if (ownerPublicKeyBase58Check) {
-      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = ownerPublicKeyBase58Check
+      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
+      : {};
     const signedHashes = this.signingService.signHashes(
       seedHex,
       unsignedHashes,
@@ -260,13 +256,9 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    let accountNumber = 0;
-
-    if (ownerPublicKeyBase58Check) {
-      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = ownerPublicKeyBase58Check
+      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
+      : {};
     const signatures = this.signingService.signHashesETH(
       seedHex,
       unsignedHashes,
@@ -313,16 +305,10 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-
     const isDerived = !!derivedPublicKeyBase58Check;
-
-    let accountNumber = 0;
-
-    if (ownerPublicKeyBase58Check) {
-      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = ownerPublicKeyBase58Check
+      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
+      : {};
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
       transactionHex,
@@ -483,13 +469,9 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    let accountNumber = 0;
-
-    if (ownerPublicKeyBase58Check) {
-      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = ownerPublicKeyBase58Check
+      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
+      : {};
     const isDerived = !!derivedPublicKeyBase58Check;
     const jwt = this.signingService.signJWT(seedHex, accountNumber, isDerived);
 

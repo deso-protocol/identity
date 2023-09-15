@@ -71,9 +71,7 @@ export class AccountService {
     return Object.keys(this.getRootLevelUsers());
   }
 
-  getAccountInfo(
-    publicKey: string
-  ): PrivateUserInfo & SubAccountMetadata {
+  getAccountInfo(publicKey: string): PrivateUserInfo & SubAccountMetadata {
     const privateUsers = this.getRootLevelUsers();
     let info = null;
 
@@ -193,9 +191,7 @@ export class AccountService {
 
   requiresMessagingKeyRandomness(publicKey: string): boolean {
     const account = this.getAccountInfo(publicKey);
-    return (
-      this.isMetamaskAccount(account) && !account.messagingKeyRandomness
-    );
+    return this.isMetamaskAccount(account) && !account.messagingKeyRandomness;
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -515,7 +511,7 @@ export class AccountService {
   ): string {
     // if the account number is provided, and it is greater than 0, this is a sub account.
     if (typeof accountNumber === 'number' && accountNumber > 0) {
-      // NOTE: we've already stored the sub account in the root user's subAccounts array,
+      // We've already stored the sub account in the root user's subAccounts array,
       // so we can just return it's public key directly here.
       const seedHex = this.cryptoService.keychainToSeedHex(keychain);
       const keyPair = this.cryptoService.seedHexToPrivateKey(
@@ -526,10 +522,7 @@ export class AccountService {
     }
 
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const keyPair = this.cryptoService.seedHexToPrivateKey(
-      seedHex,
-      accountNumber ?? 0
-    );
+    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex, 0);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(
       // @ts-ignore TODO: add "identifier" to type definition
       keychain.identifier,
@@ -683,9 +676,8 @@ export class AccountService {
     publicKey: string
   ): string {
     const account = this.getAccountInfo(ownerPublicKeyBase58Check);
-    const seedHex = account.seedHex;
     const privateKey = this.cryptoService.seedHexToPrivateKey(
-      seedHex,
+      account.seedHex,
       account.accountNumber
     );
     const privateKeyBytes = privateKey.getPrivate().toBuffer(undefined, 32);
@@ -700,7 +692,6 @@ export class AccountService {
     messagingKeyName: string
   ): Promise<DefaultKeyPrivateInfo> {
     const account = this.getAccountInfo(ownerPublicKeyBase58Check);
-    const seedHex = account.seedHex;
     // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
     let messagingPrivateKeyBuff;
     try {
@@ -734,7 +725,7 @@ export class AccountService {
     let messagingKeySignature = '';
     if (messagingKeyName === this.globalVars.defaultMessageKeyName) {
       messagingKeySignature = this.signingService.signHashes(
-        seedHex,
+        account.seedHex,
         [messagingKeyHash],
         account.accountNumber
       )[0];
@@ -836,16 +827,9 @@ export class AccountService {
       ownerPublicKeyBase58Check?: string;
     } = {}
   ): any {
-    let accountNumber = 0;
-
-    if (options.ownerPublicKeyBase58Check) {
-      const account = this.getAccountInfo(
-        options.ownerPublicKeyBase58Check
-      );
-
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = options.ownerPublicKeyBase58Check
+      ? this.getAccountInfo(options.ownerPublicKeyBase58Check)
+      : {};
     const privateKey = this.cryptoService.seedHexToPrivateKey(
       seedHex,
       accountNumber
@@ -883,16 +867,9 @@ export class AccountService {
     encryptedHexes: any,
     options: { ownerPublicKeyBase58Check?: string } = {}
   ): { [key: string]: any } {
-    let accountNumber = 0;
-
-    if (options.ownerPublicKeyBase58Check) {
-      const account = this.getAccountInfo(
-        options.ownerPublicKeyBase58Check
-      );
-
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = options.ownerPublicKeyBase58Check
+      ? this.getAccountInfo(options.ownerPublicKeyBase58Check)
+      : {};
     const privateKey = this.cryptoService.seedHexToPrivateKey(
       seedHex,
       accountNumber
@@ -924,16 +901,9 @@ export class AccountService {
       ownerPublicKeyBase58Check?: string;
     } = {}
   ): Promise<{ [key: string]: any }> {
-    let accountNumber = 0;
-
-    if (options.ownerPublicKeyBase58Check) {
-      const account = this.getAccountInfo(
-        options.ownerPublicKeyBase58Check
-      );
-
-      accountNumber = account.accountNumber;
-    }
-
+    const { accountNumber = 0 } = options.ownerPublicKeyBase58Check
+      ? this.getAccountInfo(options.ownerPublicKeyBase58Check)
+      : {};
     const privateKey = this.cryptoService.seedHexToPrivateKey(
       seedHex,
       accountNumber
@@ -1263,8 +1233,11 @@ export class AccountService {
 
     const subAccounts = parentAccount.subAccounts ?? [];
     const foundAccountIndex =
-      typeof options.accountNumber === 'number' ?
-      subAccounts.findIndex((a) => a.accountNumber === options.accountNumber) : -1
+      typeof options.accountNumber === 'number'
+        ? subAccounts.findIndex(
+            (a) => a.accountNumber === options.accountNumber
+          )
+        : -1;
     const accountNumbers = new Set(subAccounts.map((a) => a.accountNumber));
     const accountNumber =
       options.accountNumber ?? generateAccountNumber(accountNumbers);
