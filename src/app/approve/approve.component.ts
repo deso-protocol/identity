@@ -101,11 +101,6 @@ export class ApproveComponent implements OnInit {
 
   onSubmit(): void {
     const user = this.accountService.getStoredUserInfo(this.publicKey);
-
-    if (!user) {
-      throw new Error(`User not found for public key ${this.publicKey}`);
-    }
-
     const isDerived = this.accountService.isMetamaskAccount(user);
     const signedTransactionHex = this.signingService.signTransaction(
       user.seedHex,

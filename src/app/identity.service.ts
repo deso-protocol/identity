@@ -229,15 +229,13 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    let accountNumber = 0;
 
+    let accountNumber = 0;
     if (ownerPublicKeyBase58Check) {
       const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      if (!user) {
-        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
-      }
       accountNumber = user.accountNumber;
     }
+
     const signedHashes = this.signingService.signHashes(
       seedHex,
       unsignedHashes,
@@ -266,9 +264,6 @@ export class IdentityService {
 
     if (ownerPublicKeyBase58Check) {
       const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      if (!user) {
-        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
-      }
       accountNumber = user.accountNumber;
     }
 
@@ -325,9 +320,6 @@ export class IdentityService {
 
     if (ownerPublicKeyBase58Check) {
       const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      if (!user) {
-        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
-      }
       accountNumber = user.accountNumber;
     }
 
@@ -495,9 +487,6 @@ export class IdentityService {
 
     if (ownerPublicKeyBase58Check) {
       const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      if (!user) {
-        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
-      }
       accountNumber = user.accountNumber;
     }
 
