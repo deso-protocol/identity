@@ -68,13 +68,13 @@ export class AccountService {
   // Public Getters
 
   getPublicKeys(): any {
-    return Object.keys(this.getStoredUsers());
+    return Object.keys(this.getRootLevelUsers());
   }
 
-  getStoredUserInfo(
+  getAccountInfo(
     publicKey: string
   ): PrivateUserInfo & SubAccountMetadata {
-    const privateUsers = this.getStoredUsers();
+    const privateUsers = this.getRootLevelUsers();
     let info = null;
 
     if (publicKey in privateUsers) {
@@ -142,7 +142,7 @@ export class AccountService {
 
   getEncryptedUsers(): { [key: string]: PublicUserInfo } {
     const hostname = this.globalVars.hostname;
-    const privateUsers = this.getStoredUsers();
+    const privateUsers = this.getRootLevelUsers();
     const publicUsers: { [key: string]: PublicUserInfo } = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
@@ -192,13 +192,9 @@ export class AccountService {
   }
 
   requiresMessagingKeyRandomness(publicKey: string): boolean {
-    const privateUser = this.getStoredUserInfo(publicKey);
-    if (!privateUser) {
-      console.error('private user not found');
-      throw new Error('private user not found');
-    }
+    const account = this.getAccountInfo(publicKey);
     return (
-      this.isMetamaskAccount(privateUser) && !privateUser.messagingKeyRandomness
+      this.isMetamaskAccount(account) && !account.messagingKeyRandomness
     );
   }
 
@@ -230,14 +226,9 @@ export class AccountService {
     derivedPublicKeyBase58CheckInput?: string,
     expirationDays?: number
   ): Promise<DerivedPrivateUserInfo | undefined> {
-    const privateUser = this.getStoredUserInfo(publicKeyBase58Check);
-
-    if (!privateUser) {
-      throw new Error(`No user found for public key ${publicKeyBase58Check}`);
-    }
-
-    const network = privateUser.network;
-    const isMetamask = this.isMetamaskAccount(privateUser);
+    const account = this.getAccountInfo(publicKeyBase58Check);
+    const network = account.network;
+    const isMetamask = this.isMetamaskAccount(account);
 
     let derivedSeedHex = '';
     let derivedPublicKeyBuffer: number[];
@@ -275,8 +266,8 @@ export class AccountService {
     // Compute the owner-signed JWT with the same expiration as the derived key. This is needed for some backend endpoints.
     // In case of the metamask log-in, jwt will be signed by a derived key.
     jwt = this.signingService.signJWT(
-      privateUser.seedHex,
-      privateUser.accountNumber,
+      account.seedHex,
+      account.accountNumber,
       isMetamask,
       options
     );
@@ -376,9 +367,9 @@ export class AccountService {
       }
     } else {
       accessSignature = this.signingService.signHashes(
-        privateUser.seedHex,
+        account.seedHex,
         [accessHash],
-        privateUser.accountNumber
+        account.accountNumber
       )[0];
     }
     const {
@@ -411,7 +402,7 @@ export class AccountService {
   }
 
   getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): any {
-    const privateUser = this.getStoredUsers()[publicKey];
+    const privateUser = this.getRootLevelUsers()[publicKey];
     const network = privateUser.network;
     // create jwt with private key and app public key
     const keyEncoder = new KeyEncoder('secp256k1');
@@ -691,18 +682,11 @@ export class AccountService {
     ownerPublicKeyBase58Check: string,
     publicKey: string
   ): string {
-    const privateUser = this.getStoredUserInfo(ownerPublicKeyBase58Check);
-
-    if (!privateUser) {
-      throw new Error(
-        `No user found for public key ${ownerPublicKeyBase58Check}`
-      );
-    }
-
-    const seedHex = privateUser.seedHex;
+    const account = this.getAccountInfo(ownerPublicKeyBase58Check);
+    const seedHex = account.seedHex;
     const privateKey = this.cryptoService.seedHexToPrivateKey(
       seedHex,
-      privateUser.accountNumber
+      account.accountNumber
     );
     const privateKeyBytes = privateKey.getPrivate().toBuffer(undefined, 32);
     const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
@@ -715,20 +699,13 @@ export class AccountService {
     ownerPublicKeyBase58Check: string,
     messagingKeyName: string
   ): Promise<DefaultKeyPrivateInfo> {
-    const privateUser = this.getStoredUserInfo(ownerPublicKeyBase58Check);
-
-    if (!privateUser) {
-      throw new Error(
-        `No user found for public key ${ownerPublicKeyBase58Check}`
-      );
-    }
-
-    const seedHex = privateUser.seedHex;
+    const account = this.getAccountInfo(ownerPublicKeyBase58Check);
+    const seedHex = account.seedHex;
     // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
     let messagingPrivateKeyBuff;
     try {
       messagingPrivateKeyBuff = await this.getMessagingKey(
-        privateUser,
+        account,
         messagingKeyName
       );
     } catch (e) {
@@ -759,7 +736,7 @@ export class AccountService {
       messagingKeySignature = this.signingService.signHashes(
         seedHex,
         [messagingKeyHash],
-        privateUser.accountNumber
+        account.accountNumber
       )[0];
     }
 
@@ -862,17 +839,11 @@ export class AccountService {
     let accountNumber = 0;
 
     if (options.ownerPublicKeyBase58Check) {
-      const privateUser = this.getStoredUserInfo(
+      const account = this.getAccountInfo(
         options.ownerPublicKeyBase58Check
       );
 
-      if (!privateUser) {
-        throw new Error(
-          `No user found for public key ${options.ownerPublicKeyBase58Check}`
-        );
-      }
-
-      accountNumber = privateUser.accountNumber;
+      accountNumber = account.accountNumber;
     }
 
     const privateKey = this.cryptoService.seedHexToPrivateKey(
@@ -915,17 +886,11 @@ export class AccountService {
     let accountNumber = 0;
 
     if (options.ownerPublicKeyBase58Check) {
-      const privateUser = this.getStoredUserInfo(
+      const account = this.getAccountInfo(
         options.ownerPublicKeyBase58Check
       );
 
-      if (!privateUser) {
-        throw new Error(
-          `No user found for public key ${options.ownerPublicKeyBase58Check}`
-        );
-      }
-
-      accountNumber = privateUser.accountNumber;
+      accountNumber = account.accountNumber;
     }
 
     const privateKey = this.cryptoService.seedHexToPrivateKey(
@@ -962,17 +927,11 @@ export class AccountService {
     let accountNumber = 0;
 
     if (options.ownerPublicKeyBase58Check) {
-      const privateUser = this.getStoredUserInfo(
+      const account = this.getAccountInfo(
         options.ownerPublicKeyBase58Check
       );
 
-      if (!privateUser) {
-        throw new Error(
-          `No user found for public key ${options.ownerPublicKeyBase58Check}`
-        );
-      }
-
-      accountNumber = privateUser.accountNumber;
+      accountNumber = account.accountNumber;
     }
 
     const privateKey = this.cryptoService.seedHexToPrivateKey(
@@ -1197,11 +1156,11 @@ export class AccountService {
   getLoginMethodWithPublicKeyBase58Check(
     publicKeyBase58Check: string
   ): LoginMethod {
-    const account = this.getStoredUsers()[publicKeyBase58Check];
+    const account = this.getRootLevelUsers()[publicKeyBase58Check];
     return account.loginMethod || LoginMethod.DESO;
   }
 
-  getStoredUsers(): { [key: string]: PrivateUserInfo } {
+  getRootLevelUsers(): { [key: string]: PrivateUserInfo } {
     const privateUsers = this.getPrivateUsersRaw();
     const filteredPrivateUsers: { [key: string]: PrivateUserInfo } = {};
 
@@ -1225,7 +1184,7 @@ export class AccountService {
     return filteredPrivateUsers;
   }
 
-  updateStoredUser(publicKey: string, attrs: Partial<PrivateUserInfo>): void {
+  updateAccountInfo(publicKey: string, attrs: Partial<PrivateUserInfo>): void {
     const privateUsers = this.getPrivateUsersRaw();
 
     if (!privateUsers[publicKey]) {

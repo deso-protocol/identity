@@ -291,7 +291,7 @@ export class BackendAPIService {
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
-    const userInfo = this.accountService.getStoredUserInfo(publicKey);
+    const userInfo = this.accountService.getAccountInfo(publicKey);
     // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
     // this is happening.

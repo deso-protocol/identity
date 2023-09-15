@@ -46,7 +46,7 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   initializeAccountGroups() {
-    const storedUsers = Object.entries(this.accountService.getStoredUsers());
+    const storedUsers = Object.entries(this.accountService.getRootLevelUsers());
     const accountGroupsByRootKey = new Map<
       string,
       { publicKey: string; accountNumber: number }[]
@@ -118,7 +118,7 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   selectAccount(publicKey: string) {
-    this.accountService.updateStoredUser(publicKey, {
+    this.accountService.updateAccountInfo(publicKey, {
       lastLoginTimestamp: Date.now(),
     });
     this.onAccountSelect.emit(publicKey);
@@ -132,7 +132,7 @@ export class GroupedAccountSelectComponent implements OnInit {
       showCancelButton: true,
     }).then(({ isConfirmed }) => {
       if (isConfirmed) {
-        this.accountService.updateStoredUser(publicKey, { isHidden: true });
+        this.accountService.updateAccountInfo(publicKey, { isHidden: true });
         const rootKeyLookupMap =
           this.accountService.getSubAccountReverseLookupMap();
         const mapping = rootKeyLookupMap[publicKey];

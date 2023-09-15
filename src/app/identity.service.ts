@@ -232,8 +232,8 @@ export class IdentityService {
 
     let accountNumber = 0;
     if (ownerPublicKeyBase58Check) {
-      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      accountNumber = user.accountNumber;
+      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
+      accountNumber = account.accountNumber;
     }
 
     const signedHashes = this.signingService.signHashes(
@@ -263,8 +263,8 @@ export class IdentityService {
     let accountNumber = 0;
 
     if (ownerPublicKeyBase58Check) {
-      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      accountNumber = user.accountNumber;
+      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
+      accountNumber = account.accountNumber;
     }
 
     const signatures = this.signingService.signHashesETH(
@@ -319,8 +319,8 @@ export class IdentityService {
     let accountNumber = 0;
 
     if (ownerPublicKeyBase58Check) {
-      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      accountNumber = user.accountNumber;
+      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
+      accountNumber = account.accountNumber;
     }
 
     const signedTransactionHex = this.signingService.signTransaction(
@@ -486,8 +486,8 @@ export class IdentityService {
     let accountNumber = 0;
 
     if (ownerPublicKeyBase58Check) {
-      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
-      accountNumber = user.accountNumber;
+      const account = this.accountService.getAccountInfo(ownerPublicKeyBase58Check);
+      accountNumber = account.accountNumber;
     }
 
     const isDerived = !!derivedPublicKeyBase58Check;
