@@ -223,19 +223,25 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes },
+      payload: { encryptedSeedHex, unsignedHashes, ownerPublicKeyBase58Check },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    // TODO: figure out if this payload contains the user's public key
-    // if we don't have it, we won't be able to find the user's account number.
-    // For now we just assume the user is burning from their root account by passing 0.
+    let accountNumber = 0;
+
+    if (ownerPublicKeyBase58Check) {
+      const user = this.accountService.getStoredUserInfo(ownerPublicKeyBase58Check);
+      if (!user) {
+        throw new Error(`Could not find user with public key ${ownerPublicKeyBase58Check}`);
+      }
+      accountNumber = user.accountNumber;
+    }
     const signedHashes = this.signingService.signHashes(
       seedHex,
       unsignedHashes,
-      0
+      accountNumber
     );
 
     this.respond(id, {
