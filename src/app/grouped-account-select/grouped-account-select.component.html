@@ -52,7 +52,9 @@
             </button>
             <button
               class="styleless-button"
-              (click)="hideAccount(group.key, account.publicKey, account.accountNumber)"
+              (click)="
+                hideAccount(group.key, account.publicKey, account.accountNumber)
+              "
             >
               <i-feather name="power" class="text--blue-base"></i-feather>
             </button>
@@ -60,14 +62,32 @@
         </li>
       </ul>
       <div>
-        <button (click)="addSubAccount(group.key)">Add account</button>
-        <button (click)="toggleRecoverSubAccountForm(group.key)">
-          Recover account
-        </button>
-        <button>Export Seed</button>
+        <div class="display--flex">
+          <button
+            class="button--small button--primary margin-right--small"
+            style="width: auto; white-space: nowrap"
+            (click)="addSubAccount(group.key)"
+          >
+            Add account
+          </button>
+          <button
+            class="button--small button--secondary"
+            style="width: auto; white-space: nowrap"
+            (click)="toggleRecoverSubAccountForm(group.key)"
+          >
+            Recover account
+          </button>
+          <button
+            class="button--small button--red"
+            style="width: auto; white-space: nowrap; margin-left: auto"
+          >
+            Export Seed
+          </button>
+        </div>
         <form
           *ngIf="group.value.showRecoverSubAccountInput"
           (submit)="recoverSubAccount($event, group.key)"
+          class="margin-top--small margin-left--small"
         >
           <label for="account-number" class="display--block font-size--small"
             >Account:</label
@@ -79,10 +99,15 @@
             type="number"
             step="1"
           />
-          <button type="submit">Submit</button>
+          <button
+            type="submit"
+            class="button--primary button--small margin-left--small"
+            style="width: auto; white-space: nowrap"
+          >
+            Submit
+          </button>
         </form>
       </div>
     </div>
   </ng-container>
-  <button>Add new account group</button>
 </div>

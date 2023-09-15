@@ -151,6 +151,7 @@ export class GroupedAccountSelectComponent implements OnInit {
     rootPublicKey: string,
     { accountNumber }: { accountNumber?: number } = {}
   ) {
+    debugger;
     const addedAccountNumber = this.accountService.addSubAccount(
       rootPublicKey,
       { accountNumber }
@@ -160,7 +161,7 @@ export class GroupedAccountSelectComponent implements OnInit {
       addedAccountNumber
     );
     // Check if this account has profile, balance, etc, and add it to the list.
-    // TODO: some loading state while fetching profile data.
+    // TODO: some loading state while fetching profile data?
     this.backendApi
       .GetUserProfiles([publicKeyBase58])
       .pipe(take(1))

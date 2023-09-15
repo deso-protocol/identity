@@ -1,14 +1,15 @@
 /**
  * https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#extended-keys
- * The max value that should be used for an hd key account number. In practice,
- * we would never reach this via pure incremental account number generation, but
- * we allow entering arbitrary account numbers in the UI, so we need to
- * explicitly validate them.
+ * The max value that should be used for an hd key account number is 2^31 -1. In
+ * practice, we would never reach this via pure incremental account number
+ * generation, but we allow entering arbitrary account numbers in the UI, so we
+ * need to explicitly validate them. For whatever reason, the hdkey library
+ * we use throws for anything over 2^30.
  */
-const MAX_32_BIT_UNSIGNED_INT = 4294967295; // 2^32 - 1
+const MAX_UNSIGNED_INT_VALUE = 1073741824; // 2^30
 
 export function isValid32BitUnsignedInt(value: number) {
-  return Number.isInteger(value) && value >= 0 && value <= MAX_32_BIT_UNSIGNED_INT;
+  return Number.isInteger(value) && value >= 0 && value <= MAX_UNSIGNED_INT_VALUE;
 }
 
 /**
@@ -27,7 +28,7 @@ export function generateAccountNumber(accountNumbers: Set<number>): number {
 
   const candidate = sorted[sorted.length - 1] + 1;
 
-  if (candidate <= MAX_32_BIT_UNSIGNED_INT) {
+  if (candidate <= MAX_UNSIGNED_INT_VALUE) {
     return candidate;
   }
 

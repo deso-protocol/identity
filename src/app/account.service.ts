@@ -1219,7 +1219,7 @@ export class AccountService {
     // account, but for historical reasons its public key is used to index the
     // main users map in local storage.
     if (options.accountNumber === 0) {
-      throw new Error('A sub-account index must be greater than 0');
+      return 0;
     }
 
     const privateUsers = this.getPrivateUsersRaw();
@@ -1262,7 +1262,7 @@ export class AccountService {
       });
     }
 
-    this.updateAccountInfo(rootPublicKey, { subAccounts });
+    this.updateAccountInfo(rootPublicKey, { subAccounts: newSubAccounts });
 
     return accountNumber;
   }
