@@ -3,7 +3,12 @@
     Select an account
   </div>
 
-  <ng-container *ngFor="let group of accountGroups | keyvalue: mapSortModifier; let i = index">
+  <ng-container
+    *ngFor="
+      let group of accountGroups | keyvalue : keyValueSort;
+      let i = index
+    "
+  >
     <div *ngIf="group.value.accounts.length" class="margin-bottom--large">
       <ul
         class="section--accounts__list container--scrollbar margin-bottom--small"
@@ -24,7 +29,11 @@
                   [appAvatar]="account.publicKey"
                 />
                 {{ getAccountDisplayName(account) | truncateAddressOrUsername }}
-                <span *ngIf="i === 0 && j === 0" class="font-size--xsmall text--green-lighter margin-left--small">Last used</span>
+                <span
+                  *ngIf="i === 0 && j === 0"
+                  class="font-size--xsmall text--green-lighter margin-left--small"
+                  >Last used</span
+                >
               </div>
               <div class="display--flex items--center">
                 <div class="display--flex flex--column items--end">

@@ -1,11 +1,22 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { take } from 'rxjs/operators';
-import { LoginMethod } from 'src/types/identity';
+import { LoginMethod, SubAccountMetadata, UserProfile } from 'src/types/identity';
 import { SwalHelper } from '../../lib/helpers/swal-helper';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { isValid32BitUnsignedInt } from './account-number';
+
+type AccountViewModel = SubAccountMetadata & UserProfile & { publicKey: string };
+
+function sortAccounts(a: AccountViewModel, b: AccountViewModel) {
+  // sort accounts by last login timestamp DESC,
+  // secondarily by balance DESC
+  return (
+    (b.lastLoginTimestamp ?? 0) - (a.lastLoginTimestamp ?? 0) ||
+    b.balanceNanos - a.balanceNanos
+  );
+}
 
 @Component({
   selector: 'grouped-account-select',
@@ -23,14 +34,7 @@ export class GroupedAccountSelectComponent implements OnInit {
     string,
     {
       showRecoverSubAccountInput?: boolean;
-      accounts: {
-        publicKey: string;
-        accountNumber: number;
-        balanceNanos: number;
-        username?: string;
-        profilePic?: string;
-        lastLoginTimestamp?: number;
-      }[];
+      accounts: AccountViewModel[];
     }
   > = new Map();
 
@@ -50,13 +54,15 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   initializeAccountGroups() {
-    const storedUsers = Object.entries(this.accountService.getRootLevelUsers()).sort(([kA, vA], [kb, vB]) => {
-      // sort groups by last login timestamp DESC
+    const storedUsers = Object.entries(
+      this.accountService.getRootLevelUsers()
+    ).sort(([kA, vA], [kb, vB]) => {
+      // sort groups by last login timestamp DESC. We don't have balance info yet.
       return (vB.lastLoginTimestamp ?? 0) - (vA.lastLoginTimestamp ?? 0);
     });
     const accountGroupsByRootKey = new Map<
       string,
-      { publicKey: string; accountNumber: number, lastLoginTimestamp: number }[]
+      { publicKey: string; accountNumber: number; lastLoginTimestamp: number }[]
     >();
 
     for (const [rootPublicKey, userInfo] of storedUsers) {
@@ -77,11 +83,10 @@ export class GroupedAccountSelectComponent implements OnInit {
           continue;
         }
 
-        const publicKeyBase58 =
-          this.accountService.getAccountPublicKeyBase58(
-            rootPublicKey,
-            subAccount.accountNumber
-          );
+        const publicKeyBase58 = this.accountService.getAccountPublicKeyBase58(
+          rootPublicKey,
+          subAccount.accountNumber
+        );
 
         accounts.push({
           publicKey: publicKeyBase58,
@@ -106,20 +111,12 @@ export class GroupedAccountSelectComponent implements OnInit {
           ([key, accounts], i) => {
             this.accountGroups.set(key, {
               showRecoverSubAccountInput: false,
-              accounts: accounts.map((account, j) => ({
-                ...account,
-                ...users[account.publicKey],
-              })).sort((a, b) => {
-                // sort sub accounts by last login timestamp DESC,
-                // secondarily by balance DESC
-                let diff = b.lastLoginTimestamp - a.lastLoginTimestamp;
-
-                if (diff === 0) {
-                  diff = b.balanceNanos - a.balanceNanos;
-                }
-
-                return diff;
-              }),
+              accounts: accounts
+                .map((account, j) => ({
+                  ...account,
+                  ...users[account.publicKey],
+                }))
+                .sort(sortAccounts),
             });
           }
         );
@@ -127,12 +124,12 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   /**
-   * We need this to address angular's weird default sorting of Maps when
+   * We need this to address angular's weird default sorting of Maps by key when
    * iterating in the template. See this issue for details. We just want to
-   * preserve the natural order of the Map:
+   * preserve the natural order of the Map entries:
    * https://github.com/angular/angular/issues/31420
    */
-  mapSortModifier() {
+  keyValueSort() {
     return 1;
   }
 
@@ -203,6 +200,7 @@ export class GroupedAccountSelectComponent implements OnInit {
         if (!group.accounts.find((a) => a.accountNumber === accountNumber)) {
           // TODO: should we sort here?
           group.accounts.push(account);
+          group.accounts.sort(sortAccounts);
         }
 
         this.accountGroups.set(rootPublicKey, group);
@@ -232,10 +230,12 @@ export class GroupedAccountSelectComponent implements OnInit {
       return;
     }
 
-    this.addSubAccount(rootPublicKey, { accountNumber: this.accountNumberToRecover });
+    this.addSubAccount(rootPublicKey, {
+      accountNumber: this.accountNumberToRecover,
+    });
   }
 
-  getAccountDisplayName(account: { username?: string, publicKey: string }) {
+  getAccountDisplayName(account: { username?: string; publicKey: string }) {
     return account.username ?? account.publicKey;
   }
 }
