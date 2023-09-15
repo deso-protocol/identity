@@ -46,7 +46,7 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   initializeAccountGroups() {
-    const storedUsers = Object.entries(this.accountService.getPrivateUsers());
+    const storedUsers = Object.entries(this.accountService.getStoredUsers());
     const accountGroupsByRootKey = new Map<
       string,
       { publicKey: string; accountNumber: number }[]
@@ -62,7 +62,7 @@ export class GroupedAccountSelectComponent implements OnInit {
           ]
         : [];
 
-      const subAccounts = this.accountService.getSubAccounts(rootPublicKey);
+      const subAccounts = userInfo?.subAccounts ?? [];
 
       for (const subAccount of subAccounts) {
         if (subAccount.isHidden) {

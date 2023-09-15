@@ -62,19 +62,19 @@ export class AccountService {
     private signingService: SigningService,
     private metamaskService: MetamaskService
   ) {
-    this.cleanupSubAccountReverseLookup();
+    this.initializeSubAccountReverseLookup();
   }
 
   // Public Getters
 
   getPublicKeys(): any {
-    return Object.keys(this.getPrivateUsers());
+    return Object.keys(this.getStoredUsers());
   }
 
   getStoredUserInfo(
     publicKey: string
   ): (PrivateUserInfo & SubAccountMetadata) | null {
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getStoredUsers();
 
     if (publicKey in privateUsers) {
       return {
@@ -137,7 +137,7 @@ export class AccountService {
 
   getEncryptedUsers(): { [key: string]: PublicUserInfo } {
     const hostname = this.globalVars.hostname;
-    const privateUsers = this.getPrivateUsers();
+    const privateUsers = this.getStoredUsers();
     const publicUsers: { [key: string]: PublicUserInfo } = {};
 
     for (const publicKey of Object.keys(privateUsers)) {
@@ -373,7 +373,7 @@ export class AccountService {
       accessSignature = this.signingService.signHashes(
         privateUser.seedHex,
         [accessHash],
-        privateUser.accountNumber ?? 0
+        privateUser.accountNumber
       )[0];
     }
     const {
@@ -406,7 +406,7 @@ export class AccountService {
   }
 
   getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): any {
-    const privateUser = this.getPrivateUsers()[publicKey];
+    const privateUser = this.getStoredUsers()[publicKey];
     const network = privateUser.network;
     // create jwt with private key and app public key
     const keyEncoder = new KeyEncoder('secp256k1');
@@ -1192,11 +1192,11 @@ export class AccountService {
   getLoginMethodWithPublicKeyBase58Check(
     publicKeyBase58Check: string
   ): LoginMethod {
-    const account = this.getPrivateUsers()[publicKeyBase58Check];
+    const account = this.getStoredUsers()[publicKeyBase58Check];
     return account.loginMethod || LoginMethod.DESO;
   }
 
-  getPrivateUsers(): { [key: string]: PrivateUserInfo } {
+  getStoredUsers(): { [key: string]: PrivateUserInfo } {
     const privateUsers = this.getPrivateUsersRaw();
     const filteredPrivateUsers: { [key: string]: PrivateUserInfo } = {};
 
@@ -1268,6 +1268,14 @@ export class AccountService {
     this.setPrivateUsersRaw(privateUsers);
   }
 
+  /**
+   * Adds a new sub account entry to the root user's subAccounts array.  If the
+   * account number is provided, we will use it. Otherwise we will generate a
+   * new account number that is not already in use. If the account number
+   * provided matches an existing account, we will just make sure it appears in
+   * the UI again if it had been hidden before. If it matches and the account is
+   * NOT hidden, then nothing happens.
+   */
   addSubAccount(
     rootPublicKey: string,
     options: { accountNumber?: number } = {}
@@ -1291,14 +1299,13 @@ export class AccountService {
 
     const subAccounts = parentAccount.subAccounts ?? [];
     const foundAccountIndex =
-      typeof options.accountNumber === 'number' &&
-      subAccounts.findIndex((a) => a.accountNumber === options.accountNumber);
+      typeof options.accountNumber === 'number' ?
+      subAccounts.findIndex((a) => a.accountNumber === options.accountNumber) : -1
     const accountNumbers = new Set(subAccounts.map((a) => a.accountNumber));
-
     const accountNumber =
       options.accountNumber ?? generateAccountNumber(accountNumbers);
 
-    if (typeof foundAccountIndex === 'number' && foundAccountIndex > 0) {
+    if (foundAccountIndex > 0) {
       // If accountNumber is provided and we already have it, we just make sure
       // the existing account is not hidden.
       subAccounts[foundAccountIndex].isHidden = false;
@@ -1332,19 +1339,12 @@ export class AccountService {
     return accountNumber;
   }
 
-  getSubAccounts(rootPublicKey: string) {
-    const privateUsers = this.getPrivateUsersRaw();
-    const parentAccount = privateUsers[rootPublicKey];
-
-    return parentAccount.subAccounts ?? [];
-  }
-
   getAccountPublicKeyBase58Enc(
     rootPublicKeyBase58Enc: string,
     accountNumber: number = 0
   ) {
     // Account number 0 is reserved for the parent account, so we can just
-    // return he parent key directly in this case.
+    // return the parent key directly in this case.
     if (accountNumber === 0) {
       return rootPublicKeyBase58Enc;
     }
@@ -1388,7 +1388,7 @@ export class AccountService {
    * development or testing. This method will fix any discrepancies by iterating
    * through all the accounts and adding any missing entries.
    */
-  private cleanupSubAccountReverseLookup() {
+  private initializeSubAccountReverseLookup() {
     const lookupMap = this.getSubAccountReverseLookupMap();
     const allUsers = this.getPrivateUsersRaw();
 
