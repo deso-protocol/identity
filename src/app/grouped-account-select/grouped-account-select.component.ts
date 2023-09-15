@@ -127,7 +127,7 @@ export class GroupedAccountSelectComponent implements OnInit {
     this.onAccountSelect.emit(publicKey);
   }
 
-  removeAccount(publicKey: string) {
+  hideAccount(groupKey: string, publicKey: string, accountNumber: number) {
     SwalHelper.fire({
       title: 'Remove Account?',
       // TODO: revisit this copy and make sure it makes sense for both the main account and sub accounts
@@ -136,22 +136,13 @@ export class GroupedAccountSelectComponent implements OnInit {
     }).then(({ isConfirmed }) => {
       if (isConfirmed) {
         this.accountService.updateAccountInfo(publicKey, { isHidden: true });
-        const rootKeyLookupMap =
-          this.accountService.getSubAccountReverseLookupMap();
-        const mapping = rootKeyLookupMap[publicKey];
-        const rootPublicKey = mapping?.lookupKey;
-
-        if (!rootPublicKey) {
-          throw new Error(`Failed to find root public key for ${publicKey}`);
-        }
-
-        const group = this.accountGroups.get(rootPublicKey) ?? {
+        const group = this.accountGroups.get(groupKey) ?? {
           accounts: [],
         };
         group.accounts = group.accounts.filter(
-          (a) => a.accountNumber !== mapping.accountNumber
+          (a) => a.accountNumber !== accountNumber
         );
-        this.accountGroups.set(rootPublicKey, group);
+        this.accountGroups.set(groupKey, group);
       }
     });
   }

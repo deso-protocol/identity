@@ -32,8 +32,8 @@ export function generateAccountNumber(accountNumbers: Set<number>): number {
   }
 
   // At most we look back 500 numbers. This is a bit arbitrary...  but the
-  // number of values could *technically* be 2^32 - 1, so we just arbitrarily
-  // limit the number of iterations to some reasonable value.
+  // number of values could *technically* be 2^32 - 1, so we just limit the
+  // number of iterations to some reasonable value.
   const maxLookBack = Math.max(sorted.length - 1001, 0);
   for (let i = sorted.length - 1; i >= maxLookBack; i--) {
     const expectedValueInSequence = i + 1;
