@@ -25,11 +25,10 @@ export class SigningService {
     { expiration = 60 * 10 }: { expiration?: string | number } = {}
   ): string {
     const keyEncoder = new KeyEncoder('secp256k1');
-    // TODO: figure out how to get this encoded private key
-    // I think we'll need signJWT to take in the owner/main public key...
-    const keychain = this.cryptoService.seedHexToPrivateKey(seedHex, accountNumber);
-    // TODO: make sure this works.... no idea.
-    const encodedPrivateKey = keyEncoder.encodePrivate(keychain.getPrivate('hex'), 'raw', 'pem');
+    // TODO: make sure the account number stuff works here...
+    const acctNumber = isDerived ? 0 : accountNumber;
+    const keys = this.cryptoService.seedHexToPrivateKey(seedHex, acctNumber);
+    const encodedPrivateKey = keyEncoder.encodePrivate(keys.getPrivate('hex'), 'raw', 'pem');
     if (isDerived) {
       const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(seedHex, accountNumber);
       const derivedPublicKeyBase58Check =

@@ -73,19 +73,20 @@ export class AccountService {
 
   getStoredUserInfo(
     publicKey: string
-  ): (PrivateUserInfo & SubAccountMetadata) | null {
+  ): PrivateUserInfo & SubAccountMetadata {
     const privateUsers = this.getStoredUsers();
+    let info = null;
 
     if (publicKey in privateUsers) {
-      return {
+      info = {
         ...privateUsers[publicKey],
-        // If the user is in the private users map, their keys were generated
+        // If the user is in the top level users map, their keys were generated
         // with account number 0. This is the "root/parent" account.
         accountNumber: 0,
       };
     }
 
-    // If the user is not found, it *could* be a sub account public key.
+    // If the user is not found at the top level, it should be a sub account public key.
     const lookup = this.getSubAccountReverseLookupMap();
     const mapping = lookup[publicKey];
 
@@ -96,15 +97,19 @@ export class AccountService {
         (a) => a.accountNumber === mapping.accountNumber
       );
 
-      return foundAccount
-        ? {
-            ...rootUser,
-            ...foundAccount,
-          }
-        : null;
+      if (foundAccount) {
+        info = {
+          ...rootUser,
+          ...foundAccount,
+        };
+      }
     }
 
-    return null;
+    if (info === null) {
+      throw new Error(`No user found for public key ${publicKey}`);
+    }
+
+    return info;
   }
 
   getSubAccountReverseLookupMap(): {
