@@ -3,7 +3,7 @@
     Select an account
   </div>
 
-  <ng-container *ngFor="let group of accountGroups | keyvalue">
+  <ng-container *ngFor="let group of accountGroups | keyvalue: mapSortModifier">
     <div *ngIf="group.value.accounts.length" class="margin-bottom--large">
       <ul
         class="section--accounts__list container--scrollbar margin-bottom--small"

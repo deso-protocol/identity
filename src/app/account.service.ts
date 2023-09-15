@@ -126,7 +126,7 @@ export class AccountService {
     accountNumber,
   }: SubAccountReversLookupEntry) {
     const keyMap = this.getSubAccountReverseLookupMap();
-    const subAccountPublicKey = this.getAccountPublicKeyBase58Enc(
+    const subAccountPublicKey = this.getAccountPublicKeyBase58(
       lookupKey,
       accountNumber
     );
@@ -1219,6 +1219,7 @@ export class AccountService {
     // account, but for historical reasons its public key is used to index the
     // main users map in local storage.
     if (options.accountNumber === 0) {
+      this.updateAccountInfo(rootPublicKey, { isHidden: false });
       return 0;
     }
 
@@ -1267,31 +1268,27 @@ export class AccountService {
     return accountNumber;
   }
 
-  getAccountPublicKeyBase58Enc(
-    rootPublicKeyBase58Enc: string,
+  getAccountPublicKeyBase58(
+    rootPublicKeyBase58: string,
     accountNumber: number = 0
   ) {
     // Account number 0 is reserved for the parent account, so we can just
     // return the parent key directly in this case.
     if (accountNumber === 0) {
-      return rootPublicKeyBase58Enc;
+      return rootPublicKeyBase58;
     }
 
-    const privateUsers = this.getPrivateUsersRaw();
-    const parentAccount = privateUsers[rootPublicKeyBase58Enc];
+    const users = this.getRootLevelUsers();
+    const parentAccount = users[rootPublicKeyBase58];
     const parentSeedHex = parentAccount.seedHex;
     const childKey = this.cryptoService.getSubAccountKeys(
       parentSeedHex,
       accountNumber
     );
-    const prefix =
-      CryptoService.PUBLIC_KEY_PREFIXES[parentAccount.network].deso;
     const ec = new EC('secp256k1');
-    const derivedKeyPair = ec.keyFromPrivate(childKey.privateKey);
-    const desoKey = derivedKeyPair.getPublic().encode('array', true);
-    const prefixAndKey = Uint8Array.from([...prefix, ...desoKey]);
+    const keyPair = ec.keyFromPrivate(childKey.privateKey);
 
-    return bs58check.encode(prefixAndKey);
+   return this.cryptoService.publicKeyToDeSoPublicKey(keyPair, parentAccount.network);
   }
 
   // Private Getters and Modifiers
@@ -1323,7 +1320,7 @@ export class AccountService {
     Object.keys(allUsers).forEach((lookupKey) => {
       const subAccounts = allUsers[lookupKey].subAccounts ?? [];
       subAccounts.forEach((subAccount) => {
-        const publicKey = this.getAccountPublicKeyBase58Enc(
+        const publicKey = this.getAccountPublicKeyBase58(
           lookupKey,
           subAccount.accountNumber
         );

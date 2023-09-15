@@ -17,7 +17,6 @@ export class AvatarDirective implements OnChanges {
   }
 
   setAvatar(): void {
-    console.log('setAvatar', this.appAvatar);
     if (!this.appAvatar) {
       return;
     }

@@ -29,6 +29,7 @@ export class GroupedAccountSelectComponent implements OnInit {
         balanceNanos: number;
         username?: string;
         profilePic?: string;
+        lastLoginTimestamp?: number;
       }[];
     }
   > = new Map();
@@ -49,10 +50,13 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   initializeAccountGroups() {
-    const storedUsers = Object.entries(this.accountService.getRootLevelUsers());
+    const storedUsers = Object.entries(this.accountService.getRootLevelUsers()).sort(([kA, vA], [kb, vB]) => {
+      // sort groups by last login timestamp DESC
+      return (vB.lastLoginTimestamp ?? 0) - (vA.lastLoginTimestamp ?? 0);
+    });
     const accountGroupsByRootKey = new Map<
       string,
-      { publicKey: string; accountNumber: number }[]
+      { publicKey: string; accountNumber: number, lastLoginTimestamp: number }[]
     >();
 
     for (const [rootPublicKey, userInfo] of storedUsers) {
@@ -61,6 +65,7 @@ export class GroupedAccountSelectComponent implements OnInit {
             {
               publicKey: rootPublicKey,
               accountNumber: 0,
+              lastLoginTimestamp: userInfo.lastLoginTimestamp ?? 0,
             },
           ]
         : [];
@@ -73,7 +78,7 @@ export class GroupedAccountSelectComponent implements OnInit {
         }
 
         const publicKeyBase58 =
-          this.accountService.getAccountPublicKeyBase58Enc(
+          this.accountService.getAccountPublicKeyBase58(
             rootPublicKey,
             subAccount.accountNumber
           );
@@ -81,6 +86,7 @@ export class GroupedAccountSelectComponent implements OnInit {
         accounts.push({
           publicKey: publicKeyBase58,
           accountNumber: subAccount.accountNumber,
+          lastLoginTimestamp: subAccount.lastLoginTimestamp ?? 0,
         });
       }
 
@@ -96,8 +102,6 @@ export class GroupedAccountSelectComponent implements OnInit {
       .GetUserProfiles(profileKeysToFetch)
       .pipe(take(1))
       .subscribe((users) => {
-        // TODO: revisit sorting. we want to sort by last login timestamp DESC, at both the
-        // group level and the sub group levels.
         Array.from(accountGroupsByRootKey.entries()).forEach(
           ([key, accounts]) => {
             this.accountGroups.set(key, {
@@ -105,11 +109,31 @@ export class GroupedAccountSelectComponent implements OnInit {
               accounts: accounts.map((account) => ({
                 ...account,
                 ...users[account.publicKey],
-              })),
+              })).sort((a, b) => {
+                // sort sub accounts by last login timestamp DESC,
+                // secondarily by balance DESC
+                let diff = b.lastLoginTimestamp - a.lastLoginTimestamp;
+
+                if (diff === 0) {
+                  diff = b.balanceNanos - a.balanceNanos;
+                }
+
+                return diff;
+              }),
             });
           }
         );
       });
+  }
+
+  /**
+   * We need this to address angular's weird default sorting of Maps when
+   * iterating in the template. See this issue for details. We just want to
+   * preserve the natural order of the Map:
+   * https://github.com/angular/angular/issues/31420
+   */
+  mapSortModifier() {
+    return 1;
   }
 
   getLoginMethodIcon(loginMethod: LoginMethod = LoginMethod.DESO): string {
@@ -151,12 +175,11 @@ export class GroupedAccountSelectComponent implements OnInit {
     rootPublicKey: string,
     { accountNumber }: { accountNumber?: number } = {}
   ) {
-    debugger;
     const addedAccountNumber = this.accountService.addSubAccount(
       rootPublicKey,
       { accountNumber }
     );
-    const publicKeyBase58 = this.accountService.getAccountPublicKeyBase58Enc(
+    const publicKeyBase58 = this.accountService.getAccountPublicKeyBase58(
       rootPublicKey,
       addedAccountNumber
     );
