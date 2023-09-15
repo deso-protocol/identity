@@ -19,31 +19,36 @@
               (click)="selectAccount(account.publicKey)"
               role="button"
             >
-              <div *ngIf="!account.username" [title]="account.publicKey">
-                <img
-                  class="avatar--rounded avatar--large margin-right--xsmall"
-                  src="assets/placeholder-account-image.png"
-                />
-                {{ account.publicKey | truncateAddressOrUsername }}
-              </div>
-              <div *ngIf="account.username" [title]="account.username">
+              <div [title]="getAccountDisplayName(account)">
                 <img
                   class="avatar--rounded avatar--large margin-right--xsmall"
                   [appAvatar]="account.publicKey"
                 />
-                {{ account.username | truncateAddressOrUsername }}
+                {{ getAccountDisplayName(account) | truncateAddressOrUsername }}
               </div>
-              <img
-                *ngIf="account.publicKey === group.key"
-                [src]="
-                  getLoginMethodIcon(
-                    accountService.getLoginMethodWithPublicKeyBase58Check(
-                      account.publicKey
+              <div class="display--flex items--center">
+                <div class="display--flex flex--column items--end">
+                  <span class="font-weight--bold font-size--xsmall margin-right--small"
+                    >{{
+                      globalVars.nanosToDeSo(account.balanceNanos)
+                    }}
+                    $DESO</span
+                  >
+                  <span class="font-size--xsmall margin-right--small"
+                    >Account: {{ account.accountNumber }}</span
+                  >
+                </div>
+                <img
+                  [src]="
+                    getLoginMethodIcon(
+                      accountService.getLoginMethodWithPublicKeyBase58Check(
+                        group.key
+                      )
                     )
-                  )
-                "
-                class="section--accounts__icon"
-              />
+                  "
+                  class="section--accounts__icon"
+                />
+              </div>
             </button>
             <button
               class="styleless-button"
@@ -52,18 +57,28 @@
               <i-feather name="power" class="text--blue-base"></i-feather>
             </button>
           </div>
-          <div class="font-size--xsmall margin-left--medium">
-            acct# {{ account.accountNumber }}
-          </div>
         </li>
       </ul>
       <div>
         <button (click)="addSubAccount(group.key)">Add account</button>
         <button>Export Seed</button>
-        <button (click)="toggleRecoverSubAccountForm(group.key)">Recover account</button>
-        <form *ngIf="group.value.showRecoverSubAccountInput" (submit)="recoverSubAccount($event, group.key)">
-          <label for="account-number" class="display--block font-size--small">Account number:</label>
-          <input [(ngModel)]="accountNumberToRecover" name="account-number" id="account-number" type="number" step="1"/>
+        <button (click)="toggleRecoverSubAccountForm(group.key)">
+          Recover account
+        </button>
+        <form
+          *ngIf="group.value.showRecoverSubAccountInput"
+          (submit)="recoverSubAccount($event, group.key)"
+        >
+          <label for="account-number" class="display--block font-size--small"
+            >Account:</label
+          >
+          <input
+            [(ngModel)]="accountNumberToRecover"
+            name="account-number"
+            id="account-number"
+            type="number"
+            step="1"
+          />
           <button type="submit">Submit</button>
         </form>
       </div>

@@ -291,22 +291,22 @@ export class BackendAPIService {
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
-    const userInfo = this.accountService.getAccountInfo(publicKey);
+    const account = this.accountService.getAccountInfo(publicKey);
     // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
     // this is happening.
     logInteractionEvent('backend-api', 'jwt-post', {
-      hasPublicUserInfo: !!userInfo,
+      hasPublicUserInfo: !!account,
     });
 
-    if (!userInfo) {
+    if (!account) {
       return of(null);
     }
-    const isDerived = this.accountService.isMetamaskAccount(userInfo);
+    const isDerived = this.accountService.isMetamaskAccount(account);
 
     const jwt = this.signingService.signJWT(
-      userInfo.seedHex,
-      userInfo.accountNumber,
+      account.seedHex,
+      account.accountNumber,
       isDerived
     );
     return this.post(path, { ...body, ...{ JWT: jwt } });
@@ -386,8 +386,8 @@ export class BackendAPIService {
     )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
   }
 
-  GetDefaultProfilePictureURL(defaultImgHost: string): string {
-    return defaultImgHost + '/assets/img/default_profile_pic.png';
+  GetDefaultProfilePictureURL(): string {
+    return window.location.origin + '/assets/placeholder-account-image.png';
   }
 
   JumioBegin(

@@ -23,7 +23,7 @@ import {
   PrivateUserInfo,
   PrivateUserVersion,
   PublicUserInfo,
-  SubAccountMetadata,
+  SubAccountMetadata
 } from '../types/identity';
 import {
   BackendAPIService,

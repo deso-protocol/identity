@@ -4,6 +4,7 @@ import { LoginMethod } from 'src/types/identity';
 import { SwalHelper } from '../../lib/helpers/swal-helper';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
+import { GlobalVarsService } from '../global-vars.service';
 import { isValid32BitUnsignedInt } from './account-number';
 
 @Component({
@@ -25,6 +26,7 @@ export class GroupedAccountSelectComponent implements OnInit {
       accounts: {
         publicKey: string;
         accountNumber: number;
+        balanceNanos: number;
         username?: string;
         profilePic?: string;
       }[];
@@ -38,6 +40,7 @@ export class GroupedAccountSelectComponent implements OnInit {
 
   constructor(
     public accountService: AccountService,
+    public globalVars: GlobalVarsService,
     private backendApi: BackendAPIService
   ) {}
 
@@ -209,5 +212,9 @@ export class GroupedAccountSelectComponent implements OnInit {
     }
 
     this.addSubAccount(rootPublicKey, { accountNumber: parseInt(this.accountNumberToRecover, 10) });
+  }
+
+  getAccountDisplayName(account: { username?: string, publicKey: string }) {
+    return account.username ?? account.publicKey;
   }
 }
