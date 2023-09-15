@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import * as sweetalert2 from 'sweetalert2';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
-import * as _ from 'lodash';
 
 type Awaited<T> = T extends Promise<infer U> ? U : T;
 
@@ -84,7 +84,7 @@ export class SwalHelper {
         }
       }
     }
-
+    console.log('swal options', escapedOptions);
     return Swal.fire(escapedOptions);
   }
 }

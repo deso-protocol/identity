@@ -1,13 +1,19 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { escape } from 'lodash';
 import { take } from 'rxjs/operators';
-import { LoginMethod, SubAccountMetadata, UserProfile } from 'src/types/identity';
-import { SwalHelper } from '../../lib/helpers/swal-helper';
+import {
+  LoginMethod,
+  SubAccountMetadata,
+  UserProfile,
+} from 'src/types/identity';
+import Swal from 'sweetalert2';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { isValid32BitUnsignedInt } from './account-number';
 
-type AccountViewModel = SubAccountMetadata & UserProfile & { publicKey: string };
+type AccountViewModel = SubAccountMetadata &
+  UserProfile & { publicKey: string };
 
 function sortAccounts(a: AccountViewModel, b: AccountViewModel) {
   // sort accounts by last login timestamp DESC,
@@ -56,10 +62,15 @@ export class GroupedAccountSelectComponent implements OnInit {
   initializeAccountGroups() {
     const storedUsers = Object.entries(
       this.accountService.getRootLevelUsers()
-    ).sort(([kA, vA], [kb, vB]) => {
-      // sort groups by last login timestamp DESC. We don't have balance info yet.
-      return (vB.lastLoginTimestamp ?? 0) - (vA.lastLoginTimestamp ?? 0);
-    });
+    ).sort(
+      (
+        [kA, { lastLoginTimestamp: timestampA = 0 }],
+        [kb, { lastLoginTimestamp: timestampB = 0 }]
+      ) => {
+        // sort groups by last login timestamp DESC. We don't have balance info here.
+        return timestampB - timestampA;
+      }
+    );
     const accountGroupsByRootKey = new Map<
       string,
       { publicKey: string; accountNumber: number; lastLoginTimestamp: number }[]
@@ -148,21 +159,62 @@ export class GroupedAccountSelectComponent implements OnInit {
     this.onAccountSelect.emit(publicKey);
   }
 
-  hideAccount(groupKey: string, publicKey: string, accountNumber: number) {
-    SwalHelper.fire({
+  hideAccount(groupKey: string, account: AccountViewModel) {
+    // NOTE: if there is at least 1 sub account left in the group after hiding this account,
+    // the user only needs the account number to recover it. If there are no sub accounts left,
+    // the user needs the seed phrase + the account number to recover it.
+    const group = this.accountGroups.get(groupKey) ?? {
+      accounts: [],
+    };
+    // get a copy of the underlying array so we can preview what it looks like when hiding this account
+    const hiddenPreview = group.accounts.slice().filter(
+      (a) => a.accountNumber !== account.accountNumber
+    );
+    const hasAccountsAfterHiding = hiddenPreview.length > 0;
+    const { displayName, displayAccountNumber } = {
+      displayName: escape(this.getAccountDisplayName(account)),
+      displayAccountNumber: escape(account.accountNumber.toString()),
+    }
+    Swal.fire({
       title: 'Remove Account?',
-      // TODO: revisit this copy and make sure it makes sense for both the main account and sub accounts
-      text: 'Do you really want to remove this account? Your account will be irrecoverable if you lose your seed phrase or login credentials.',
+      html: hasAccountsAfterHiding ? `
+        <div>
+          <p class="font-size--small font-weight--bold margin-bottom--small">
+            ${displayName}
+          </p>
+          <p class="margin-bottom--small">You can recover this account as long as you have the account number.</p>
+          <p>
+            <button
+              onclick="navigator.clipboard.writeText(${displayAccountNumber}).then(() => alert('copied ${displayAccountNumber} to clipboard!'));"
+            >
+              ${displayAccountNumber}
+              <img
+                src="assets/copy.svg"
+                width="16px"
+                height="16px"
+                class="margin-left--small"
+              />
+            </button>
+          </p>
+        </div>
+      ` : `
+        <div>
+          <p class="font-size--small font-weight--bold margin-bottom--small">
+            ${displayName}
+          </p>
+          <p class="margin-bottom--small font-size--large font-weight--bold">
+            Your account will be irrecoverable if you lose your seed phrase.
+          </p>
+          <p class="margin-bottom--small">Make sure you have backed up your seed phrase before continuing!</p>
+        </div>
+      `,
       showCancelButton: true,
     }).then(({ isConfirmed }) => {
       if (isConfirmed) {
-        this.accountService.updateAccountInfo(publicKey, { isHidden: true });
-        const group = this.accountGroups.get(groupKey) ?? {
-          accounts: [],
-        };
-        group.accounts = group.accounts.filter(
-          (a) => a.accountNumber !== accountNumber
-        );
+        this.accountService.updateAccountInfo(account.publicKey, {
+          isHidden: true,
+        });
+        group.accounts = hiddenPreview;
         this.accountGroups.set(groupKey, group);
       }
     });
@@ -223,7 +275,9 @@ export class GroupedAccountSelectComponent implements OnInit {
     event.preventDefault();
 
     if (!isValid32BitUnsignedInt(this.accountNumberToRecover)) {
-      SwalHelper.fire({
+      // TODO: revisit this... make sure it looks right.
+      Swal.fire({
+        iconHtml: 'warning',
         title: 'Invalid Account Number',
         html: `Please enter a valid account number.`,
       });
