@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { escape } from 'lodash';
 import { take } from 'rxjs/operators';
 import {
@@ -11,9 +12,10 @@ import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { isValid32BitUnsignedInt } from './account-number';
+import { ExportSeedDialogComponent } from './export-seed-dialog/export-seed-dialog.component';
 
 type AccountViewModel = SubAccountMetadata &
-  UserProfile & { publicKey: string };
+  UserProfile & { publicKey: string } & { lastUsed?: boolean };
 
 function sortAccounts(a: AccountViewModel, b: AccountViewModel) {
   // sort accounts by last login timestamp DESC,
@@ -52,7 +54,8 @@ export class GroupedAccountSelectComponent implements OnInit {
   constructor(
     public accountService: AccountService,
     public globalVars: GlobalVarsService,
-    private backendApi: BackendAPIService
+    private backendApi: BackendAPIService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -119,7 +122,7 @@ export class GroupedAccountSelectComponent implements OnInit {
       .pipe(take(1))
       .subscribe((users) => {
         Array.from(accountGroupsByRootKey.entries()).forEach(
-          ([key, accounts], i) => {
+          ([key, accounts]) => {
             this.accountGroups.set(key, {
               showRecoverSubAccountInput: false,
               accounts: accounts
@@ -129,6 +132,14 @@ export class GroupedAccountSelectComponent implements OnInit {
                 }))
                 .sort(sortAccounts),
             });
+
+            // get the first account in the list and set it as the lastUsed.
+            const firstKey = this.accountGroups.keys().next().value;
+            const firstGroup = this.accountGroups.get(firstKey);
+            if (firstGroup) {
+              firstGroup.accounts[0].lastUsed = true;
+              this.accountGroups.set(firstKey, firstGroup);
+            }
           }
         );
       });
@@ -250,9 +261,9 @@ export class GroupedAccountSelectComponent implements OnInit {
 
         // if the account is already in the list, don't add it again...
         if (!group.accounts.find((a) => a.accountNumber === accountNumber)) {
-          // TODO: should we sort here?
-          group.accounts.push(account);
-          group.accounts.sort(sortAccounts);
+          // Insert recovered/added account at the top of the list so
+          // easy to see that it was added.
+          group.accounts.unshift(account);
         }
 
         this.accountGroups.set(rootPublicKey, group);
@@ -291,5 +302,20 @@ export class GroupedAccountSelectComponent implements OnInit {
 
   getAccountDisplayName(account: { username?: string; publicKey: string }) {
     return account.username ?? account.publicKey;
+  }
+
+  shouldShowExportSeedButton(rootPublicKey: string) {
+    const rootAccount = this.accountService.getAccountInfo(rootPublicKey);
+    return !rootAccount.exportDisabled;
+  }
+
+  exportSeed(rootPublicKey: string) {
+    const dialogRef = this.dialog.open(ExportSeedDialogComponent, {
+      data: { rootPublicKey },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 }

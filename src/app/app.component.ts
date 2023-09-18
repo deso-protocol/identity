@@ -66,6 +66,11 @@ export class AppComponent implements OnInit {
       this.globalVars.getFreeDeso = true;
     }
 
+    const authenticatedUsers = new Set(params.get('authenticatedUsers')?.split(',') ?? []);
+    if (authenticatedUsers.size > 0) {
+      this.globalVars.authenticatedUsers = authenticatedUsers;
+    }
+
     // Callback should only be used in mobile applications, where payload is passed through URL parameters.
     const callback = params.get('callback') || stateParamsFromGoogle.callback;
     if (callback) {

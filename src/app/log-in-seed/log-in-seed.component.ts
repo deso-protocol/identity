@@ -92,7 +92,7 @@ export class LogInSeedComponent implements OnInit {
       // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
       if (keychain.publicKey !== keychainNonStandard.publicKey) {
         const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
-        const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex, 0);
+        const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, 0);
         const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
           privateKey,
           network

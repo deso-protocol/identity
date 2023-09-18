@@ -28,6 +28,8 @@ export interface PrivateUserInfo extends AccountMetadata {
    */
   subAccounts?: SubAccountMetadata[];
 
+  exportDisabled?: boolean;
+
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;
 }

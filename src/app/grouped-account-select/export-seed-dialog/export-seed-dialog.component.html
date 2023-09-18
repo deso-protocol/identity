@@ -1,0 +1,30 @@
+<div *ngIf="!this.secrets">
+  <p class="margin-bottom--small">
+    Your seed phrase is the only way to recover your DeSo account. If you lose
+    your seed phrase, you will lose access to your DeSo account.
+  </p>
+  <p class="margin-bottom--small font-size--large">
+    <strong>DO NOT share your seed phrase with anyone!</strong>
+  </p>
+  <p class="margin-bottom--small">
+    <strong>DeSo support agents will ever request this.</strong>
+  </p>
+  <p class="margin-bottom--small">
+    Write down your seed phrase and store it in a safe place!
+  </p>
+  <button (click)="onContinue()">Continue</button>
+  <button (click)="onCancel()">Cancel</button>
+</div>
+
+<div *ngIf="this.secrets">
+  <p>{{ this.secrets.mnemonic }}</p>
+  <p>{{ this.secrets.extraText }}</p>
+  <p>{{ this.secrets.seedHex }}</p>
+  <button (click)="onDisableExport()">Disable seed phrase export</button>
+  <p>
+    Recommended: Disabling export makes your account more secure by preventing anyone from
+    revealing your seed phrase, even if they've gained access to your device.
+    Only disable export once you're sure that you've backed up your seed phrase
+    and stored it in a safe place.
+  </p>
+</div>

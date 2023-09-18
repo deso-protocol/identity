@@ -185,6 +185,19 @@ export class DeriveComponent implements OnInit {
           });
           return;
         }
+
+        // If this user has already approved a derived key for login, then we can just log them in
+        // without approval.
+        if (this.globalVars.authenticatedUsers.has(publicKey)) {
+          this.identityService.login({
+            users: this.accountService.getEncryptedUsers(),
+            publicKeyAdded: publicKey,
+          });
+
+          return;
+        }
+
+        // Otherwise, setting the public key will trigger the approval UI to show.
         this.publicKeyBase58Check = publicKey;
       });
   }

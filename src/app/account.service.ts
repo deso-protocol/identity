@@ -514,7 +514,7 @@ export class AccountService {
       // We've already stored the sub account in the root user's subAccounts array,
       // so we can just return it's public key directly here.
       const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-      const keyPair = this.cryptoService.seedHexToPrivateKey(
+      const keyPair = this.cryptoService.seedHexToKeyPair(
         seedHex,
         accountNumber
       );
@@ -522,7 +522,7 @@ export class AccountService {
     }
 
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex, 0);
+    const keyPair = this.cryptoService.seedHexToKeyPair(seedHex, 0);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(
       // @ts-ignore TODO: add "identifier" to type definition
       keychain.identifier,
@@ -549,7 +549,7 @@ export class AccountService {
   }
 
   addUserWithSeedHex(seedHex: string, network: Network): string {
-    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex, 0);
+    const keyPair = this.cryptoService.seedHexToKeyPair(seedHex, 0);
     const helperKeychain = new HDKey();
     helperKeychain.privateKey = Buffer.from(seedHex, 'hex');
     // @ts-ignore TODO: add "identifier" to type definition
@@ -641,7 +641,7 @@ export class AccountService {
       // Migrate from V0 -> V1
       if (privateUser.version === PrivateUserVersion.V0) {
         // Add ethDepositAddress field
-        const keyPair = this.cryptoService.seedHexToPrivateKey(
+        const keyPair = this.cryptoService.seedHexToKeyPair(
           privateUser.seedHex,
           0
         );
@@ -676,7 +676,7 @@ export class AccountService {
     publicKey: string
   ): string {
     const account = this.getAccountInfo(ownerPublicKeyBase58Check);
-    const privateKey = this.cryptoService.seedHexToPrivateKey(
+    const privateKey = this.cryptoService.seedHexToKeyPair(
       account.seedHex,
       account.accountNumber
     );
@@ -830,7 +830,7 @@ export class AccountService {
     const { accountNumber = 0 } = options.ownerPublicKeyBase58Check
       ? this.getAccountInfo(options.ownerPublicKeyBase58Check)
       : {};
-    const privateKey = this.cryptoService.seedHexToPrivateKey(
+    const privateKey = this.cryptoService.seedHexToKeyPair(
       seedHex,
       accountNumber
     );
@@ -870,7 +870,7 @@ export class AccountService {
     const { accountNumber = 0 } = options.ownerPublicKeyBase58Check
       ? this.getAccountInfo(options.ownerPublicKeyBase58Check)
       : {};
-    const privateKey = this.cryptoService.seedHexToPrivateKey(
+    const privateKey = this.cryptoService.seedHexToKeyPair(
       seedHex,
       accountNumber
     );
@@ -904,7 +904,7 @@ export class AccountService {
     const { accountNumber = 0 } = options.ownerPublicKeyBase58Check
       ? this.getAccountInfo(options.ownerPublicKeyBase58Check)
       : {};
-    const privateKey = this.cryptoService.seedHexToPrivateKey(
+    const privateKey = this.cryptoService.seedHexToKeyPair(
       seedHex,
       accountNumber
     );
@@ -1061,7 +1061,7 @@ export class AccountService {
 
   addPrivateUser(userInfo: PrivateUserInfo): string {
     const privateUsers = this.getPrivateUsersRaw();
-    const privateKey = this.cryptoService.seedHexToPrivateKey(
+    const privateKey = this.cryptoService.seedHexToKeyPair(
       userInfo.seedHex,
       0
     );
@@ -1263,7 +1263,7 @@ export class AccountService {
       });
     }
 
-    // validate that we don't have any duplicate account numbers, before we save.
+    // sanity check that we're not adding a duplicate account number before we save.
     const accountNumbersSet = new Set(newSubAccounts.map((a) => a.accountNumber));
     if (accountNumbersSet.size !== newSubAccounts.length) {
       throw new Error(
@@ -1289,7 +1289,7 @@ export class AccountService {
     const users = this.getRootLevelUsers();
     const parentAccount = users[rootPublicKeyBase58];
     const parentSeedHex = parentAccount.seedHex;
-    const childKey = this.cryptoService.getSubAccountKeys(
+    const childKey = this.cryptoService.getSubAccountKeychain(
       parentSeedHex,
       accountNumber
     );

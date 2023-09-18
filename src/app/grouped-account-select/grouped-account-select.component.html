@@ -4,10 +4,7 @@
   </div>
 
   <ng-container
-    *ngFor="
-      let group of accountGroups | keyvalue : keyValueSort;
-      let i = index
-    "
+    *ngFor="let group of accountGroups | keyvalue : keyValueSort; let i = index"
   >
     <div *ngIf="group.value.accounts.length" class="margin-bottom--large">
       <ul
@@ -23,20 +20,40 @@
               (click)="selectAccount(account.publicKey)"
               role="button"
             >
-              <div [title]="getAccountDisplayName(account)">
+              <div class="display--flex items--center">
                 <img
-                  class="avatar--rounded avatar--large margin-right--xsmall"
+                  class="avatar--rounded avatar--large margin-right--small"
                   [appAvatar]="account.publicKey"
                 />
-                {{ getAccountDisplayName(account) | truncateAddressOrUsername }}
-                <span
-                  *ngIf="i === 0 && j === 0"
-                  class="font-size--xsmall text--green-lighter margin-left--small"
-                  >Last used</span
-                >
+                <div>
+                  <div>
+                    <span [title]="getAccountDisplayName(account)">{{
+                      getAccountDisplayName(account) | truncateAddressOrUsername
+                    }}</span>
+                    <span
+                      *ngIf="account.lastUsed && !this.globalVars.isMobile()"
+                      class="font-size--xsmall text--green-lighter margin-left--small"
+                      >Last used</span
+                    >
+                  </div>
+                  <div *ngIf="this.globalVars.isMobile()" class="display--flex">
+                    <span
+                      class="font-size--xsmall"
+                      >Account: {{ account.accountNumber }}</span
+                    >
+                    <span
+                      *ngIf="account.lastUsed"
+                      class="font-size--xsmall text--green-lighter margin-left--auto"
+                      >Last used</span
+                    >
+                  </div>
+                </div>
               </div>
               <div class="display--flex items--center">
-                <div class="display--flex flex--column items--end">
+                <div
+                  *ngIf="!this.globalVars.isMobile()"
+                  class="display--flex flex--column items--end"
+                >
                   <span
                     class="font-weight--bold font-size--xsmall margin-right--small"
                     >{{
@@ -62,9 +79,7 @@
             </button>
             <button
               class="styleless-button"
-              (click)="
-                hideAccount(group.key, account)
-              "
+              (click)="hideAccount(group.key, account)"
             >
               <i-feather name="power" class="text--blue-base"></i-feather>
             </button>
@@ -74,24 +89,27 @@
       <div>
         <div class="display--flex">
           <button
-            class="button--small button--primary margin-right--small"
-            style="width: auto; white-space: nowrap"
-            (click)="addSubAccount(group.key)"
+            *ngIf="shouldShowExportSeedButton(group.key)"
+            class="button--small button--red display--flex items--center margin-right--small"
+            style="width: auto; white-space: nowrap;"
+            (click)="exportSeed(group.key)"
           >
-            Add account
+            <i-feather name="save" class="margin-right--xsmall" style="height:16px;width:16px;"/> Backup
           </button>
           <button
-            class="button--small button--secondary"
+            class="button--small button--primary display--flex items--center margin-right--small"
+            style="width: auto; white-space: nowrap"
+            aria-label="Add account"
+            (click)="addSubAccount(group.key)"
+          >
+            <i-feather name="user-plus" class="margin-right--xsmall" style="height:16px;width:16px;"/> Account
+          </button>
+          <button
+            class="button--small button--secondary display--flex items--center"
             style="width: auto; white-space: nowrap"
             (click)="toggleRecoverSubAccountForm(group.key)"
           >
-            Recover account
-          </button>
-          <button
-            class="button--small button--red"
-            style="width: auto; white-space: nowrap; margin-left: auto"
-          >
-            Export Seed
+          <i-feather name="power" class="margin-right--xsmall" style="height:16px;width:16px;"/> Recover
           </button>
         </div>
         <form
@@ -100,7 +118,7 @@
           class="margin-top--small margin-left--small"
         >
           <label for="account-number" class="display--block font-size--small"
-            >Account:</label
+            >Enter account number:</label
           >
           <input
             [(ngModel)]="accountNumberToRecover"

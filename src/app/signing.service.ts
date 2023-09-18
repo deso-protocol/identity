@@ -27,10 +27,10 @@ export class SigningService {
     const keyEncoder = new KeyEncoder('secp256k1');
     // TODO: make sure the account number stuff works here...
     const acctNumber = isDerived ? 0 : accountNumber;
-    const keys = this.cryptoService.seedHexToPrivateKey(seedHex, acctNumber);
+    const keys = this.cryptoService.seedHexToKeyPair(seedHex, acctNumber);
     const encodedPrivateKey = keyEncoder.encodePrivate(keys.getPrivate('hex'), 'raw', 'pem');
     if (isDerived) {
-      const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(seedHex, accountNumber);
+      const derivedPrivateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
       const derivedPublicKeyBase58Check =
         this.cryptoService.privateKeyToDeSoPublicKey(
           derivedPrivateKey,
@@ -59,7 +59,7 @@ export class SigningService {
     isDerivedKey: boolean,
     accountNumber: number
   ): string {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex, accountNumber);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
     const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [TransactionV0, Buffer];
@@ -79,7 +79,7 @@ export class SigningService {
   }
 
   signHashes(seedHex: string, unsignedHashes: string[], accountNumber: number): string[] {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex, accountNumber);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
     const signedHashes = [];
 
     for (const unsignedHash of unsignedHashes) {
@@ -96,7 +96,7 @@ export class SigningService {
     unsignedHashes: string[],
     accountNumber: number
   ): { s: any; r: any; v: number | null }[] {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex, accountNumber);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
     const signedHashes = [];
 
     for (const unsignedHash of unsignedHashes) {

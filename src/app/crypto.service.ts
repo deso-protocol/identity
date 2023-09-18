@@ -143,12 +143,12 @@ export class CryptoService {
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive(derivationPath(0), nonStandard);
+    return deriveKeys(seed, 0);
   }
 
-  getSubAccountKeys(masterSeedHex: string, accountIndex: number): HDNode {
+  getSubAccountKeychain(masterSeedHex: string, accountIndex: number): HDNode {
     const seedBytes = Buffer.from(masterSeedHex, 'hex');
-    return HDKey.fromMasterSeed(seedBytes).derive(derivationPath(accountIndex));
+    return deriveKeys(seedBytes, accountIndex);
   }
 
   keychainToSeedHex(keychain: HDNode): string {
@@ -162,14 +162,14 @@ export class CryptoService {
    * @param accountNumber This is the account number used to generate unique keys from the parent seed.
    * @returns
    */
-  seedHexToPrivateKey(parentSeedHex: string, accountNumber: number): EC.KeyPair {
+  seedHexToKeyPair(parentSeedHex: string, accountNumber: number): EC.KeyPair {
     const ec = new EC('secp256k1');
 
     if (accountNumber === 0) {
       return ec.keyFromPrivate(parentSeedHex);
     }
 
-    const hdKeys = this.getSubAccountKeys(
+    const hdKeys = this.getSubAccountKeychain(
       parentSeedHex,
       accountNumber
     );
@@ -183,7 +183,7 @@ export class CryptoService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const privateKey = this.seedHexToPrivateKey(seedHex, accountNumber);
+    const privateKey = this.seedHexToKeyPair(seedHex, accountNumber);
     return this.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
   }
 
@@ -308,6 +308,6 @@ export class CryptoService {
  * m / purpose' / coin_type' / account' / change / address_index
  * See for more details: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account
  */
-function derivationPath(accountIndex: number = 0) {
-  return `m/44'/0'/${accountIndex}'/0/0`;
+function deriveKeys(seedBytes: Buffer, accountIndex: number) {
+  return HDKey.fromMasterSeed(seedBytes).derive(`m/44'/0'/${accountIndex}'/0/0`)
 }
