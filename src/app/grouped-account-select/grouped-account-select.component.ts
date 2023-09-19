@@ -325,6 +325,11 @@ export class GroupedAccountSelectComponent implements OnInit {
     return !rootAccount.exportDisabled;
   }
 
+  isMetaMaskAccountGroup(rootPublicKey: string) {
+    const rootAccount = this.accountService.getAccountInfo(rootPublicKey);
+    return this.accountService.isMetamaskAccount(rootAccount);
+  }
+
   exportSeed(rootPublicKey: string) {
     const dialogRef = this.dialog.open(ExportSeedDialogComponent, {
       data: { rootPublicKey },
