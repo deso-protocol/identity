@@ -569,6 +569,7 @@ export class AccountService {
       network,
       loginMethod: LoginMethod.DESO,
       version: PrivateUserVersion.V2,
+      lastLoginTimestamp: Date.now(),
     });
   }
 
