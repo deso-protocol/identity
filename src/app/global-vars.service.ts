@@ -191,7 +191,7 @@ export class GlobalVarsService {
     }
 
     let shortValue;
-    const suffixes = ['', 'k', 'm', 'b', 'e12', 'e15', 'e18', 'e21'];
+    const suffixes = ['', 'K', 'M', 'B', 'e12', 'e15', 'e18', 'e21'];
     const suffixNum = Math.floor((('' + value.toFixed(0)).length - 1) / 3);
     shortValue = value / Math.pow(1000, suffixNum);
     if (

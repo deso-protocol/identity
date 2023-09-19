@@ -51,6 +51,11 @@ export class GroupedAccountSelectComponent implements OnInit {
    */
   accountNumberToRecover = 0;
 
+  get hasVisibleAccounts() {
+    // if any group has at least 1 visible account, return true.
+    return !!Array.from(this.accountGroups.values()).find(group => group.accounts.length > 0);
+  }
+
   constructor(
     public accountService: AccountService,
     public globalVars: GlobalVarsService,

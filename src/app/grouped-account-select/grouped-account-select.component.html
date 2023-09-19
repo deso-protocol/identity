@@ -1,4 +1,4 @@
-<div class="section--accounts" *ngIf="accountGroups.size > 0">
+<div class="section--accounts" *ngIf="hasVisibleAccounts">
   <div class="section--accounts__header margin-bottom--medium">
     Select an account
   </div>
@@ -37,8 +37,7 @@
                     >
                   </div>
                   <div *ngIf="this.globalVars.isMobile()" class="display--flex">
-                    <span
-                      class="font-size--xsmall"
+                    <span class="font-size--xsmall"
                       >Account: {{ account.accountNumber }}</span
                     >
                     <span
@@ -57,7 +56,7 @@
                   <span
                     class="font-weight--bold font-size--xsmall margin-right--small"
                     >{{
-                      globalVars.nanosToDeSo(account.balanceNanos)
+                      globalVars.abbreviateNumber(account.balanceNanos / 1e9)
                     }}
                     $DESO</span
                   >
@@ -91,10 +90,15 @@
           <button
             *ngIf="shouldShowExportSeedButton(group.key)"
             class="button--small button--red display--flex items--center margin-right--small"
-            style="width: auto; white-space: nowrap;"
+            style="width: auto; white-space: nowrap"
             (click)="exportSeed(group.key)"
           >
-            <i-feather name="save" class="margin-right--xsmall" style="height:16px;width:16px;"/> Backup
+            <i-feather
+              name="save"
+              class="margin-right--xsmall"
+              style="height: 16px; width: 16px"
+            />
+            Backup
           </button>
           <button
             class="button--small button--primary display--flex items--center margin-right--small"
@@ -102,14 +106,24 @@
             aria-label="Add account"
             (click)="addSubAccount(group.key)"
           >
-            <i-feather name="user-plus" class="margin-right--xsmall" style="height:16px;width:16px;"/> Account
+            <i-feather
+              name="user-plus"
+              class="margin-right--xsmall"
+              style="height: 16px; width: 16px"
+            />
+            Account
           </button>
           <button
             class="button--small button--secondary display--flex items--center"
             style="width: auto; white-space: nowrap"
             (click)="toggleRecoverSubAccountForm(group.key)"
           >
-          <i-feather name="power" class="margin-right--xsmall" style="height:16px;width:16px;"/> Recover
+            <i-feather
+              name="power"
+              class="margin-right--xsmall"
+              style="height: 16px; width: 16px"
+            />
+            Recover
           </button>
         </div>
         <form
@@ -137,5 +151,7 @@
         </form>
       </div>
     </div>
+    <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
   </ng-container>
 </div>
+<app-log-in-options></app-log-in-options>
