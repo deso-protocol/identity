@@ -196,7 +196,13 @@ export class GroupedAccountSelectComponent implements OnInit {
           <p class="margin-bottom--small">You can recover this account as long as you have the account number.</p>
           <p>
             <button
-              onclick="navigator.clipboard.writeText(${displayAccountNumber}).then(() => alert('copied ${displayAccountNumber} to clipboard!'));"
+              onclick="(() => {
+                if (!navigator.clipboard) {
+                  alert('Your browser does not support copying to clipboard. Is it running in a secure context (https or localhost)?');
+                  return;
+                }
+                navigator.clipboard.writeText(${displayAccountNumber}).then(() => alert('copied ${displayAccountNumber} to clipboard!'));
+              })()"
             >
               ${displayAccountNumber}
               <img
