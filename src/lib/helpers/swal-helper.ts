@@ -84,7 +84,6 @@ export class SwalHelper {
         }
       }
     }
-    console.log('swal options', escapedOptions);
     return Swal.fire(escapedOptions);
   }
 }
