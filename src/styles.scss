@@ -1115,6 +1115,9 @@ a, .link--primary {
   cursor: pointer;
 }
 
-//-------------------------
-// Material Dialog
-//-------------------------
+.dialog {
+  background-color: lighten(#040609, 10%);
+  background-image: linear-gradient(0deg,#040609,#040609 10%,#050e1d 90%,#050e1d);
+  border: 1px solid gray;
+  border-radius: 4px;
+}

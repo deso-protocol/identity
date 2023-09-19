@@ -1288,6 +1288,11 @@ export class AccountService {
 
     const users = this.getRootLevelUsers();
     const parentAccount = users[rootPublicKeyBase58];
+
+    if (!parentAccount) {
+      throw new Error(`Account not found for public key: ${rootPublicKeyBase58}`);
+    }
+
     const parentSeedHex = parentAccount.seedHex;
     const childKey = this.cryptoService.getSubAccountKeychain(
       parentSeedHex,
