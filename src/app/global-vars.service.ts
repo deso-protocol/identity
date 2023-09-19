@@ -71,6 +71,12 @@ export class GlobalVarsService {
    */
   authenticatedUsers: Set<string> = new Set();
 
+  /**
+   * Flag used to gate the new subAccounts functionality. After some sunset
+   * period (TBD), we can remove this flag and make this the default behavior.
+   */
+  subAccounts: boolean = false;
+
   isFullAccessHostname(): boolean {
     return GlobalVarsService.fullAccessHostnames.includes(this.hostname);
   }

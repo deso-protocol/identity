@@ -22,8 +22,16 @@
     </h4>
     <ng-container *ngIf="!publicKeyBase58Check">
       <grouped-account-select
-        (onAccountSelect)="this.onAccountSelected($event)"
+        *ngIf="globalVars.subAccounts; else legacyAccountSelect"
+        (onAccountSelect)="onAccountSelected($event)"
       />
+      <ng-template #legacyAccountSelect>
+        <app-account-select
+          (onAccountSelect)="onAccountSelected($event)"
+        ></app-account-select>
+        <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
+        <app-log-in-options></app-log-in-options>
+      </ng-template>
     </ng-container>
     <div
       class="box--border box--base box--rounded"
