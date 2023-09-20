@@ -2,22 +2,40 @@
 
 <div
   class="container"
-  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
+  *ngIf="
+    globalVars.inTab ||
+    globalVars.webview ||
+    globalVars.callback ||
+    globalVars.redirectURI
+  "
 >
   <div class="section--login text--center margin-bottom--small">
-    <img src="assets/image-lock.svg" width="60" class="section--accounts__illustration"/>
-    <div class="font-size--small margin-bottom--small text--text-lighter">For Advanced Users</div>
-    <h4 class="text--neutral-white">Import account to access {{ globalVars.hostname }}</h4>
-  <div class="font-size--small margin-top--small text--center margin-bottom--large">
-    <p class="margin-bottom--xsmall">Safely add your DeSo seed (mnemonic) to import your existing account.</p>
-    <p class="font-weight--medium">
-      Please make sure you are on: <span class="text--green-lighter">https://identity.deso.org</span>
-    </p>
+    <img
+      src="assets/image-lock.svg"
+      width="60"
+      class="section--accounts__illustration"
+    />
+    <div class="font-size--small margin-bottom--small text--text-lighter">
+      For Advanced Users
+    </div>
+    <h4 class="text--neutral-white">
+      Import account to access {{ globalVars.hostname }}
+    </h4>
+    <div
+      class="font-size--small margin-top--small text--center margin-bottom--large"
+    >
+      <p class="margin-bottom--xsmall">
+        Safely add your DeSo seed (mnemonic) to import your existing account.
+      </p>
+      <p class="font-weight--medium">
+        Please make sure you are on:
+        <span class="text--green-lighter">https://identity.deso.org</span>
+      </p>
+    </div>
+    <div *ngIf="loginError" class="warning--error margin-bottom--medium">
+      {{ loginError }}
+    </div>
   </div>
-  <div *ngIf="loginError" class="warning--error margin-bottom--medium">
-    {{ loginError }}
-  </div>
-</div>
 
   <div class="section--login__option">
     <textarea
@@ -27,10 +45,20 @@
       placeholder="Enter your DeSo seed only!"
     ></textarea>
     <div class="margin-top--small text--right">
-      <div *ngIf="!advancedOpen" (click)="advancedOpen = true" class="link--secondary" data-control-name="log-in-with-seed-advanced-toggle-button">
+      <div
+        *ngIf="!advancedOpen"
+        (click)="advancedOpen = true"
+        class="link--secondary"
+        data-control-name="log-in-with-seed-advanced-toggle-button"
+      >
         <u>Show Advanced</u>
       </div>
-      <div *ngIf="advancedOpen" (click)="advancedOpen = false" class="link--secondary" data-control-name="log-in-with-seed-simple-toggle-button">
+      <div
+        *ngIf="advancedOpen"
+        (click)="advancedOpen = false"
+        class="link--secondary"
+        data-control-name="log-in-with-seed-simple-toggle-button"
+      >
         <u>Hide Advanced</u>
       </div>
     </div>
@@ -60,7 +88,7 @@
         class="input--textarea"
         rows="2"
         placeholder="Enter your seed hex"
-      ></textarea>   
+      ></textarea>
     </div>
     <button
       data-control-name="log-in-with-seed-load-account-button"
@@ -71,6 +99,7 @@
     </button>
   </div>
   <div class="warning--error warning--error--medium margin-top--base">
-    Never share these details with anyone!<br/> Keep it safe and secure at all times.
+    Never share these details with anyone!<br />
+    Keep it safe and secure at all times.
   </div>
 </div>

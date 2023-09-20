@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import {AccountService} from '../account.service';
-import {IdentityService} from '../identity.service';
-import {BackendAPIService} from '../backend-api.service';
-import {GlobalVarsService} from '../global-vars.service';
-import {GoogleDriveService} from '../google-drive.service';
-import {UserProfile} from '../../types/identity';
-import {ActivatedRoute, Router} from '@angular/router';
-import {CryptoService} from '../crypto.service';
-import {SigningService} from '../signing.service';
-import {Observable} from 'rxjs';
+import { AccountService } from '../account.service';
+import { IdentityService } from '../identity.service';
+import { BackendAPIService } from '../backend-api.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { GoogleDriveService } from '../google-drive.service';
+import { UserProfile } from '../../types/identity';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CryptoService } from '../crypto.service';
+import { SigningService } from '../signing.service';
+import { Observable } from 'rxjs';
 
 export enum MESSAGING_GROUP_OPERATION {
   DEFAULT_KEY = 'DefaultKey',
@@ -19,12 +19,11 @@ export enum MESSAGING_GROUP_OPERATION {
 @Component({
   selector: 'app-messaging-group',
   templateUrl: './messaging-group.component.html',
-  styleUrls: ['./messaging-group.component.scss']
+  styleUrls: ['./messaging-group.component.scss'],
 })
 export class MessagingGroupComponent implements OnInit {
-
   error: any = '';
-  allUsers: {[key: string]: UserProfile} = {};
+  allUsers: { [key: string]: UserProfile } = {};
   hasUsers = false;
 
   operation: MESSAGING_GROUP_OPERATION = MESSAGING_GROUP_OPERATION.DEFAULT_KEY;
@@ -34,7 +33,9 @@ export class MessagingGroupComponent implements OnInit {
   updatedGroupKeyName = '';
   updatedMembersPublicKeysBase58Check: string[] = [];
   updatedMembersKeyNames: string[] = [];
-  updatedMembersProfiles = {} as Observable<{[publicKeyBase58Check: string]: UserProfile}>;
+  updatedMembersProfiles = {} as Observable<{
+    [publicKeyBase58Check: string]: UserProfile;
+  }>;
   MESSAGING_GROUP_OPERATION = MESSAGING_GROUP_OPERATION;
 
   constructor(
@@ -46,17 +47,20 @@ export class MessagingGroupComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private cryptoService: CryptoService,
-    private signingService: SigningService,
-  ) { }
+    private signingService: SigningService
+  ) {}
 
   ngOnInit(): void {
     try {
       this.initializeMessagingGroupComponent();
-      this.backendApi.GetUserProfiles([this.updatedGroupOwnerPublicKeyBase58Check]).toPromise()
-        .then(profiles => {
-          this.updatedGroupOwnerUsername = profiles[this.updatedGroupOwnerPublicKeyBase58Check].username;
+      this.backendApi
+        .GetUserProfiles([this.updatedGroupOwnerPublicKeyBase58Check])
+        .toPromise()
+        .then((profiles) => {
+          this.updatedGroupOwnerUsername =
+            profiles[this.updatedGroupOwnerPublicKeyBase58Check].username;
         })
-        .catch(e => {
+        .catch((e) => {
           this.error = e;
         });
     } catch (e) {
@@ -68,12 +72,11 @@ export class MessagingGroupComponent implements OnInit {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
     this.hasUsers = publicKeys.length > 0;
-    this.backendApi.GetUserProfiles(publicKeys)
-      .subscribe(profiles => {
-        this.allUsers = profiles;
-      });
+    this.backendApi.GetUserProfiles(publicKeys).subscribe((profiles) => {
+      this.allUsers = profiles;
+    });
 
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       try {
         this.processURLParams(params);
       } catch (e) {
@@ -101,13 +104,18 @@ export class MessagingGroupComponent implements OnInit {
     // Get the application public key from the query params.
     if (params.applicationMessagingPublicKeyBase58Check) {
       // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
-      this.cryptoService.publicKeyToBuffer(params.applicationMessagingPublicKeyBase58Check);
-      this.applicationMessagingPublicKeyBase58Check = params.applicationMessagingPublicKeyBase58Check;
+      this.cryptoService.publicKeyToBuffer(
+        params.applicationMessagingPublicKeyBase58Check
+      );
+      this.applicationMessagingPublicKeyBase58Check =
+        params.applicationMessagingPublicKeyBase58Check;
     }
     // Get the group chat owner public key.
     if (params.updatedGroupOwnerPublicKeyBase58Check) {
       // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
-      this.cryptoService.publicKeyToBuffer(params.updatedGroupOwnerPublicKeyBase58Check);
+      this.cryptoService.publicKeyToBuffer(
+        params.updatedGroupOwnerPublicKeyBase58Check
+      );
       let userExists = false;
       for (const pk of this.accountService.getPublicKeys()) {
         if (pk === params.updatedGroupOwnerPublicKeyBase58Check) {
@@ -116,9 +124,12 @@ export class MessagingGroupComponent implements OnInit {
         }
       }
       if (!userExists) {
-        throw new Error('Invalid group chat owner, doesn\'t exist in the signed-in user\'s account');
+        throw new Error(
+          "Invalid group chat owner, doesn't exist in the signed-in user's account"
+        );
       }
-      this.updatedGroupOwnerPublicKeyBase58Check = params.updatedGroupOwnerPublicKeyBase58Check;
+      this.updatedGroupOwnerPublicKeyBase58Check =
+        params.updatedGroupOwnerPublicKeyBase58Check;
     }
     // Get the group chat name.
     if (params.updatedGroupKeyName) {
@@ -129,7 +140,8 @@ export class MessagingGroupComponent implements OnInit {
     }
     // Get the group chat members.
     if (params.updatedMembersPublicKeysBase58Check) {
-      this.updatedMembersPublicKeysBase58Check = params.updatedMembersPublicKeysBase58Check.split(',');
+      this.updatedMembersPublicKeysBase58Check =
+        params.updatedMembersPublicKeysBase58Check.split(',');
       for (const pk of this.updatedMembersPublicKeysBase58Check) {
         // We call publicKeyToBuffer just to make sure the public key is valid. If it's not, we'll throw an error.
         this.cryptoService.publicKeyToBuffer(pk);
@@ -149,27 +161,37 @@ export class MessagingGroupComponent implements OnInit {
     }
 
     if (this.operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS) {
-      this.updatedMembersProfiles = this.backendApi.GetUserProfiles(this.updatedMembersPublicKeysBase58Check);
+      this.updatedMembersProfiles = this.backendApi.GetUserProfiles(
+        this.updatedMembersPublicKeysBase58Check
+      );
     }
   }
 
-  validateMessagingGroupKeyName(keyName: string): boolean{
+  validateMessagingGroupKeyName(keyName: string): boolean {
     return keyName.length <= this.globalVars.messagingGroupNameMaxLength;
   }
 
   validateMessagingGroupOperation(): boolean {
-    const groupSet = this.updatedGroupOwnerPublicKeyBase58Check !== '' && this.updatedGroupKeyName !== '';
+    const groupSet =
+      this.updatedGroupOwnerPublicKeyBase58Check !== '' &&
+      this.updatedGroupKeyName !== '';
     const applicationSet = this.applicationMessagingPublicKeyBase58Check !== '';
-    const membersSetEmpty = this.updatedMembersPublicKeysBase58Check.length === 0 && this.updatedMembersKeyNames.length === 0;
-    const membersSetNonEmpty = this.updatedMembersPublicKeysBase58Check.length > 0 &&
-      this.updatedMembersPublicKeysBase58Check.length === this.updatedMembersKeyNames.length;
+    const membersSetEmpty =
+      this.updatedMembersPublicKeysBase58Check.length === 0 &&
+      this.updatedMembersKeyNames.length === 0;
+    const membersSetNonEmpty =
+      this.updatedMembersPublicKeysBase58Check.length > 0 &&
+      this.updatedMembersPublicKeysBase58Check.length ===
+        this.updatedMembersKeyNames.length;
 
     let validityCondition = groupSet;
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
         // In this operation, we need to set the group to be the default key. We also optionally set the application
         // key, and the members of the group need to be set to empty.
-        if (this.updatedGroupKeyName !== this.globalVars.defaultMessageKeyName) {
+        if (
+          this.updatedGroupKeyName !== this.globalVars.defaultMessageKeyName
+        ) {
           return false;
         }
         validityCondition &&= membersSetEmpty;
@@ -179,7 +201,9 @@ export class MessagingGroupComponent implements OnInit {
         // to the default key. We distinguish between the default-key and non-default-key operation for the ease of API.
         // This way, don't have to send the messaging group signature in the generic CREATE_GROUP operation, which is
         // required in the DEFAULT_KEY case in order to authorize a default-key.
-        if (this.updatedGroupKeyName === this.globalVars.defaultMessageKeyName) {
+        if (
+          this.updatedGroupKeyName === this.globalVars.defaultMessageKeyName
+        ) {
           return false;
         }
         validityCondition &&= membersSetEmpty;
@@ -212,24 +236,35 @@ export class MessagingGroupComponent implements OnInit {
   }
 
   approveOperation(): void {
-    this.asyncApproveOperation()
-      .catch((err) => {
-        this.error = err;
-        console.error(err);
-      });
+    this.asyncApproveOperation().catch((err) => {
+      this.error = err;
+      console.error(err);
+    });
   }
 
   public async asyncApproveOperation(): Promise<void> {
-    const {messagingPublicKeyBase58Check, messagingPrivateKeyHex, messagingKeySignature} =
-     await this.accountService.getMessagingGroupStandardDerivation(
-        this.updatedGroupOwnerPublicKeyBase58Check, this.updatedGroupKeyName);
+    const {
+      messagingPublicKeyBase58Check,
+      messagingPrivateKeyHex,
+      messagingKeySignature,
+    } = await this.accountService.getMessagingGroupStandardDerivation(
+      this.updatedGroupOwnerPublicKeyBase58Check,
+      this.updatedGroupKeyName
+    );
     let encryptedMessagingKeyRandomness: string | undefined;
-    const publicUser = this.accountService.getEncryptedUsers()[this.updatedGroupOwnerPublicKeyBase58Check];
+    const publicUser =
+      this.accountService.getEncryptedUsers()[
+        this.updatedGroupOwnerPublicKeyBase58Check
+      ];
     if (publicUser?.encryptedMessagingKeyRandomness) {
-      encryptedMessagingKeyRandomness = publicUser.encryptedMessagingKeyRandomness;
+      encryptedMessagingKeyRandomness =
+        publicUser.encryptedMessagingKeyRandomness;
     }
-    const encryptedToApplicationGroupMessagingPrivateKey = this.signingService.encryptGroupMessagingPrivateKeyToMember(
-      this.applicationMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
+    const encryptedToApplicationGroupMessagingPrivateKey =
+      this.signingService.encryptGroupMessagingPrivateKeyToMember(
+        this.applicationMessagingPublicKeyBase58Check,
+        messagingPrivateKeyHex
+      );
     switch (this.operation) {
       case MESSAGING_GROUP_OPERATION.DEFAULT_KEY:
         this.respondToClient(
@@ -251,27 +286,42 @@ export class MessagingGroupComponent implements OnInit {
         break;
       case MESSAGING_GROUP_OPERATION.ADD_MEMBERS:
         try {
-          const allPublicKeys = [ this.updatedGroupOwnerPublicKeyBase58Check, ...this.updatedMembersPublicKeysBase58Check];
-          const allKeyNames = [ this.updatedGroupKeyName, ...this.updatedMembersKeyNames];
-          const resp = await this.backendApi.GetBulkMessagingPublicKeys(allPublicKeys, allKeyNames).toPromise();
+          const allPublicKeys = [
+            this.updatedGroupOwnerPublicKeyBase58Check,
+            ...this.updatedMembersPublicKeysBase58Check,
+          ];
+          const allKeyNames = [
+            this.updatedGroupKeyName,
+            ...this.updatedMembersKeyNames,
+          ];
+          const resp = await this.backendApi
+            .GetBulkMessagingPublicKeys(allPublicKeys, allKeyNames)
+            .toPromise();
           const messagingPublicKeys = resp.MessagingPublicKeysBase58Check;
           const ownerMessagingPublicKey = messagingPublicKeys[0];
           if (ownerMessagingPublicKey !== messagingPublicKeyBase58Check) {
-            throw new Error('Error can\'t perform AddMembers operation on a group with non-standard key derivation');
+            throw new Error(
+              "Error can't perform AddMembers operation on a group with non-standard key derivation"
+            );
           }
           const memberMessagingPublicKeys = messagingPublicKeys.slice(1);
           const encryptedToMembersGroupMessagingPrivateKey: string[] = [];
           for (const memberMessagingPublicKeyBase58Check of memberMessagingPublicKeys) {
-            const encryptedGroupMessagingPriv = this.signingService.encryptGroupMessagingPrivateKeyToMember(
-              memberMessagingPublicKeyBase58Check, messagingPrivateKeyHex);
-            encryptedToMembersGroupMessagingPrivateKey.push(encryptedGroupMessagingPriv);
+            const encryptedGroupMessagingPriv =
+              this.signingService.encryptGroupMessagingPrivateKeyToMember(
+                memberMessagingPublicKeyBase58Check,
+                messagingPrivateKeyHex
+              );
+            encryptedToMembersGroupMessagingPrivateKey.push(
+              encryptedGroupMessagingPriv
+            );
           }
           this.respondToClient(
             '',
             encryptedToApplicationGroupMessagingPrivateKey,
             encryptedToMembersGroupMessagingPrivateKey,
             messagingPublicKeyBase58Check,
-            encryptedMessagingKeyRandomness,
+            encryptedMessagingKeyRandomness
           );
         } catch (e) {
           throw new Error('Error getting bulk messaging public keys');

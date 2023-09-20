@@ -1,21 +1,28 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {GlobalVarsService} from 'src/app/global-vars.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { GlobalVarsService } from 'src/app/global-vars.service';
 import {
   AccessGroupMemberLimitMapItem,
   AccessGroupMemberOperationString,
   AccessGroupScopeType,
   BackendAPIService,
-  User
+  User,
 } from '../../backend-api.service';
-import {TransactionSpendingLimitComponent} from '../transaction-spending-limit.component';
+import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
 @Component({
   selector: 'app-transaction-spending-limit-access-group-member',
-  templateUrl: './transaction-spending-limit-access-group-member.component.html',
-  styleUrls: ['./transaction-spending-limit-access-group-member.component.scss'],
+  templateUrl:
+    './transaction-spending-limit-access-group-member.component.html',
+  styleUrls: [
+    './transaction-spending-limit-access-group-member.component.scss',
+  ],
 })
-export class TransactionSpendingLimitAccessGroupMemberComponent implements OnInit {
-  @Input() accessGroupMemberLimitMapItem: AccessGroupMemberLimitMapItem | undefined;
+export class TransactionSpendingLimitAccessGroupMemberComponent
+  implements OnInit
+{
+  @Input() accessGroupMemberLimitMapItem:
+    | AccessGroupMemberLimitMapItem
+    | undefined;
   @Input() appUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
@@ -24,11 +31,13 @@ export class TransactionSpendingLimitAccessGroupMemberComponent implements OnIni
     public globalVars: GlobalVarsService
   ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   isScoped(): boolean {
-    return this.accessGroupMemberLimitMapItem?.ScopeType === AccessGroupScopeType.SCOPED;
+    return (
+      this.accessGroupMemberLimitMapItem?.ScopeType ===
+      AccessGroupScopeType.SCOPED
+    );
   }
 
   getOperationString(): string {

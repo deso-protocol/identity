@@ -5,6 +5,10 @@
     {{ associationLimitMapItem?.AssociationClass }}
     {{ associationLimitMapItem?.AssociationType }}
     associations on
-    {{ (appUser?.ProfileEntryResponse?.Username || associationLimitMapItem?.AppPublicKeyBase58Check | truncateAddressOrUsername) || 'any app' }}.
+    {{
+      (appUser?.ProfileEntryResponse?.Username ||
+        associationLimitMapItem?.AppPublicKeyBase58Check
+        | truncateAddressOrUsername) || 'any app'
+    }}.
   </code>
 </div>

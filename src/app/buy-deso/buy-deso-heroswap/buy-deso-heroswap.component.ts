@@ -24,9 +24,8 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private router: Router,
     private identityService: IdentityService,
-    private accountService: AccountService,
-  ) {
-  }
+    private accountService: AccountService
+  ) {}
 
   ngOnInit(): void {
     window.scroll(0, 0);
@@ -47,17 +46,17 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
       ].join('')
     );
 
-    window.addEventListener("message", this.#heroswapMessageListener);
+    window.addEventListener('message', this.#heroswapMessageListener);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener("message", this.#heroswapMessageListener);
+    window.removeEventListener('message', this.#heroswapMessageListener);
   }
 
   finishFlow(): void {
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: {publicKey: this.publicKey},
+        queryParams: { publicKey: this.publicKey },
         queryParamsHandling: 'merge',
       });
     } else {
@@ -75,6 +74,6 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
 
   #heroswapMessageListener = (event: MessageEvent) => {
     if (event.origin !== environment.heroswapURL) return;
-    logInteractionEvent("heroswap-iframe", "message", event.data);
-  }
+    logInteractionEvent('heroswap-iframe', 'message', event.data);
+  };
 }

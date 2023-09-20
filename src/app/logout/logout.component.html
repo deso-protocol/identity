@@ -1,14 +1,19 @@
 <app-banner></app-banner>
 
 <div class="container text--center">
-  <h4 class="text--neutral-white margin-bottom--medium">Log out of {{ globalVars.hostname }}</h4>
+  <h4 class="text--neutral-white margin-bottom--medium">
+    Log out of {{ globalVars.hostname }}
+  </h4>
   <div class="box--border box--rounded box--large">
     <p class="padding-bottom--medium">
       Logging out revokes any permissions you've granted on
       <span class="text--text-lightest">{{ globalVars.hostname }}</span>
     </p>
     <p>
-      Your account will stay logged in on <span class="text--text-lightest">{{ globalVars.environment.hostname }}</span>
+      Your account will stay logged in on
+      <span class="text--text-lightest">{{
+        globalVars.environment.hostname
+      }}</span>
     </p>
   </div>
   <div class="margin-top--medium">
@@ -26,6 +31,6 @@
       data-control-name="cancel-logout-button"
     >
       Cancel
-  </a>
+    </a>
   </div>
 </div>

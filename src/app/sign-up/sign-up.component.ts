@@ -1,16 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { EntropyService } from '../entropy.service';
-import { CryptoService } from '../crypto.service';
-import { AccountService } from '../account.service';
-import { IdentityService } from '../identity.service';
-import { GlobalVarsService } from '../global-vars.service';
-import { environment } from '../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TextService } from '../text.service';
 import * as bip39 from 'bip39';
+import { Network } from 'src/types/identity';
+import { environment } from '../../environments/environment';
+import { AccountService } from '../account.service';
 import { RouteNames } from '../app-routing.module';
 import { BackendAPIService } from '../backend-api.service';
-import { Network } from 'src/types/identity';
+import { CryptoService } from '../crypto.service';
+import { EntropyService } from '../entropy.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { IdentityService } from '../identity.service';
+import { TextService } from '../text.service';
 
 @Component({
   selector: 'app-sign-up',

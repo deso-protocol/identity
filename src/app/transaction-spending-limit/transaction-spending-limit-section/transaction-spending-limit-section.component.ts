@@ -12,7 +12,7 @@ import {
   NFTLimitOperationString,
   NFTOperationLimitMap,
   OperationToCountMap,
-  User
+  User,
 } from '../../backend-api.service';
 import { GlobalVarsService } from '../../global-vars.service';
 import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
@@ -63,11 +63,15 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         break;
       case TransactionSpendingLimitComponent.CreatorCoinLimitsSection:
       case TransactionSpendingLimitComponent.DAOCoinLimitsSection:
-        this.anyCreatorItem = (this.sectionMap as DAOCoinOperationLimitMap | CreatorCoinOperationLimitMap)[''] as
+        this.anyCreatorItem = (
+          this.sectionMap as
+            | DAOCoinOperationLimitMap
+            | CreatorCoinOperationLimitMap
+        )[''] as
           | OperationToCountMap<CreatorCoinLimitOperationString>
           | OperationToCountMap<DAOCoinLimitOperationString>
           | undefined;
-        this.coinLimitMap = {...this.sectionMap} as
+        this.coinLimitMap = { ...this.sectionMap } as
           | CreatorCoinOperationLimitMap
           | DAOCoinOperationLimitMap;
         delete this.coinLimitMap[''];
@@ -76,7 +80,7 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         this.anyNFTItem = (this.sectionMap as NFTOperationLimitMap)[''] as
           | OperationToCountMap<NFTLimitOperationString>
           | undefined;
-        this.nftLimitMap = {...this.sectionMap} as NFTOperationLimitMap;
+        this.nftLimitMap = { ...this.sectionMap } as NFTOperationLimitMap;
         delete this.nftLimitMap[''];
         break;
       case TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection:
@@ -107,7 +111,8 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         this.accessGroupLimitMap = this.sectionMap as AccessGroupLimitMapItem[];
         break;
       case TransactionSpendingLimitComponent.AccessGroupMemberSection:
-        this.accessGroupMemberLimitMap = this.sectionMap as AccessGroupMemberLimitMapItem[];
+        this.accessGroupMemberLimitMap = this
+          .sectionMap as AccessGroupMemberLimitMapItem[];
     }
 
     this.showAll = this.getSectionMapLength() <= this.defaultNumShown;

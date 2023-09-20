@@ -12,14 +12,14 @@ import { TransactionSpendingLimitComponent } from '../transaction-spending-limit
   ],
 })
 export class TransactionSpendingLimitDaoCoinLimitOrderComponent
-  implements OnInit {
+  implements OnInit
+{
   @Input() daoCoinLimitOrderLimitItem: DAOCoinLimitOrderLimitItem | undefined;
   @Input() buyingUser: User | undefined;
   @Input() sellingUser: User | undefined;
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
-  constructor(public globalVars: GlobalVarsService) {
-  }
+  constructor(public globalVars: GlobalVarsService) {}
 
   ngOnInit(): void {
     console.log(this.daoCoinLimitOrderLimitItem);

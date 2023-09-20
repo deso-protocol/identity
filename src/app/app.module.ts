@@ -5,10 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgHcaptchaModule } from 'ng-hcaptcha';
 import { CookieModule } from 'ngx-cookie';
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
+import { environment } from '../environments/environment';
 import { AccountSelectComponent } from './account-select/account-select.component';
 import { AccountService } from './account.service';
 import { AppRoutingModule } from './app-routing.module';
@@ -45,30 +47,14 @@ import { SharedSecretComponent } from './shared-secret/shared-secret.component';
 import { SignUpGetStarterDESOComponent } from './sign-up-get-starter-deso/sign-up-get-starter-deso.component';
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
-import {
-  TransactionSpendingLimitAccessGroupMemberComponent
-} from './transaction-spending-limit/transaction-spending-limit-access-group-member/transaction-spending-limit-access-group-member.component';
-import {
-  TransactionSpendingLimitAccessGroupComponent
-} from './transaction-spending-limit/transaction-spending-limit-access-group/transaction-spending-limit-access-group.component';
-import {
-  TransactionSpendingLimitAssociationComponent
-} from './transaction-spending-limit/transaction-spending-limit-association/transaction-spending-limit-association.component';
-import {
-  TransactionSpendingLimitCoinComponent
-} from './transaction-spending-limit/transaction-spending-limit-coin/transaction-spending-limit-coin.component';
-import {
-  TransactionSpendingLimitDaoCoinLimitOrderComponent
-} from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
-import {
-  TransactionSpendingLimitNftComponent
-} from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component';
-import {
-  TransactionSpendingLimitSectionComponent
-} from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
+import { TransactionSpendingLimitAccessGroupMemberComponent } from './transaction-spending-limit/transaction-spending-limit-access-group-member/transaction-spending-limit-access-group-member.component';
+import { TransactionSpendingLimitAccessGroupComponent } from './transaction-spending-limit/transaction-spending-limit-access-group/transaction-spending-limit-access-group.component';
+import { TransactionSpendingLimitAssociationComponent } from './transaction-spending-limit/transaction-spending-limit-association/transaction-spending-limit-association.component';
+import { TransactionSpendingLimitCoinComponent } from './transaction-spending-limit/transaction-spending-limit-coin/transaction-spending-limit-coin.component';
+import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transaction-spending-limit/transaction-spending-limit-dao-coin-limit-order/transaction-spending-limit-dao-coin-limit-order.component';
+import { TransactionSpendingLimitNftComponent } from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component';
+import { TransactionSpendingLimitSectionComponent } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
-import { NgHcaptchaModule } from 'ng-hcaptcha';
-import {environment} from "../environments/environment";
 
 @NgModule({
   declarations: [
@@ -139,5 +125,4 @@ import {environment} from "../environments/environment";
 
   bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}

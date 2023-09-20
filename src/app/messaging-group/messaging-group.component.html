@@ -1,49 +1,64 @@
 <app-banner></app-banner>
 
 <div *ngIf="error" class="container">
-  Problem verifying input data. Please contact the developer of the app you're using and provide them with the following
-  error message: <span class="text--red-base">{{error}}</span>
+  Problem verifying input data. Please contact the developer of the app you're
+  using and provide them with the following error message:
+  <span class="text--red-base">{{ error }}</span>
 </div>
 <div *ngIf="!error">
   <div *ngIf="!globalVars.callbackInvalid">
     <div class="container">
       <div class="margin-bottom--medium" *ngIf="!globalVars.callback">
-        <span *ngIf="!globalVars.callback">{{ globalVars.hostname }} requests: </span>
+        <span *ngIf="!globalVars.callback"
+          >{{ globalVars.hostname }} requests:
+        </span>
         <span *ngIf="globalVars.callback">Request for:</span>
-        <code class="font-size--medium">{{getOperationString()}}</code>
+        <code class="font-size--medium">{{ getOperationString() }}</code>
       </div>
       <div class="margin-bottom--large">
         <p *ngIf="!updatedGroupOwnerUsername" class="margin-bottom--medium">
-          Public key: 
-          <code class="font-size--medium">{{updatedGroupOwnerPublicKeyBase58Check | truncateAddressOrUsername}}</code>
+          Public key:
+          <code class="font-size--medium">{{
+            updatedGroupOwnerPublicKeyBase58Check | truncateAddressOrUsername
+          }}</code>
         </p>
         <p *ngIf="updatedGroupOwnerUsername">
           Username:
-          <code class="font-size--medium">{{updatedGroupOwnerUsername | truncateAddressOrUsername}}</code>
+          <code class="font-size--medium">{{
+            updatedGroupOwnerUsername | truncateAddressOrUsername
+          }}</code>
         </p>
         Group name:
-        <code class="font-size--medium">{{updatedGroupKeyName}}</code>
+        <code class="font-size--medium">{{ updatedGroupKeyName }}</code>
       </div>
 
       <div *ngIf="operation === MESSAGING_GROUP_OPERATION.DEFAULT_KEY">
         <div class="box--border box--rounded box--large">
-          <p class="margin-bottom--large">DeSo is the first and only blockchain that supports fully decentralized,
-          censorship-resistant, and end-to-end encrypted group chats.</p>
-          <p>Click approve to register the default messaging key. This is usually a one-time setup used to enable
-          group chats on the DeSo blockchain. This additional setup allows for interoperability of group chats
-          across desktop and mobile applications.</p>
+          <p class="margin-bottom--large">
+            DeSo is the first and only blockchain that supports fully
+            decentralized, censorship-resistant, and end-to-end encrypted group
+            chats.
+          </p>
+          <p>
+            Click approve to register the default messaging key. This is usually
+            a one-time setup used to enable group chats on the DeSo blockchain.
+            This additional setup allows for interoperability of group chats
+            across desktop and mobile applications.
+          </p>
         </div>
       </div>
       <div *ngIf="operation === MESSAGING_GROUP_OPERATION.CREATE_GROUP">
         <div class="box--border box--rounded box--large">
-          Click approve to create a new group chat on the DeSo blockchain. We will perform some magic to make sure
-          all messages sent in the chat are securely encrypted 💫
+          Click approve to create a new group chat on the DeSo blockchain. We
+          will perform some magic to make sure all messages sent in the chat are
+          securely encrypted 💫
         </div>
       </div>
       <div *ngIf="operation === MESSAGING_GROUP_OPERATION.ADD_MEMBERS">
         <div class="box--border box--rounded box--large">
-          Click approve to add new users to your group. Members can read and write messages to the group. Only you can
-          add new members, and you can also mute or unmute existing members at any time.
+          Click approve to add new users to your group. Members can read and
+          write messages to the group. Only you can add new members, and you can
+          also mute or unmute existing members at any time.
         </div>
 
         <app-account-select
@@ -53,14 +68,26 @@
           [hideLoginMethod]="true"
         ></app-account-select>
       </div>
-      <div class="box--border box--rounded box--large margin-top--large margin-bottom--large">
+      <div
+        class="box--border box--rounded box--large margin-top--large margin-bottom--large"
+      >
         <span *ngIf="applicationMessagingPublicKeyBase58Check">
-          🔐 <span *ngIf="!globalVars.callback"><strong>{{ globalVars.hostname }}</strong></span>
-          requested access to this group. Make sure you trust this app as it will be able to read messages sent within the group.
+          🔐
+          <span *ngIf="!globalVars.callback"
+            ><strong>{{ globalVars.hostname }}</strong></span
+          >
+          requested access to this group. Make sure you trust this app as it
+          will be able to read messages sent within the group.
         </span>
       </div>
       <div class="justify-content--center display--flex">
-        <button type="button" class="button--medium button--primary" (click)="approveOperation()">Approve</button>
+        <button
+          type="button"
+          class="button--medium button--primary"
+          (click)="approveOperation()"
+        >
+          Approve
+        </button>
       </div>
     </div>
   </div>

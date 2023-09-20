@@ -9,9 +9,8 @@
     >
       <div *ngIf="globalVars.callback; else elseBlock">Continue</div>
       <ng-template #elseBlock
-      >Continue {{ !globalVars.derive ? "to " + globalVars.hostname : ""}}
-      </ng-template
-      >
+        >Continue {{ !globalVars.derive ? 'to ' + globalVars.hostname : '' }}
+      </ng-template>
     </button>
   </div>
 </ng-template>
@@ -38,13 +37,18 @@
 <div
   class="container"
   *ngIf="
-    (globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI) &&
+    (globalVars.inTab ||
+      globalVars.webview ||
+      globalVars.callback ||
+      globalVars.redirectURI) &&
     !loading &&
     user &&
     user.HasPhoneNumber
   "
 >
-  <div class="box--border box--rounded box--large margin-bottom--base text--center">
+  <div
+    class="box--border box--rounded box--large margin-bottom--base text--center"
+  >
     You have already received starter DESO for verifying your phone number.
   </div>
   <ng-container *ngTemplateOutlet="continueToHost"></ng-container>
@@ -52,7 +56,10 @@
 <div
   class="container"
   *ngIf="
-    (globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI) &&
+    (globalVars.inTab ||
+      globalVars.webview ||
+      globalVars.callback ||
+      globalVars.redirectURI) &&
     !loading &&
     user &&
     !user.HasPhoneNumber
@@ -65,15 +72,24 @@
     "
   >
     <div class="section--phone text--center margin-bottom--large">
-      <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
+      <img
+        src="assets/image-coin.svg"
+        width="60"
+        class="section--accounts__illustration"
+      />
       <h3 class="text--neutral-white">Get free $DESO</h3>
-      <p class="font-size--small margin-top--small">We'll send you a small amount of $DESO that will last<br/>you up to
-        thousands of on-chain transactions.</p>
+      <p class="font-size--small margin-top--small">
+        We'll send you a small amount of $DESO that will last<br />you up to
+        thousands of on-chain transactions.
+      </p>
     </div>
     <div class="section--phone__option margin-bottom--medium">
       <p class="margin-bottom--medium">
-        <span class="font-weight--semibold">Verify your phone number for free $DESO.</span> Your phone number will never
-        be shared or used for any marketing purpose. Only to prevent spam.
+        <span class="font-weight--semibold"
+          >Verify your phone number for free $DESO.</span
+        >
+        Your phone number will never be shared or used for any marketing
+        purpose. Only to prevent spam.
       </p>
 
       <form #f="ngForm" [formGroup]="phoneForm">
@@ -170,9 +186,8 @@
           class="button--link button--primary--outline button--medium"
           (click)="cancelButtonClicked()"
           *ngIf="displayForSignupFlow"
-        >Cancel</a
+          >Cancel</a
         >
-
       </div>
     </div>
   </div>
@@ -185,12 +200,20 @@
     "
   >
     <div class="text--center margin-bottom--large">
-      <img src="assets/image-lock.svg" width="60" class="section--accounts__illustration"/>
+      <img
+        src="assets/image-lock.svg"
+        width="60"
+        class="section--accounts__illustration"
+      />
       <h3 class="text--neutral-white">Confirm your authentication code</h3>
-      <p class="font-size--small margin-top--small">Please verify your number by entering the 6 digit code that was sent
-        to you.</p>
+      <p class="font-size--small margin-top--small">
+        Please verify your number by entering the 6 digit code that was sent to
+        you.
+      </p>
     </div>
-    <div class="section--verify__option padding--large bg--neutral-white text--neutral-black">
+    <div
+      class="section--verify__option padding--large bg--neutral-white text--neutral-black"
+    >
       <div class="font-size--medium font-weight--medium margin-bottom--small">
         Enter the 6 digit code sent to {{ phoneNumber }}:
         <div
@@ -199,8 +222,8 @@
           "
           class="margin-top--xsmall text--red-base font-size--medium"
         >
-          You've requested too many verification codes. Please wait 10 minutes and
-          try again.
+          You've requested too many verification codes. Please wait 10 minutes
+          and try again.
         </div>
       </div>
       <form
@@ -247,15 +270,17 @@
             href=""
             class="link--secondary"
             (click)="resendVerificationCode($event)"
-          >Resend</a>
+            >Resend</a
+          >
         </div>
-        <div *ngIf="resentVerificationCode" class="display--flex items--center justify--end">
+        <div
+          *ngIf="resentVerificationCode"
+          class="display--flex items--center justify--end"
+        >
           <div class="text--neutral-black margin-right--xsmall">
             Resend: {{ resentVerificationCodeTimeout }}s
           </div>
-          <i
-            class="far fa-check-circle text--blue-base"
-          ></i>
+          <i class="far fa-check-circle text--blue-base"></i>
         </div>
       </div>
     </div>

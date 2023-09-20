@@ -56,16 +56,18 @@ export const TransactionNonceTranscoder: Transcoder<TransactionNonce | null> = {
   },
   write: (nonce) => {
     if (nonce) {
-      return Buffer.concat([nonce.toBytes()])
+      return Buffer.concat([nonce.toBytes()]);
     }
     return Buffer.alloc(0);
-  }
-}
+  },
+};
 
-export function Optional<T>(transcoder: Transcoder<T>): Transcoder<T|null> {
+export function Optional<T>(transcoder: Transcoder<T>): Transcoder<T | null> {
   return {
-    read: (bytes: Buffer) => !bytes.length ? [null, bytes] : transcoder.read(bytes),
-    write: (value: T | null) => value === null ? Buffer.alloc(0) : transcoder.write(value),
+    read: (bytes: Buffer) =>
+      !bytes.length ? [null, bytes] : transcoder.read(bytes),
+    write: (value: T | null) =>
+      value === null ? Buffer.alloc(0) : transcoder.write(value),
   };
 }
 

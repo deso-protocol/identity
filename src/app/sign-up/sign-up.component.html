@@ -2,24 +2,33 @@
 
 <div
   class="container"
-  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
+  *ngIf="
+    globalVars.inTab ||
+    globalVars.webview ||
+    globalVars.callback ||
+    globalVars.redirectURI
+  "
 >
   <!-- Step 1 -->
   <!-- Generate seed phrase. -->
   <div *ngIf="stepScreen === SignUpComponent.STEP_GENERATE_SEED">
     <div class="section--seed margin-bottom--small">
-      <img src="assets/image-logomark.svg" width="60" class="section--accounts__illustration"/>
-      <div class="font-size--small margin-bottom--small text--text-lighter">Step 1 of {{ stepTotal }}</div>
+      <img
+        src="assets/image-logomark.svg"
+        width="60"
+        class="section--accounts__illustration"
+      />
+      <div class="font-size--small margin-bottom--small text--text-lighter">
+        Step 1 of {{ stepTotal }}
+      </div>
       <h3 class="text--neutral-white">Safely store your DeSo seed phrase</h3>
     </div>
     <p class="font-size--small text--center margin-bottom--large">
-      Write, download, print, or copy it somewhere<br/>safe and secure that only you have access to.
+      Write, download, print, or copy it somewhere<br />safe and secure that
+      only you have access to.
     </p>
     <div class="section--seed__container">
-      <div
-        *ngIf="!entropyService.advancedOpen"
-        class="section--seed__phrase"
-      >
+      <div *ngIf="!entropyService.advancedOpen" class="section--seed__phrase">
         {{ entropyService.temporaryEntropy.mnemonic }}
       </div>
       <div
@@ -38,7 +47,9 @@
       >
         Note that you have added a passphrase in the advanced menu.
       </div>
-      <div class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet">
+      <div
+        class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet"
+      >
         <div class="section--seed__actions">
           <button
             data-control-name="sign-up-with-seed-copy-button"
@@ -53,7 +64,11 @@
               height="16px"
               class="margin-right--small image--invert"
             />
-            <img *ngIf="!seedCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
+            <img
+              *ngIf="!seedCopied"
+              src="assets/copy.svg"
+              class="margin-right--small image--invert"
+            />
             <span>Copy</span>
           </button>
           <button
@@ -62,7 +77,10 @@
             data-control-name="sign-up-with-seed-copy-button"
             data-control-option="download"
           >
-            <img src="assets/download.svg" class="margin-right--small image--invert"/>
+            <img
+              src="assets/download.svg"
+              class="margin-right--small image--invert"
+            />
             <span>Download</span>
           </button>
           <button
@@ -71,7 +89,10 @@
             data-control-name="sign-up-with-seed-copy-button"
             data-control-option="print"
           >
-            <img src="assets/print.svg" class="margin-right--small image--invert"/>
+            <img
+              src="assets/print.svg"
+              class="margin-right--small image--invert"
+            />
             <span>Print</span>
           </button>
         </div>
@@ -92,61 +113,104 @@
           Hide Advanced
         </div>
       </div>
-      <div
-        class="section--seed__advanced"
-        *ngIf="entropyService.advancedOpen"
-      >
+      <div class="section--seed__advanced" *ngIf="entropyService.advancedOpen">
         <div class="padding--none text--neutral-black">
           <div class="font-size--small">
-            <h4 class="font-size--medium font-weight--semibold text--neutral-black margin-bottom--small">Advanced</h4>
+            <h4
+              class="font-size--medium font-weight--semibold text--neutral-black margin-bottom--small"
+            >
+              Advanced
+            </h4>
             <p>
-              Every DeSo wallet consists of a public/private keypair generated using the same key derivation standard
-              used by Bitcoin, namely
-              <a target="_blank" class="link--secondary"
-                 href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a> under the under the
-              m/44'/0'/0'/0/n derivation path.
+              Every DeSo wallet consists of a public/private keypair generated
+              using the same key derivation standard used by Bitcoin, namely
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
+                >BIP39</a
+              >
+              under the under the m/44'/0'/0'/0/n derivation path.
             </p>
             <p class="padding-top--medium">
-              Because of this, you can verify that the wallet is behaving as it should using a standard tool like the
-              <a target="_blank" class="link--secondary" href="https://iancoleman.io/bip39/">Ian Coleman mnemonic
-                generator</a>. To do this, simply click "show entropy details" on Ian Coleman, enter the
-              entropy hex you see below into Ian Coleman, and verify that the seed phrases match.
+              Because of this, you can verify that the wallet is behaving as it
+              should using a standard tool like the
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://iancoleman.io/bip39/"
+                >Ian Coleman mnemonic generator</a
+              >. To do this, simply click "show entropy details" on Ian Coleman,
+              enter the entropy hex you see below into Ian Coleman, and verify
+              that the seed phrases match.
             </p>
             <p class="padding-top--medium">
-              The BIP39 standard very precisely defines how entropy bytes are converted to a seed phrase, and how that
-              seed phrase is converted into public/private keypairs so that your keys can be recovered on any wallet,
-              not just ours. As a result, DeSo seed phrases can also be used with any Bitcoin wallet that implements
-              this standard under the m/44'/0'/0'/0/n derivation path (e.g.
-              <a target="_blank" class="link--secondary" href="https://wallet.mycelium.com/">Mycelium</a>,
-              <a target="_blank" class="link--secondary" href="https://electrum.org/">Electrum</a>).
+              The BIP39 standard very precisely defines how entropy bytes are
+              converted to a seed phrase, and how that seed phrase is converted
+              into public/private keypairs so that your keys can be recovered on
+              any wallet, not just ours. As a result, DeSo seed phrases can also
+              be used with any Bitcoin wallet that implements this standard
+              under the m/44'/0'/0'/0/n derivation path (e.g.
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://wallet.mycelium.com/"
+                >Mycelium</a
+              >,
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://electrum.org/"
+                >Electrum</a
+              >).
             </p>
             <p class="padding-top--medium">
-              Note that Ethereum wallets like MetaMask use a different derivation path, namely
-              <a target="_blank" class="link--secondary"
-                 href="https://community.metamask.io/t/configurable-derivation-path-for-custom-rpcs/1242">m/44'/60'/0'/0/n</a>,
-              so they will NOT produce the same keypairs given the same seed phrase. If you'd like to use MetaMask as
-              your DeSo wallet, please use the login with MetaMask option, which uses MetaMask as your master key to
-              sign a transaction issuing a
-              <a target="_blank" class="link--secondary" href="https://blog.deso.com/blog/how-metamask-works">derived
-                key</a> that is then used as your DeSo key. The approach of issuing a derived key allows you to use DeSo
-              apps without having to confirm/sign every transaction in MetaMask.
+              Note that Ethereum wallets like MetaMask use a different
+              derivation path, namely
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://community.metamask.io/t/configurable-derivation-path-for-custom-rpcs/1242"
+                >m/44'/60'/0'/0/n</a
+              >, so they will NOT produce the same keypairs given the same seed
+              phrase. If you'd like to use MetaMask as your DeSo wallet, please
+              use the login with MetaMask option, which uses MetaMask as your
+              master key to sign a transaction issuing a
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://blog.deso.com/blog/how-metamask-works"
+                >derived key</a
+              >
+              that is then used as your DeSo key. The approach of issuing a
+              derived key allows you to use DeSo apps without having to
+              confirm/sign every transaction in MetaMask.
             </p>
             <p class="padding-top--medium">
-              The entropy below was randomly generated, but you can edit the fields below to use your own randomness to
-              generate the DeSo seed phrase. You can also, alternatively, use a tool like
-              <a target="_blank" class="link--secondary" href="https://iancoleman.io/bip39/">Ian Coleman</a> to generate
-              a seed phrase using dice rolls, and then enter that seed phrase here.
+              The entropy below was randomly generated, but you can edit the
+              fields below to use your own randomness to generate the DeSo seed
+              phrase. You can also, alternatively, use a tool like
+              <a
+                target="_blank"
+                class="link--secondary"
+                href="https://iancoleman.io/bip39/"
+                >Ian Coleman</a
+              >
+              to generate a seed phrase using dice rolls, and then enter that
+              seed phrase here.
             </p>
           </div>
 
           <div class="margin-bottom--medium margin-top--medium">
-            <p class="font-size--medium font-weight--semibold margin-bottom--small">
+            <p
+              class="font-size--medium font-weight--semibold margin-bottom--small"
+            >
               Custom DeSo seed phrase (must be
               <a
                 target="_blank"
                 class="link--secondary"
                 href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki"
-              >BIP39</a
+                >BIP39</a
               >
               mnemonic):
             </p>
@@ -165,7 +229,11 @@
           </div>
 
           <div class="margin-bottom--medium">
-            <p class="font-size--medium font-weight--semibold margin-bottom--small">Passphrase:</p>
+            <p
+              class="font-size--medium font-weight--semibold margin-bottom--small"
+            >
+              Passphrase:
+            </p>
             <textarea
               [(ngModel)]="entropyService.temporaryEntropy.extraText"
               (ngModelChange)="normalizeExtraText()"
@@ -175,7 +243,9 @@
           </div>
 
           <div class="margin-bottom--medium">
-            <p class="font-size--medium font-weight--semibold margin-bottom--small">
+            <p
+              class="font-size--medium font-weight--semibold margin-bottom--small"
+            >
               Custom Entropy (hex = base16 = [0-9a-f]):
             </p>
             <p
@@ -205,8 +275,8 @@
       </div>
     </div>
     <div class="warning--error margin-top--medium">
-      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of
-      https://identity.deso.org
+      If you lose your DeSo seed phrase your account will be lost forever.<br />Never
+      enter it anywhere outside of https://identity.deso.org
     </div>
     <div class="margin-top--medium padding-bottom--xlarge">
       <button
@@ -231,15 +301,23 @@
   <!-- Verify seed phrase. -->
   <div *ngIf="stepScreen === SignUpComponent.STEP_VERIFY_SEED">
     <div class="section--seed margin-bottom--small">
-      <img src="assets/image-logomark.svg" width="60" class="section--accounts__illustration"/>
-      <div class="font-size--small margin-bottom--small text--text-lighter">Step 2 of {{ stepTotal }}</div>
+      <img
+        src="assets/image-logomark.svg"
+        width="60"
+        class="section--accounts__illustration"
+      />
+      <div class="font-size--small margin-bottom--small text--text-lighter">
+        Step 2 of {{ stepTotal }}
+      </div>
       <h3 class="text--neutral-white">Verify your DeSo seed phrase</h3>
     </div>
     <div class="font-size--small text--center margin-bottom--large">
       Never share your DeSo seed phrase with anyone.
     </div>
     <div class="section--seed__container">
-      <p class="font-size--medium font-weight--semibold margin-bottom--small text--neutral-black">
+      <p
+        class="font-size--medium font-weight--semibold margin-bottom--small text--neutral-black"
+      >
         Verify:
       </p>
       <textarea
@@ -269,15 +347,14 @@
     <div class="margin-bottom--base margin-top--base">
       <div class="text--text-base font-size--small">
         By proceeding, you agree to the
-        <a
-          (click)="clickTos()"
-          data-control-name="sign-up-with-seed-tos-link"
-        >Terms of Service</a>.
+        <a (click)="clickTos()" data-control-name="sign-up-with-seed-tos-link"
+          >Terms of Service</a
+        >.
       </div>
     </div>
     <div class="warning--error margin-top--medium">
-      If you lose your DeSo seed phrase your account will be lost forever.<br/>Never enter it anywhere outside of
-      https://identity.deso.org
+      If you lose your DeSo seed phrase your account will be lost forever.<br />Never
+      enter it anywhere outside of https://identity.deso.org
     </div>
     <div class="margin-top--medium">
       <div>

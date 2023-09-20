@@ -8,11 +8,11 @@
       />
       <div class="display--block" style="max-width: 100px">
         {{
-        daoCoinLimitOrderLimitItem?.BuyingPublicKey === 'DESO'
-        ? '$DESO'
-        : buyingUser?.ProfileEntryResponse?.Username ||
-        (daoCoinLimitOrderLimitItem?.BuyingPublicKey
-        | truncateAddressOrUsername)
+          daoCoinLimitOrderLimitItem?.BuyingPublicKey === 'DESO'
+            ? '$DESO'
+            : buyingUser?.ProfileEntryResponse?.Username ||
+              (daoCoinLimitOrderLimitItem?.BuyingPublicKey
+                | truncateAddressOrUsername)
         }}
       </div>
     </div>
@@ -25,16 +25,18 @@
       ></div>
       <div class="display--block" style="max-width: 100px">
         {{
-        daoCoinLimitOrderLimitItem?.SellingPublicKey === 'DESO'
-        ? '$DESO'
-        : sellingUser?.ProfileEntryResponse?.Username ||
-        (daoCoinLimitOrderLimitItem?.SellingPublicKey
-        | truncateAddressOrUsername)
+          daoCoinLimitOrderLimitItem?.SellingPublicKey === 'DESO'
+            ? '$DESO'
+            : sellingUser?.ProfileEntryResponse?.Username ||
+              (daoCoinLimitOrderLimitItem?.SellingPublicKey
+                | truncateAddressOrUsername)
         }}
       </div>
     </div>
     <div class="display--flex width--20 items-center justify--center">
-      <div>{{ globalVars.formatTxCountLimit(daoCoinLimitOrderLimitItem?.OpCount) }}</div>
+      <div>
+        {{ globalVars.formatTxCountLimit(daoCoinLimitOrderLimitItem?.OpCount) }}
+      </div>
     </div>
   </div>
 </div>

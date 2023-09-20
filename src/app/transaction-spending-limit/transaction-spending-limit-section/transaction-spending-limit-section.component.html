@@ -6,7 +6,9 @@
     <div class="justify--between text--left">
       <div class="items--center width--full">
         <div class="font--small text--text-lightest">
-          <app-arrow-toggle (click)="showDetails = !showDetails"></app-arrow-toggle>
+          <app-arrow-toggle
+            (click)="showDetails = !showDetails"
+          ></app-arrow-toggle>
           {{ sectionTitle }}
         </div>
         <div class="font--small paddin-top--small padding-left--large">
@@ -52,8 +54,7 @@
             TransactionSpendingLimitComponent.DAOCoinLimitsSection
         "
       >
-        <div *ngIf="anyCreatorItem"
-             class="margin-bottom--medium">
+        <div *ngIf="anyCreatorItem" class="margin-bottom--medium">
           <app-transaction-spending-limit-coin
             coinPublicKey=""
             [coinOperationMap]="anyCreatorItem"
@@ -84,8 +85,7 @@
           sectionTitle === TransactionSpendingLimitComponent.NFTLimitsSection
         "
       >
-        <div *ngIf="anyNFTItem"
-             class="margin-bottom--medium">
+        <div *ngIf="anyNFTItem" class="margin-bottom--medium">
           <app-transaction-spending-limit-nft
             nftPostHashHex=""
             [nftSerialNumToOperationMap]="anyNFTItem"
@@ -160,9 +160,7 @@
             let associationLimitMapItem of associationLimitMap
               | slice
                 : 0
-                : (showAll
-                    ? associationLimitMap.length
-                    : defaultNumShown)
+                : (showAll ? associationLimitMap.length : defaultNumShown)
           "
           class="display--flex flex--column padding-bottom--small"
         >
@@ -182,21 +180,24 @@
             let accessGroupLimitMapItem of accessGroupLimitMap
               | slice
                 : 0
-                : (showAll
-                    ? accessGroupLimitMap.length
-                    : defaultNumShown)
+                : (showAll ? accessGroupLimitMap.length : defaultNumShown)
           "
           class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-access-group
             [accessGroupLimitMapItem]="accessGroupLimitMapItem"
-            [appUser]="userMap[accessGroupLimitMapItem.AccessGroupOwnerPublicKeyBase58Check]"
+            [appUser]="
+              userMap[
+                accessGroupLimitMapItem.AccessGroupOwnerPublicKeyBase58Check
+              ]
+            "
           ></app-transaction-spending-limit-access-group>
         </div>
       </ng-container>
       <ng-container
         *ngIf="
-          sectionTitle === TransactionSpendingLimitComponent.AccessGroupMemberSection
+          sectionTitle ===
+          TransactionSpendingLimitComponent.AccessGroupMemberSection
         "
       >
         <div
@@ -204,15 +205,18 @@
             let accessGroupMemberLimitMapItem of accessGroupMemberLimitMap
               | slice
                 : 0
-                : (showAll
-                    ? accessGroupMemberLimitMap.length
-                    : defaultNumShown)
+                : (showAll ? accessGroupMemberLimitMap.length : defaultNumShown)
           "
           class="display--flex flex--column padding-bottom--medium"
         >
           <app-transaction-spending-limit-access-group-member
             [accessGroupMemberLimitMapItem]="accessGroupMemberLimitMapItem"
-            [appUser]="userMap[accessGroupMemberLimitMapItem.AccessGroupOwnerPublicKeyBase58Check]"
+            [appUser]="
+              userMap[
+                accessGroupMemberLimitMapItem
+                  .AccessGroupOwnerPublicKeyBase58Check
+              ]
+            "
           ></app-transaction-spending-limit-access-group-member>
         </div>
       </ng-container>

@@ -10,7 +10,7 @@ import {
   TransactionNonceTranscoder,
   Uint8,
   Uvarint64,
-  VarBuffer
+  VarBuffer,
 } from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {

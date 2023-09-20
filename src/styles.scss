@@ -2,12 +2,12 @@
 // BREAKPOINTS
 //-------------------------------
 $breakpoints: (
-  "mobile": 320px,
-  "tablet": 640px,
-  "desktop": 960px,
-  "desktop-large": 1280px,
-  "desktop-xlarge": 1440px,
-  "desktop-2xlarge": 1600px
+  'mobile': 320px,
+  'tablet': 640px,
+  'desktop': 960px,
+  'desktop-large': 1280px,
+  'desktop-xlarge': 1440px,
+  'desktop-2xlarge': 1600px,
 );
 
 @mixin media($breakpoint) {
@@ -33,20 +33,21 @@ $breakpoints: (
 //-------------------------------
 // FONTS = Families
 //-------------------------------
-$font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+  Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
 //-------------------------------
 // FONTS = Sizes
 //-------------------------------
 $font-sizes: (
-  "xsmall": 12px,
-  "small": 14px,
-  "medium": 16px,
-  "large": 22px,
-  "xlarge": 28px,
-  "2xlarge": 34px,
-  "3xlarge": 48px,
-  "4xlarge": 60px
+  'xsmall': 12px,
+  'small': 14px,
+  'medium': 16px,
+  'large': 22px,
+  'xlarge': 28px,
+  '2xlarge': 34px,
+  '3xlarge': 48px,
+  '4xlarge': 60px,
 );
 
 @mixin font-size($size-key) {
@@ -68,11 +69,11 @@ $font-sizes: (
 // FONTS = Weights
 //-------------------------------
 $font-weights: (
-  "light": 200,
-  "regular": 400,
-  "medium": 500,
-  "semibold": 600,
-  "bold": 800,
+  'light': 200,
+  'regular': 400,
+  'medium': 500,
+  'semibold': 600,
+  'bold': 800,
 );
 
 @mixin font-weight($weight-key) {
@@ -94,43 +95,43 @@ $font-weights: (
 // COLORS
 //-------------------------------
 $colors: (
-  "text": (
-    "lightest": #ccdff3fb,
-    "lighter": #93c5fdcc,
-    "base": #93c5fd99
+  'text': (
+    'lightest': #ccdff3fb,
+    'lighter': #93c5fdcc,
+    'base': #93c5fd99,
   ),
-  "neutral": (
-    "white": #FFF,
-    "black": #000,
-    "transparent": transparent,
+  'neutral': (
+    'white': #fff,
+    'black': #000,
+    'transparent': transparent,
   ),
-  "blue": (
-    "lighter": lighten(#1d40b0, 40%),
-    "light": lighten(#1d40b0, 20%),
-    "base": #1d40b0,
-    "dark": #1b3561,
-    "darker": #0b183a,
+  'blue': (
+    'lighter': lighten(#1d40b0, 40%),
+    'light': lighten(#1d40b0, 20%),
+    'base': #1d40b0,
+    'dark': #1b3561,
+    'darker': #0b183a,
   ),
-  "red": (
-    "lighter": #ffc2be,
-    "light": #e84a49,
-    "base": #c03230,
-    "dark": #8a1c1b,
-    "darker": #460a0997,
+  'red': (
+    'lighter': #ffc2be,
+    'light': #e84a49,
+    'base': #c03230,
+    'dark': #8a1c1b,
+    'darker': #460a0997,
   ),
-  "yellow": (
-    "lighter": #ffffe0,
-    "light": #ffff00,
-    "base": #ffd700,
-    "dark": #ff8c00,
-    "darker": #ff4500,
+  'yellow': (
+    'lighter': #ffffe0,
+    'light': #ffff00,
+    'base': #ffd700,
+    'dark': #ff8c00,
+    'darker': #ff4500,
   ),
-  "green": (
-    "lighter": #90ee90,
-    "light": #32cd32,
-    "base": #008000,
-    "dark": #006400,
-    "darker": #002800,
+  'green': (
+    'lighter': #90ee90,
+    'light': #32cd32,
+    'base': #008000,
+    'dark': #006400,
+    'darker': #002800,
   ),
 );
 
@@ -163,21 +164,31 @@ $colors: (
 // SPACING UNITS
 //-------------------------------
 $spacing-units: (
-  "none": 0,
-  "xsmall": 4px,
-  "small": 8px,
-  "medium": 16px,
-  "base": 24px,
-  "large": 32px,
-  "xlarge": 64px,
-  "2xlarge": 128px,
-  "3xlarge": 256px,
-  "4xlarge": 512px
+  'none': 0,
+  'xsmall': 4px,
+  'small': 8px,
+  'medium': 16px,
+  'base': 24px,
+  'large': 32px,
+  'xlarge': 64px,
+  '2xlarge': 128px,
+  '3xlarge': 256px,
+  '4xlarge': 512px,
 );
 
 $directions: (
-  "padding": ( "left", "right", "top", "bottom" ),
-  "margin": ( "left", "right", "top", "bottom" ),
+  'padding': (
+    'left',
+    'right',
+    'top',
+    'bottom',
+  ),
+  'margin': (
+    'left',
+    'right',
+    'top',
+    'bottom',
+  ),
 );
 
 @mixin spacing($property, $values...) {
@@ -202,15 +213,37 @@ $directions: (
 // WIDTH
 //-------------------------------
 $sizes: (
-  0, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 33, 49
+  0,
+  05,
+  10,
+  15,
+  20,
+  25,
+  30,
+  35,
+  40,
+  45,
+  50,
+  55,
+  60,
+  65,
+  70,
+  75,
+  80,
+  85,
+  90,
+  95,
+  100,
+  33,
+  49
 );
 
 @mixin width($size) {
-  width: unquote($size + "%");
+  width: unquote($size + '%');
 }
 
 @mixin gap($size) {
-  gap: unquote($size + "px");
+  gap: unquote($size + 'px');
 }
 
 @each $size in $sizes {
@@ -221,16 +254,16 @@ $sizes: (
 
 @each $size in $sizes {
   .gap--#{$size}--mobile {
-    @include media(mobile){
-       @include gap($size);
+    @include media(mobile) {
+      @include gap($size);
     }
   }
 }
 
 @each $size in $sizes {
   .gap--#{$size}--tablet {
-    @include media(tablet){
-       @include gap($size);
+    @include media(tablet) {
+      @include gap($size);
     }
   }
 }
@@ -239,12 +272,12 @@ $sizes: (
 // BORDER RADIUS = Sizes
 //-------------------------------
 $border-radius: (
-  "xsmall": 4px,
-  "small": 8px,
-  "medium": 12px,
-  "base": 20px,
-  "pill": 100px,
-  "circle": 100%,
+  'xsmall': 4px,
+  'small': 8px,
+  'medium': 12px,
+  'base': 20px,
+  'pill': 100px,
+  'circle': 100%,
 );
 
 @mixin border-radius($size-key) {
@@ -262,11 +295,12 @@ $border-radius: (
   }
 }
 
-
 //-------------------------------
 // HTML & BODY
 //-------------------------------
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -277,7 +311,13 @@ body {
   width: 100%;
   overflow-x: hidden;
   background-color: #040609;
-  background-image: linear-gradient(0deg,#040609,#040609 10%,#050e1d 90%,#050e1d);
+  background-image: linear-gradient(
+    0deg,
+    #040609,
+    #040609 10%,
+    #050e1d 90%,
+    #050e1d
+  );
   margin: 0;
   @include color('text', 'base', 'color');
 }
@@ -296,11 +336,15 @@ img {
   filter: invert(1);
 }
 
-
 //-------------------------------
 // TYPOGRAPHY
 //-------------------------------
-h1, h2, h3, h4, h5, h6{
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   @include spacing('margin', 'none');
   font-weight: normal;
   line-height: 1.5;
@@ -383,7 +427,8 @@ code {
 //-------------------------------
 // LINKS = Styles
 //-------------------------------
-a, .link--primary {
+a,
+.link--primary {
   @include color('text', 'lighter', 'color');
   text-decoration: underline;
   &:hover {
@@ -553,16 +598,24 @@ a, .link--primary {
   flex-direction: row-reverse;
 }
 .flex--column--tablet {
-  @include media(tablet) { flex-direction: column; };
+  @include media(tablet) {
+    flex-direction: column;
+  }
 }
 .flex--row--tablet {
-  @include media(tablet) { flex-direction: row; };
+  @include media(tablet) {
+    flex-direction: row;
+  }
 }
 .flex--column-reverse--tablet {
-  @include media(tablet) { flex-direction: column-reverse; };
+  @include media(tablet) {
+    flex-direction: column-reverse;
+  }
 }
 .flex--row-reverse--tablet {
-  @include media(tablet) { flex-direction: row-reverse; };
+  @include media(tablet) {
+    flex-direction: row-reverse;
+  }
 }
 //-------------------------------
 // LAYOUT
@@ -687,7 +740,7 @@ a, .link--primary {
   margin: 0 auto;
 }
 .section--login__common {
-  @include spacing('margin-bottom', 'medium')
+  @include spacing('margin-bottom', 'medium');
 }
 .section--login__advanced {
   @include color('blue', 'dark', 'border-color');
@@ -775,7 +828,7 @@ a, .link--primary {
   width: 100%;
   height: 100%;
   @include color('text', 'base', 'color');
-  @include color('neutral', 'white','background-color');
+  @include color('neutral', 'white', 'background-color');
   @include border-radius('base');
   @include font-size('medium');
   @include spacing('padding', 'large');
@@ -785,7 +838,7 @@ a, .link--primary {
   @include font-size('medium');
   @include spacing('line-height', 'large');
   @include spacing('word-spacing', 'large');
-  @include color('neutral', 'black', 'color')
+  @include color('neutral', 'black', 'color');
 }
 .section--seed__actions {
   display: flex;
@@ -796,7 +849,7 @@ a, .link--primary {
   border-top: 1px solid;
   @include spacing('margin-top', 'large');
   @include spacing('padding-top', 'large');
-  @include color('blue', 'dark', 'border-top-color')
+  @include color('blue', 'dark', 'border-top-color');
 }
 //-------------------------------
 // SECTION = Get Starter DeSo
@@ -842,7 +895,7 @@ a, .link--primary {
   border-bottom: 1px solid;
   @include font-size('medium');
   @include spacing('padding', 'base');
-  @include color('blue','dark','border-bottom-color');
+  @include color('blue', 'dark', 'border-bottom-color');
   &:last-of-type {
     border-bottom: none;
   }
@@ -909,7 +962,8 @@ a, .link--primary {
   width: 100%;
   position: relative;
   text-align: center;
-  &:after, &:before {
+  &:after,
+  &:before {
     content: '';
     border-bottom: 1px solid;
     width: 45%;
@@ -1037,7 +1091,9 @@ a, .link--primary {
 //-------------------------
 // Wallet Connect
 //-------------------------
-.walletconnect-qrcode__image, .walletconnect-qrcode__text, .walletconnect-modal__footer {
+.walletconnect-qrcode__image,
+.walletconnect-qrcode__text,
+.walletconnect-modal__footer {
   display: none !important;
 }
 
@@ -1081,10 +1137,10 @@ a, .link--primary {
     display: none !important;
   }
   .swal2-popup {
-    @include spacing('padding-top','base');
-    @include spacing('padding-bottom','base');
-    @include spacing('padding-right','base');
-    @include spacing('padding-left','base');
+    @include spacing('padding-top', 'base');
+    @include spacing('padding-bottom', 'base');
+    @include spacing('padding-right', 'base');
+    @include spacing('padding-left', 'base');
     @include color('blue', 'base', 'background-color');
   }
   .swal2-title {
@@ -1103,6 +1159,6 @@ a, .link--primary {
     @include color('neutral', 'white', 'color');
   }
   &.swal2-backdrop-show {
-    background-color: rgba(0,0,0,.8) !important;
+    background-color: rgba(0, 0, 0, 0.8) !important;
   }
 }

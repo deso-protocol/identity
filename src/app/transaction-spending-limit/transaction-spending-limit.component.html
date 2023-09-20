@@ -7,18 +7,22 @@
       <div class="text-left">Cumulative Spending Limit</div>
       <code class="font-size--medium">
         {{
-        globalVars.nanosToDeSo(
-        transactionSpendingLimitResponse.GlobalDESOLimit || 0,
-        4
-        )
+          globalVars.nanosToDeSo(
+            transactionSpendingLimitResponse.GlobalDESOLimit || 0,
+            4
+          )
         }}
         DESO
       </code>
     </div>
 
     <div class="margin-top--large margin-bottom--large">
-      <p class="margin-bottom--small font-size--small text--text-lighter margin-bottom--base">By clicking approve, you
-        are granting all of the listed permissions to {{globalVars.hostname}} </p>
+      <p
+        class="margin-bottom--small font-size--small text--text-lighter margin-bottom--base"
+      >
+        By clicking approve, you are granting all of the listed permissions to
+        {{ globalVars.hostname }}
+      </p>
       <button
         data-control-name="tx-spending-limit-approve-button"
         [attr.data-control-is-unlimited]="
@@ -34,7 +38,9 @@
         (click)="this.onApproveClickWrapper()"
         [disabled]="this.isPendingApprove"
       >
-        <span *ngIf="!this.isPendingApprove; else loadingSpinner">Yes, I Approve</span>
+        <span *ngIf="!this.isPendingApprove; else loadingSpinner"
+          >Yes, I Approve</span
+        >
         <ng-template #loadingSpinner>
           <div
             class="spinner-border margin-left--xsmall"
