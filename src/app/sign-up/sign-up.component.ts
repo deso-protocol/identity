@@ -117,7 +117,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
       keychain,
       mnemonic,
       extraText,
-      network
+      network,
+      0
     );
 
     this.accountService.setAccessLevel(
