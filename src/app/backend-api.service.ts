@@ -291,24 +291,24 @@ export class BackendAPIService {
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
+    const account = this.accountService.getAccountInfo(publicKey);
     // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
     // this is happening.
     logInteractionEvent('backend-api', 'jwt-post', {
-      hasPublicUserInfo: !!publicUserInfo,
+      hasPublicUserInfo: !!account,
     });
 
-    if (!publicUserInfo) {
+    if (!account) {
       return of(null);
     }
-    const isDerived = this.accountService.isMetamaskAccount(publicUserInfo);
+    const isDerived = this.accountService.isMetamaskAccount(account);
 
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
+    const jwt = this.signingService.signJWT(
+      account.seedHex,
+      account.accountNumber,
+      isDerived
     );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
     return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 

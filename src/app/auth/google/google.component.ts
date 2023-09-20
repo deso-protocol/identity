@@ -93,7 +93,10 @@ export class GoogleComponent implements OnInit {
             mnemonic,
             extraText,
             network,
-            true
+            0,
+            {
+              google: true,
+            }
           );
         } catch (err) {
           console.error(err);
@@ -146,7 +149,10 @@ export class GoogleComponent implements OnInit {
           mnemonic,
           extraText,
           network,
-          true
+          0,
+          {
+            google: true,
+          }
         );
         this.loading = false;
       });

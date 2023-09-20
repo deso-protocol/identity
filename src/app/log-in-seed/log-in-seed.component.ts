@@ -85,41 +85,41 @@ export class LogInSeedComponent implements OnInit {
         keychain,
         mnemonic,
         extraText,
-        network
+        network,
+        0
       );
 
       // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
       if (keychain.publicKey !== keychainNonStandard.publicKey) {
         const seedHex =
           this.cryptoService.keychainToSeedHex(keychainNonStandard);
-        const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+        const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, 0);
         const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
           privateKey,
           network
         );
 
         // We only want to add nonStandard derivations if the account is worth importing
-        this.backendApi
-          .GetUsersStateless([publicKey], true, true)
-          .subscribe((res) => {
-            if (!res.UserList.length) {
-              return;
-            }
-            const user = res.UserList[0];
-            if (
-              user.ProfileEntryResponse ||
-              user.BalanceNanos > 0 ||
-              user.UsersYouHODL?.length
-            ) {
-              // Add the non-standard key if the user has a profile, a balance, or holdings
-              userPublicKey = this.accountService.addUser(
-                keychainNonStandard,
-                mnemonic,
-                extraText,
-                network
-              );
-            }
-          });
+        this.backendApi.GetUsersStateless([publicKey]).subscribe((res) => {
+          if (!res.UserList.length) {
+            return;
+          }
+          const user = res.UserList[0];
+          if (
+            user.ProfileEntryResponse ||
+            user.BalanceNanos > 0 ||
+            user.UsersYouHODL?.length
+          ) {
+            // Add the non-standard key if the user has a profile, a balance, or holdings
+            userPublicKey = this.accountService.addUser(
+              keychainNonStandard,
+              mnemonic,
+              extraText,
+              network,
+              0
+            );
+          }
+        });
       }
     }
 
