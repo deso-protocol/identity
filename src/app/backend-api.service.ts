@@ -349,7 +349,7 @@ export class BackendAPIService {
     publicKeys: string[]
   ): Observable<{ [key: string]: UserProfile }> {
     const userProfiles: { [key: string]: any } = {};
-    const req = this.GetUsersStateless(publicKeys, true);
+    const req = this.GetUsersStateless(publicKeys, true, true);
     if (publicKeys.length > 0) {
       return req
         .pipe(
@@ -358,6 +358,7 @@ export class BackendAPIService {
               userProfiles[user.PublicKeyBase58Check] = {
                 username: user.ProfileEntryResponse?.Username,
                 profilePic: user.ProfileEntryResponse?.ProfilePic,
+                balanceNanos: user.BalanceNanos,
               };
             }
             return userProfiles;

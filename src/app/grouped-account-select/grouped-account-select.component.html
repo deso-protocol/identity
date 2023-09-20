@@ -66,6 +66,13 @@
                     *ngIf="!this.globalVars.isMobile()"
                     class="display--flex flex--column items--end"
                   >
+                    <span
+                      class="font-weight--bold font-size--xsmall margin-right--small"
+                      >{{
+                        globalVars.abbreviateNumber(account.balanceNanos / 1e9)
+                      }}
+                      $DESO</span
+                    >
                     <span class="font-size--xsmall margin-right--small"
                       >Account: {{ account.accountNumber }}</span
                     >

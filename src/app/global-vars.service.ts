@@ -180,4 +180,36 @@ export class GlobalVarsService {
   formatTxCountLimit(count: number = 0): string {
     return count >= 1e9 ? 'UNLIMITED' : count.toLocaleString();
   }
+
+  abbreviateNumber(value: number) {
+    if (value === 0) {
+      return '0';
+    }
+
+    if (value < 0) {
+      return value.toString();
+    }
+    if (value < 0.01) {
+      return value.toFixed(5);
+    }
+    if (value < 0.1) {
+      return value.toFixed(4);
+    }
+
+    let shortValue;
+    const suffixes = ['', 'K', 'M', 'B', 'e12', 'e15', 'e18', 'e21'];
+    const suffixNum = Math.floor((('' + value.toFixed(0)).length - 1) / 3);
+    shortValue = value / Math.pow(1000, suffixNum);
+    if (
+      Math.floor(shortValue / 100) > 0 ||
+      shortValue / 1 === 0 ||
+      suffixNum > 3
+    ) {
+      return shortValue.toFixed(0) + suffixes[suffixNum];
+    }
+    if (Math.floor(shortValue / 10) > 0 || Math.floor(shortValue) > 0) {
+      return shortValue.toFixed(2) + suffixes[suffixNum];
+    }
+    return shortValue.toFixed(3) + suffixes[suffixNum];
+  }
 }
