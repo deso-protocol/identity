@@ -164,6 +164,7 @@ $colors: (
 // SPACING UNITS
 //-------------------------------
 $spacing-units: (
+<<<<<<< HEAD
   'none': 0,
   'xsmall': 4px,
   'small': 8px,
@@ -174,6 +175,19 @@ $spacing-units: (
   '2xlarge': 128px,
   '3xlarge': 256px,
   '4xlarge': 512px,
+=======
+  "auto": auto,
+  "none": 0,
+  "xsmall": 4px,
+  "small": 8px,
+  "medium": 16px,
+  "base": 24px,
+  "large": 32px,
+  "xlarge": 64px,
+  "2xlarge": 128px,
+  "3xlarge": 256px,
+  "4xlarge": 512px
+>>>>>>> ab7aea1 (feature: new component for sub account UI)
 );
 
 $directions: (
@@ -806,7 +820,6 @@ a,
   @include spacing('padding-right', 'medium');
   @include spacing('padding-top', 'small');
   @include spacing('padding-bottom', 'small');
-  @include spacing('margin-top', 'small');
   @include color('text', 'lighter', 'color');
   @include color('blue', 'darker', 'background-color');
   @include color('blue', 'dark', 'border-color');
@@ -1161,4 +1174,12 @@ a,
   &.swal2-backdrop-show {
     background-color: rgba(0, 0, 0, 0.8) !important;
   }
+}
+
+.styleless-button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
