@@ -1,33 +1,62 @@
 <div class="dialog">
-  <h1></h1>
-  <div *ngIf="!this.secrets">
-    <p class="margin-bottom--small">
-      Your seed phrase is the only way to recover your DeSo account. If you lose
-      your seed phrase, you will lose access to your DeSo account.
-    </p>
-    <p class="margin-bottom--small font-size--large">
-      <strong>DO NOT share your seed phrase with anyone!</strong>
-    </p>
-    <p class="margin-bottom--small">
-      <strong>DeSo support agents will ever request this.</strong>
-    </p>
-    <p class="margin-bottom--small">
-      Write down your seed phrase and store it in a safe place!
-    </p>
-    <button (click)="onContinue()">Continue</button>
-    <button (click)="onCancel()">Cancel</button>
-  </div>
+  <header class="dialog__header">
+    <button class="dialog__x" style="top: 0; right: 0" (click)="onCancel()">
+      <i-feather name="x" />
+    </button>
+    <h1 class="dialog__title">Backup Recovery Data</h1>
+  </header>
+  <div class="dialog__body">
+    <div *ngIf="!this.displayValues" class="text--center">
+      <p class="margin-bottom--small">
+        Your seed phrase is the only way to recover your DeSo account. If you
+        lose your seed phrase, you will lose access to your DeSo account. Store
+        it in a safe and secure place.
+      </p>
+      <p class="margin-bottom--small font-size--large text--neutral-white">
+        <strong
+          >DO NOT share your seed phrase with anyone! DeSo support agents will
+          never request this.</strong
+        >
+      </p>
+      <footer class="display--flex">
+        <button
+          class="button--medium button--primary margin-right--small"
+          (click)="onContinue()"
+        >
+          Continue
+        </button>
+        <button class="button--medium button--secondary" (click)="onCancel()">
+          Cancel
+        </button>
+      </footer>
+    </div>
 
-  <div *ngIf="this.secrets">
-    <p>{{ this.secrets.mnemonic }}</p>
-    <p>{{ this.secrets.extraText }}</p>
-    <p>{{ this.secrets.seedHex }}</p>
-    <button (click)="onDisableExport()">Disable seed phrase export</button>
-    <p>
-      Recommended: Disabling export makes your account more secure by preventing
-      anyone from revealing your seed phrase, even if they've gained access to
-      your device. Only disable export once you're sure that you've backed up
-      your seed phrase and stored it in a safe place.
-    </p>
+    <ng-container *ngIf="this.secrets">
+      <div class="margin-bottom--small">
+        <p>Seed Phrase</p>
+        <recovery-secret [secret]="this.secrets.mnemonic" />
+      </div>
+      <div *ngIf="this.secrets.extraText" class="margin-bottom--small">
+        <p>Pass Phrase</p>
+        <recovery-secret [secret]="this.secrets.extraText"/>
+      </div>
+      <div>
+        <p>Seed Hex</p>
+        <recovery-secret [secret]="this.secrets.seedHex"/>
+      </div>
+      <button
+        class="button--primary button--medium margin-top--large"
+        (click)="onDisableExport()"
+      >
+        Disable recovery data backup
+      </button>
+      <p class="font-size--small text--center margin-top--xsmall">
+        Disabling backup is recommended because it makes your account more
+        secure by preventing anyone from revealing your seed phrase in the
+        future, even if they've gained access to your device. Only disable
+        backup once you're sure that you've copied your seed phrase and stored
+        it in a safe place.
+      </p>
+    </ng-container>
   </div>
 </div>

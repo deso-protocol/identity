@@ -72,6 +72,7 @@ import {
   TransactionSpendingLimitSectionComponent
 } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
+import { RecoverySecretComponent } from './grouped-account-select/recovery-secret/recovery-secret.component';
 
 @NgModule({
   declarations: [
@@ -117,6 +118,7 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     TransactionSpendingLimitAccessGroupMemberComponent,
     GroupedAccountSelectComponent,
     ExportSeedDialogComponent,
+    RecoverySecretComponent,
   ],
   imports: [
     BrowserModule,
