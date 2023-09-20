@@ -32,7 +32,6 @@ export class DeriveComponent implements OnInit {
   transactionSpendingLimitResponse:
     | TransactionSpendingLimitResponse
     | undefined;
-  hasUsers = false;
   hoveredAccount = -1;
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
@@ -54,10 +53,6 @@ export class DeriveComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Load profile pictures and usernames
-    const publicKeys = this.accountService.getPublicKeys();
-    this.hasUsers = publicKeys.length > 0;
-
     this.backendApi.GetAppState().subscribe((res) => {
       this.blockHeight = res.BlockHeight;
     });

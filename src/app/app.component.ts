@@ -66,6 +66,10 @@ export class AppComponent implements OnInit {
       this.globalVars.getFreeDeso = true;
     }
 
+    if (params.get('subAccounts') === 'true') {
+      this.globalVars.subAccounts = true;
+    }
+
     // Callback should only be used in mobile applications, where payload is passed through URL parameters.
     const callback = params.get('callback') || stateParamsFromGoogle.callback;
     if (callback) {
