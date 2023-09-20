@@ -66,6 +66,13 @@ export class AppComponent implements OnInit {
       this.globalVars.getFreeDeso = true;
     }
 
+    const authenticatedUsers = new Set(
+      params.get('authenticatedUsers')?.split(',') ?? []
+    );
+    if (authenticatedUsers.size > 0) {
+      this.globalVars.authenticatedUsers = authenticatedUsers;
+    }
+
     if (params.get('subAccounts') === 'true') {
       this.globalVars.subAccounts = true;
     }
