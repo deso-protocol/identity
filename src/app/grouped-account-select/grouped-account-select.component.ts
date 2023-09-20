@@ -316,11 +316,6 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   shouldShowExportSeedButton(rootPublicKey: string) {
-    // Don't show the export seed button in production until it's ready.
-    if (this.globalVars.environment.production) {
-      return false;
-    }
-
     const rootAccount = this.accountService.getAccountInfo(rootPublicKey);
     return !rootAccount.exportDisabled;
   }
