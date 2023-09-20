@@ -6,12 +6,12 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./recovery-secret.component.scss']
 })
 export class RecoverySecretComponent {
-  @Input() secret: string = '';
+  @Input() secret = '';
 
-  isRevealed: boolean = false;
-  copySuccess: boolean = false;
+  isRevealed = false;
+  copySuccess = false;
 
-  maskSecret(secret: string) {
+  maskSecret(secret = '') {
     return secret.slice().replace(/\S/g, '*');
   }
 
