@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { escape } from 'lodash';
 import { finalize, take } from 'rxjs/operators';
 import {
@@ -11,6 +12,7 @@ import { isValid32BitUnsignedInt } from '../../lib/account-number';
 import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
+import { BackupSeedDialogComponent } from './backup-seed-dialog/backup-seed-dialog.component';
 
 type AccountViewModel = SubAccountMetadata &
   UserProfile & { publicKey: string } & { lastUsed?: boolean };
@@ -64,7 +66,8 @@ export class GroupedAccountSelectComponent implements OnInit {
   constructor(
     public accountService: AccountService,
     public globalVars: GlobalVarsService,
-    private backendApi: BackendAPIService
+    private backendApi: BackendAPIService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -326,5 +329,20 @@ export class GroupedAccountSelectComponent implements OnInit {
   isMetaMaskAccountGroup(rootPublicKey: string) {
     const rootAccount = this.accountService.getAccountInfo(rootPublicKey);
     return this.accountService.isMetamaskAccount(rootAccount);
+  }
+
+  shouldShowExportSeedButton(rootPublicKey: string) {
+    const rootAccount = this.accountService.getAccountInfo(rootPublicKey);
+    return !rootAccount.exportDisabled;
+  }
+
+  exportSeed(rootPublicKey: string) {
+    const dialogRef = this.dialog.open(BackupSeedDialogComponent, {
+      data: { rootPublicKey },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 }

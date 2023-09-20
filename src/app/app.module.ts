@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
@@ -31,7 +32,9 @@ import { ErrorCallbackComponent } from './error-callback/error-callback.componen
 import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component';
 import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
 import { GetDesoComponent } from './get-deso/get-deso.component';
+import { BackupSeedDialogComponent } from './grouped-account-select/backup-seed-dialog/backup-seed-dialog.component';
 import { GroupedAccountSelectComponent } from './grouped-account-select/grouped-account-select.component';
+import { RecoverySecretComponent } from './grouped-account-select/recovery-secret/recovery-secret.component';
 import { HomeComponent } from './home/home.component';
 import { IconsModule } from './icons/icons.module';
 import { IdentityService } from './identity.service';
@@ -100,6 +103,8 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     TransactionSpendingLimitAccessGroupComponent,
     TransactionSpendingLimitAccessGroupMemberComponent,
     GroupedAccountSelectComponent,
+    RecoverySecretComponent,
+    BackupSeedDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -116,6 +121,7 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     }),
     BuyDeSoComponentWrapper,
     CookieModule.forRoot(),
+    MatDialogModule,
   ],
   providers: [
     IdentityService,
