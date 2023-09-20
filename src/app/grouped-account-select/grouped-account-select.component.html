@@ -83,7 +83,6 @@
                 </div>
               </button>
               <button
-                *ngIf="!isMetaMaskAccountGroup(group.key)"
                 class="styleless-button"
                 (click)="hideAccount(group.key, account)"
               >
@@ -94,6 +93,19 @@
         </ul>
         <div *ngIf="!isMetaMaskAccountGroup(group.key)">
           <div class="display--flex">
+            <button
+              *ngIf="shouldShowExportSeedButton(group.key)"
+              class="button--small button--red display--flex items--center margin-right--small"
+              style="width: auto; white-space: nowrap"
+              (click)="exportSeed(group.key)"
+            >
+              <i-feather
+                name="save"
+                class="margin-right--xsmall"
+                style="height: 16px; width: 16px"
+              />
+              Backup
+            </button>
             <button
               class="button--small button--primary display--flex items--center margin-right--small"
               style="width: auto; white-space: nowrap"

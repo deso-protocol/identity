@@ -618,6 +618,17 @@ a,
     flex-direction: row-reverse;
   }
 }
+
+//-------------------------------
+// POSITION
+//-------------------------------
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+
 //-------------------------------
 // LAYOUT
 //-------------------------------
@@ -1169,4 +1180,40 @@ a,
   padding: 0;
   margin: 0;
   cursor: pointer;
+}
+
+//-------------------------
+// Material Dialog
+//-------------------------
+.cdk-overlay-dark-backdrop {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+.dialog {
+  background-color: lighten(#040609, 10%);
+  border: 1px solid darkgray;
+  border-radius: 4px;
+  padding: 8px;
+}
+.dialog__header {
+  position: relative;
+  @include color('neutral', 'white', 'color');
+}
+.dialog__x {
+  border: none;
+  background: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  @include color('neutral', 'white', 'color');
+}
+.dialog__title {
+  @include font-size('large');
+  @include color('neutral', 'white', 'color');
+  @include font-weight('bold');
+}
+.dialog__body {
+  padding: 12px 0;
 }

@@ -28,6 +28,13 @@ export interface PrivateUserInfo extends AccountMetadata {
    */
   subAccounts?: SubAccountMetadata[];
 
+  /**
+   * Determines whether we display the "Back up your seed" button in the UI.  We
+   * show it by default for all users, but we hide it for users who have
+   * explicitly disabled it.
+   */
+  exportDisabled?: boolean;
+
   /** DEPRECATED in favor of loginMethod */
   google?: boolean;
 }
