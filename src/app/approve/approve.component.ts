@@ -100,12 +100,13 @@ export class ApproveComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const user = this.accountService.getEncryptedUsers()[this.publicKey];
-    const isDerived = this.accountService.isMetamaskAccount(user);
+    const account = this.accountService.getAccountInfo(this.publicKey);
+    const isDerived = this.accountService.isMetamaskAccount(account);
     const signedTransactionHex = this.signingService.signTransaction(
-      this.seedHex(),
+      account.seedHex,
       this.transactionHex,
-      isDerived
+      isDerived,
+      account.accountNumber
     );
     this.finishFlow(signedTransactionHex);
   }
@@ -115,15 +116,6 @@ export class ApproveComponent implements OnInit {
       users: this.accountService.getEncryptedUsers(),
       signedTransactionHex,
     });
-  }
-
-  seedHex(): string {
-    const encryptedSeedHex =
-      this.accountService.getEncryptedUsers()[this.publicKey].encryptedSeedHex;
-    return this.cryptoService.decryptSeedHex(
-      encryptedSeedHex,
-      this.globalVars.hostname
-    );
   }
 
   generateTransactionDescription(): void {

@@ -15,18 +15,22 @@ import { GlobalVarsService } from './global-vars.service';
 export class SigningService {
   constructor(
     private cryptoService: CryptoService,
-    private globalVars: GlobalVarsService
+    private globalVars: GlobalVarsService,
   ) {}
 
   signJWT(
     seedHex: string,
+    accountNumber: number,
     isDerived: boolean,
-    expiration: string | number = 60 * 10
+    { expiration = 60 * 10 }: { expiration?: string | number } = {}
   ): string {
     const keyEncoder = new KeyEncoder('secp256k1');
-    const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
+    // TODO: make sure the account number stuff works here...
+    const acctNumber = isDerived ? 0 : accountNumber;
+    const keys = this.cryptoService.seedHexToKeyPair(seedHex, acctNumber);
+    const encodedPrivateKey = keyEncoder.encodePrivate(keys.getPrivate('hex'), 'raw', 'pem');
     if (isDerived) {
-      const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+      const derivedPrivateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
       const derivedPublicKeyBase58Check =
         this.cryptoService.privateKeyToDeSoPublicKey(
           derivedPrivateKey,
@@ -52,9 +56,10 @@ export class SigningService {
   signTransaction(
     seedHex: string,
     transactionHex: string,
-    isDerivedKey: boolean
+    isDerivedKey: boolean,
+    accountNumber: number
   ): string {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
     const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [
@@ -83,8 +88,8 @@ export class SigningService {
     ]).toString('hex');
   }
 
-  signHashes(seedHex: string, unsignedHashes: string[]): string[] {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+  signHashes(seedHex: string, unsignedHashes: string[], accountNumber: number): string[] {
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
     const signedHashes = [];
 
     for (const unsignedHash of unsignedHashes) {
@@ -98,9 +103,10 @@ export class SigningService {
 
   signHashesETH(
     seedHex: string,
-    unsignedHashes: string[]
+    unsignedHashes: string[],
+    accountNumber: number
   ): { s: any; r: any; v: number | null }[] {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex, accountNumber);
     const signedHashes = [];
 
     for (const unsignedHash of unsignedHashes) {
