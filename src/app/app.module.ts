@@ -31,6 +31,7 @@ import { ErrorCallbackComponent } from './error-callback/error-callback.componen
 import { FreeDeSoDisclaimerComponent } from './free-deso-message/free-deso-disclaimer/free-deso-disclaimer.component';
 import { FreeDesoMessageComponent } from './free-deso-message/free-deso-message.component';
 import { GetDesoComponent } from './get-deso/get-deso.component';
+import { GroupedAccountSelectComponent } from './grouped-account-select/grouped-account-select.component';
 import { HomeComponent } from './home/home.component';
 import { IconsModule } from './icons/icons.module';
 import { IdentityService } from './identity.service';
@@ -98,6 +99,7 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     TransactionSpendingLimitAssociationComponent,
     TransactionSpendingLimitAccessGroupComponent,
     TransactionSpendingLimitAccessGroupMemberComponent,
+    GroupedAccountSelectComponent,
   ],
   imports: [
     BrowserModule,

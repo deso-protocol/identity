@@ -164,6 +164,7 @@ $colors: (
 // SPACING UNITS
 //-------------------------------
 $spacing-units: (
+  'auto': auto,
   'none': 0,
   'xsmall': 4px,
   'small': 8px,
@@ -806,7 +807,6 @@ a,
   @include spacing('padding-right', 'medium');
   @include spacing('padding-top', 'small');
   @include spacing('padding-bottom', 'small');
-  @include spacing('margin-top', 'small');
   @include color('text', 'lighter', 'color');
   @include color('blue', 'darker', 'background-color');
   @include color('blue', 'dark', 'border-color');
@@ -1161,4 +1161,12 @@ a,
   &.swal2-backdrop-show {
     background-color: rgba(0, 0, 0, 0.8) !important;
   }
+}
+
+.styleless-button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
