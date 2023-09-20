@@ -27,6 +27,7 @@ exports.config = {
       project: require('path').join(__dirname, './tsconfig.json'),
     });
     jasmine.getEnv().addReporter(
+      // @ts-ignore
       new SpecReporter({
         spec: {
           displayStacktrace: StacktraceOption.PRETTY,
