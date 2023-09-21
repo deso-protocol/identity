@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { escape } from 'lodash';
 import { finalize, take } from 'rxjs/operators';
 import {
   LoginMethod,
@@ -13,6 +12,7 @@ import { AccountService } from '../account.service';
 import { BackendAPIService } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { BackupSeedDialogComponent } from './backup-seed-dialog/backup-seed-dialog.component';
+import { RemoveAccountDialogComponent } from './remove-account-dialog/remove-account-dialog.component';
 
 type AccountViewModel = SubAccountMetadata &
   UserProfile & { publicKey: string } & { lastUsed?: boolean };
@@ -197,55 +197,18 @@ export class GroupedAccountSelectComponent implements OnInit {
     const hiddenPreview = group.accounts
       .slice()
       .filter((a) => a.accountNumber !== account.accountNumber);
-    const hasAccountsAfterHiding = hiddenPreview.length > 0;
-    const { displayName, displayAccountNumber } = {
-      displayName: escape(this.getAccountDisplayName(account)),
-      displayAccountNumber: escape(account.accountNumber.toString()),
-    };
-    Swal.fire({
-      title: 'Remove Account?',
-      html: hasAccountsAfterHiding
-        ? `
-        <div>
-          <p class="font-size--small font-weight--bold margin-bottom--small">
-            ${displayName}
-          </p>
-          <p class="margin-bottom--small">You can recover this account as long as you have the account number.</p>
-          <p>
-            <button
-              onclick="(() => {
-                if (!navigator.clipboard) {
-                  alert('Your browser does not support copying to clipboard. Is it running in a secure context (https or localhost)?');
-                  return;
-                }
-                navigator.clipboard.writeText(${displayAccountNumber}).then(() => alert('copied ${displayAccountNumber} to clipboard!'));
-              })()"
-            >
-              ${displayAccountNumber}
-              <img
-                src="assets/copy.svg"
-                width="16px"
-                height="16px"
-                class="margin-left--small"
-              />
-            </button>
-          </p>
-        </div>
-      `
-        : `
-        <div>
-          <p class="font-size--small font-weight--bold margin-bottom--small">
-            ${displayName}
-          </p>
-          <p class="margin-bottom--small font-size--large font-weight--bold">
-            Your account will be irrecoverable if you lose your seed phrase.
-          </p>
-          <p class="margin-bottom--small">Make sure you have backed up your seed phrase before continuing!</p>
-        </div>
-      `,
-      showCancelButton: true,
-    }).then(({ isConfirmed }) => {
-      if (isConfirmed) {
+
+    const dialogRef = this.dialog.open(RemoveAccountDialogComponent, {
+      data: {
+        publicKey: account.publicKey,
+        accountNumber: account.accountNumber,
+        username: account.username,
+        isLastAccountInGroup: hiddenPreview.length === 0,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
         this.accountService.updateAccountInfo(account.publicKey, {
           isHidden: true,
         });

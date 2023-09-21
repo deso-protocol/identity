@@ -35,6 +35,7 @@ import { GetDesoComponent } from './get-deso/get-deso.component';
 import { BackupSeedDialogComponent } from './grouped-account-select/backup-seed-dialog/backup-seed-dialog.component';
 import { GroupedAccountSelectComponent } from './grouped-account-select/grouped-account-select.component';
 import { RecoverySecretComponent } from './grouped-account-select/recovery-secret/recovery-secret.component';
+import { RemoveAccountDialogComponent } from './grouped-account-select/remove-account-dialog/remove-account-dialog.component';
 import { HomeComponent } from './home/home.component';
 import { IconsModule } from './icons/icons.module';
 import { IdentityService } from './identity.service';
@@ -105,6 +106,7 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     GroupedAccountSelectComponent,
     RecoverySecretComponent,
     BackupSeedDialogComponent,
+    RemoveAccountDialogComponent,
   ],
   imports: [
     BrowserModule,
