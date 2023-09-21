@@ -70,10 +70,13 @@ export class BuyDeSoComponent implements OnInit {
   keyIsCopied = false;
 
   BuyDeSoComponent = BuyDeSoComponent;
-  defaultBuyTabs = [BuyDeSoComponent.BUY_WITH_HEROSWAP, /*BuyDeSoComponent.BUY_WITH_USD, */BuyDeSoComponent.BUY_ON_CB];
+  defaultBuyTabs = [
+    BuyDeSoComponent.BUY_WITH_HEROSWAP,
+    /*BuyDeSoComponent.BUY_WITH_USD, */ BuyDeSoComponent.BUY_ON_CB,
+  ];
   buyTabs = this.defaultBuyTabs;
   activeTab = BuyDeSoComponent.BUY_WITH_HEROSWAP;
-  linkTabs = {[BuyDeSoComponent.BUY_ON_CB]: BuyDeSoComponent.CB_LINK};
+  linkTabs = { [BuyDeSoComponent.BUY_ON_CB]: BuyDeSoComponent.CB_LINK };
 
   satoshisPerDeSoExchangeRate = 0;
   ProtocolUSDCentsPerBitcoinExchangeRate = 0;
@@ -146,8 +149,8 @@ export class BuyDeSoComponent implements OnInit {
       confirmButtonText: showBuyDeSo
         ? 'Buy DeSo'
         : showBuyCreatorCoin
-          ? 'Buy Creator Coin'
-          : 'Ok',
+        ? 'Buy Creator Coin'
+        : 'Ok',
       reverseButtons: true,
     });
   }
@@ -250,5 +253,4 @@ export class BuyDeSoComponent implements OnInit {
   exports: [BuyDeSoComponent, BuyDeSoCompleteComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class BuyDeSoComponentWrapper {
-}
+export class BuyDeSoComponentWrapper {}

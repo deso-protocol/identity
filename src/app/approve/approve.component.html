@@ -11,10 +11,12 @@
       <app-transaction-spending-limit
         [transactionSpendingLimitResponse]="transactionSpendingLimitResponse"
       ></app-transaction-spending-limit>
-      <br/>
+      <br />
     </div>
     <div *ngIf="transactionDeSoSpent">
-      <p>Total Cost: <code>{{ transactionDeSoSpent }} $DESO</code></p>
+      <p>
+        Total Cost: <code>{{ transactionDeSoSpent }} $DESO</code>
+      </p>
     </div>
     <div class="margin-top--large">
       <button

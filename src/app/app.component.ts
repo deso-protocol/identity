@@ -78,7 +78,8 @@ export class AppComponent implements OnInit {
       }
     }
 
-    this.globalVars.redirectURI = params.get('redirect_uri') ?? stateParamsFromGoogle.redirect_uri ?? '';
+    this.globalVars.redirectURI =
+      params.get('redirect_uri') ?? stateParamsFromGoogle.redirect_uri ?? '';
 
     const showSkip = params.get('showSkip');
     this.globalVars.showSkip =
@@ -94,29 +95,25 @@ export class AppComponent implements OnInit {
       params.get('transactionSpendingLimitResponse') ||
       stateParamsFromGoogle.transactionSpendingLimitResponse;
     if (transactionSpendingLimitResponse) {
-      this.globalVars.transactionSpendingLimitResponse = transactionSpendingLimitResponse;
+      this.globalVars.transactionSpendingLimitResponse =
+        transactionSpendingLimitResponse;
     }
 
     const derivedPublicKey =
-      params.get('derivedPublicKey') ||
-      stateParamsFromGoogle.derivedPublicKey;
+      params.get('derivedPublicKey') || stateParamsFromGoogle.derivedPublicKey;
     if (derivedPublicKey) {
       this.globalVars.derivedPublicKey = derivedPublicKey;
     }
 
     const deleteKey =
-      params.get('deleteKey') === 'true' ||
-      stateParamsFromGoogle.deleteKey;
+      params.get('deleteKey') === 'true' || stateParamsFromGoogle.deleteKey;
     if (deleteKey) {
       this.globalVars.deleteKey = true;
     }
 
     const expirationDays =
-      parseInt(
-        params.get('expirationDays') ||
-        '0',
-        10
-      ) || stateParamsFromGoogle.expirationDays;
+      parseInt(params.get('expirationDays') || '0', 10) ||
+      stateParamsFromGoogle.expirationDays;
     if (expirationDays) {
       this.globalVars.expirationDays = expirationDays;
     }

@@ -1,13 +1,19 @@
 <div class="section--header" *ngIf="!globalVars.webview">
   <div class="section--header__left">
-    <img src="/assets/logo-deso.svg" class="section--header__logo"/>
+    <img src="/assets/logo-deso.svg" class="section--header__logo" />
     <span>Wallet</span>
   </div>
   <div class="section--header__right">
     <span class="font-size--small">Always verify you are on: </span>
     <div class="section--header__verify">
-      <img src="/assets/lock-green.svg" class="margin-right--small" width="12px"/>
-      <span class="font-size--xsmall">{{globalVars.environment.hostname}}</span>
+      <img
+        src="/assets/lock-green.svg"
+        class="margin-right--small"
+        width="12px"
+      />
+      <span class="font-size--xsmall">{{
+        globalVars.environment.hostname
+      }}</span>
     </div>
   </div>
 </div>

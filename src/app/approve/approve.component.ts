@@ -1,15 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CryptoService } from '../crypto.service';
-import { IdentityService } from '../identity.service';
-import { AccountService } from '../account.service';
-import { GlobalVarsService } from '../global-vars.service';
-import { SigningService } from '../signing.service';
-import {
-  BackendAPIService,
-  TransactionSpendingLimitResponse,
-  User,
-} from '../backend-api.service';
+import bs58check from 'bs58check';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
@@ -34,9 +25,9 @@ import {
   TransactionMetadataFollow,
   TransactionMetadataLike,
   TransactionMetadataMessagingGroup,
-  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
+  TransactionMetadataNewMessage,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
@@ -47,8 +38,17 @@ import {
   TransactionMetadataUpdateProfile,
   TransactionSpendingLimit,
 } from '../../lib/deso/transaction';
-import bs58check from 'bs58check';
 import { ExtraData } from '../../types/identity';
+import { AccountService } from '../account.service';
+import {
+  BackendAPIService,
+  TransactionSpendingLimitResponse,
+  User,
+} from '../backend-api.service';
+import { CryptoService } from '../crypto.service';
+import { GlobalVarsService } from '../global-vars.service';
+import { IdentityService } from '../identity.service';
+import { SigningService } from '../signing.service';
 
 @Component({
   selector: 'app-approve',
@@ -451,44 +451,61 @@ export class ApproveComponent implements OnInit {
         }
         break;
       case TransactionMetadataCreateUserAssociation:
-        const createUserAssociationMetadata = this.transaction.metadata as TransactionMetadataCreateUserAssociation;
-        const targetPublicKey = this.base58KeyCheck(createUserAssociationMetadata.targetUserPublicKey);
+        const createUserAssociationMetadata = this.transaction
+          .metadata as TransactionMetadataCreateUserAssociation;
+        const targetPublicKey = this.base58KeyCheck(
+          createUserAssociationMetadata.targetUserPublicKey
+        );
         publicKeys = [targetPublicKey];
         let userAssociationAppDisplayName = 'the global';
         if (!this.isZeroByteArray(createUserAssociationMetadata.appPublicKey)) {
-          const appPublicKey = this.base58KeyCheck(createUserAssociationMetadata.appPublicKey);
-          userAssociationAppDisplayName = appPublicKey + '\'s';
+          const appPublicKey = this.base58KeyCheck(
+            createUserAssociationMetadata.appPublicKey
+          );
+          userAssociationAppDisplayName = appPublicKey + "'s";
           publicKeys.push(appPublicKey);
         }
-        const userAssociationType = createUserAssociationMetadata.associationType.toString();
-        const userAssociationValue = createUserAssociationMetadata.associationValue.toString();
-        description = `create a ${userAssociationType} association on ${targetPublicKey} with value ` +
+        const userAssociationType =
+          createUserAssociationMetadata.associationType.toString();
+        const userAssociationValue =
+          createUserAssociationMetadata.associationValue.toString();
+        description =
+          `create a ${userAssociationType} association on ${targetPublicKey} with value ` +
           `${userAssociationValue} in ${userAssociationAppDisplayName} app namespace`;
         break;
       case TransactionMetadataDeleteUserAssociation:
         // TODO: do we want to fetch the association from the API and display more information?
-        const deleteUserAssociationMetadata = this.transaction.metadata as TransactionMetadataDeleteUserAssociation;
+        const deleteUserAssociationMetadata = this.transaction
+          .metadata as TransactionMetadataDeleteUserAssociation;
         description = `delete user association with ID ${deleteUserAssociationMetadata.associationID.toString()}`;
         break;
       case TransactionMetadataCreatePostAssociation:
-        const createPostAssociationMetadata = this.transaction.metadata as TransactionMetadataCreateUserAssociation;
+        const createPostAssociationMetadata = this.transaction
+          .metadata as TransactionMetadataCreateUserAssociation;
         // TODO: do we want to fetch the post so we can have more information?
-        const targetPostHash = createPostAssociationMetadata.targetUserPublicKey.toString('hex');
+        const targetPostHash =
+          createPostAssociationMetadata.targetUserPublicKey.toString('hex');
         publicKeys = [];
         let postAssociationAppDisplayName = 'the global';
         if (!this.isZeroByteArray(createPostAssociationMetadata.appPublicKey)) {
-          const appPublicKey = this.base58KeyCheck(createPostAssociationMetadata.appPublicKey);
-          postAssociationAppDisplayName = appPublicKey + '\'s';
+          const appPublicKey = this.base58KeyCheck(
+            createPostAssociationMetadata.appPublicKey
+          );
+          postAssociationAppDisplayName = appPublicKey + "'s";
           publicKeys.push(appPublicKey);
         }
-        const postAssociationType = createPostAssociationMetadata.associationType.toString();
-        const postAssociationValue = createPostAssociationMetadata.associationValue.toString();
-        description = `create a ${postAssociationType} association on post ${targetPostHash} with value ` +
+        const postAssociationType =
+          createPostAssociationMetadata.associationType.toString();
+        const postAssociationValue =
+          createPostAssociationMetadata.associationValue.toString();
+        description =
+          `create a ${postAssociationType} association on post ${targetPostHash} with value ` +
           `${postAssociationValue} in ${postAssociationAppDisplayName} app namespace`;
         break;
       case TransactionMetadataDeletePostAssociation:
         // TODO: do we want to fetch the association from the API and display more information?
-        const deletePostAssociationMetadata = this.transaction.metadata as TransactionMetadataDeletePostAssociation;
+        const deletePostAssociationMetadata = this.transaction
+          .metadata as TransactionMetadataDeletePostAssociation;
         description = `delete post association with ID ${deletePostAssociationMetadata.associationID.toString()}`;
         break;
       case TransactionMetadataAccessGroup:
@@ -503,14 +520,15 @@ export class ApproveComponent implements OnInit {
             accessGroupOperation = 'update';
             break;
           default:
-            accessGroupOperation = 'take unknown action on'
+            accessGroupOperation = 'take unknown action on';
         }
         description = `${accessGroupOperation} access group with name "${accessGroupMetadata.accessGroupKeyName.toString()}"`;
         break;
       case TransactionMetadataAccessGroupMembers:
         const accessGroupMembersMetadata = this.transaction
           .metadata as TransactionMetadataAccessGroupMembers;
-        const numMembers = accessGroupMembersMetadata.accessGroupMembersList.length;
+        const numMembers =
+          accessGroupMembersMetadata.accessGroupMembersList.length;
         const pluralSuffix = numMembers > 1 ? 's' : '';
         let accessGroupMemberOperation: string;
         switch (accessGroupMembersMetadata.accessGroupMemberOperationType) {
@@ -527,24 +545,21 @@ export class ApproveComponent implements OnInit {
             accessGroupMemberOperation = `take unknown action on ${numMembers} member${pluralSuffix} of`;
         }
         publicKeys = [
-          this.base58KeyCheck(accessGroupMembersMetadata.accessGroupOwnerPublicKey),
-          ...accessGroupMembersMetadata.accessGroupMembersList
-            .map(
-              (member) =>
-                this.base58KeyCheck(member.accessGroupMemberPublicKey)
-            )];
+          this.base58KeyCheck(
+            accessGroupMembersMetadata.accessGroupOwnerPublicKey
+          ),
+          ...accessGroupMembersMetadata.accessGroupMembersList.map((member) =>
+            this.base58KeyCheck(member.accessGroupMemberPublicKey)
+          ),
+        ];
         description = `
         ${accessGroupMemberOperation} group with name ${accessGroupMembersMetadata.accessGroupKeyName.toString()}.\n
         ${accessGroupMembersMetadata.accessGroupMembersList.map((member) => {
-          return `${
-            this.base58KeyCheck(member.accessGroupMemberPublicKey)
-          } - key name: ${
-            member.accessGroupMemberKeyName.toString()
-          }, encrypted key:${
-            member.encryptedKey.toString()
-          }\n`
+          return `${this.base58KeyCheck(
+            member.accessGroupMemberPublicKey
+          )} - key name: ${member.accessGroupMemberKeyName.toString()}, encrypted key:${member.encryptedKey.toString()}\n`;
         })}
-         `
+         `;
         break;
       case TransactionMetadataNewMessage:
         const newMessageMetadata = this.transaction
@@ -554,15 +569,17 @@ export class ApproveComponent implements OnInit {
         switch (newMessageMetadata.newMessageType) {
           case 0:
             messageType = 'dm';
-            recipient = this.base58KeyCheck(newMessageMetadata.recipientAccessGroupPublicKey);
+            recipient = this.base58KeyCheck(
+              newMessageMetadata.recipientAccessGroupPublicKey
+            );
             publicKeys = [recipient];
             break;
           case 1:
             messageType = 'message';
-            const groupOwnerPublicKey = this.base58KeyCheck(newMessageMetadata.recipientAccessGroupOwnerPublicKey);
-            recipient = `${groupOwnerPublicKey}'s group with name ${
-              newMessageMetadata.recipientAccessGroupKeyname.toString()
-            }`;
+            const groupOwnerPublicKey = this.base58KeyCheck(
+              newMessageMetadata.recipientAccessGroupOwnerPublicKey
+            );
+            recipient = `${groupOwnerPublicKey}'s group with name ${newMessageMetadata.recipientAccessGroupKeyname.toString()}`;
             publicKeys = [groupOwnerPublicKey];
             break;
           default:

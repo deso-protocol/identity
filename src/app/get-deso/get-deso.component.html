@@ -2,32 +2,54 @@
 
 <div
   class="container"
-  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
+  *ngIf="
+    globalVars.inTab ||
+    globalVars.webview ||
+    globalVars.callback ||
+    globalVars.redirectURI
+  "
 >
   <!-- Step 3 -->
   <!-- Get Starter $DESO. -->
   <div *ngIf="stepScreen === GetDesoComponent.STEP_GET_STARTER_DESO">
     <div class="section--starter text--center margin-bottom--large">
-      <img src="assets/image-coin.svg" width="60" class="section--accounts__illustration"/>
+      <img
+        src="assets/image-coin.svg"
+        width="60"
+        class="section--accounts__illustration"
+      />
       <h3 class="text--neutral-white">Get starter $DESO</h3>
     </div>
-    <div *ngIf="!alternativeOptionsEnabled && captchaAvailable" class="padding-bottom--2xlarge text--center">
+    <div
+      *ngIf="!alternativeOptionsEnabled && captchaAvailable"
+      class="padding-bottom--2xlarge text--center"
+    >
       <div class="section--starter__option">
         <div class="font-size--small margin-bottom--medium">
-          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+          <h6
+            class="margin-bottom--small text--text-lightest font-weight--medium"
+          >
             Complete a captcha to get free $DESO
           </h6>
-          <p>Prove you're not a robot 🤖 and we'll<br/>send you a small amount of $DESO that will last<br/>you up to thousands of on-chain transactions.</p>
+          <p>
+            Prove you're not a robot 🤖 and we'll<br />send you a small amount
+            of $DESO that will last<br />you up to thousands of on-chain
+            transactions.
+          </p>
         </div>
-        <ng-hcaptcha #captchaElem
-                     data-theme="dark"
-                     (verify)="onCaptchaVerify($event)"
-                     (expired)="onCaptchaExpired($event)"
-                     (error)="onCaptchaError($event)">
+        <ng-hcaptcha
+          #captchaElem
+          data-theme="dark"
+          (verify)="onCaptchaVerify($event)"
+          (expired)="onCaptchaExpired($event)"
+          (error)="onCaptchaError($event)"
+        >
         </ng-hcaptcha>
         <div *ngIf="captchaFailed" class="warning--error margin-top--small">
-          There was an issue verifying your captcha. Please <a (click)="resetCaptcha()">reset the captcha</a> and try again,
-          or <a (click)="setAlternativeEarnOptions(true)">try another method</a> to earn free $DESO.
+          There was an issue verifying your captcha. Please
+          <a (click)="resetCaptcha()">reset the captcha</a> and try again, or
+          <a (click)="setAlternativeEarnOptions(true)">try another method</a> to
+          earn free $DESO.
         </div>
       </div>
       <button
@@ -38,14 +60,24 @@
         Try Another Way
       </button>
     </div>
-    <div *ngIf="alternativeOptionsEnabled || !captchaAvailable" class="padding-bottom--2xlarge text--center">
+    <div
+      *ngIf="alternativeOptionsEnabled || !captchaAvailable"
+      class="padding-bottom--2xlarge text--center"
+    >
       <div class="section--starter__option">
         <div class="font-size--small margin-bottom--medium">
-          <span class="text--text-lighter margin-bottom--small display--block">FREE DESO</span>
-          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+          <span class="text--text-lighter margin-bottom--small display--block"
+            >FREE DESO</span
+          >
+          <h6
+            class="margin-bottom--small text--text-lightest font-weight--medium"
+          >
             1. Get DESO for free by verifying your phone number
           </h6>
-          <p>We'll send you a small amount of $DESO that will last<br/>you up to thousands of on-chain transactions.</p>
+          <p>
+            We'll send you a small amount of $DESO that will last<br />you up to
+            thousands of on-chain transactions.
+          </p>
         </div>
         <button
           (click)="stepThreeNextPhone()"
@@ -56,36 +88,55 @@
           Get Free $DESO
         </button>
       </div>
-      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
+      <div class="text--divider margin-top--medium margin-bottom--medium">
+        or
+      </div>
       <div class="section--starter__option">
         <div class="font-size--small margin-bottom--medium">
-          <span class="text--text-lighter margin-bottom--small display--block">ANONYMOUS & INSTANT</span>
-          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+          <span class="text--text-lighter margin-bottom--small display--block"
+            >ANONYMOUS & INSTANT</span
+          >
+          <h6
+            class="margin-bottom--small text--text-lightest font-weight--medium"
+          >
             2. Buy DESO anonymously, in under 10 seconds!
           </h6>
-          <p>Get DESO directly via HeroSwap, anonymously and instantly<br/>using BTC, ETH, SOL, USDT, USDC and more.
+          <p>
+            Get DESO directly via HeroSwap, anonymously and instantly<br />using
+            BTC, ETH, SOL, USDT, USDC and more.
+          </p>
         </div>
+
         <div class="display--flex justify-content--center">
-          <iframe [src]="heroswapIframeUrl" class="section--heroswap__iframe"
-                  *ngIf="heroswapIframeUrl; else elseBlockIframe"></iframe>
+          <iframe
+            [src]="heroswapIframeUrl"
+            class="section--heroswap__iframe"
+            *ngIf="heroswapIframeUrl; else elseBlockIframe"
+          ></iframe>
           <ng-template #elseBlockIframe>
             <p class="text--text-lightest text--center">
-              <i class="fas fa-exclamation-triangle"></i> Unable to render iFrame.<br/>Invalid HeroSwap URL.
+              <i class="fas fa-exclamation-triangle"></i> Unable to render
+              iFrame.<br />Invalid HeroSwap URL.
             </p>
           </ng-template>
         </div>
         <div>
           <p class="text--left font-size--small text--text-lightest">
             Check your DeSo balance:
-            <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
-              globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
+            <code
+              class="display--block font-size--medium margin-left--xsmall margin-top--small"
+              >{{ globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code
+            >
           </p>
         </div>
-        <button class="button--secondary button--medium margin-top--medium display--flex items--center justify--center"
-                (click)="refreshBalance()">
+        <button
+          class="button--secondary button--medium margin-top--medium display--flex items--center justify--center"
+          (click)="refreshBalance()"
+        >
           <div
             class="spinner-border margin-right--small"
-            *ngIf="refreshingBalance"></div>
+            *ngIf="refreshingBalance"
+          ></div>
           Refresh Balance
         </button>
         <button
@@ -94,46 +145,88 @@
           [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
           class="button--secondary button--medium margin-top--medium"
           data-control-name="get-deso-finish-flow-button"
-        >Continue
+        >
+          Continue
         </button>
       </div>
-      <div class="text--divider margin-top--medium margin-bottom--medium">or</div>
+      <div class="text--divider margin-top--medium margin-bottom--medium">
+        or
+      </div>
       <div class="section--starter__option">
         <div class="font-size--small">
-          <span class="text--text-lighter margin-bottom--small display--block">TRANSFER VIA WALLET</span>
-          <h6 class="margin-bottom--small text--text-lightest font-weight--medium">
+          <span class="text--text-lighter margin-bottom--small display--block"
+            >TRANSFER VIA WALLET</span
+          >
+          <h6
+            class="margin-bottom--small text--text-lightest font-weight--medium"
+          >
             3. Transfer DESO from an exchange or external wallet
           </h6>
-          <p>You will need at least 0.01 $DESO to create your new account. This could be transferred from an exchange
-            like Coinbase, or from a DeSo app like Diamond.</p>
-          <div class=" box--base box--rounded box--border margin-top--base">
+          <p>
+            You will need at least 0.01 $DESO to create your new account. This
+            could be transferred from an exchange like Coinbase, or from a DeSo
+            app like Diamond.
+          </p>
+          <div class="box--base box--rounded box--border margin-top--base">
             <div class="text--left">
               <p class="margin-bottom--small text--text-lightest">
                 1. DeSo is listed across top exchanges, like:
               </p>
               <p class="text--xsmall">
-                <a target="_blank" href="https://exchange.coinbase.com/trade/DESO-USD"
-                   class="link--secondary display--inline-block margin-right--xsmall">Coinbase,</a>
-                <a target="_blank"
-                   href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710"
-                   class="link--secondary display--inline-block margin-right--xsmall">Huobi,</a>
-                <a target="_blank" href="https://gate.io/trade/deso_usdt?ref=12312805"
-                   class="link--secondary display--inline-block margin-right--xsmall">Gate.io,</a>
-                <a target="_blank" href="https://www.ascendex.com/en/basic/cashtrade-spottrading/usdt/deso"
-                   class="link--secondary display--inline-block margin-right--xsmall">Ascendex,</a>
-                <a target="_blank" href="https://www.lbank.com/en-US/trade/deso_usdt/"
-                   class="link--secondary display--inline-block margin-right--xsmall">LBank,</a>
-                <a target="_blank" href="https://p2pb2b.com/trade/DESO_USDT"
-                   class="link--secondary display--inline-block margin-right--xsmall">p2b,</a>and
-                <a target="_blank" href="https://coinmarketcap.com/currencies/deso/#Markets" class="link--secondary">more</a>.
+                <a
+                  target="_blank"
+                  href="https://exchange.coinbase.com/trade/DESO-USD"
+                  class="link--secondary display--inline-block margin-right--xsmall"
+                  >Coinbase,</a
+                >
+                <a
+                  target="_blank"
+                  href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710"
+                  class="link--secondary display--inline-block margin-right--xsmall"
+                  >Huobi,</a
+                >
+                <a
+                  target="_blank"
+                  href="https://gate.io/trade/deso_usdt?ref=12312805"
+                  class="link--secondary display--inline-block margin-right--xsmall"
+                  >Gate.io,</a
+                >
+                <a
+                  target="_blank"
+                  href="https://www.ascendex.com/en/basic/cashtrade-spottrading/usdt/deso"
+                  class="link--secondary display--inline-block margin-right--xsmall"
+                  >Ascendex,</a
+                >
+                <a
+                  target="_blank"
+                  href="https://www.lbank.com/en-US/trade/deso_usdt/"
+                  class="link--secondary display--inline-block margin-right--xsmall"
+                  >LBank,</a
+                >
+                <a
+                  target="_blank"
+                  href="https://p2pb2b.com/trade/DESO_USDT"
+                  class="link--secondary display--inline-block margin-right--xsmall"
+                  >p2b,</a
+                >and
+                <a
+                  target="_blank"
+                  href="https://coinmarketcap.com/currencies/deso/#Markets"
+                  class="link--secondary"
+                  >more</a
+                >.
               </p>
             </div>
             <div class="section--divider"></div>
             <p class="text--left text--text-lightest">
               2. Send DESO to your public key (wallet address):
-              <code class="display--block font-size--small margin-top--small">{{ publicKeyAdded }}</code>
+              <code class="display--block font-size--small margin-top--small">{{
+                publicKeyAdded
+              }}</code>
             </p>
-            <div class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet">
+            <div
+              class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet"
+            >
               <div class="section--seed__actions">
                 <button
                   data-control-name="sign-up-with-seed-copy-button"
@@ -148,7 +241,11 @@
                     height="16px"
                     class="margin-right--small image--invert"
                   />
-                  <img *ngIf="!publicKeyCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
+                  <img
+                    *ngIf="!publicKeyCopied"
+                    src="assets/copy.svg"
+                    class="margin-right--small image--invert"
+                  />
                   <span>Copy</span>
                 </button>
               </div>
@@ -156,15 +253,20 @@
             <div class="section--divider"></div>
             <p class="text--left text--text-lightest">
               3. Check your DeSo balance:
-              <code class="display--block font-size--medium margin-left--xsmall margin-top--small">{{
-                globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code>
+              <code
+                class="display--block font-size--medium margin-left--xsmall margin-top--small"
+                >{{ globalVars.nanosToDeSo(userBalanceNanos, 6) }} $DESO</code
+              >
             </p>
           </div>
-          <button class="button--secondary button--medium margin-top--base display--flex items--center justify--center"
-                  (click)="refreshBalance()">
+          <button
+            class="button--secondary button--medium margin-top--base display--flex items--center justify--center"
+            (click)="refreshBalance()"
+          >
             <div
               class="spinner-border margin-right--small"
-              *ngIf="refreshingBalance"></div>
+              *ngIf="refreshingBalance"
+            ></div>
             Refresh Balance
           </button>
           <button
@@ -173,7 +275,8 @@
             [ngClass]="{ 'button--disabled': isFinishFlowDisabled }"
             class="button--secondary button--medium margin-top--medium"
             data-control-name="get-deso-finish-flow-button"
-          >Continue
+          >
+            Continue
           </button>
         </div>
       </div>

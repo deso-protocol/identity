@@ -41,7 +41,8 @@ export class DeriveComponent implements OnInit {
   isSingleAccount = false;
   validationErrors = false;
   blockHeight = 0;
-  onApproveClick = async () => this.approveDerivedKey(this.publicKeyBase58Check);
+  onApproveClick = async () =>
+    this.approveDerivedKey(this.publicKeyBase58Check);
 
   constructor(
     private accountService: AccountService,
@@ -104,7 +105,9 @@ export class DeriveComponent implements OnInit {
   }
 
   async approveDerivedKey(publicKey: string | undefined): Promise<void> {
-    if (!publicKey) { return; }
+    if (!publicKey) {
+      return;
+    }
     try {
       if (this.accountService.requiresMessagingKeyRandomness(publicKey)) {
         await this.getMessagingKeyRandomness(publicKey);
@@ -120,18 +123,22 @@ export class DeriveComponent implements OnInit {
       return;
     }
     if (this.transactionSpendingLimitResponse?.AccessGroupLimitMap) {
-      this.transactionSpendingLimitResponse.AccessGroupLimitMap.forEach((agl) => {
-        if (!agl.AccessGroupOwnerPublicKeyBase58Check) {
-          agl.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+      this.transactionSpendingLimitResponse.AccessGroupLimitMap.forEach(
+        (agl) => {
+          if (!agl.AccessGroupOwnerPublicKeyBase58Check) {
+            agl.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+          }
         }
-      })
+      );
     }
     if (this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap) {
-      this.transactionSpendingLimitResponse.AccessGroupMemberLimitMap.forEach((agml) => {
-        if (!agml.AccessGroupOwnerPublicKeyBase58Check) {
-          agml.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+      this.transactionSpendingLimitResponse.AccessGroupMemberLimitMap.forEach(
+        (agml) => {
+          if (!agml.AccessGroupOwnerPublicKeyBase58Check) {
+            agml.AccessGroupOwnerPublicKeyBase58Check = publicKey;
+          }
         }
-      })
+      );
     }
     return this.identityService.derive({
       publicKey,
@@ -144,18 +151,18 @@ export class DeriveComponent implements OnInit {
 
   async getMessagingKeyRandomness(publicKey: string): Promise<void> {
     const swalRes = await SwalHelper.fire({
-        target: 'sign-messaging-randomness',
-        icon: 'info',
-        title: 'Generate Messaging Key',
-        confirmButtonText: 'Approve',
-        html: `Metamask will open and request that you sign a message.
+      target: 'sign-messaging-randomness',
+      icon: 'info',
+      title: 'Generate Messaging Key',
+      confirmButtonText: 'Approve',
+      html: `Metamask will open and request that you sign a message.
           This is used to generate a key pair that will be used to encrypt and decrypt messages on the DeSo Blockchain.
           Messaging keys are required for derived keys to properly encrypt and decrypt messages`,
-        showConfirmButton: true,
-        showCancelButton: false,
-        allowEscapeKey: false,
-        allowOutsideClick: false,
-      });
+      showConfirmButton: true,
+      showCancelButton: false,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+    });
     if (!swalRes.isConfirmed) {
       return Promise.reject('User declined to sign messaging key randomness');
     }
@@ -164,8 +171,7 @@ export class DeriveComponent implements OnInit {
         publicKey,
         this.globalVars.defaultMessageKeyName
       );
-    }
-    catch (e) {
+    } catch (e) {
       return Promise.reject('Error getting messaing group derivation');
     }
   }

@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../account.service';
-import { IdentityService } from '../identity.service';
+import { RouteNames } from '../app-routing.module';
+import { BackendAPIService } from '../backend-api.service';
 import { CryptoService } from '../crypto.service';
 import { EntropyService } from '../entropy.service';
 import { GlobalVarsService } from '../global-vars.service';
-import { BackendAPIService } from '../backend-api.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import HDNode from 'hdkey';
-import { RouteNames } from '../app-routing.module';
+import { IdentityService } from '../identity.service';
 
 @Component({
   selector: 'app-log-in-seed',
@@ -41,11 +40,9 @@ export class LogInSeedComponent implements OnInit {
     private backendApi: BackendAPIService,
     private router: Router,
     private activatedRoute: ActivatedRoute
-  ) {
-  }
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   clickLoadAccount(): void {
     // Store mnemonic, seedHex and extraText locally because we clear them below and otherwise
@@ -60,7 +57,7 @@ export class LogInSeedComponent implements OnInit {
       return;
     }
 
-    let userPublicKey: string
+    let userPublicKey: string;
 
     if (seedHex) {
       if (!/^[\da-f]{64}$/i.test(seedHex)) {
@@ -68,17 +65,17 @@ export class LogInSeedComponent implements OnInit {
         return;
       }
 
-      userPublicKey = this.accountService.addUserWithSeedHex(
-        seedHex,
-        network
-      );
+      userPublicKey = this.accountService.addUserWithSeedHex(seedHex, network);
     } else {
       if (!this.entropyService.isValidMnemonic(mnemonic)) {
         this.loginError = 'Invalid mnemonic';
         return;
       }
 
-      const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+      const keychain = this.cryptoService.mnemonicToKeychain(
+        mnemonic,
+        extraText
+      );
       const keychainNonStandard = this.cryptoService.mnemonicToKeychain(
         mnemonic,
         extraText,
@@ -93,7 +90,8 @@ export class LogInSeedComponent implements OnInit {
 
       // NOTE: Temporary support for 1 in 128 legacy users who have non-standard derivations
       if (keychain.publicKey !== keychainNonStandard.publicKey) {
-        const seedHex = this.cryptoService.keychainToSeedHex(keychainNonStandard);
+        const seedHex =
+          this.cryptoService.keychainToSeedHex(keychainNonStandard);
         const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
         const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
           privateKey,
@@ -101,25 +99,27 @@ export class LogInSeedComponent implements OnInit {
         );
 
         // We only want to add nonStandard derivations if the account is worth importing
-        this.backendApi.GetUsersStateless([publicKey], true, true).subscribe((res) => {
-          if (!res.UserList.length) {
-            return;
-          }
-          const user = res.UserList[0];
-          if (
-            user.ProfileEntryResponse ||
-            user.BalanceNanos > 0 ||
-            user.UsersYouHODL?.length
-          ) {
-            // Add the non-standard key if the user has a profile, a balance, or holdings
-            userPublicKey = this.accountService.addUser(
-              keychainNonStandard,
-              mnemonic,
-              extraText,
-              network
-            );
-          }
-        });
+        this.backendApi
+          .GetUsersStateless([publicKey], true, true)
+          .subscribe((res) => {
+            if (!res.UserList.length) {
+              return;
+            }
+            const user = res.UserList[0];
+            if (
+              user.ProfileEntryResponse ||
+              user.BalanceNanos > 0 ||
+              user.UsersYouHODL?.length
+            ) {
+              // Add the non-standard key if the user has a profile, a balance, or holdings
+              userPublicKey = this.accountService.addUser(
+                keychainNonStandard,
+                mnemonic,
+                extraText,
+                network
+              );
+            }
+          });
       }
     }
 
@@ -130,7 +130,7 @@ export class LogInSeedComponent implements OnInit {
 
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: {publicKey: userPublicKey},
+        queryParams: { publicKey: userPublicKey },
         queryParamsHandling: 'merge',
       });
     } else {

@@ -2,11 +2,19 @@
   <code class="display--block">
     {{ getOperationString() }}{{ !isScoped() ? ' any of' : '' }}
     {{
-      appUser?.ProfileEntryResponse?.Username || accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check ?
-      (appUser?.ProfileEntryResponse?.Username || accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check | truncateAddressOrUsername) + "'s"
-      : 'your'
+      appUser?.ProfileEntryResponse?.Username ||
+      accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check
+        ? (appUser?.ProfileEntryResponse?.Username ||
+            accessGroupLimitMapItem?.AccessGroupOwnerPublicKeyBase58Check
+            | truncateAddressOrUsername) + "'s"
+        : 'your'
     }}
-    access group{{ isScoped() ? ' "' + accessGroupLimitMapItem?.AccessGroupKeyName + '"' : 's' }}<br/>
-    ({{ globalVars.formatTxCountLimit(accessGroupLimitMapItem?.OpCount) }} times).
+    access group{{
+      isScoped()
+        ? ' "' + accessGroupLimitMapItem?.AccessGroupKeyName + '"'
+        : 's'
+    }}<br />
+    ({{ globalVars.formatTxCountLimit(accessGroupLimitMapItem?.OpCount) }}
+    times).
   </code>
 </div>

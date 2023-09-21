@@ -7,7 +7,11 @@
       [routerLink]="['/sign-up']"
       queryParamsHandling="merge"
     >
-      <img src="assets/logo-deso-mark.svg" class="margin-right--small" height="26px" />
+      <img
+        src="assets/logo-deso-mark.svg"
+        class="margin-right--small"
+        height="26px"
+      />
       Sign up with DeSo Seed
     </button>
   </div>
@@ -19,7 +23,12 @@
       (click)="launchGoogle()"
       *ngIf="!globalVars.hideGoogle"
     >
-      <img src="assets/google_logo.svg" class="margin-right--small" width="26px" height="26px" />
+      <img
+        src="assets/google_logo.svg"
+        class="margin-right--small"
+        width="26px"
+        height="26px"
+      />
       Sign up / Log in with Google
     </button>
     <button
@@ -30,13 +39,20 @@
       queryParamsHandling="merge"
       *ngIf="globalVars.showMetamask()"
     >
-      <img src="assets/metamask.png" class="margin-right--small" width="26px" height="26px" />
+      <img
+        src="assets/metamask.png"
+        class="margin-right--small"
+        width="26px"
+        height="26px"
+      />
       Sign up / Log in with MetaMask
-    </button>   
+    </button>
     <a
       data-control-name="log-in-cta"
       data-control-login-option="log-in-with-deso-seed"
-      class="font-size--small" [routerLink]="['/load-seed']" queryParamsHandling="merge"
+      class="font-size--small"
+      [routerLink]="['/load-seed']"
+      queryParamsHandling="merge"
     >
       or import existing DeSo account
     </a>

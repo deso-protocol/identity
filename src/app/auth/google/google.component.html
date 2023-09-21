@@ -13,11 +13,14 @@
       You can use this DeSo seed phrase to login if you lose access to your
       Google account.
     </div>
-    <div class="warning--error margin-bottom--small">Do not share this with anyone.</div>
+    <div class="warning--error margin-bottom--small">
+      Do not share this with anyone.
+    </div>
     <div class="section--seed__container">
       <div class="section--seed__phrase">{{ mnemonic }}</div>
       <div
-        class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet">
+        class="margin-top--medium display--flex justify--between items--center flex--column--tablet gap--25--tablet"
+      >
         >
         <div class="section--seed__actions">
           <button
@@ -31,21 +34,31 @@
               height="16px"
               class="margin-right--small image--invert"
             />
-            <img *ngIf="!seedCopied" src="assets/copy.svg" class="margin-right--small image--invert"/>
+            <img
+              *ngIf="!seedCopied"
+              src="assets/copy.svg"
+              class="margin-right--small image--invert"
+            />
             <span>Copy</span>
           </button>
           <button
             (click)="downloadSeed()"
             class="button--secondary button--small display--flex items--center"
           >
-            <img src="assets/download.svg" class="margin-right--small image--invert"/>
+            <img
+              src="assets/download.svg"
+              class="margin-right--small image--invert"
+            />
             <span>Download</span>
           </button>
           <button
             (click)="printSeed()"
             class="button--secondary button--small display--flex items--center"
           >
-            <img src="assets/print.svg" class="margin-right--small image--invert"/>
+            <img
+              src="assets/print.svg"
+              class="margin-right--small image--invert"
+            />
             <span>Print</span>
           </button>
         </div>

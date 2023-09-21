@@ -3,18 +3,26 @@
   (click)="tapToUnlock()"
 >
   <div
-    class="display--flex justify--center padding-left--base padding-right--base padding-top--base padding-bottom--base">
-    <img class="margin-top--2xlarge" width="120px" src="/assets/logo-deso.svg"/>
+    class="display--flex justify--center padding-left--base padding-right--base padding-top--base padding-bottom--base"
+  >
+    <img
+      class="margin-top--2xlarge"
+      width="120px"
+      src="/assets/logo-deso.svg"
+    />
   </div>
-  <div class="padding-left--base padding-right--base padding-top--base padding-bottom--base font-size--large"
-       *ngIf="identityService.browserSupported">
+  <div
+    class="padding-left--base padding-right--base padding-top--base padding-bottom--base font-size--large"
+    *ngIf="identityService.browserSupported"
+  >
     Tap anywhere to unlock your wallet.
   </div>
   <div
     class="padding-left--base padding-right--base padding-top--base padding-bottom--base text--center font-size--large"
-    *ngIf="!identityService.browserSupported">
+    *ngIf="!identityService.browserSupported"
+  >
     Your browser is either in Incognito mode or it is not supported.
-    <br/><br/>
+    <br /><br />
     Please exit Incognito, allow third-party cookies, or use a different
     browser.
   </div>

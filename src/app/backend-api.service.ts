@@ -200,7 +200,7 @@ export type AssociationLimitMapItem = {
   AppPublicKeyBase58Check: string;
   AssociationOperation: AssociationOperationString;
   OpCount: number;
-}
+};
 
 export enum AccessGroupScopeType {
   ANY = 'Any',
@@ -219,7 +219,7 @@ export type AccessGroupLimitMapItem = {
   AccessGroupKeyName: string;
   OperationType: AccessGroupOperationString;
   OpCount: number;
-}
+};
 
 export enum AccessGroupMemberOperationString {
   ANY = 'Any',
@@ -234,7 +234,7 @@ export type AccessGroupMemberLimitMapItem = {
   AccessGroupKeyName: string;
   OperationType: AccessGroupMemberOperationString;
   OpCount: number;
-}
+};
 
 export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
@@ -269,8 +269,7 @@ export class BackendAPIService {
     private signingService: SigningService,
     private accountService: AccountService,
     private globalVars: GlobalVarsService
-  ) {
-  }
+  ) {}
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
@@ -310,7 +309,7 @@ export class BackendAPIService {
       this.globalVars.hostname
     );
     const jwt = this.signingService.signJWT(seedHex, isDerived);
-    return this.post(path, {...body, ...{JWT: jwt}});
+    return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 
   // Error parsing
@@ -336,7 +335,10 @@ export class BackendAPIService {
     });
   }
 
-  VerifyHCaptcha(token: string, publicKey: string): Observable<{Success: boolean, TxnHashHex: string}> {
+  VerifyHCaptcha(
+    token: string,
+    publicKey: string
+  ): Observable<{ Success: boolean; TxnHashHex: string }> {
     return this.jwtPost('verify-captcha', publicKey, {
       Token: token,
       PublicKeyBase58Check: publicKey,
@@ -374,7 +376,10 @@ export class BackendAPIService {
     }
   }
 
-  GetSingleProfilePictureURL(PublicKeyBase58Check: string, FallbackURL?: string): string {
+  GetSingleProfilePictureURL(
+    PublicKeyBase58Check: string,
+    FallbackURL?: string
+  ): string {
     return `${this.getRoute(
       'get-single-profile-picture'
     )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
@@ -436,15 +441,15 @@ export class BackendAPIService {
           if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
             derivedKeys[
               res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check
-              ] = {
+            ] = {
               derivedPublicKeyBase58Check:
-              res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
+                res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
               ownerPublicKeyBase58Check:
-              res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
+                res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
               expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
               isValid: res.DerivedKeys[derivedKey]?.IsValid,
               transactionSpendingLimit:
-              res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
+                res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
             };
           }
         }
@@ -836,7 +841,7 @@ export class BackendAPIService {
 
   GetBulkMessagingPublicKeys(
     GroupOwnerPublicKeysBase58Check: string[],
-    MessagingGroupKeyNames: string[],
+    MessagingGroupKeyNames: string[]
   ): Observable<any> {
     const req = this.post('get-bulk-messaging-public-keys', {
       GroupOwnerPublicKeysBase58Check,

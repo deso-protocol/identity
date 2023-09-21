@@ -160,7 +160,9 @@ export class WalletProvider {
 
   get ethereumProvider() {
     if (!this.#ethereumProvider) {
-      throw new Error('Ethereum provider not initialized. Did you forget to call connectWallet()?');
+      throw new Error(
+        'Ethereum provider not initialized. Did you forget to call connectWallet()?'
+      );
     }
     return this.#ethereumProvider;
   }
@@ -181,7 +183,8 @@ export class WalletProvider {
         optionalChains: [5 /* Goerli */],
         optionalMethods: ['eth_requestAccounts'],
         metadata: {
-          description: 'DeSo Identity: The official wallet provider supported by the DeSo Foundation',
+          description:
+            'DeSo Identity: The official wallet provider supported by the DeSo Foundation',
           url: 'https://identity.deso.org',
           icons: ['https://cryptologos.cc/logos/deso-deso-logo.svg'],
           name: 'DeSo Identity',
@@ -191,9 +194,11 @@ export class WalletProvider {
         // `provider.on('display_uri', ...) below.
         showQrModal: true,
         qrModalOptions: {
-          explorerRecommendedWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
+          explorerRecommendedWalletIds: [
+            'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+          ],
           explorerExcludedWalletIds: 'ALL',
-        }
+        },
       });
 
       // provider.on('display_uri', (uri) => {
@@ -216,24 +221,29 @@ export class WalletProvider {
     } else if (!this.globalVars.isMobile()) {
       // NOTE: wallet_requestPermissions is not currently supported on the metamask mobile app
       // https://docs.metamask.io/wallet/reference/rpc-api/#wallet_requestpermissions
-      await this.ethereumProvider.send('wallet_requestPermissions', [
-        {
-          eth_accounts: {},
-        },
-      ]).catch((err) => {
-        if (err.code === 4001) {
-          throw new Error('user rejected the eth_requestPermissions');
-        } else {
-          throw new Error(`error while sending eth_requestPermissions: ${err}`);
-        }
-      });
+      await this.ethereumProvider
+        .send('wallet_requestPermissions', [
+          {
+            eth_accounts: {},
+          },
+        ])
+        .catch((err) => {
+          if (err.code === 4001) {
+            throw new Error('user rejected the eth_requestPermissions');
+          } else {
+            throw new Error(
+              `error while sending eth_requestPermissions: ${err}`
+            );
+          }
+        });
     }
   }
 
   async connectMetamaskMiddleware(): Promise<boolean> {
     const accounts = await this.listAccounts();
     if (accounts.length === 0) {
-      await this.ethereumProvider.send('eth_requestAccounts', [])
+      await this.ethereumProvider
+        .send('eth_requestAccounts', [])
         .then()
         .catch((err) => {
           // EIP-1193 userRejectedRequest error.

@@ -2,10 +2,15 @@
 
 <div
   class="container"
-  *ngIf="globalVars.inTab || globalVars.webview || globalVars.callback || globalVars.redirectURI"
+  *ngIf="
+    globalVars.inTab ||
+    globalVars.webview ||
+    globalVars.callback ||
+    globalVars.redirectURI
+  "
 >
   <div class="onboarding-buy-deso-container p-16px">
-    <div class="font-size--large  padding-bottom--small margin-bottom--small">
+    <div class="font-size--large padding-bottom--small margin-bottom--small">
       Easily transfer $DESO or purchase some directly
     </div>
     <div class="border-bottom w-100 margin-bottom--large"></div>
@@ -19,13 +24,13 @@
         </div>
       </div>
       <div class="ml-20px w-100">
-        <div class="fs-20px  font-weight-bold margin-bottom--medium">
+        <div class="fs-20px font-weight-bold margin-bottom--medium">
           Don't have any $DESO? We make it easy to buy.
         </div>
         <div
           class="p-30px margin-bottom--base bg-light br-10px display--flex flex--column items--center"
         >
-          <div class=" font-weight-bold fs-18px margin-bottom--base text-center">
+          <div class="font-weight-bold fs-18px margin-bottom--base text-center">
             Buy DESO with ETH, BTC, or fiat
           </div>
           <div class="display--flex justify-content-around">
@@ -38,7 +43,7 @@
               >
                 Buy Now!
               </button>
-              <div class="fs-12px  text-center">
+              <div class="fs-12px text-center">
                 We support 20 fiat currencies including USD and more.
               </div>
             </div>
@@ -57,20 +62,22 @@
         </div>
       </div>
       <div class="ml-20px">
-        <div class="fs-20px  font-weight-bold margin-bottom--medium">
+        <div class="fs-20px font-weight-bold margin-bottom--medium">
           Transfer $DESO to your new account
         </div>
-        <div class="fs-16px  margin-bottom--large">
+        <div class="fs-16px margin-bottom--large">
           You will need at least 0.01 $DESO to create your new account. This
           could be transferred from an exchange like Coinbase, or from another
           account on a DeSo app like Diamond.
         </div>
-        <div class="fs-18px  font-weight-semibold margin-bottom--small">
+        <div class="fs-18px font-weight-semibold margin-bottom--small">
           Send $DESO to this address
         </div>
-        <div class="w-100 bg-light p-10px br-10px cursor-pointer margin-bottom--small">
+        <div
+          class="w-100 bg-light p-10px br-10px cursor-pointer margin-bottom--small"
+        >
           <div
-            class="fs-16px font-weight-normal  margin-bottom--small margin-top--xsmall text-center"
+            class="fs-16px font-weight-normal margin-bottom--small margin-top--xsmall text-center"
           >
             {{ publicKeyAdded }}
           </div>
@@ -96,10 +103,10 @@
           </div>
         </div>
         <div class="display--flex margin-bottom--base">
-          <div class=" fs-16px mr-5px font-weight-semibold">
+          <div class="fs-16px mr-5px font-weight-semibold">
             Your current balance
           </div>
-          <div class="fs-16px  display--flex items--center">
+          <div class="fs-16px display--flex items--center">
             <div>{{ globalVars.nanosToDeSo(userBalanceNanos) }} $DESO</div>
 
             <div *ngIf="!refreshBalanceCooldown">
@@ -110,7 +117,7 @@
               >
                 <div class="display--flex">
                   <i-feather
-                    class=" feather-small fs-0px mr-5px"
+                    class="feather-small fs-0px mr-5px"
                     name="refresh-cw"
                   ></i-feather>
                 </div>
@@ -119,9 +126,7 @@
             </div>
             <div *ngIf="refreshBalanceCooldown">
               <div class="ml-10px">
-                <span class=""
-                >Refresh in {{ refreshBalanceRetryTime }}s</span
-                >
+                <span class="">Refresh in {{ refreshBalanceRetryTime }}s</span>
               </div>
             </div>
           </div>
@@ -144,10 +149,10 @@
   <div class="p-16px">
     <a
       data-control-name="buy-or-send-finish-flow-button"
-      class=" ml-25px cursor-pointer"
+      class="ml-25px cursor-pointer"
       style="cursor: pointer"
       (click)="cancelButtonClicked()"
-    >Cancel</a
+      >Cancel</a
     >
   </div>
 </div>

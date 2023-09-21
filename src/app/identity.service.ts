@@ -153,10 +153,9 @@ export class IdentityService {
       .then((derivedPrivateUserInfo) => {
         if (this.globalVars.callback) {
           // If callback is passed, we redirect to it with payload as URL parameters.
-          const httpParams = this.parseTypeToHttpParams(
-            derivedPrivateUserInfo
-          );
-          const callbackURL = this.globalVars.callback + `?${httpParams.toString()}`;
+          const httpParams = this.parseTypeToHttpParams(derivedPrivateUserInfo);
+          const callbackURL =
+            this.globalVars.callback + `?${httpParams.toString()}`;
           window.location.href = callbackURL;
           // This is a temporary hack to fix an issue with callback URLs on
           // android devices. Sometimes we need an additional user click

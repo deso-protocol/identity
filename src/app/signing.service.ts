@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import KeyEncoder from 'key-encoder';
+import { ec } from 'elliptic';
 import * as jsonwebtoken from 'jsonwebtoken';
+import KeyEncoder from 'key-encoder';
+import * as sha256 from 'sha256';
+import { uvarint64ToBuf } from '../lib/bindata/util';
+import { TransactionV0 } from '../lib/deso/transaction';
 import * as ecies from '../lib/ecies';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
-import * as sha256 from 'sha256';
-import { uvarint64ToBuf } from '../lib/bindata/util';
-import { ec } from 'elliptic';
-import { TransactionV0 } from '../lib/deso/transaction';
 
 @Injectable({
   providedIn: 'root',
@@ -57,8 +57,13 @@ export class SigningService {
     const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
-    const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [TransactionV0, Buffer];
-    const signatureIndex = v1FieldsBuffer.length ? transactionBytes.indexOf(v1FieldsBuffer) -1 : -1;
+    const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [
+      TransactionV0,
+      Buffer
+    ];
+    const signatureIndex = v1FieldsBuffer.length
+      ? transactionBytes.indexOf(v1FieldsBuffer) - 1
+      : -1;
     const v0FieldsWithoutSignature = transactionBytes.slice(0, signatureIndex);
     const transactionHash = new Buffer(sha256.x2(transactionBytes), 'hex');
     const signature = privateKey.sign(transactionHash, { canonical: true });
@@ -70,7 +75,12 @@ export class SigningService {
       signatureBytes[0] += 1 + (signature.recoveryParam as number);
     }
 
-    return Buffer.concat([v0FieldsWithoutSignature, signatureLength, signatureBytes, v1FieldsBuffer]).toString('hex');
+    return Buffer.concat([
+      v0FieldsWithoutSignature,
+      signatureLength,
+      signatureBytes,
+      v1FieldsBuffer,
+    ]).toString('hex');
   }
 
   signHashes(seedHex: string, unsignedHashes: string[]): string[] {
@@ -106,14 +116,28 @@ export class SigningService {
     return signedHashes;
   }
 
-  encryptGroupMessagingPrivateKeyToMember(memberMessagingPublicKeyBase58Check: string, privateKeyHex: string): string {
-    const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(memberMessagingPublicKeyBase58Check);
-    // @ts-ignore
-    const messagingPkBuffer = new Buffer(memberMessagingPkKeyPair.getPublic('arr'));
-    return ecies.encrypt(messagingPkBuffer, privateKeyHex, { legacy: false }).toString('hex');
+  encryptGroupMessagingPrivateKeyToMember(
+    memberMessagingPublicKeyBase58Check: string,
+    privateKeyHex: string
+  ): string {
+    const memberMessagingPkKeyPair = this.cryptoService.publicKeyToECKeyPair(
+      memberMessagingPublicKeyBase58Check
+    );
+    const messagingPkBuffer = new Buffer(
+      // @ts-ignore
+      memberMessagingPkKeyPair.getPublic('arr')
+    );
+    return ecies
+      .encrypt(messagingPkBuffer, privateKeyHex, { legacy: false })
+      .toString('hex');
   }
-  decryptGroupMessagingPrivateKeyToMember(privateKeyBuffer: Buffer, encryptedPrivateKeyBuffer: Buffer): ec.KeyPair {
-    const memberMessagingPriv = ecies.decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, { legacy: false }).toString();
+  decryptGroupMessagingPrivateKeyToMember(
+    privateKeyBuffer: Buffer,
+    encryptedPrivateKeyBuffer: Buffer
+  ): ec.KeyPair {
+    const memberMessagingPriv = ecies
+      .decrypt(privateKeyBuffer, encryptedPrivateKeyBuffer, { legacy: false })
+      .toString();
     const EC = new ec('secp256k1');
     return EC.keyFromPrivate(memberMessagingPriv);
   }

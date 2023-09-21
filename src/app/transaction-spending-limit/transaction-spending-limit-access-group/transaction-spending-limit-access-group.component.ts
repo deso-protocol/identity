@@ -1,13 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {GlobalVarsService} from 'src/app/global-vars.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { GlobalVarsService } from 'src/app/global-vars.service';
 import {
   AccessGroupLimitMapItem,
   AccessGroupOperationString,
   AccessGroupScopeType,
   BackendAPIService,
-  User
+  User,
 } from '../../backend-api.service';
-import {TransactionSpendingLimitComponent} from '../transaction-spending-limit.component';
+import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
 @Component({
   selector: 'app-transaction-spending-limit-access-group',
@@ -24,11 +24,12 @@ export class TransactionSpendingLimitAccessGroupComponent implements OnInit {
     public globalVars: GlobalVarsService
   ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   isScoped(): boolean {
-    return this.accessGroupLimitMapItem?.ScopeType === AccessGroupScopeType.SCOPED;
+    return (
+      this.accessGroupLimitMapItem?.ScopeType === AccessGroupScopeType.SCOPED
+    );
   }
 
   getOperationString(): string {

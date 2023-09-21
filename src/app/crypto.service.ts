@@ -1,21 +1,20 @@
 import { Injectable } from '@angular/core';
-import HDNode from 'hdkey';
 import * as bip39 from 'bip39';
-import HDKey from 'hdkey';
-import { ec as EC } from 'elliptic';
 import bs58check from 'bs58check';
-import { CookieService } from 'ngx-cookie';
 import {
-  createHmac,
   createCipher,
   createDecipher,
-  randomBytes,
   createHash,
+  createHmac,
+  randomBytes,
 } from 'crypto';
-import {AccessLevel, Network} from '../types/identity';
-import { GlobalVarsService } from './global-vars.service';
-import { Keccak } from 'sha3';
+import { ec as EC } from 'elliptic';
+import { default as HDKey, default as HDNode } from 'hdkey';
+import { CookieService } from 'ngx-cookie';
 import * as sha256 from 'sha256';
+import { Keccak } from 'sha3';
+import { AccessLevel, Network } from '../types/identity';
+import { GlobalVarsService } from './global-vars.service';
 
 @Injectable({
   providedIn: 'root',
@@ -144,7 +143,7 @@ export class CryptoService {
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
     // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive('m/44\'/0\'/0\'/0/0', nonStandard);
+    return HDKey.fromMasterSeed(seed).derive("m/44'/0'/0'/0/0", nonStandard);
   }
 
   keychainToSeedHex(keychain: HDNode): string {

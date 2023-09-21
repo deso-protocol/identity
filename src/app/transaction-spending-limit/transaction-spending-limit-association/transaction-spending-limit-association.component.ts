@@ -1,13 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {GlobalVarsService} from 'src/app/global-vars.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { GlobalVarsService } from 'src/app/global-vars.service';
 import {
   AssociationAppScopeType,
   AssociationLimitMapItem,
   AssociationOperationString,
   BackendAPIService,
-  User
+  User,
 } from '../../backend-api.service';
-import {TransactionSpendingLimitComponent} from '../transaction-spending-limit.component';
+import { TransactionSpendingLimitComponent } from '../transaction-spending-limit.component';
 
 @Component({
   selector: 'app-transaction-spending-limit-association',
@@ -24,8 +24,7 @@ export class TransactionSpendingLimitAssociationComponent implements OnInit {
     public globalVars: GlobalVarsService
   ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   getOperationString(): string {
     switch (this.associationLimitMapItem?.AssociationOperation) {

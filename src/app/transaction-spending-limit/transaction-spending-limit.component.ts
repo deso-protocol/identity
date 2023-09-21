@@ -8,7 +8,7 @@ import {
   CoinOperationLimitMap,
   DAOCoinLimitOrderLimitMap,
   TransactionSpendingLimitResponse,
-  User
+  User,
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 
@@ -22,8 +22,7 @@ export class TransactionSpendingLimitComponent implements OnInit {
     {
       GlobalDESOLimit: 0,
     };
-  @Input() onApproveClick: () => Promise<void> = async () => {
-  };
+  @Input() onApproveClick: () => Promise<void> = async () => {};
   hasUsers = false;
   userMap: { [k: string]: User } = {};
   showTransactions: boolean = false;
@@ -42,8 +41,7 @@ export class TransactionSpendingLimitComponent implements OnInit {
   constructor(
     private backendApi: BackendAPIService,
     public globalVars: GlobalVarsService
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     const publicKeysToFetch = [
@@ -63,17 +61,17 @@ export class TransactionSpendingLimitComponent implements OnInit {
           )
           .concat(
             this.getPublicKeysFromAssociationLimitMap(
-              this.transactionSpendingLimitResponse?.AssociationLimitMap,
+              this.transactionSpendingLimitResponse?.AssociationLimitMap
             )
           )
           .concat(
             this.getPublicKeysFromAccessGroupLimitMap(
-              this.transactionSpendingLimitResponse?.AccessGroupLimitMap,
+              this.transactionSpendingLimitResponse?.AccessGroupLimitMap
             )
           )
           .concat(
             this.getPublicKeysFromAccessGroupLimitMap(
-              this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap,
+              this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap
             )
           )
       ),
@@ -120,23 +118,30 @@ export class TransactionSpendingLimitComponent implements OnInit {
     }
 
     let allPublicKeys = new Set<string>();
-    associationLimitMap.forEach((item) => allPublicKeys.add(item.AppPublicKeyBase58Check));
+    associationLimitMap.forEach((item) =>
+      allPublicKeys.add(item.AppPublicKeyBase58Check)
+    );
     return Array.from(allPublicKeys);
   }
 
   getPublicKeysFromAccessGroupLimitMap(
-    accessGroupLimitMap: AccessGroupLimitMapItem[] | AccessGroupMemberLimitMapItem[] | undefined
+    accessGroupLimitMap:
+      | AccessGroupLimitMapItem[]
+      | AccessGroupMemberLimitMapItem[]
+      | undefined
   ): string[] {
     if (!accessGroupLimitMap) {
       return [];
     }
     let allPublicKeys = new Set<string>();
-    accessGroupLimitMap.forEach((item) => allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check));
+    accessGroupLimitMap.forEach((item) =>
+      allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check)
+    );
     return Array.from(allPublicKeys);
   }
 
   async onApproveClickWrapper() {
     this.isPendingApprove = true;
-    await this.onApproveClick().finally(() => this.isPendingApprove = false);
+    await this.onApproveClick().finally(() => (this.isPendingApprove = false));
   }
 }

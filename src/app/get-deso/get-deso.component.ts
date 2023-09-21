@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EntropyService } from '../entropy.service';
 import { CryptoService } from '../crypto.service';
 import { AccountService } from '../account.service';
@@ -12,7 +12,7 @@ import { RouteNames } from '../app-routing.module';
 import { BackendAPIService } from '../backend-api.service';
 import { Network } from 'src/types/identity';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { logInteractionEvent } from "../interaction-event-helpers";
+import { logInteractionEvent } from '../interaction-event-helpers';
 
 @Component({
   selector: 'app-get-deso',
@@ -63,7 +63,7 @@ export class GetDesoComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private textService: TextService,
     private backendAPIService: BackendAPIService,
-    private sanitizer: DomSanitizer,
+    private sanitizer: DomSanitizer
   ) {
     this.stepTotal = globalVars.showJumio() ? 3 : 2;
     if (this.activatedRoute.snapshot.queryParamMap.has('origin')) {
@@ -98,11 +98,11 @@ export class GetDesoComponent implements OnInit {
         `&now=${Date.now()}`,
       ].join('')
     );
-    window.addEventListener("message", this.#heroswapMessageListener);
+    window.addEventListener('message', this.#heroswapMessageListener);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener("message", this.#heroswapMessageListener);
+    window.removeEventListener('message', this.#heroswapMessageListener);
   }
 
   copyPublicKey(): void {
@@ -112,8 +112,8 @@ export class GetDesoComponent implements OnInit {
 
   #heroswapMessageListener = (event: MessageEvent) => {
     if (event.origin !== environment.heroswapURL) return;
-    logInteractionEvent("heroswap-iframe", "message", event.data);
-  }
+    logInteractionEvent('heroswap-iframe', 'message', event.data);
+  };
 
   clickTos(): void {
     const h = 700;
@@ -132,7 +132,7 @@ export class GetDesoComponent implements OnInit {
 
   stepThreeNextPhone(): void {
     this.router.navigate(['/', RouteNames.VERIFY_PHONE_NUMBER], {
-      queryParams: {public_key: this.publicKeyAdded},
+      queryParams: { public_key: this.publicKeyAdded },
       queryParamsHandling: 'merge',
     });
   }
@@ -160,16 +160,19 @@ export class GetDesoComponent implements OnInit {
   }
 
   onCaptchaVerify(token: string): void {
-    this.backendAPIService.VerifyHCaptcha(token, this.publicKeyAdded).subscribe((res) => {
-      if (res.Success) {
-        this.isFinishFlowDisabled = false;
-        this.finishFlow();
-      } else {
+    this.backendAPIService.VerifyHCaptcha(token, this.publicKeyAdded).subscribe(
+      (res) => {
+        if (res.Success) {
+          this.isFinishFlowDisabled = false;
+          this.finishFlow();
+        } else {
+          this.captchaFailed = true;
+        }
+      },
+      (err) => {
         this.captchaFailed = true;
       }
-    }, (err) => {
-      this.captchaFailed = true;
-    });
+    );
   }
 
   onCaptchaExpired(event: any): void {
@@ -203,13 +206,20 @@ export class GetDesoComponent implements OnInit {
         const user = res.UserList[0];
         if (user.BalanceNanos) {
           this.userBalanceNanos = user.BalanceNanos;
-          this.isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
+          this.isFinishFlowDisabled =
+            this.globalVars.derive && !this.globalVars.showSkip
+              ? this.userBalanceNanos < 1e4
+              : false;
         }
-      }).add(() => this.refreshingBalance = false);
+      })
+      .add(() => (this.refreshingBalance = false));
   }
 
   ////// FINISH FLOW ///////
-  isFinishFlowDisabled = this.globalVars.derive && !this.globalVars.showSkip ? this.userBalanceNanos < 1e4 : false;
+  isFinishFlowDisabled =
+    this.globalVars.derive && !this.globalVars.showSkip
+      ? this.userBalanceNanos < 1e4
+      : false;
 
   finishFlow(): void {
     if (this.isFinishFlowDisabled) {
@@ -217,7 +227,7 @@ export class GetDesoComponent implements OnInit {
     }
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: {publicKey: this.publicKeyAdded},
+        queryParams: { publicKey: this.publicKeyAdded },
         queryParamsHandling: 'merge',
       });
     } else {
