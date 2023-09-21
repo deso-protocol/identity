@@ -19,7 +19,7 @@
     "module": "es2020",
     "allowJs": true,
     "lib": [
-      "es2018",
+      "es2020",
       "dom"
     ],
     "types": [],
