@@ -385,10 +385,6 @@ export class BackendAPIService {
     )}/${PublicKeyBase58Check}?fallback=${FallbackURL}`;
   }
 
-  GetDefaultProfilePictureURL(defaultImgHost: string): string {
-    return defaultImgHost + '/assets/img/default_profile_pic.png';
-  }
-
   JumioBegin(
     PublicKey: string,
     ReferralHashBase58: string,
