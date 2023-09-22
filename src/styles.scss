@@ -471,7 +471,7 @@ a,
   @include color('blue', 'base', 'background-color');
   @include color('neutral', 'white', 'color');
   &:hover {
-    @include color('blue', 'darker', 'background-color');
+    @include color('blue', 'dark', 'background-color');
   }
 }
 .button--primary--outline {
@@ -481,6 +481,7 @@ a,
   @include color('neutral', 'transparent', 'background-color');
   @include color('text', 'lighter', 'color');
   &:hover {
+    @include color('neutral', 'white', 'color');
     @include color('blue', 'darker', 'background-color');
   }
 }
