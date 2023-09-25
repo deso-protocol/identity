@@ -803,6 +803,7 @@ a,
   max-height: 245px;
   overflow: scroll;
   border: 1px solid;
+  scroll-behavior: smooth;
   @include spacing('padding', 'medium');
   @include spacing('padding-top', 'small');
   @include color('blue', 'dark', 'border-color');
@@ -828,6 +829,11 @@ a,
   &:hover {
     @include color('blue', 'light', 'border-color');
     cursor: pointer;
+  }
+
+  &--just-added {
+    @include color('blue', 'light', 'border-color');
+    @include color('blue', 'dark', 'background-color');
   }
 }
 //-------------------------------

@@ -304,11 +304,7 @@ export class BackendAPIService {
     }
     const isDerived = this.accountService.isMetamaskAccount(account);
 
-    const jwt = this.signingService.signJWT(
-      account.seedHex,
-      account.accountNumber,
-      isDerived
-    );
+    const jwt = this.signingService.signJWT(account.seedHex, isDerived);
     return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 

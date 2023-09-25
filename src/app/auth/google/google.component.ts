@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { GoogleAuthState } from '../../../types/identity';
+import { GoogleAuthState, LoginMethod } from '../../../types/identity';
 import { AccountService } from '../../account.service';
 import { RouteNames } from '../../app-routing.module';
 import { BackendAPIService } from '../../backend-api.service';
@@ -93,9 +93,8 @@ export class GoogleComponent implements OnInit {
             mnemonic,
             extraText,
             network,
-            0,
             {
-              google: true,
+              loginMethod: LoginMethod.GOOGLE,
             }
           );
         } catch (err) {
@@ -149,9 +148,8 @@ export class GoogleComponent implements OnInit {
           mnemonic,
           extraText,
           network,
-          0,
           {
-            google: true,
+            loginMethod: LoginMethod.GOOGLE,
           }
         );
         this.loading = false;

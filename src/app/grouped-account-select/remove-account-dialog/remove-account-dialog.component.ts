@@ -8,7 +8,7 @@ import { AccountService } from '../../account.service';
   styleUrls: ['./remove-account-dialog.component.scss'],
 })
 export class RemoveAccountDialogComponent {
-  copySuccess: boolean = false;
+  copySuccess = false;
 
   constructor(
     public dialogRef: MatDialogRef<RemoveAccountDialogComponent>,

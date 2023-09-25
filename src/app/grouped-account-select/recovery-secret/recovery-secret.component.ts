@@ -1,18 +1,19 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'recovery-secret',
   templateUrl: './recovery-secret.component.html',
   styleUrls: ['./recovery-secret.component.scss'],
 })
-export class RecoverySecretComponent {
+export class RecoverySecretComponent implements OnInit {
   @Input() secret = '';
 
+  maskedSecret = '';
   isRevealed = false;
   copySuccess = false;
 
-  maskSecret(secret = '') {
-    return secret.slice().replace(/\S/g, '*');
+  ngOnInit(): void {
+    this.maskedSecret = this.secret.replace(/\S/g, '*');
   }
 
   copySecret() {
