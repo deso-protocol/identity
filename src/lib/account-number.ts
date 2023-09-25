@@ -34,12 +34,18 @@ export function generateAccountNumber(accountNumbers: Set<number>): number {
     return candidate;
   }
 
-  // At most we look back 500 numbers. This is a bit arbitrary...  but the
-  // number of values could *technically* be 2^32 - 1, so we just limit the
+  // If we get here, it means a user must have manually entered the maximum
+  // allowed account number into the recover account field, and subsequently
+  // tried to add a new account. We'll get an error if we try to use the next
+  // incremented value (which is too big).  We cannot use a static default
+  // fallback value because it could conflict with an account number we already
+  // have stored in local storage, so we look back for the first gap in the
+  // numbers. At most we look back 500 numbers. This is a bit arbitrary...  but
+  // the number of values could *technically* be 2^32 - 1, so we just limit the
   // number of iterations to some reasonable value. The reason we look back for
-  // the highest available number instead of picking the lowest number is that
-  // the lowest number is more likely to have been used in the past and we're
-  // aiming to get a fresh wallet.
+  // the highest available number instead of picking the lowest available number
+  // is that the lowest number is more likely to have been used in the past and
+  // we're aiming to get a fresh/unused set of keys.
   const maxLookBack = Math.max(sorted.length - 500, 0);
   let nextExpectedValueInSequence = currentHighestAccountNumber - 1;
   for (let i = sorted.length - 2; i >= maxLookBack; i--) {

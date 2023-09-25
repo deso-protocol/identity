@@ -119,10 +119,6 @@
     </div>
   </div>
   <div class="padding-bottom--xlarge">
-    <app-account-select
-      (onAccountSelect)="onAccountSelect($event)"
-    ></app-account-select>
-    <div class="text--divider margin-top--large margin-bottom--large">or</div>
-    <app-log-in-options></app-log-in-options>
+    <grouped-account-select (onAccountSelect)="onAccountSelect($event)" />
   </div>
 </div>

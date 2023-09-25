@@ -236,8 +236,7 @@ export class SignUpMetamaskComponent implements OnInit {
     const signedTransactionHex = this.signingService.signTransaction(
       derivedKeyPair.getPrivate().toString('hex'),
       authorizeDerivedKeyResponse.TransactionHex,
-      true,
-      0
+      true
     );
 
     this.backendApi

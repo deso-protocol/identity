@@ -105,8 +105,7 @@ export class ApproveComponent implements OnInit {
     const signedTransactionHex = this.signingService.signTransaction(
       account.seedHex,
       this.transactionHex,
-      isDerived,
-      account.accountNumber
+      isDerived
     );
     this.finishFlow(signedTransactionHex);
   }
