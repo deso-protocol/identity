@@ -63,12 +63,6 @@ export class GlobalVarsService {
   showSkip: boolean = false;
 
   /**
-   * Flag used to gate the new subAccounts functionality. After some sunset
-   * period (TBD), we can remove this flag and make this the default behavior.
-   */
-  subAccounts: boolean = false;
-
-  /**
    * Set of public keys that have been authenticated by the calling application.
    * This is used as a hint to decide whether to show the derived key approval
    * UI or not after the user selects an account to login with. If the account

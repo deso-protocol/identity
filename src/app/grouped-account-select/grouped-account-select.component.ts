@@ -15,7 +15,11 @@ import { BackupSeedDialogComponent } from './backup-seed-dialog/backup-seed-dial
 import { RemoveAccountDialogComponent } from './remove-account-dialog/remove-account-dialog.component';
 
 type AccountViewModel = SubAccountMetadata &
-  UserProfile & { publicKey: string } & { lastUsed?: boolean };
+  UserProfile & {
+    rootPublicKey: string;
+    publicKey: string;
+    lastUsed?: boolean;
+  };
 
 function sortAccounts(a: AccountViewModel, b: AccountViewModel) {
   // sort accounts by last login timestamp DESC,
@@ -56,12 +60,7 @@ export class GroupedAccountSelectComponent implements OnInit {
    */
   loadingAccounts: boolean = false;
 
-  get hasVisibleAccounts() {
-    // if any group has at least 1 visible account, return true.
-    return !!Array.from(this.accountGroups.values()).find(
-      (group) => group.accounts.length > 0
-    );
-  }
+  justAddedPublicKey?: string;
 
   constructor(
     public accountService: AccountService,
@@ -76,29 +75,27 @@ export class GroupedAccountSelectComponent implements OnInit {
 
   initializeAccountGroups() {
     this.loadingAccounts = true;
-    const storedUsers = Object.entries(
+    const rootUserEntries = Object.entries(
       this.accountService.getRootLevelUsers()
-    ).sort(
-      (
-        [kA, { lastLoginTimestamp: timestampA = 0 }],
-        [kb, { lastLoginTimestamp: timestampB = 0 }]
-      ) => {
-        // sort groups by last login timestamp DESC. We don't have balance info here.
-        return timestampB - timestampA;
-      }
     );
     const accountGroupsByRootKey = new Map<
       string,
-      { publicKey: string; accountNumber: number; lastLoginTimestamp: number }[]
+      {
+        rootPublicKey: string;
+        publicKey: string;
+        accountNumber: number;
+        lastLoginTimestamp?: number;
+      }[]
     >();
 
-    for (const [rootPublicKey, userInfo] of storedUsers) {
+    for (const [rootPublicKey, userInfo] of rootUserEntries) {
       const accounts = !userInfo.isHidden
         ? [
             {
+              rootPublicKey: rootPublicKey,
               publicKey: rootPublicKey,
               accountNumber: 0,
-              lastLoginTimestamp: userInfo.lastLoginTimestamp ?? 0,
+              lastLoginTimestamp: userInfo.lastLoginTimestamp,
             },
           ]
         : [];
@@ -116,13 +113,16 @@ export class GroupedAccountSelectComponent implements OnInit {
         );
 
         accounts.push({
+          rootPublicKey: rootPublicKey,
           publicKey: publicKeyBase58,
           accountNumber: subAccount.accountNumber,
-          lastLoginTimestamp: subAccount.lastLoginTimestamp ?? 0,
+          lastLoginTimestamp: subAccount.lastLoginTimestamp,
         });
       }
 
-      accountGroupsByRootKey.set(rootPublicKey, accounts);
+      if (accounts.length > 0) {
+        accountGroupsByRootKey.set(rootPublicKey, accounts);
+      }
     }
 
     const profileKeysToFetch = Array.from(accountGroupsByRootKey.values())
@@ -137,27 +137,48 @@ export class GroupedAccountSelectComponent implements OnInit {
         finalize(() => (this.loadingAccounts = false))
       )
       .subscribe((users) => {
+        const unorderedAccountGroups: typeof this.accountGroups = new Map();
         Array.from(accountGroupsByRootKey.entries()).forEach(
           ([key, accounts]) => {
-            this.accountGroups.set(key, {
-              showRecoverSubAccountInput: false,
-              accounts: accounts
-                .map((account, j) => ({
-                  ...account,
-                  ...users[account.publicKey],
-                }))
-                .sort(sortAccounts),
+            unorderedAccountGroups.set(key, {
+              accounts: accounts.map((account) => ({
+                ...account,
+                ...users[account.publicKey],
+              })),
             });
-
-            // get the first account in the list and set it as the lastUsed.
-            const firstKey = this.accountGroups.keys().next().value;
-            const firstGroup = this.accountGroups.get(firstKey);
-            if (firstGroup) {
-              firstGroup.accounts[0].lastUsed = true;
-              this.accountGroups.set(firstKey, firstGroup);
-            }
           }
         );
+
+        // To sort the accounts holistically across groups, we need to flatten
+        // the Map values into a single array. Once they're sorted, we can determine
+        // which account was last used and mark it as such. There can be a case where
+        // no account is "last used" if the user has never logged in to any account and
+        // simply loaded or added accounts to the wallet. In this case, we don't mark
+        // any account as "last used".
+        const allAccounts = Array.from(unorderedAccountGroups.values())
+          .map((a) => a.accounts)
+          .flat();
+        const sortedAccounts = allAccounts.sort(sortAccounts);
+        const lastUsedAccount = sortedAccounts.find(
+          (a) =>
+            typeof a.lastLoginTimestamp === 'number' && a.lastLoginTimestamp > 0
+        );
+
+        if (lastUsedAccount) {
+          lastUsedAccount.lastUsed = true;
+        }
+
+        sortedAccounts.forEach((account) => {
+          const group = this.accountGroups.get(account.rootPublicKey);
+          if (group?.accounts?.length) {
+            group.accounts.push(account);
+          } else {
+            this.accountGroups.set(account.rootPublicKey, {
+              showRecoverSubAccountInput: false,
+              accounts: [account],
+            });
+          }
+        });
       });
   }
 
@@ -214,6 +235,23 @@ export class GroupedAccountSelectComponent implements OnInit {
         });
         group.accounts = hiddenPreview;
         this.accountGroups.set(groupKey, group);
+
+        // if removing the last used account, select the next last used account
+        // in the list, if one exists.
+        if (account.lastUsed) {
+          const allAccounts = Array.from(this.accountGroups.values())
+            .map((a) => a.accounts)
+            .flat();
+          const sortedAccounts = allAccounts.sort(sortAccounts);
+          const lastUsedAccount = sortedAccounts.find(
+            (a) =>
+              typeof a.lastLoginTimestamp === 'number' &&
+              a.lastLoginTimestamp > 0
+          );
+          if (lastUsedAccount) {
+            lastUsedAccount.lastUsed = true;
+          }
+        }
       }
     });
   }
@@ -237,6 +275,7 @@ export class GroupedAccountSelectComponent implements OnInit {
       .pipe(take(1))
       .subscribe((users) => {
         const account = {
+          rootPublicKey: rootPublicKey,
           publicKey: publicKeyBase58,
           accountNumber: addedAccountNumber,
           ...users[publicKeyBase58],
@@ -248,12 +287,29 @@ export class GroupedAccountSelectComponent implements OnInit {
 
         // if the account is already in the list, don't add it again...
         if (!group.accounts.find((a) => a.accountNumber === accountNumber)) {
-          // Insert recovered/added account at the top of the list so
-          // easy to see that it was added.
-          group.accounts.unshift(account);
+          group.accounts.push(account);
         }
 
         this.accountGroups.set(rootPublicKey, group);
+
+        // scroll to, and temporarily highlight the account that was just added/recovered
+        window.requestAnimationFrame(() => {
+          const scrollContainer = document.getElementById(
+            'account-select-group-' + rootPublicKey
+          );
+          const accountElement = document.getElementById(
+            'account-select-' + publicKeyBase58
+          );
+
+          if (scrollContainer && accountElement) {
+            scrollContainer.scrollTop = accountElement.offsetTop;
+          }
+        });
+
+        this.justAddedPublicKey = publicKeyBase58;
+        setTimeout(() => {
+          this.justAddedPublicKey = undefined;
+        }, 3000);
       });
   }
 
@@ -300,12 +356,8 @@ export class GroupedAccountSelectComponent implements OnInit {
   }
 
   exportSeed(rootPublicKey: string) {
-    const dialogRef = this.dialog.open(BackupSeedDialogComponent, {
+    this.dialog.open(BackupSeedDialogComponent, {
       data: { rootPublicKey },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
     });
   }
 }

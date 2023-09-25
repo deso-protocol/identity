@@ -314,7 +314,7 @@
     <div class="font-size--small text--center margin-bottom--large">
       Never share your DeSo seed phrase with anyone.
     </div>
-    <div class="section--seed__container">
+    <div class="section--seed__container margin-bottom--medium">
       <p
         class="font-size--medium font-weight--semibold margin-bottom--small text--neutral-black"
       >
@@ -331,7 +331,11 @@
       class="section--seed__container margin-bottom--medium"
       *ngIf="entropyService.temporaryEntropy.extraText.length > 0"
     >
-      Enter your passphrase:
+      <p
+        class="font-size--medium font-weight--semibold margin-bottom--small text--neutral-black"
+      >
+        Enter your passphrase:
+      </p>
       <div
         class="margin-top--medium"
         *ngIf="entropyService.temporaryEntropy.extraText.length > 0"
