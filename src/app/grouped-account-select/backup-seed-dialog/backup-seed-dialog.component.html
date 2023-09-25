@@ -19,11 +19,14 @@
         >
       </p>
       <footer class="display--flex">
-        <button class="button--medium button--secondary" (click)="cancel()">
+        <button
+          class="button--medium button--primary--outline"
+          (click)="cancel()"
+        >
           Cancel
         </button>
         <button
-          class="button--medium button--primary margin-right--small"
+          class="button--medium button--primary margin-left--small"
           (click)="showSecrets()"
         >
           Continue
@@ -73,14 +76,17 @@
         >
       </p>
       <footer class="display--flex">
-        <button class="button--medium button--secondary" (click)="cancel()">
+        <button
+          class="button--medium button--primary--outline"
+          (click)="cancel()"
+        >
           Cancel
         </button>
         <button
-          class="button--medium button--primary margin-right--small"
+          class="button--medium button--primary margin-left--small"
           (click)="disableBackup()"
         >
-          I Have Backed Up My Seed
+          Confirm
         </button>
       </footer>
     </div>

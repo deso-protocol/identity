@@ -118,7 +118,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
       mnemonic,
       extraText,
       network,
-      0
+      {
+        lastLoginTimestamp: Date.now(),
+      }
     );
 
     this.accountService.setAccessLevel(
