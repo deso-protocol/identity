@@ -24,9 +24,9 @@ import {
   TransactionMetadataDeleteUserAssociation,
   TransactionMetadataFollow,
   TransactionMetadataLike,
-  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
+  TransactionMetadataNewMessage,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
@@ -222,19 +222,15 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes, ownerPublicKeyBase58Check },
+      payload: { encryptedSeedHex, unsignedHashes },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const { accountNumber = 0 } = ownerPublicKeyBase58Check
-      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
-      : {};
     const signedHashes = this.signingService.signHashes(
       seedHex,
-      unsignedHashes,
-      accountNumber
+      unsignedHashes
     );
 
     this.respond(id, {
@@ -249,19 +245,15 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes, ownerPublicKeyBase58Check },
+      payload: { encryptedSeedHex, unsignedHashes },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const { accountNumber = 0 } = ownerPublicKeyBase58Check
-      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
-      : {};
     const signatures = this.signingService.signHashesETH(
       seedHex,
-      unsignedHashes,
-      accountNumber
+      unsignedHashes
     );
 
     this.respond(id, {
@@ -276,7 +268,6 @@ export class IdentityService {
         encryptedSeedHex,
         transactionHex,
         derivedPublicKeyBase58Check,
-        ownerPublicKeyBase58Check,
       },
     } = data;
 
@@ -305,14 +296,10 @@ export class IdentityService {
       this.globalVars.hostname
     );
     const isDerived = !!derivedPublicKeyBase58Check;
-    const { accountNumber = 0 } = ownerPublicKeyBase58Check
-      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
-      : {};
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
       transactionHex,
-      isDerived,
-      accountNumber
+      isDerived
     );
 
     this.respond(id, {
@@ -372,10 +359,7 @@ export class IdentityService {
       senderGroupKeyName,
       recipientPublicKey,
       message,
-      {
-        ownerPublicKeyBase58Check,
-        messagingKeyRandomness,
-      }
+      messagingKeyRandomness
     );
 
     this.respond(id, { ...encryptedMessage });
@@ -421,8 +405,7 @@ export class IdentityService {
       try {
         const decryptedHexes = this.accountService.decryptMessagesLegacy(
           seedHex,
-          encryptedHexes,
-          data.payload.ownerPublicKeyBase58Check
+          encryptedHexes
         );
         this.respond(id, {
           decryptedHexes,
@@ -440,10 +423,8 @@ export class IdentityService {
           seedHex,
           encryptedMessages,
           data.payload.messagingGroups || [],
-          {
-            messagingKeyRandomness,
-            ownerPublicKeyBase58Check: data.payload.ownerPublicKeyBase58Check,
-          }
+          messagingKeyRandomness,
+          data.payload.ownerPublicKeyBase58Check
         )
         .then(
           (res) => this.respond(id, { decryptedHexes: res }),
@@ -462,21 +443,14 @@ export class IdentityService {
 
     const {
       id,
-      payload: {
-        encryptedSeedHex,
-        derivedPublicKeyBase58Check,
-        ownerPublicKeyBase58Check,
-      },
+      payload: { encryptedSeedHex, derivedPublicKeyBase58Check },
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const { accountNumber = 0 } = ownerPublicKeyBase58Check
-      ? this.accountService.getAccountInfo(ownerPublicKeyBase58Check)
-      : {};
     const isDerived = !!derivedPublicKeyBase58Check;
-    const jwt = this.signingService.signJWT(seedHex, accountNumber, isDerived);
+    const jwt = this.signingService.signJWT(seedHex, isDerived);
 
     this.respond(id, {
       jwt,
@@ -565,7 +539,6 @@ export class IdentityService {
     if (accessLevel < requiredAccessLevel) {
       return false;
     }
-
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname

@@ -119,18 +119,6 @@
     </div>
   </div>
   <div class="padding-bottom--xlarge">
-    <grouped-account-select
-      *ngIf="globalVars.subAccounts; else legacyAccountSelect"
-      (onAccountSelect)="onAccountSelect($event)"
-    />
-    <ng-template #legacyAccountSelect>
-      <app-account-select
-        (onAccountSelect)="onAccountSelect($event)"
-      ></app-account-select>
-      <div class="text--divider margin-top--medium margin-bottom--medium">
-        or
-      </div>
-      <app-log-in-options></app-log-in-options>
-    </ng-template>
+    <grouped-account-select (onAccountSelect)="onAccountSelect($event)" />
   </div>
 </div>
