@@ -142,49 +142,32 @@ export class CryptoService {
     nonStandard?: boolean
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
-    return deriveKeys(seed, 0, {
+    return generateSubAccountKeys(seed, 0, {
       nonStandard,
     });
   }
 
   getSubAccountKeychain(masterSeedHex: string, accountIndex: number): HDNode {
     const seedBytes = Buffer.from(masterSeedHex, 'hex');
-    return deriveKeys(seedBytes, accountIndex);
+    return generateSubAccountKeys(seedBytes, accountIndex);
   }
 
   keychainToSeedHex(keychain: HDNode): string {
     return keychain.privateKey.toString('hex');
   }
 
-  /**
-   * For a given parent seed hex and account number, return the corresponding private key. Public/private
-   * key pairs are independent and unique based on a combination of the seed hex and account number.
-   * @param parentSeedHex This is the seed hex used to generate multiple HD wallets/keys from a single seed.
-   * @param accountNumber This is the account number used to generate unique keys from the parent seed.
-   * @returns
-   */
-  seedHexToKeyPair(parentSeedHex: string, accountNumber: number): EC.KeyPair {
+  seedHexToKeyPair(seedHex: string): EC.KeyPair {
     const ec = new EC('secp256k1');
-
-    if (accountNumber === 0) {
-      return ec.keyFromPrivate(parentSeedHex);
-    }
-
-    const hdKeys = this.getSubAccountKeychain(parentSeedHex, accountNumber);
-    const seedHex = this.keychainToSeedHex(hdKeys);
 
     return ec.keyFromPrivate(seedHex);
   }
 
-  encryptedSeedHexToPublicKey(
-    encryptedSeedHex: string,
-    accountNumber: number
-  ): string {
+  encryptedSeedHexToPublicKey(encryptedSeedHex: string): string {
     const seedHex = this.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const privateKey = this.seedHexToKeyPair(seedHex, accountNumber);
+    const privateKey = this.seedHexToKeyPair(seedHex);
     return this.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
   }
 
@@ -309,7 +292,7 @@ export class CryptoService {
  * m / purpose' / coin_type' / account' / change / address_index
  * See for more details: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account
  */
-function deriveKeys(
+function generateSubAccountKeys(
   seedBytes: Buffer,
   accountIndex: number,
   options?: { nonStandard?: boolean }
