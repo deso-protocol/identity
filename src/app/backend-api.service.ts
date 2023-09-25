@@ -304,11 +304,7 @@ export class BackendAPIService {
     }
     const isDerived = this.accountService.isMetamaskAccount(account);
 
-    const jwt = this.signingService.signJWT(
-      account.seedHex,
-      account.accountNumber,
-      isDerived
-    );
+    const jwt = this.signingService.signJWT(account.seedHex, isDerived);
     return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 
@@ -349,7 +345,7 @@ export class BackendAPIService {
     publicKeys: string[]
   ): Observable<{ [key: string]: UserProfile }> {
     const userProfiles: { [key: string]: any } = {};
-    const req = this.GetUsersStateless(publicKeys, true);
+    const req = this.GetUsersStateless(publicKeys, true, true);
     if (publicKeys.length > 0) {
       return req
         .pipe(
@@ -358,6 +354,7 @@ export class BackendAPIService {
               userProfiles[user.PublicKeyBase58Check] = {
                 username: user.ProfileEntryResponse?.Username,
                 profilePic: user.ProfileEntryResponse?.ProfilePic,
+                balanceNanos: user.BalanceNanos,
               };
             }
             return userProfiles;

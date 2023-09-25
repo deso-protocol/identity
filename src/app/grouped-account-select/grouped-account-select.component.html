@@ -4,7 +4,7 @@
   *ngIf="loadingAccounts; else accountsSection"
 ></div>
 <ng-template #accountsSection>
-  <div class="section--accounts" *ngIf="hasVisibleAccounts">
+  <div class="section--accounts" *ngIf="this.accountGroups.size > 0">
     <div class="section--accounts__header margin-bottom--medium">
       Select an account
     </div>
@@ -17,17 +17,22 @@
     >
       <div *ngIf="group.value.accounts.length" class="margin-bottom--large">
         <ul
-          class="section--accounts__list container--scrollbar margin-bottom--small"
+          [id]="'account-select-group-' + group.key"
+          class="section--accounts__list container--scrollbar margin-bottom--small relative"
         >
           <li
+            [id]="'account-select-' + account.publicKey"
             *ngFor="let account of group.value.accounts; let j = index"
-            data-control-name="account-select-item"
           >
             <div class="display--flex items--center margin-top--small">
               <button
                 class="section--accounts__item margin-right--small"
+                data-control-name="account-select-item"
                 (click)="selectAccount(account.publicKey)"
                 role="button"
+                [ngClass]="{
+                  'section--accounts__item--just-added': account.publicKey === this.justAddedPublicKey,
+                }"
               >
                 <div class="display--flex items--center">
                   <img
@@ -36,10 +41,17 @@
                   />
                   <div>
                     <div>
-                      <span [title]="getAccountDisplayName(account)">{{
-                        getAccountDisplayName(account)
-                          | truncateAddressOrUsername
-                      }}</span>
+                      <span
+                        [ngClass]="{
+                          'font-weight--bold': account.publicKey === this.justAddedPublicKey,
+                          'text--neutral-white': account.publicKey === this.justAddedPublicKey,
+                        }"
+                        [title]="getAccountDisplayName(account)"
+                        >{{
+                          getAccountDisplayName(account)
+                            | truncateAddressOrUsername
+                        }}</span
+                      >
                       <span
                         *ngIf="account.lastUsed && !this.globalVars.isMobile()"
                         class="font-size--xsmall text--green-lighter margin-left--small"
@@ -49,6 +61,10 @@
                     <div
                       *ngIf="this.globalVars.isMobile()"
                       class="display--flex"
+                      [ngClass]="{
+                        'font-weight--bold': account.publicKey === this.justAddedPublicKey,
+                        'text--neutral-white': account.publicKey === this.justAddedPublicKey,
+                      }"
                     >
                       <span class="font-size--xsmall"
                         >Account: {{ account.accountNumber }}</span
@@ -65,7 +81,18 @@
                   <div
                     *ngIf="!this.globalVars.isMobile()"
                     class="display--flex flex--column items--end"
+                    [ngClass]="{
+                      'font-weight--bold': account.publicKey === this.justAddedPublicKey,
+                      'text--neutral-white': account.publicKey === this.justAddedPublicKey,
+                    }"
                   >
+                    <span
+                      class="font-weight--bold font-size--xsmall margin-right--small"
+                      >{{
+                        globalVars.abbreviateNumber(account.balanceNanos / 1e9)
+                      }}
+                      $DESO</span
+                    >
                     <span class="font-size--xsmall margin-right--small"
                       >Account: {{ account.accountNumber }}</span
                     >
@@ -94,19 +121,6 @@
         <div *ngIf="!isMetaMaskAccountGroup(group.key)">
           <div class="display--flex">
             <button
-              *ngIf="shouldShowExportSeedButton(group.key)"
-              class="button--small button--red display--flex items--center margin-right--small"
-              style="width: auto; white-space: nowrap"
-              (click)="exportSeed(group.key)"
-            >
-              <i-feather
-                name="save"
-                class="margin-right--xsmall"
-                style="height: 16px; width: 16px"
-              />
-              Backup
-            </button>
-            <button
               class="button--small button--primary display--flex items--center margin-right--small"
               style="width: auto; white-space: nowrap"
               aria-label="Add account"
@@ -120,7 +134,7 @@
               Account
             </button>
             <button
-              class="button--small button--secondary display--flex items--center"
+              class="button--small button--primary--outline display--flex items--center margin-right--small"
               style="width: auto; white-space: nowrap"
               (click)="toggleRecoverSubAccountForm(group.key)"
             >
@@ -130,6 +144,19 @@
                 style="height: 16px; width: 16px"
               />
               Recover
+            </button>
+            <button
+              *ngIf="shouldShowExportSeedButton(group.key)"
+              class="button--small button--red display--flex items--center"
+              style="width: auto; white-space: nowrap"
+              (click)="exportSeed(group.key)"
+            >
+              <i-feather
+                name="save"
+                class="margin-right--xsmall"
+                style="height: 16px; width: 16px"
+              />
+              Backup
             </button>
           </div>
           <form
@@ -161,7 +188,7 @@
   </div>
 </ng-template>
 <div
-  *ngIf="hasVisibleAccounts"
+  *ngIf="this.accountGroups.size > 0"
   class="text--divider margin-top--medium margin-bottom--medium"
 >
   or
