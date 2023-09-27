@@ -1,8 +1,4 @@
-<div
-  class="spinner-border"
-  style="width: 8rem; height: 8rem"
-  *ngIf="loadingAccounts; else accountsSection"
-></div>
+<div class="spinner-border" *ngIf="loadingAccounts; else accountsSection"></div>
 <ng-template #accountsSection>
   <div class="section--accounts" *ngIf="this.accountGroups.size > 0">
     <div class="section--accounts__header margin-bottom--medium">

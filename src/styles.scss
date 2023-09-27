@@ -880,6 +880,14 @@ a,
   @include color('blue', 'dark', 'border-color');
   @include spacing('padding', 'medium');
 }
+.section--accounts__recover--actions {
+  display: flex;
+  flex-direction: row;
+  @include spacing('gap', 'small');
+  @include media(mobile) {
+    flex-direction: column;
+  }
+}
 //-------------------------------
 // SECTION = Sub Actions
 //-------------------------------
@@ -916,6 +924,11 @@ a,
   display: flex;
   align-items: center;
   @include spacing('gap', 'small');
+  @include media(mobile) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
 }
 .section--seed__advanced {
   border-top: 1px solid;
@@ -934,6 +947,17 @@ a,
   @include spacing('padding', 'large');
   @include color('blue', 'dark', 'border-color');
   @include border-radius('base');
+}
+.section--starter__option--captcha {
+  border: 1px solid;
+  @include spacing('padding', 'large');
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
+  @include media(mobile) {
+    padding: 0;
+    border-radius: none;
+    border: none;
+  }
 }
 //-------------------------------
 // SECTION = Phone Page
@@ -1197,14 +1221,16 @@ a,
 }
 .spinner-border {
   display: inline-block;
-  width: 2rem;
-  height: 2rem;
+  width: 30px;
+  height: 30px;
   vertical-align: text-bottom;
   border: 0.25em solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
   -webkit-animation: 0.75s linear infinite spinner-border;
   animation: 0.75s linear infinite spinner-border;
+  padding: 40px;
+  margin: 40px;
 }
 
 //-------------------------
@@ -1283,3 +1309,6 @@ a,
 .dialog__body {
   padding: 12px 0;
 }
+//-------------------------
+// Material Dialog
+//-------------------------

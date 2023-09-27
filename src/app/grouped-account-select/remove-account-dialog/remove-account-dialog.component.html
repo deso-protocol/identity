@@ -9,13 +9,11 @@
     <ng-container
       *ngIf="this.data.isLastAccountInGroup; else simpleRecoverMessage"
     >
-      <p
-        class="margin-bottom--small font-size--large font-weight--bold text--neutral-white"
-      >
-        Your account will be irrecoverable if you lose your seed phrase.
-      </p>
-      <p class="margin-bottom--small">
+      <p class="margin-bottom--medium">
         Make sure you have backed up your seed phrase before continuing!
+      </p>
+      <p class="margin-bottom--small warning--error warning--error--medium">
+        Your account will be irrecoverable if you lose your seed phrase.
       </p>
     </ng-container>
     <ng-template #simpleRecoverMessage>
@@ -37,7 +35,7 @@
             [name]="copySuccess ? 'check' : 'copy'"
             style="height: 12px; width: 12px"
           />
-          Copy to Clipboard
+          Copy
         </button>
       </div>
     </ng-template>
