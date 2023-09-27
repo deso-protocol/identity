@@ -24,7 +24,9 @@
       </p>
       <div class="padding-bottom--medium padding-top--medium">
         <span class="font-size--small margin-right--small text--text-lightest"
-          >Account number:&nbsp;&nbsp;<code>{{ this.data.accountNumber }}</code></span
+          >Account number:&nbsp;&nbsp;<code>{{
+            this.data.accountNumber
+          }}</code></span
         >
         <button
           (click)="copyAccountNumber()"
@@ -41,14 +43,17 @@
     </ng-template>
   </div>
   <footer class="display--flex flex--column">
-    <button class="button--medium button--primary margin-bottom--medium" (click)="confirm()">
+    <button
+      class="button--medium button--primary margin-bottom--medium"
+      (click)="confirm()"
+    >
       Confirm
     </button>
     <button
-    class="button--medium button--primary--outline margin-right--small"
-    (click)="cancel()"
-  >
-    Cancel
-  </button>
+      class="button--medium button--primary--outline margin-right--small"
+      (click)="cancel()"
+    >
+      Cancel
+    </button>
   </footer>
 </div>

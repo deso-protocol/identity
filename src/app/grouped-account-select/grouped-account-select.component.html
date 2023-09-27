@@ -121,8 +121,11 @@
             </div>
           </li>
           <!-- Group Actions -->
-          <div *ngIf="!isMetaMaskAccountGroup(group.key)" class="section--subactions">
-            <div class="display--flex ">
+          <div
+            *ngIf="!isMetaMaskAccountGroup(group.key)"
+            class="section--subactions"
+          >
+            <div class="display--flex">
               <button
                 class="button--xsmall button--primary display--flex items--center margin-right--small"
                 style="width: auto; white-space: nowrap"
@@ -167,8 +170,12 @@
               (submit)="recoverSubAccount($event, group.key)"
               class="margin-top--medium section--accounts__recover"
             >
-              <label for="account-number" class="display--block font-size--small margin-bottom--medium"
-                >To recover your account, please enter the <span class="text--text-lightest">account number</span> that was associated with it:</label
+              <label
+                for="account-number"
+                class="display--block font-size--small margin-bottom--medium"
+                >To recover your account, please enter the
+                <span class="text--text-lightest">account number</span> that was
+                associated with it:</label
               >
               <input
                 [(ngModel)]="accountNumberToRecover"
@@ -188,7 +195,7 @@
               </button>
             </form>
           </div>
-        </ul>        
+        </ul>
       </div>
     </ng-container>
   </div>

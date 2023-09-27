@@ -3,7 +3,9 @@
     <button class="dialog__x" style="top: 0; right: 0" (click)="cancel()">
       <i-feather name="x" />
     </button>
-    <h1 class="dialog__title" *ngIf="this.step === 1 || this.step === 2">Backup DeSo Seed</h1>
+    <h1 class="dialog__title" *ngIf="this.step === 1 || this.step === 2">
+      Backup DeSo Seed
+    </h1>
     <h1 class="dialog__title" *ngIf="this.step === 3">Disable Backup</h1>
   </header>
   <div class="dialog__body">
@@ -14,15 +16,16 @@
         it in a safe and secure place.
       </p>
       <p class="margin-bottom--medium warning--error warning--error--medium">
-        DO NOT share your seed phrase with anyone! Developers and support agents will never request this.
+        DO NOT share your seed phrase with anyone! Developers and support agents
+        will never request this.
       </p>
       <footer class="display--flex flex--column">
         <button
-        class="button--medium button--primary margin-bottom--medium"
-        (click)="showSecrets()"
-      >
-        Continue
-      </button>
+          class="button--medium button--primary margin-bottom--medium"
+          (click)="showSecrets()"
+        >
+          Continue
+        </button>
         <button
           class="button--medium button--primary--outline"
           (click)="cancel()"
@@ -49,30 +52,34 @@
         </p>
         <recovery-secret [secret]="this.seedHex" />
       </div>
-      <div class="warning--error warning--error--medium margin-top--large warning--error--border">
-        <p class="margin-bottom--small font-size--medium font-weight--semibold">Disable Backup</p>
-        <p
-          class="font-size--small margin-top--xsmall"
-        >
+      <div
+        class="warning--error warning--error--medium margin-top--large warning--error--border"
+      >
+        <p class="margin-bottom--small font-size--medium font-weight--semibold">
+          Disable Backup
+        </p>
+        <p class="font-size--small margin-top--xsmall">
           Disabling backup makes your account more secure by preventing anyone
-          from revealing your seed in the future, even if they've gained access to
-          your device.
+          from revealing your seed in the future, even if they've gained access
+          to your device.
         </p>
         <button
-        class="button--red button--small margin-top--medium"
-        (click)="showDisableBackupConfirmation()"
-      >
-        Disable DeSo Seed Backup
-      </button>
+          class="button--red button--small margin-top--medium"
+          (click)="showDisableBackupConfirmation()"
+        >
+          Disable DeSo Seed Backup
+        </button>
       </div>
     </ng-container>
 
     <div *ngIf="this.step === 3">
       <p class="margin-bottom--medium">
         Disabling backup means you will not be able to access your seed phrase
-        anymore.       
+        anymore.
       </p>
-      <div class="warning--error warning--error--medium margin-bottom--medium warning--error--border">
+      <div
+        class="warning--error warning--error--medium margin-bottom--medium warning--error--border"
+      >
         Make sure that you've copied your seed phrase and stored it in a safe
         place before you proceed.
       </div>
@@ -88,7 +95,7 @@
           (click)="cancel()"
         >
           Cancel
-        </button>    
+        </button>
       </footer>
     </div>
   </div>

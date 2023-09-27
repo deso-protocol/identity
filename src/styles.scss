@@ -354,7 +354,8 @@ h6 {
   }
 }
 
-p, label {
+p,
+label {
   @include spacing('margin', 'none');
   font-weight: normal;
   line-height: 1.5;
@@ -860,7 +861,7 @@ a,
   @include color('blue', 'darker', 'background-color');
   @include spacing('right', 'medium');
   @include spacing('padding', 'xsmall');
-  i-feather[name="power"] {
+  i-feather[name='power'] {
     @include color('text', 'base', 'color');
     width: 16px;
     height: 16px;
@@ -868,7 +869,7 @@ a,
   &:hover {
     @include color('red', 'dark', 'background-color');
     cursor: pointer;
-    i-feather[name="power"] {
+    i-feather[name='power'] {
       @include color('red', 'lighter', 'color');
     }
   }
@@ -880,7 +881,7 @@ a,
   @include spacing('padding', 'medium');
 }
 //-------------------------------
-// SECTION = Sub Actions 
+// SECTION = Sub Actions
 //-------------------------------
 .section--subactions {
   border-top: 1px solid;
