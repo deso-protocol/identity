@@ -24,7 +24,7 @@
       *ngIf="!alternativeOptionsEnabled && captchaAvailable"
       class="padding-bottom--2xlarge text--center"
     >
-      <div class="section--starter__option">
+      <div class="section--starter__option--captcha">
         <div class="font-size--small margin-bottom--medium">
           <h6
             class="margin-bottom--small text--text-lightest font-weight--medium"
@@ -32,9 +32,9 @@
             Complete a captcha to get free $DESO
           </h6>
           <p>
-            Prove you're not a robot 🤖 and we'll<br />send you a small amount
-            of $DESO that will last<br />you up to thousands of on-chain
-            transactions.
+            Prove you're not a robot 🤖 and we'll<br />
+            send you a small amount of free $DESO that will last<br />
+            you up to thousands of on-chain transactions.
           </p>
         </div>
         <ng-hcaptcha
@@ -75,8 +75,8 @@
             1. Get DESO for free by verifying your phone number
           </h6>
           <p>
-            We'll send you a small amount of $DESO that will last<br />you up to
-            thousands of on-chain transactions.
+            We'll send you a small amount of $DESO that will last <br />
+            you up to thousands of on-chain transactions.
           </p>
         </div>
         <button
@@ -181,7 +181,7 @@
                 >
                 <a
                   target="_blank"
-                  href="https://www.huobi.com/en-us/exchange/deso_usdt?inviter_id=11345710"
+                  href="https://www.huobi.com/en-us/exchange/deso_usdt"
                   class="link--secondary display--inline-block margin-right--xsmall"
                   >Huobi,</a
                 >
@@ -232,7 +232,7 @@
                   data-control-name="sign-up-with-seed-copy-button"
                   data-control-option="copy"
                   (click)="copyPublicKey()"
-                  class="button--primary--outline button--small display--flex items--center"
+                  class="button--primary button--small display--flex items--center"
                 >
                   <img
                     *ngIf="publicKeyCopied"
@@ -246,7 +246,7 @@
                     src="assets/copy.svg"
                     class="margin-right--small image--invert"
                   />
-                  <span>Copy</span>
+                  <span>Copy to clipboard</span>
                 </button>
               </div>
             </div>
