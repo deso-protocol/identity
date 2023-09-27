@@ -25,8 +25,12 @@
             [id]="'account-select-' + account.publicKey"
             *ngFor="let account of group.value.accounts; let j = index"
           >
-            <div class="display--flex items--center margin-top--small"
-                 [ngClass]="{ 'margin-bottom-medium': isMetaMaskAccountGroup(group.key)}">
+            <div
+              class="display--flex items--center margin-top--small"
+              [ngClass]="{
+                'margin-bottom-medium': isMetaMaskAccountGroup(group.key)
+              }"
+            >
               <button
                 class="section--accounts__item margin-right--small"
                 data-control-name="account-select-item"
@@ -49,7 +53,7 @@
                           'text--neutral-white': account.publicKey === this.justAddedPublicKey,
                         }"
                         [title]="getAccountDisplayName(account)"
-                      >{{
+                        >{{
                           getAccountDisplayName(account)
                             | truncateAddressOrUsername
                         }}</span
@@ -57,7 +61,7 @@
                       <span
                         *ngIf="account.lastUsed && !this.globalVars.isMobile()"
                         class="font-size--xsmall text--green-lighter margin-left--small"
-                      >Last used</span
+                        >Last used</span
                       >
                     </div>
                     <div
@@ -69,12 +73,12 @@
                       }"
                     >
                       <span class="font-size--xsmall"
-                      >account #{{ account.accountNumber }}</span
+                        >account #{{ account.accountNumber }}</span
                       >
                       <span
                         *ngIf="account.lastUsed"
                         class="font-size--xsmall text--green-lighter margin-left--auto"
-                      >Last used</span
+                        >Last used</span
                       >
                     </div>
                   </div>
@@ -90,13 +94,13 @@
                   >
                     <span
                       class="font-weight--bold font-size--xsmall margin-right--small text--text-lightest"
-                    >{{
+                      >{{
                         globalVars.abbreviateNumber(account.balanceNanos / 1e9)
                       }}
                       $DESO</span
                     >
                     <span class="font-size--xsmall margin-right--small"
-                    >account #{{ account.accountNumber }}</span
+                      >account #{{ account.accountNumber }}</span
                     >
                   </div>
                   <img
@@ -174,7 +178,7 @@
               <label
                 for="account-number"
                 class="display--block font-size--small margin-bottom--medium"
-              >To recover your account, please enter the
+                >To recover your account, please enter the
                 <span class="text--text-lightest">account number</span> that was
                 associated with it:</label
               >
