@@ -21,7 +21,12 @@
             [id]="'account-select-' + account.publicKey"
             *ngFor="let account of group.value.accounts; let j = index"
           >
-            <div class="display--flex items--center margin-top--small">
+            <div
+              class="display--flex items--center margin-top--small"
+              [ngClass]="{
+                'margin-bottom-medium': isMetaMaskAccountGroup(group.key)
+              }"
+            >
               <button
                 class="section--accounts__item margin-right--small"
                 data-control-name="account-select-item"
