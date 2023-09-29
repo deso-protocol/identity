@@ -111,7 +111,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const network = this.globalVars.network;
     const mnemonic = this.mnemonicCheck;
     const extraText = this.extraTextCheck;
-    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, extraText);
+    const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+      extraText,
+    });
     this.seedHex = this.cryptoService.keychainToSeedHex(keychain);
     this.publicKeyAdded = this.accountService.addUser(
       keychain,

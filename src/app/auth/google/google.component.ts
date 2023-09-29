@@ -83,10 +83,9 @@ export class GoogleComponent implements OnInit {
           const mnemonic = fileContents.mnemonic;
           const extraText = fileContents.extraText;
           const network = fileContents.network;
-          const keychain = this.cryptoService.mnemonicToKeychain(
-            mnemonic,
-            extraText
-          );
+          const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+            extraText,
+          });
 
           this.publicKey = this.accountService.addUser(
             keychain,
@@ -139,10 +138,9 @@ export class GoogleComponent implements OnInit {
     this.googleDrive
       .uploadFile(this.fileName(), JSON.stringify(userInfo))
       .subscribe(() => {
-        const keychain = this.cryptoService.mnemonicToKeychain(
-          mnemonic,
-          extraText
-        );
+        const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+          extraText,
+        });
         this.publicKey = this.accountService.addUser(
           keychain,
           mnemonic,
