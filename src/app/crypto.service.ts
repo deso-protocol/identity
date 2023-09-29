@@ -138,18 +138,20 @@ export class CryptoService {
 
   mnemonicToKeychain(
     mnemonic: string,
-    extraText?: string,
-    nonStandard?: boolean
+    {
+      extraText,
+      nonStandard,
+      accountNumber = 0,
+    }: {
+      extraText?: string;
+      nonStandard?: boolean;
+      accountNumber?: number;
+    } = {}
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
-    return generateSubAccountKeys(seed, 0, {
+    return generateSubAccountKeys(seed, accountNumber, {
       nonStandard,
     });
-  }
-
-  getSubAccountKeychain(masterSeedHex: string, accountIndex: number): HDNode {
-    const seedBytes = Buffer.from(masterSeedHex, 'hex');
-    return generateSubAccountKeys(seedBytes, accountIndex);
   }
 
   keychainToSeedHex(keychain: HDNode): string {

@@ -72,14 +72,15 @@ export class LogInSeedComponent implements OnInit {
         return;
       }
 
-      const keychain = this.cryptoService.mnemonicToKeychain(
-        mnemonic,
-        extraText
-      );
+      const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+        extraText,
+      });
       const keychainNonStandard = this.cryptoService.mnemonicToKeychain(
         mnemonic,
-        extraText,
-        true
+        {
+          extraText,
+          nonStandard: true,
+        }
       );
       userPublicKey = this.accountService.addUser(
         keychain,

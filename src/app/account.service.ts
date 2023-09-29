@@ -141,9 +141,12 @@ export class AccountService {
       );
 
       if (foundAccount) {
-        const keychain = this.cryptoService.getSubAccountKeychain(
-          rootUser.seedHex,
-          foundAccount.accountNumber
+        const keychain = this.cryptoService.mnemonicToKeychain(
+          rootUser.mnemonic,
+          {
+            extraText: rootUser.extraText,
+            accountNumber: foundAccount.accountNumber,
+          }
         );
         const subAccountSeedHex =
           this.cryptoService.keychainToSeedHex(keychain);
@@ -1322,10 +1325,12 @@ export class AccountService {
       );
     }
 
-    const parentSeedHex = parentAccount.seedHex;
-    const childKey = this.cryptoService.getSubAccountKeychain(
-      parentSeedHex,
-      accountNumber
+    const childKey = this.cryptoService.mnemonicToKeychain(
+      parentAccount.mnemonic,
+      {
+        accountNumber,
+        extraText: parentAccount.extraText,
+      }
     );
     const ec = new EC('secp256k1');
     const keyPair = ec.keyFromPrivate(childKey.privateKey);
