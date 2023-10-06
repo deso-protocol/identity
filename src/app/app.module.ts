@@ -60,6 +60,7 @@ import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transactio
 import { TransactionSpendingLimitNftComponent } from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component';
 import { TransactionSpendingLimitSectionComponent } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
+import { JwtApproveComponent } from './jwt-approve/jwt-approve.component';
 
 @NgModule({
   declarations: [
@@ -107,6 +108,7 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     RecoverySecretComponent,
     BackupSeedDialogComponent,
     RemoveAccountDialogComponent,
+    JwtApproveComponent,
   ],
   imports: [
     BrowserModule,

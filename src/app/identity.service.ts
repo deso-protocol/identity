@@ -55,6 +55,11 @@ export type DerivePayload = {
   blockHeight: number;
 };
 
+export type IdentityJwtPayload = {
+  publicKey: string;
+  expirationDays: number;
+};
+
 export type MessagingGroupPayload = {
   messagingKeySignature: string;
   encryptedToApplicationGroupMessagingPrivateKey: string;
@@ -137,6 +142,33 @@ export class IdentityService {
         this.globalVars.callback + `?${httpParams.toString()}`;
     } else {
       this.cast('login', payload);
+    }
+  }
+
+  jwt(payload: IdentityJwtPayload): void {
+    const privateUserInfo = this.accountService.getAccountInfo(
+      payload.publicKey
+    );
+    const jwt = this.signingService.signJWT(privateUserInfo.seedHex, false, {
+      expiration: payload.expirationDays,
+    });
+    const response = {
+      publicKey: payload.publicKey,
+      jwt,
+      expirationDays: payload.expirationDays,
+    };
+    if (this.globalVars.callback) {
+      // If callback is passed, we redirect to it with payload as URL parameters.
+      let httpParams = new HttpParams();
+      for (const key in response) {
+        if (payload.hasOwnProperty(key)) {
+          httpParams = httpParams.append(key, (payload as any)[key].toString());
+        }
+      }
+      window.location.href =
+        this.globalVars.callback + `?${httpParams.toString()}`;
+    } else {
+      this.cast('jwt', response);
     }
   }
 
@@ -306,6 +338,7 @@ export class IdentityService {
       signedTransactionHex,
     });
   }
+
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {

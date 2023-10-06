@@ -17,6 +17,7 @@ import { BuyDeSoCompletePageComponent } from './buy-deso/buy-deso-complete-page/
 import { BuyOrSendDesoComponent } from './buy-or-send-deso/buy-or-send-deso.component';
 import { SignUpMetamaskComponent } from './sign-up-metamask/sign-up-metamask.component';
 import { MessagingGroupComponent } from './messaging-group/messaging-group.component';
+import { JwtApproveComponent } from './jwt-approve/jwt-approve.component';
 
 export class RouteNames {
   public static EMBED = 'embed';
@@ -40,6 +41,7 @@ export class RouteNames {
   public static BUY_DESO = 'buy-deso';
   public static BUY_OR_SEND_DESO = 'buy-or-send-deso';
   public static MESSAGING_GROUP = 'messaging-group';
+  public static JWT = 'jwt';
 }
 
 const routes: Routes = [
@@ -94,6 +96,11 @@ const routes: Routes = [
   {
     path: RouteNames.MESSAGING_GROUP,
     component: MessagingGroupComponent,
+    pathMatch: 'full',
+  },
+  {
+    path: RouteNames.JWT,
+    component: JwtApproveComponent,
     pathMatch: 'full',
   },
 ];
