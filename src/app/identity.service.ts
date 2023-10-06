@@ -215,16 +215,16 @@ export class IdentityService {
 
   // Incoming Messages
 
-  private handleBurn(data: any): void {
-    if (!this.approve(data, AccessLevel.Full)) {
-      return;
+  private async handleBurn(data: any): Promise<void> {
+    if (!(await this.approve(data, AccessLevel.Full))) {
+      return Promise.resolve();
     }
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes },
+      payload: {encryptedSeedHex, unsignedHashes},
     } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
@@ -238,16 +238,16 @@ export class IdentityService {
     });
   }
 
-  private handleSignETH(data: any): void {
-    if (!this.approve(data, AccessLevel.Full)) {
+  private async handleSignETH(data: any): Promise<void> {
+    if (!(await this.approve(data, AccessLevel.Full))) {
       return;
     }
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes },
+      payload: {encryptedSeedHex, unsignedHashes},
     } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
@@ -261,7 +261,7 @@ export class IdentityService {
     });
   }
 
-  private handleSign(data: any): void {
+  private async handleSign(data: any): Promise<void> {
     const {
       id,
       payload: {
@@ -278,7 +278,7 @@ export class IdentityService {
     // In the case that approve() fails, it responds with a message indicating
     // that approvalRequired = true, which the caller can then uses to trigger
     // the /approve UI.
-    if (!this.approve(data, requiredAccessLevel)) {
+    if (!(await this.approve(data, requiredAccessLevel))) {
       return;
     }
 
@@ -291,7 +291,7 @@ export class IdentityService {
       return;
     }
 
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
@@ -306,9 +306,10 @@ export class IdentityService {
       signedTransactionHex,
     });
   }
+
   // Encrypt with shared secret
-  private handleEncrypt(data: any): void {
-    if (!this.approve(data, AccessLevel.ApproveAll)) {
+  private async handleEncrypt(data: any): Promise<void> {
+    if (!(await this.approve(data, AccessLevel.ApproveAll))) {
       return;
     }
 
@@ -337,13 +338,13 @@ export class IdentityService {
       });
       return;
     }
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
     let messagingKeyRandomness: string | undefined;
     if (encryptedMessagingKeyRandomness) {
-      messagingKeyRandomness = this.cryptoService.decryptSeedHex(
+      messagingKeyRandomness = await this.cryptoService.decryptSeedHex(
         encryptedMessagingKeyRandomness,
         this.globalVars.hostname
       );
@@ -362,11 +363,11 @@ export class IdentityService {
       messagingKeyRandomness
     );
 
-    this.respond(id, { ...encryptedMessage });
+    this.respond(id, {...encryptedMessage});
   }
 
-  private handleDecrypt(data: any): void {
-    if (!this.approve(data, AccessLevel.ApproveAll)) {
+  private async handleDecrypt(data: any): Promise<void> {
+    if (!(await this.approve(data, AccessLevel.ApproveAll))) {
       return;
     }
 
@@ -386,13 +387,13 @@ export class IdentityService {
     }
 
     const encryptedSeedHex = data.payload.encryptedSeedHex;
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
     let messagingKeyRandomness: string | undefined;
     if (data.payload.encryptedMessagingKeyRandomness) {
-      messagingKeyRandomness = this.cryptoService.decryptSeedHex(
+      messagingKeyRandomness = await this.cryptoService.decryptSeedHex(
         data.payload.encryptedMessagingKeyRandomness,
         this.globalVars.hostname
       );
@@ -413,7 +414,7 @@ export class IdentityService {
       } catch (e: any) {
         console.error(e);
         // We include an empty decryptedHexes response to be backward compatible
-        this.respond(id, { error: e.message, decryptedHexes: {} }); // no suggestion just throw
+        this.respond(id, {error: e.message, decryptedHexes: {}}); // no suggestion just throw
       }
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
@@ -427,25 +428,25 @@ export class IdentityService {
           data.payload.ownerPublicKeyBase58Check
         )
         .then(
-          (res) => this.respond(id, { decryptedHexes: res }),
+          (res) => this.respond(id, {decryptedHexes: res}),
           (err) => {
             console.error(err);
-            this.respond(id, { decryptedHexes: {}, error: err });
+            this.respond(id, {decryptedHexes: {}, error: err});
           }
         );
     }
   }
 
-  private handleJwt(data: any): void {
-    if (!this.approve(data, AccessLevel.ApproveAll)) {
+  private async handleJwt(data: any): Promise<void> {
+    if (!(await this.approve(data, AccessLevel.ApproveAll))) {
       return;
     }
 
     const {
       id,
-      payload: { encryptedSeedHex, derivedPublicKeyBase58Check },
+      payload: {encryptedSeedHex, derivedPublicKeyBase58Check},
     } = data;
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
@@ -532,14 +533,14 @@ export class IdentityService {
     return AccessLevel.Full;
   }
 
-  private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
+  private async hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): Promise<boolean> {
     const {
-      payload: { encryptedSeedHex, accessLevel, accessLevelHmac },
+      payload: {encryptedSeedHex, accessLevel, accessLevelHmac},
     } = data;
     if (accessLevel < requiredAccessLevel) {
       return false;
     }
-    const seedHex = this.cryptoService.decryptSeedHex(
+    const seedHex = await this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
@@ -553,7 +554,7 @@ export class IdentityService {
   // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
   private approveSpending(data: any): boolean {
     const {
-      payload: { accessLevel, transactionHex },
+      payload: {accessLevel, transactionHex},
     } = data;
 
     // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
@@ -566,7 +567,7 @@ export class IdentityService {
           output.publicKey.toString('hex') !==
           transaction.publicKey.toString('hex')
         ) {
-          this.respond(data.id, { approvalRequired: true });
+          this.respond(data.id, {approvalRequired: true});
           return false;
         }
       }
@@ -574,14 +575,14 @@ export class IdentityService {
     return true;
   }
 
-  private approve(data: any, accessLevel: AccessLevel): boolean {
-    const hasAccess = this.hasAccessLevel(data, accessLevel);
+  private async approve(data: any, accessLevel: AccessLevel): Promise<boolean> {
+    const hasAccess = await this.hasAccessLevel(data, accessLevel);
     const hasEncryptionKey = this.cryptoService.hasSeedHexEncryptionKey(
       this.globalVars.hostname
     );
 
     if (!hasAccess || !hasEncryptionKey) {
-      this.respond(data.id, { approvalRequired: true });
+      this.respond(data.id, {approvalRequired: true});
       return false;
     }
 
@@ -591,8 +592,8 @@ export class IdentityService {
   // Message handling
 
   private handleMessage(event: MessageEvent): void {
-    const { data } = event;
-    const { service, method } = data;
+    const {data} = event;
+    const {service, method} = data;
 
     if (service !== 'identity') {
       return;
@@ -606,12 +607,12 @@ export class IdentityService {
     }
   }
 
-  private handleRequest(event: MessageEvent): void {
+  private async handleRequest(event: MessageEvent): Promise<void> {
     const data = event.data;
     const method = data.method;
 
     if (method === 'burn') {
-      this.handleBurn(data);
+      await this.handleBurn(data);
     } else if (method === 'encrypt') {
       this.handleEncrypt(data);
     } else if (method === 'decrypt') {
@@ -623,7 +624,7 @@ export class IdentityService {
     } else if (method === 'jwt') {
       this.handleJwt(data);
     } else if (method === 'info') {
-      this.handleInfo(event);
+      await this.handleInfo(event);
     } else {
       console.error('Unhandled identity request');
       console.error(event);
@@ -632,7 +633,7 @@ export class IdentityService {
 
   private handleResponse(event: MessageEvent): void {
     const {
-      data: { id, payload },
+      data: {id, payload},
       origin,
     } = event;
     const hostname = new URL(origin).hostname;

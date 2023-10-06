@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 export class JumioErrorComponent implements OnInit, OnDestroy {
   publicKey = '';
   hostname = '';
+
   constructor(
     public globalVars: GlobalVarsService,
     private activatedRoute: ActivatedRoute,
@@ -25,13 +26,15 @@ export class JumioErrorComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+  }
 
-  finishFlow(): void {
+  async finishFlow(): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
       signedUp: true,
       jumioSuccess: false,

@@ -12,6 +12,7 @@ import {
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { IdentityService } from '../identity.service';
+
 type Accounts = { [key: string]: UserProfile } | {};
 type DeriveParams = {
   publicKey?: string;
@@ -20,6 +21,7 @@ type DeriveParams = {
   transactionSpendingLimitResponse?: any;
   expirationDays?: string;
 };
+
 @Component({
   selector: 'app-derive',
   templateUrl: './derive.component.html',
@@ -50,7 +52,8 @@ export class DeriveComponent implements OnInit {
     private backendApi: BackendAPIService,
     private activatedRoute: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.backendApi.GetAppState().subscribe((res) => {
@@ -84,7 +87,7 @@ export class DeriveComponent implements OnInit {
         this.deleteKey = params.deleteKey === 'true';
         // We don't want or need to parse transaction spending limit when revoking derived key,
         // so we initialize a spending limit object with no permissions.
-        this.transactionSpendingLimitResponse = { GlobalDESOLimit: 0 };
+        this.transactionSpendingLimitResponse = {GlobalDESOLimit: 0};
         // Setting expiration days to 0 forces us to have a minimum transaction size that is still valid.
         this.expirationDays = 0;
       }
@@ -185,10 +188,10 @@ export class DeriveComponent implements OnInit {
         true /*IncludeBalance*/
       )
       .pipe(take(1))
-      .subscribe((res) => {
+      .subscribe(async (res) => {
         if (res.UserList?.[0]?.BalanceNanos === 0) {
-          this.router.navigate(['/', RouteNames.GET_DESO], {
-            queryParams: { publicKey },
+          await this.router.navigate(['/', RouteNames.GET_DESO], {
+            queryParams: {publicKey},
             queryParamsHandling: 'merge',
           });
           return;
@@ -198,7 +201,7 @@ export class DeriveComponent implements OnInit {
         // without approval.
         if (this.globalVars.authenticatedUsers.has(publicKey)) {
           this.identityService.login({
-            users: this.accountService.getEncryptedUsers(),
+            users: await this.accountService.getEncryptedUsers(),
             publicKeyAdded: publicKey,
           });
 

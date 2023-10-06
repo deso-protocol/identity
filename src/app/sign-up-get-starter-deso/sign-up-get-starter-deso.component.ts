@@ -74,7 +74,8 @@ export class SignUpGetStarterDESOComponent implements OnInit {
     private identityService: IdentityService,
     private accountService: AccountService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
@@ -148,7 +149,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
 
   checkIsValidPhoneNumber() {
     this.phoneForm.controls.phone.setErrors(
-      !!this.intlPhoneInputInstance?.isValidNumber() ? null : { invalid: true }
+      !!this.intlPhoneInputInstance?.isValidNumber() ? null : {invalid: true}
     );
   }
 
@@ -313,18 +314,18 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       .add(() => (this.submittingPhoneNumberVerificationCode = false));
   }
 
-  finishFlow(): void {
+  async finishFlow(): Promise<void> {
     this.finishFlowEvent.emit();
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+      await this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {publicKey: this.publicKey},
         queryParamsHandling: 'merge',
       });
       return;
     }
     if (!this.finishFlowEventOnly) {
       this.identityService.login({
-        users: this.accountService.getEncryptedUsers(),
+        users: await this.accountService.getEncryptedUsers(),
         publicKeyAdded: this.publicKey,
         signedUp: this.globalVars.signedUp,
         phoneNumberSuccess: this.isPhoneNumberSuccess,

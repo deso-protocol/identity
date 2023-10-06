@@ -22,9 +22,9 @@ export class JumioSuccessComponent implements OnInit, OnDestroy {
       const jumioInternalReference = params.customerInternalReference || '';
       this.backendApiService
         .JumioFlowFinished(publicKey, jumioInternalReference)
-        .subscribe((res) => {
+        .subscribe(async (res) => {
           this.identityService.login({
-            users: this.accountService.getEncryptedUsers(),
+            users: await this.accountService.getEncryptedUsers(),
             publicKeyAdded: publicKey,
             signedUp: true,
             jumioSuccess: true,
@@ -33,7 +33,9 @@ export class JumioSuccessComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+  }
 }

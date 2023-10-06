@@ -32,6 +32,8 @@
     "@ethereumjs/vm": "^5.9.0",
     "@metamask/post-message-stream": "^6.1.2",
     "@metamask/providers": "^11.1.1",
+    "@noble/ciphers": "^0.3.0",
+    "@noble/secp256k1": "^1.7.1",
     "@types/lodash": "^4.14.182",
     "@types/sha256": "^0.2.0",
     "@types/sprintf-js": "^1.1.2",

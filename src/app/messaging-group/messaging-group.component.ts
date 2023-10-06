@@ -48,7 +48,8 @@ export class MessagingGroupComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private cryptoService: CryptoService,
     private signingService: SigningService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     try {
@@ -182,7 +183,7 @@ export class MessagingGroupComponent implements OnInit {
     const membersSetNonEmpty =
       this.updatedMembersPublicKeysBase58Check.length > 0 &&
       this.updatedMembersPublicKeysBase58Check.length ===
-        this.updatedMembersKeyNames.length;
+      this.updatedMembersKeyNames.length;
 
     let validityCondition = groupSet;
     switch (this.operation) {
@@ -252,9 +253,9 @@ export class MessagingGroupComponent implements OnInit {
       this.updatedGroupKeyName
     );
     let encryptedMessagingKeyRandomness: string | undefined;
-    const publicUser =
-      this.accountService.getEncryptedUsers()[
-        this.updatedGroupOwnerPublicKeyBase58Check
+    const publicUser = (await
+      this.accountService.getEncryptedUsers())[
+      this.updatedGroupOwnerPublicKeyBase58Check
       ];
     if (publicUser?.encryptedMessagingKeyRandomness) {
       encryptedMessagingKeyRandomness =
@@ -331,6 +332,7 @@ export class MessagingGroupComponent implements OnInit {
         throw new Error('Error invalid operation');
     }
   }
+
   respondToClient(
     messagingKeySignature: string,
     encryptedToApplicationGroupMessagingPrivateKey: string,
@@ -347,5 +349,6 @@ export class MessagingGroupComponent implements OnInit {
     });
   }
 
-  onAccountSelect(event: any): void {}
+  onAccountSelect(event: any): void {
+  }
 }

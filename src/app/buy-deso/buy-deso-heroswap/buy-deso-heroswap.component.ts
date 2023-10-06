@@ -25,7 +25,8 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
     private router: Router,
     private identityService: IdentityService,
     private accountService: AccountService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     window.scroll(0, 0);
@@ -53,20 +54,20 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
     window.removeEventListener('message', this.#heroswapMessageListener);
   }
 
-  finishFlow(): void {
+  async finishFlow(): Promise<void> {
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+      await this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {publicKey: this.publicKey},
         queryParamsHandling: 'merge',
       });
     } else {
-      this.login();
+      await this.login();
     }
   }
 
-  login(): void {
+  async login(): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });

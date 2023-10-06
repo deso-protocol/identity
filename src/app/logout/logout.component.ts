@@ -24,7 +24,8 @@ export class LogoutComponent implements OnInit {
     private identityService: IdentityService,
     private accountService: AccountService,
     public globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
@@ -32,14 +33,14 @@ export class LogoutComponent implements OnInit {
     });
   }
 
-  onCancel(): void {
+  async onCancel(): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
     });
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     // We set the accessLevel for the logged out user to None.
     this.accountService.setAccessLevel(
       this.publicKey,
@@ -50,12 +51,12 @@ export class LogoutComponent implements OnInit {
     // the logged out user, will regenerate their encryptedSeedHex. Without this,
     // someone could have reused the encryptedSeedHex of an already logged out user.
     this.cryptoService.seedHexEncryptionKey(this.globalVars.hostname, true);
-    this.finishFlow();
+    await this.finishFlow();
   }
 
-  finishFlow(): void {
+  async finishFlow(): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
     });
   }
 }

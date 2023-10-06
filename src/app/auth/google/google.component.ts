@@ -38,7 +38,8 @@ export class GoogleComponent implements OnInit {
     private zone: NgZone,
     private route: ActivatedRoute,
     private backendApi: BackendAPIService
-  ) {}
+  ) {
+  }
 
   copySeed(): void {
     this.textService.copyText(this.mnemonic);
@@ -63,7 +64,7 @@ export class GoogleComponent implements OnInit {
 
       this.googleDrive.setAccessToken(accessToken);
 
-      this.googleDrive.listFiles(this.fileName()).subscribe((res) => {
+      this.googleDrive.listFiles(this.fileName()).subscribe(async (res) => {
         if (res.files.length > 0) {
           this.loadAccounts(res.files);
         } else {
@@ -108,9 +109,9 @@ export class GoogleComponent implements OnInit {
       });
     }
 
-    filesLoaded.subscribe(() => {
+    filesLoaded.subscribe(async () => {
       if (numLoaded === 1) {
-        this.finishFlow(false);
+        await this.finishFlow(false);
       } else {
         this.zone.run(() => {
           this.router.navigate(['/', RouteNames.LOG_IN], {
@@ -154,7 +155,7 @@ export class GoogleComponent implements OnInit {
       });
   }
 
-  finishFlow(signedUp: boolean): void {
+  async finishFlow(signedUp: boolean): Promise<void> {
     this.globalVars.signedUp = signedUp;
     this.accountService.setAccessLevel(
       this.publicKey,
@@ -163,11 +164,11 @@ export class GoogleComponent implements OnInit {
     );
 
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
+      await this.router.navigate(['/', RouteNames.DERIVE], {
         queryParams: {
           publicKey: this.publicKey,
           transactionSpendingLimitResponse:
-            this.globalVars.transactionSpendingLimitResponse,
+          this.globalVars.transactionSpendingLimitResponse,
           deleteKey: this.globalVars.deleteKey || undefined,
           derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
           expirationDays: this.globalVars.expirationDays || undefined,
@@ -176,35 +177,35 @@ export class GoogleComponent implements OnInit {
       });
     } else {
       if (!this.globalVars.getFreeDeso) {
-        this.login(signedUp);
+        await this.login(signedUp);
       }
       if (!signedUp) {
         this.backendApi
           .GetUsersStateless([this.publicKey], true, true)
-          .subscribe((res) => {
+          .subscribe(async (res) => {
             if (res?.UserList?.length) {
               if (res.UserList[0].BalanceNanos !== 0) {
-                this.login(signedUp);
+                await this.login(signedUp);
                 return;
               }
             }
-            this.router.navigate(['/', RouteNames.GET_DESO], {
-              queryParams: { publicKey: this.publicKey, signedUp },
+            await this.router.navigate(['/', RouteNames.GET_DESO], {
+              queryParams: {publicKey: this.publicKey, signedUp},
               queryParamsHandling: 'merge',
             });
           });
       } else {
-        this.router.navigate(['/', RouteNames.GET_DESO], {
-          queryParams: { publicKey: this.publicKey, signedUp },
+        await this.router.navigate(['/', RouteNames.GET_DESO], {
+          queryParams: {publicKey: this.publicKey, signedUp},
           queryParamsHandling: 'merge',
         });
       }
     }
   }
 
-  login(signedUp: boolean): void {
+  async login(signedUp: boolean): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
       signedUp,
     });

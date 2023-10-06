@@ -21,16 +21,17 @@ export class LogInComponent implements OnInit {
     private backendApi: BackendAPIService,
     public globalVars: GlobalVarsService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     // Set showAccessLevels
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
   }
 
-  login(publicKey: string): void {
+  async login(publicKey: string): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: publicKey,
       signedUp: false,
     });
@@ -39,25 +40,25 @@ export class LogInComponent implements OnInit {
   navigateToGetDeso(publicKey: string): void {
     this.router.navigate(['/', RouteNames.GET_DESO], {
       queryParamsHandling: 'merge',
-      queryParams: { publicKey },
+      queryParams: {publicKey},
     });
   }
 
-  onAccountSelect(publicKey: string): void {
+  async onAccountSelect(publicKey: string): Promise<void> {
     this.accountService.setAccessLevel(
       publicKey,
       this.globalVars.hostname,
       this.globalVars.accessLevelRequest
     );
     if (!this.globalVars.getFreeDeso) {
-      this.login(publicKey);
+      await this.login(publicKey);
     } else {
       this.backendApi.GetUsersStateless([publicKey], true, true).subscribe(
-        (res) => {
+        async (res) => {
           if (!res?.UserList.length || res.UserList[0].BalanceNanos === 0) {
             this.navigateToGetDeso(publicKey);
           } else {
-            this.login(publicKey);
+            await this.login(publicKey);
           }
         },
         (err) => {
