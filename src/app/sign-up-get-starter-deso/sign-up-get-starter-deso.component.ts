@@ -313,7 +313,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       .add(() => (this.submittingPhoneNumberVerificationCode = false));
   }
 
-  finishFlow(): void {
+  async finishFlow() {
     this.finishFlowEvent.emit();
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
@@ -323,8 +323,9 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       return;
     }
     if (!this.finishFlowEventOnly) {
+      const users = await this.accountService.getEncryptedUsers();
       this.identityService.login({
-        users: this.accountService.getEncryptedUsers(),
+        users,
         publicKeyAdded: this.publicKey,
         signedUp: this.globalVars.signedUp,
         phoneNumberSuccess: this.isPhoneNumberSuccess,

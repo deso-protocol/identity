@@ -28,9 +28,10 @@ export class LogInComponent implements OnInit {
     this.showAccessLevels = !this.globalVars.isFullAccessHostname();
   }
 
-  login(publicKey: string): void {
+  async login(publicKey: string) {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       publicKeyAdded: publicKey,
       signedUp: false,
     });

@@ -194,16 +194,16 @@ export class BuyDeSoComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-    const encryptedUser =
-      this.accountService.getEncryptedUsers()[this.publicKey];
+  async ngOnInit() {
+    const users = await this.accountService.getEncryptedUsers();
+    const encryptedUser = users[this.publicKey];
     // TODO: need some sort of UI for when we can't get encrypted user.
     if (!encryptedUser) {
       console.error('Encrypted User not found: Buying DESO will not work.');
       this.publicKeyNotInIdentity = true;
       return;
     } else {
-      this.seedHex = this.cryptoService.decryptSeedHex(
+      this.seedHex = await this.cryptoService.decryptSeedHex(
         encryptedUser.encryptedSeedHex,
         this.globalVars.hostname
       );

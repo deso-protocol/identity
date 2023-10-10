@@ -115,9 +115,10 @@ export class BuyOrSendDesoComponent implements OnInit {
     }
   }
 
-  login(): void {
+  async login() {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       publicKeyAdded: this.publicKeyAdded,
       signedUp: this.globalVars.signedUp,
     });

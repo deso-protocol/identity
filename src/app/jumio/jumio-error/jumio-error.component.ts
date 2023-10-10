@@ -29,9 +29,10 @@ export class JumioErrorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {}
 
-  finishFlow(): void {
+  async finishFlow() {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       publicKeyAdded: this.publicKey,
       signedUp: true,
       jumioSuccess: false,

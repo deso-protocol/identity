@@ -99,27 +99,30 @@ export class ApproveComponent implements OnInit {
     this.finishFlow();
   }
 
-  onSubmit(): void {
-    const user = this.accountService.getEncryptedUsers()[this.publicKey];
+  async onSubmit() {
+    const users = await this.accountService.getEncryptedUsers();
+    const user = users[this.publicKey];
     const isDerived = this.accountService.isMetamaskAccount(user);
+    const seedHex = await this.seedHex();
     const signedTransactionHex = this.signingService.signTransaction(
-      this.seedHex(),
+      seedHex,
       this.transactionHex,
       isDerived
     );
     this.finishFlow(signedTransactionHex);
   }
 
-  finishFlow(signedTransactionHex?: string): void {
+  async finishFlow(signedTransactionHex?: string) {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       signedTransactionHex,
     });
   }
 
-  seedHex(): string {
-    const encryptedSeedHex =
-      this.accountService.getEncryptedUsers()[this.publicKey].encryptedSeedHex;
+  async seedHex() {
+    const users = await this.accountService.getEncryptedUsers();
+    const encryptedSeedHex = users[this.publicKey].encryptedSeedHex;
     return this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname

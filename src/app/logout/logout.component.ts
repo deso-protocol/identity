@@ -32,9 +32,10 @@ export class LogoutComponent implements OnInit {
     });
   }
 
-  onCancel(): void {
+  async onCancel() {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: users,
       publicKeyAdded: this.publicKey,
     });
   }
@@ -53,9 +54,10 @@ export class LogoutComponent implements OnInit {
     this.finishFlow();
   }
 
-  finishFlow(): void {
+  async finishFlow() {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
     });
   }
 }

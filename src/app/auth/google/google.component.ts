@@ -200,9 +200,10 @@ export class GoogleComponent implements OnInit {
     }
   }
 
-  login(signedUp: boolean): void {
+  async login(signedUp: boolean) {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       publicKeyAdded: this.publicKey,
       signedUp,
     });

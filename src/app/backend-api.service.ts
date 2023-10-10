@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable, of, throwError, from } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { logInteractionEvent } from 'src/app/interaction-event-helpers';
 import { environment } from '../environments/environment';
 import { DerivedKey, Network, UserProfile } from '../types/identity';
@@ -291,25 +291,36 @@ export class BackendAPIService {
   }
 
   jwtPost(path: string, publicKey: string, body: any): Observable<any> {
-    const publicUserInfo = this.accountService.getEncryptedUsers()[publicKey];
-    // NOTE: there are some cases where derived user's were not being sent phone number
-    // verification texts due to missing public user info. This is to log how often
-    // this is happening.
-    logInteractionEvent('backend-api', 'jwt-post', {
-      hasPublicUserInfo: !!publicUserInfo,
-    });
+    return from(this.accountService.getEncryptedUsers()).pipe(
+      switchMap((users) => {
+        const publicUserInfo = users[publicKey];
+        // NOTE: there are some cases where derived user's were not being sent phone number
+        // verification texts due to missing public user info. This is to log how often
+        // this is happening.
+        logInteractionEvent('backend-api', 'jwt-post', {
+          hasPublicUserInfo: !!publicUserInfo,
+        });
 
-    if (!publicUserInfo) {
-      return of(null);
-    }
-    const isDerived = this.accountService.isMetamaskAccount(publicUserInfo);
+        if (!publicUserInfo) {
+          return of(null);
+        }
 
-    const seedHex = this.cryptoService.decryptSeedHex(
-      publicUserInfo.encryptedSeedHex,
-      this.globalVars.hostname
+        // TODO: this will need to be async as well...
+        return from(
+          this.cryptoService.decryptSeedHex(
+            publicUserInfo.encryptedSeedHex,
+            this.globalVars.hostname
+          )
+        ).pipe(
+          switchMap((seedHex) => {
+            const isDerived =
+              this.accountService.isMetamaskAccount(publicUserInfo);
+            const jwt = this.signingService.signJWT(seedHex, isDerived);
+            return this.post(path, { ...body, ...{ JWT: jwt } });
+          })
+        );
+      })
     );
-    const jwt = this.signingService.signJWT(seedHex, isDerived);
-    return this.post(path, { ...body, ...{ JWT: jwt } });
   }
 
   // Error parsing
@@ -704,25 +715,28 @@ export class BackendAPIService {
     Broadcast: boolean
   ): Observable<any> {
     // Check if the user is logged in with a derived key and operating as the owner key.
-    const DerivedPublicKeyBase58Check =
-      this.accountService.getEncryptedUsers()[PublicKeyBase58Check]
-        ?.derivedPublicKeyBase58Check;
+    return from(this.accountService.getEncryptedUsers()).pipe(
+      switchMap((users) => {
+        const DerivedPublicKeyBase58Check =
+          users[PublicKeyBase58Check]?.derivedPublicKeyBase58Check;
 
-    const req = this.post('exchange-bitcoin', {
-      PublicKeyBase58Check,
-      DerivedPublicKeyBase58Check,
-      BurnAmountSatoshis,
-      LatestBitcionAPIResponse,
-      BTCDepositAddress,
-      FeeRateSatoshisPerKB,
-      SignedHashes,
-      Broadcast,
-    });
+        const req = this.post('exchange-bitcoin', {
+          PublicKeyBase58Check,
+          DerivedPublicKeyBase58Check,
+          BurnAmountSatoshis,
+          LatestBitcionAPIResponse,
+          BTCDepositAddress,
+          FeeRateSatoshisPerKB,
+          SignedHashes,
+          Broadcast,
+        });
 
-    return req.pipe(
-      catchError((err) => {
-        console.error(JSON.stringify(err));
-        return throwError(err);
+        return req.pipe(
+          catchError((err) => {
+            console.error(JSON.stringify(err));
+            return throwError(err);
+          })
+        );
       })
     );
   }

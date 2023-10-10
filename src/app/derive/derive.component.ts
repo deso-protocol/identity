@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, from, of } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RouteNames } from 'src/app/app-routing.module';
 import { SwalHelper } from '../../lib/helpers/swal-helper';
@@ -177,37 +177,37 @@ export class DeriveComponent implements OnInit {
   }
 
   onAccountSelected(publicKey: string): void {
-    // first check if this user has a balance. If not, push them to the get-deso flow
-    this.backendApi
-      .GetUsersStateless(
+    forkJoin([
+      this.backendApi.GetUsersStateless(
         [publicKey],
         true /*SkipForLeaderboard*/,
         true /*IncludeBalance*/
-      )
-      .pipe(take(1))
-      .subscribe((res) => {
-        if (res.UserList?.[0]?.BalanceNanos === 0) {
-          this.router.navigate(['/', RouteNames.GET_DESO], {
-            queryParams: { publicKey },
-            queryParamsHandling: 'merge',
-          });
-          return;
-        }
+      ),
+      from(this.accountService.getEncryptedUsers()),
+    ]).subscribe(([res, encryptedUsers]) => {
+      // first check if this user has a balance. If not, push them to the get-deso flow
+      if (res.UserList?.[0]?.BalanceNanos === 0) {
+        this.router.navigate(['/', RouteNames.GET_DESO], {
+          queryParams: { publicKey },
+          queryParamsHandling: 'merge',
+        });
+        return;
+      }
 
-        // If this user has already approved a derived key for login, then we can just log them in
-        // without approval.
-        if (this.globalVars.authenticatedUsers.has(publicKey)) {
-          this.identityService.login({
-            users: this.accountService.getEncryptedUsers(),
-            publicKeyAdded: publicKey,
-          });
+      // If this user has already approved a derived key for login, then we can just log them in
+      // without approval.
+      if (this.globalVars.authenticatedUsers.has(publicKey)) {
+        this.identityService.login({
+          users: encryptedUsers,
+          publicKeyAdded: publicKey,
+        });
 
-          return;
-        }
+        return;
+      }
 
-        // Otherwise, setting the public key will trigger the approval UI to show.
-        this.publicKeyBase58Check = publicKey;
-      });
+      // Otherwise, setting the public key will trigger the approval UI to show.
+      this.publicKeyBase58Check = publicKey;
+    });
   }
 
   private getParameterValidationErrors(params: Params): boolean {
