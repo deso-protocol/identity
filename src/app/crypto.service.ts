@@ -23,7 +23,8 @@ export class CryptoService {
   constructor(
     private cookieService: CookieService,
     private globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -77,6 +78,9 @@ export class CryptoService {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.set(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
+          path: '/',
+          sameSite: 'None',
+          secure: true,
         });
       }
     } else {
