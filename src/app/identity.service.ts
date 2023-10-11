@@ -222,7 +222,7 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes },
+      payload: {encryptedSeedHex, unsignedHashes},
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
@@ -245,7 +245,7 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, unsignedHashes },
+      payload: {encryptedSeedHex, unsignedHashes},
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
@@ -306,6 +306,7 @@ export class IdentityService {
       signedTransactionHex,
     });
   }
+
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
@@ -362,7 +363,7 @@ export class IdentityService {
       messagingKeyRandomness
     );
 
-    this.respond(id, { ...encryptedMessage });
+    this.respond(id, {...encryptedMessage});
   }
 
   private handleDecrypt(data: any): void {
@@ -413,7 +414,7 @@ export class IdentityService {
       } catch (e: any) {
         console.error(e);
         // We include an empty decryptedHexes response to be backward compatible
-        this.respond(id, { error: e.message, decryptedHexes: {} }); // no suggestion just throw
+        this.respond(id, {error: e.message, decryptedHexes: {}}); // no suggestion just throw
       }
     } else {
       // Messages can be V1, V2, or V3. The message entries will indicate version.
@@ -427,10 +428,10 @@ export class IdentityService {
           data.payload.ownerPublicKeyBase58Check
         )
         .then(
-          (res) => this.respond(id, { decryptedHexes: res }),
+          (res) => this.respond(id, {decryptedHexes: res}),
           (err) => {
             console.error(err);
-            this.respond(id, { decryptedHexes: {}, error: err });
+            this.respond(id, {decryptedHexes: {}, error: err});
           }
         );
     }
@@ -443,7 +444,7 @@ export class IdentityService {
 
     const {
       id,
-      payload: { encryptedSeedHex, derivedPublicKeyBase58Check },
+      payload: {encryptedSeedHex, derivedPublicKeyBase58Check},
     } = data;
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
@@ -473,7 +474,11 @@ export class IdentityService {
     }
 
     // check for cookie access
-    this.cookieService.put('deso-test-access', 'true');
+    this.cookieService.put('deso-test-access', 'true', {
+      path: '/',
+      secure: true,
+      sameSite: 'None',
+    });
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
     // store if browser is supported or not
@@ -534,7 +539,7 @@ export class IdentityService {
 
   private hasAccessLevel(data: any, requiredAccessLevel: AccessLevel): boolean {
     const {
-      payload: { encryptedSeedHex, accessLevel, accessLevelHmac },
+      payload: {encryptedSeedHex, accessLevel, accessLevelHmac},
     } = data;
     if (accessLevel < requiredAccessLevel) {
       return false;
@@ -553,7 +558,7 @@ export class IdentityService {
   // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
   private approveSpending(data: any): boolean {
     const {
-      payload: { accessLevel, transactionHex },
+      payload: {accessLevel, transactionHex},
     } = data;
 
     // If the requested access level is ApproveLarge, we want to confirm that transaction doesn't
@@ -566,7 +571,7 @@ export class IdentityService {
           output.publicKey.toString('hex') !==
           transaction.publicKey.toString('hex')
         ) {
-          this.respond(data.id, { approvalRequired: true });
+          this.respond(data.id, {approvalRequired: true});
           return false;
         }
       }
@@ -581,7 +586,7 @@ export class IdentityService {
     );
 
     if (!hasAccess || !hasEncryptionKey) {
-      this.respond(data.id, { approvalRequired: true });
+      this.respond(data.id, {approvalRequired: true});
       return false;
     }
 
@@ -591,8 +596,8 @@ export class IdentityService {
   // Message handling
 
   private handleMessage(event: MessageEvent): void {
-    const { data } = event;
-    const { service, method } = data;
+    const {data} = event;
+    const {service, method} = data;
 
     if (service !== 'identity') {
       return;
@@ -632,7 +637,7 @@ export class IdentityService {
 
   private handleResponse(event: MessageEvent): void {
     const {
-      data: { id, payload },
+      data: {id, payload},
       origin,
     } = event;
     const hostname = new URL(origin).hostname;
