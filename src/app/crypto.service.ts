@@ -10,7 +10,7 @@ import {
 } from 'crypto';
 import { ec as EC } from 'elliptic';
 import { default as HDKey, default as HDNode } from 'hdkey';
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import * as sha256 from 'sha256';
 import { Keccak } from 'sha3';
 import { AccessLevel, Network } from '../types/identity';
@@ -75,7 +75,7 @@ export class CryptoService {
       encryptionKey = this.cookieService.get(storageKey);
       if (!encryptionKey || reset) {
         encryptionKey = this.newEncryptionKey();
-        this.cookieService.put(storageKey, encryptionKey, {
+        this.cookieService.set(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
         });
       }

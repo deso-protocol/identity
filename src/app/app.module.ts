@@ -7,7 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
-import { CookieModule } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
@@ -122,7 +122,6 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
       siteKey: environment.hCaptchaSitekey,
     }),
     BuyDeSoComponentWrapper,
-    CookieModule.forRoot(),
     MatDialogModule,
   ],
   providers: [
@@ -131,6 +130,7 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     AccountService,
     MetamaskService,
     TruncateAddressOrUsernamePipe,
+    CookieService,
   ],
 
   bootstrap: [AppComponent],

@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable, Subject } from 'rxjs';
 import { v4 as uuid } from 'uuid';
 import {
@@ -474,7 +474,12 @@ export class IdentityService {
     // }
 
     // check for cookie access
-    this.cookieService.put('deso-test-access', 'true');
+    this.cookieService.set('deso-test-access', 'true', {
+      path: '/',
+      sameSite: 'None',
+      secure: true,
+    });
+    debugger;
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
     // store if browser is supported or not

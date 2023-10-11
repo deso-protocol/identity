@@ -55,7 +55,7 @@
     "key-encoder": "^2.0.3",
     "lodash": "^4.17.21",
     "ng-hcaptcha": "^2.2.0",
-    "ngx-cookie": "^6.0.1",
+    "ngx-cookie-service": "^16.0.1",
     "process": "^0.11.10",
     "readable-stream": "^3.6.0",
     "reflect-metadata": "^0.1.13",
