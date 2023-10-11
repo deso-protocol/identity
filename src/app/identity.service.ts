@@ -306,6 +306,7 @@ export class IdentityService {
       signedTransactionHex,
     });
   }
+
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
@@ -465,12 +466,12 @@ export class IdentityService {
     }
 
     // check for localStorage access
-    let hasLocalStorageAccess;
-    try {
-      hasLocalStorageAccess = !!localStorage;
-    } catch (e) {
-      hasLocalStorageAccess = false;
-    }
+    let hasLocalStorageAccess = false;
+    // try {
+    //   hasLocalStorageAccess = !!localStorage;
+    // } catch (e) {
+    //   hasLocalStorageAccess = false;
+    // }
 
     // check for cookie access
     this.cookieService.put('deso-test-access', 'true');
