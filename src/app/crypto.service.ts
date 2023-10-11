@@ -9,6 +9,7 @@ import * as sha256 from 'sha256';
 import { Keccak } from 'sha3';
 import { AccessLevel, Network } from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
+import { utils } from '@noble/secp256k1';
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +52,7 @@ export class CryptoService {
 
   // 32 bytes = 256 bits is plenty of entropy for encryption
   newEncryptionKey(): string {
-    return randomBytes(32).toString('hex');
+    return utils.bytesToHex(utils.randomBytes(32));
   }
 
   seedHexEncryptionStorageKey(hostname: string): string {
@@ -102,9 +103,8 @@ export class CryptoService {
   }
 
   async encryptSeedHex(seedHex: string, hostname: string) {
-    const encryptionPrivateKey = Buffer.from(
-      this.seedHexEncryptionKey(hostname, false),
-      'hex'
+    const encryptionPrivateKey = utils.hexToBytes(
+      this.seedHexEncryptionKey(hostname, false)
     );
     const cryptoKey = await globalThis.crypto.subtle.importKey(
       'raw',
@@ -114,8 +114,7 @@ export class CryptoService {
       ['encrypt']
     );
 
-    const counter = new Uint8Array(16);
-    window.crypto.getRandomValues(counter);
+    const counter = utils.randomBytes(16);
     const encryptedSeedBytes = await globalThis.crypto.subtle.encrypt(
       {
         name: 'AES-CTR',
@@ -126,17 +125,15 @@ export class CryptoService {
       new TextEncoder().encode(seedHex)
     );
 
-    return Buffer.from([
-      ...counter,
-      ...new Uint8Array(encryptedSeedBytes),
-    ]).toString('hex');
+    return utils.bytesToHex(
+      new Uint8Array([...counter, ...new Uint8Array(encryptedSeedBytes)])
+    );
   }
 
   async decryptSeedHex(encryptedSeedHex: string, hostname: string) {
-    const encryptedSeedBytes = Buffer.from(encryptedSeedHex, 'hex');
-    const encryptionPrivateKey = Buffer.from(
-      this.seedHexEncryptionKey(hostname, false),
-      'hex'
+    const encryptedSeedBytes = utils.hexToBytes(encryptedSeedHex);
+    const encryptionPrivateKey = utils.hexToBytes(
+      this.seedHexEncryptionKey(hostname, false)
     );
     const counter = encryptedSeedBytes.slice(0, 16);
     const cipherText = encryptedSeedBytes.slice(16);
