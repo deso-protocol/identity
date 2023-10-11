@@ -106,7 +106,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   ////// STEP TWO BUTTONS | STEP_VERIFY_SEED ///////
 
-  stepTwoNext(): void {
+  async stepTwoNext() {
     // Add the new user to the account service registry.
     const network = this.globalVars.network;
     const mnemonic = this.mnemonicCheck;
@@ -139,8 +139,9 @@ export class SignUpComponent implements OnInit, OnDestroy {
         queryParamsHandling: 'merge',
       });
     } else {
+      const users = await this.accountService.getEncryptedUsers();
       this.identityService.login({
-        users: this.accountService.getEncryptedUsers(),
+        users,
         publicKeyAdded: this.publicKeyAdded,
         signedUp: true,
       });

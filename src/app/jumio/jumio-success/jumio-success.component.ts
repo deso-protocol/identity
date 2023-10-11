@@ -3,6 +3,7 @@ import { AccountService } from '../../account.service';
 import { IdentityService } from '../../identity.service';
 import { ActivatedRoute } from '@angular/router';
 import { BackendAPIService } from 'src/app/backend-api.service';
+import { forkJoin, from } from 'rxjs';
 
 @Component({
   selector: 'app-jumio-success',
@@ -20,16 +21,20 @@ export class JumioSuccessComponent implements OnInit, OnDestroy {
       // If Jumio succeeds, we close identity and send the login message.
       const publicKey = params.public_key || '';
       const jumioInternalReference = params.customerInternalReference || '';
-      this.backendApiService
-        .JumioFlowFinished(publicKey, jumioInternalReference)
-        .subscribe((res) => {
-          this.identityService.login({
-            users: this.accountService.getEncryptedUsers(),
-            publicKeyAdded: publicKey,
-            signedUp: true,
-            jumioSuccess: true,
-          });
+      forkJoin([
+        this.backendApiService.JumioFlowFinished(
+          publicKey,
+          jumioInternalReference
+        ),
+        from(this.accountService.getEncryptedUsers()),
+      ]).subscribe(([_, encryptedUsers]) => {
+        this.identityService.login({
+          users: encryptedUsers,
+          publicKeyAdded: publicKey,
+          signedUp: true,
+          jumioSuccess: true,
         });
+      });
     });
   }
 

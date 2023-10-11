@@ -63,7 +63,7 @@ export class AccountService {
     return Object.keys(this.getPrivateUsers());
   }
 
-  getEncryptedUsers(): { [key: string]: PublicUserInfo } {
+  async getEncryptedUsers(): Promise<{ [key: string]: PublicUserInfo }> {
     const hostname = this.globalVars.hostname;
     const privateUsers = this.getPrivateUsers();
     const publicUsers: { [key: string]: PublicUserInfo } = {};
@@ -75,16 +75,17 @@ export class AccountService {
         continue;
       }
 
-      const encryptedSeedHex = this.cryptoService.encryptSeedHex(
+      const encryptedSeedHex = await this.cryptoService.encryptSeedHex(
         privateUser.seedHex,
         hostname
       );
       let encryptedMessagingKeyRandomness: string | undefined;
       if (privateUser.messagingKeyRandomness) {
-        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(
-          privateUser.messagingKeyRandomness,
-          hostname
-        );
+        encryptedMessagingKeyRandomness =
+          await this.cryptoService.encryptSeedHex(
+            privateUser.messagingKeyRandomness,
+            hostname
+          );
       }
       const accessLevelHmac = this.cryptoService.accessLevelHmac(
         accessLevel,
@@ -1054,13 +1055,12 @@ export class AccountService {
     );
   }
 
-  encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex: string): string {
-    return this.seedHexToPublicKeyBase58Check(
-      this.cryptoService.decryptSeedHex(
-        encryptedSeedHex,
-        this.globalVars.hostname
-      )
+  async encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex: string) {
+    const seedHex = await this.cryptoService.decryptSeedHex(
+      encryptedSeedHex,
+      this.globalVars.hostname
     );
+    return this.seedHexToPublicKeyBase58Check(seedHex);
   }
 
   seedHexToPublicKeyBase58Check(seedHex: string): string {

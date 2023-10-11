@@ -252,10 +252,9 @@ export class MessagingGroupComponent implements OnInit {
       this.updatedGroupKeyName
     );
     let encryptedMessagingKeyRandomness: string | undefined;
+    const encryptedUsers = await this.accountService.getEncryptedUsers();
     const publicUser =
-      this.accountService.getEncryptedUsers()[
-        this.updatedGroupOwnerPublicKeyBase58Check
-      ];
+      encryptedUsers[this.updatedGroupOwnerPublicKeyBase58Check];
     if (publicUser?.encryptedMessagingKeyRandomness) {
       encryptedMessagingKeyRandomness =
         publicUser.encryptedMessagingKeyRandomness;

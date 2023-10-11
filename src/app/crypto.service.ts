@@ -1,13 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as bip39 from 'bip39';
 import bs58check from 'bs58check';
-import {
-  createCipher,
-  createDecipher,
-  createHash,
-  createHmac,
-  randomBytes,
-} from 'crypto';
+import { createHash, createHmac, randomBytes } from 'crypto';
 import { ec as EC } from 'elliptic';
 import { default as HDKey, default as HDNode } from 'hdkey';
 import { CookieService } from 'ngx-cookie';
@@ -15,6 +9,7 @@ import * as sha256 from 'sha256';
 import { Keccak } from 'sha3';
 import { AccessLevel, Network } from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
+import { utils } from '@noble/secp256k1';
 
 @Injectable({
   providedIn: 'root',
@@ -57,7 +52,7 @@ export class CryptoService {
 
   // 32 bytes = 256 bits is plenty of entropy for encryption
   newEncryptionKey(): string {
-    return randomBytes(32).toString('hex');
+    return utils.bytesToHex(utils.randomBytes(32));
   }
 
   seedHexEncryptionStorageKey(hostname: string): string {
@@ -107,16 +102,56 @@ export class CryptoService {
     return encryptionKey;
   }
 
-  encryptSeedHex(seedHex: string, hostname: string): string {
-    const encryptionKey = this.seedHexEncryptionKey(hostname, false);
-    const cipher = createCipher('aes-256-gcm', encryptionKey);
-    return cipher.update(seedHex).toString('hex');
+  async encryptSeedHex(seedHex: string, hostname: string) {
+    const encryptionPrivateKey = utils.hexToBytes(
+      this.seedHexEncryptionKey(hostname, false)
+    );
+    const cryptoKey = await globalThis.crypto.subtle.importKey(
+      'raw',
+      encryptionPrivateKey,
+      'AES-CTR',
+      true,
+      ['encrypt']
+    );
+
+    const counter = utils.randomBytes(16);
+    const encryptedSeedBytes = await globalThis.crypto.subtle.encrypt(
+      {
+        name: 'AES-CTR',
+        counter,
+        length: 128,
+      },
+      cryptoKey,
+      new TextEncoder().encode(seedHex)
+    );
+
+    return utils.bytesToHex(
+      new Uint8Array([...counter, ...new Uint8Array(encryptedSeedBytes)])
+    );
   }
 
-  decryptSeedHex(encryptedSeedHex: string, hostname: string): string {
-    const encryptionKey = this.seedHexEncryptionKey(hostname, false);
-    const decipher = createDecipher('aes-256-gcm', encryptionKey);
-    return decipher.update(Buffer.from(encryptedSeedHex, 'hex')).toString();
+  async decryptSeedHex(encryptedSeedHex: string, hostname: string) {
+    const encryptedSeedBytes = utils.hexToBytes(encryptedSeedHex);
+    const encryptionPrivateKey = utils.hexToBytes(
+      this.seedHexEncryptionKey(hostname, false)
+    );
+    const counter = encryptedSeedBytes.slice(0, 16);
+    const cipherText = encryptedSeedBytes.slice(16);
+    const cryptoKey = await globalThis.crypto.subtle.importKey(
+      'raw',
+      encryptionPrivateKey,
+      'AES-CTR',
+      true,
+      ['decrypt']
+    );
+
+    const decryptedBytes = await globalThis.crypto.subtle.decrypt(
+      { name: 'AES-CTR', counter, length: 128 },
+      cryptoKey,
+      cipherText
+    );
+
+    return new TextDecoder().decode(decryptedBytes);
   }
 
   accessLevelHmac(accessLevel: AccessLevel, seedHex: string): string {
@@ -155,8 +190,8 @@ export class CryptoService {
     return ec.keyFromPrivate(seedHex);
   }
 
-  encryptedSeedHexToPublicKey(encryptedSeedHex: string): string {
-    const seedHex = this.decryptSeedHex(
+  async encryptedSeedHexToPublicKey(encryptedSeedHex: string) {
+    const seedHex = await this.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );

@@ -27,10 +27,11 @@ export class BuyDeSoCompleteComponent implements OnInit {
     this.buyMoreDeSoClicked.emit();
   }
 
-  close(): void {
+  async close() {
     this.closeModal.emit();
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });

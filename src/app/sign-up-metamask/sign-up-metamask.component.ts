@@ -271,7 +271,7 @@ export class SignUpMetamaskComponent implements OnInit {
     });
   }
 
-  public login(): void {
+  public async login() {
     this.accountService.setAccessLevel(
       this.publicKey,
       this.globalVars.hostname,
@@ -283,8 +283,9 @@ export class SignUpMetamaskComponent implements OnInit {
         queryParamsHandling: 'merge',
       });
     } else {
+      const users = await this.accountService.getEncryptedUsers();
       this.identityService.login({
-        users: this.accountService.getEncryptedUsers(),
+        users,
         publicKeyAdded: this.publicKey,
         signedUp: true,
       });

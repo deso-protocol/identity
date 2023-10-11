@@ -64,9 +64,10 @@ export class BuyDeSoHeroSwapComponent implements OnInit, OnDestroy {
     }
   }
 
-  login(): void {
+  async login() {
+    const users = await this.accountService.getEncryptedUsers();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users,
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });
