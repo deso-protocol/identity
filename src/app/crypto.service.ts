@@ -23,8 +23,7 @@ export class CryptoService {
   constructor(
     private cookieService: CookieService,
     private globalVars: GlobalVarsService
-  ) {
-  }
+  ) {}
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
