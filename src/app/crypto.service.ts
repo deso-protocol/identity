@@ -43,16 +43,7 @@ export class CryptoService {
       return false;
     }
 
-    const supportsStorageAccess =
-      typeof document.hasStorageAccess === 'function';
-    const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
-    const isSafari = !isChrome && navigator.userAgent.indexOf('Safari') > -1;
-
-    // Firefox and Edge support the storage access API but do not enforce it.
-    // For now, only use cookies if we support storage access and use Safari.
-    const mustUseStorageAccess = supportsStorageAccess && isSafari;
-
-    return mustUseStorageAccess;
+    return typeof document.hasStorageAccess === 'function';
   }
 
   // 32 bytes = 256 bits is plenty of entropy for encryption
@@ -86,6 +77,9 @@ export class CryptoService {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.put(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
+          path: '/',
+          secure: true,
+          sameSite: 'none',
         });
       }
     } else {

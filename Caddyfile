@@ -69,6 +69,7 @@ header @html Content-Security-Policy "
     https://test.deso.org/api/v0/send-starter-deso-for-metamask-account
     https://test.deso.org/api/v0/authorize-derived-key
     https://test.deso.org/api/v0/get-txn
+    https://test.deso.org/api/v0/verify-captcha
     https://test.deso.org/api/v0/get-bulk-messaging-public-keys
     https://test.deso.org/api/v0/submit-transaction
     https://www.googleapis.com/drive/v3/files

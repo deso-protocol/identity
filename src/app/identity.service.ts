@@ -306,6 +306,7 @@ export class IdentityService {
       signedTransactionHex,
     });
   }
+
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
@@ -473,7 +474,11 @@ export class IdentityService {
     }
 
     // check for cookie access
-    this.cookieService.put('deso-test-access', 'true');
+    this.cookieService.put('deso-test-access', 'true', {
+      path: '/',
+      secure: true,
+      sameSite: 'none',
+    });
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
     // store if browser is supported or not
