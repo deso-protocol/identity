@@ -1,0 +1,32 @@
+<app-banner></app-banner>
+
+<div class="container">
+  <h3 class="text--neutral-white">Approve a JWT</h3>
+  <div class="box--border box--rounded box--large">
+    <p class="padding-bottom--medium">
+      {{ globalVars.hostname }} wants to generate a JWT
+    </p>
+    <div>
+      Public Key: <code>{{ publicKey }}</code>
+    </div>
+    <div>
+      Expiration Days: <code>{{ expirationDays }}</code>
+    </div>
+    <div class="margin-top--large">
+      <button
+        type="button"
+        class="button--primary button--medium margin-bottom--medium"
+        (click)="onSubmit()"
+      >
+        Allow
+      </button>
+      <!--      <button-->
+      <!--        type="button"-->
+      <!--        class="button&#45;&#45;primary&#45;&#45;outline button&#45;&#45;medium"-->
+      <!--        (click)="onCancel()"-->
+      <!--      >-->
+      <!--        Deny-->
+      <!--      </button>-->
+    </div>
+  </div>
+</div>
