@@ -15,6 +15,10 @@ import * as sha256 from 'sha256';
 import { Keccak } from 'sha3';
 import { AccessLevel, Network } from '../types/identity';
 import { GlobalVarsService } from './global-vars.service';
+import { aes_256_gcm } from "@noble/ciphers/webcrypto/aes";
+import {
+  utils as ecUtils
+} from '@noble/secp256k1';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +27,8 @@ export class CryptoService {
   constructor(
     private cookieService: CookieService,
     private globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   static PUBLIC_KEY_PREFIXES = {
     mainnet: {
@@ -101,16 +106,26 @@ export class CryptoService {
     return encryptionKey;
   }
 
-  encryptSeedHex(seedHex: string, hostname: string): string {
+  async encryptSeedHex(seedHex: string, hostname: string): Promise<string> {
     const encryptionKey = this.seedHexEncryptionKey(hostname, false);
-    const cipher = createCipher('aes-256-gcm', encryptionKey);
-    return cipher.update(seedHex).toString('hex');
+    const cipher = aes_256_gcm(ecUtils.hexToBytes(encryptionKey), new Uint8Array(12));
+    debugger;
+    const x = await cipher.encrypt(ecUtils.hexToBytes(seedHex));
+    return ecUtils.bytesToHex(x);
+    // const cipher = createCipher('aes-256-gcm', encryptionKey);
+    // return cipher.update(seedHex).toString('hex');
   }
 
-  decryptSeedHex(encryptedSeedHex: string, hostname: string): string {
+  async decryptSeedHex(encryptedSeedHex: string, hostname: string): Promise<string> {
     const encryptionKey = this.seedHexEncryptionKey(hostname, false);
-    const decipher = createDecipher('aes-256-gcm', encryptionKey);
-    return decipher.update(Buffer.from(encryptedSeedHex, 'hex')).toString();
+    const decipher = aes_256_gcm(ecUtils.hexToBytes(encryptionKey), new Uint8Array(12));
+    const x = await decipher.decrypt(ecUtils.hexToBytes(encryptedSeedHex));
+    return ecUtils.bytesToHex(x);
+    // const decipher = createDecipher('aes-256-gcm', encryptionKey);
+    // const buff = decipher.update(Buffer.from(encryptedSeedHex, 'hex'));
+    // debugger;
+    // console.log(buff);
+    // return buff.toString();
   }
 
   accessLevelHmac(accessLevel: AccessLevel, seedHex: string): string {
@@ -158,8 +173,8 @@ export class CryptoService {
     return ec.keyFromPrivate(seedHex);
   }
 
-  encryptedSeedHexToPublicKey(encryptedSeedHex: string): string {
-    const seedHex = this.decryptSeedHex(
+  async encryptedSeedHexToPublicKey(encryptedSeedHex: string): Promise<string> {
+    const seedHex = await this.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );

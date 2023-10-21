@@ -50,7 +50,8 @@ export class BuyOrSendDesoComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   ////// STEP FIVE BUTTONS | STEP_OBTAIN_DESO ///////
 
@@ -97,27 +98,27 @@ export class BuyOrSendDesoComponent implements OnInit {
     }, 1000);
   }
 
-  finishFlowTransferDeSo(): void {
-    this.finishFlow();
+  async finishFlowTransferDeSo(): Promise<void> {
+    await this.finishFlow();
   }
 
   ////// STEP SIX BUTTONS | STEP_BUY_DESO ///////
 
   ////// FINISH FLOW ///////
-  finishFlow(): void {
+  async finishFlow(): Promise<void> {
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKeyAdded },
+      await this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {publicKey: this.publicKeyAdded},
         queryParamsHandling: 'merge',
       });
     } else {
-      this.login();
+      await this.login();
     }
   }
 
-  login(): void {
+  async login(): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKeyAdded,
       signedUp: this.globalVars.signedUp,
     });

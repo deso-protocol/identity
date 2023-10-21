@@ -77,7 +77,8 @@ export class ApproveComponent implements OnInit {
     public globalVars: GlobalVarsService,
     private signingService: SigningService,
     private backendApi: BackendAPIService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
@@ -95,11 +96,11 @@ export class ApproveComponent implements OnInit {
     });
   }
 
-  onCancel(): void {
-    this.finishFlow();
+  async onCancel(): Promise<void> {
+    await this.finishFlow();
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     const account = this.accountService.getAccountInfo(this.publicKey);
     const isDerived = this.accountService.isMetamaskAccount(account);
     const signedTransactionHex = this.signingService.signTransaction(
@@ -107,12 +108,12 @@ export class ApproveComponent implements OnInit {
       this.transactionHex,
       isDerived
     );
-    this.finishFlow(signedTransactionHex);
+    await this.finishFlow(signedTransactionHex);
   }
 
-  finishFlow(signedTransactionHex?: string): void {
+  async finishFlow(signedTransactionHex?: string): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       signedTransactionHex,
     });
   }
@@ -400,23 +401,23 @@ export class ApproveComponent implements OnInit {
             exchangeRateCoinsToSellPerCoinToBuy === 0
               ? `using ${sellingCoin} at any exchange rate`
               : `at an exchange rate of ${this.toFixedLengthDecimalString(
-                  exchangeRateCoinsToSellPerCoinToBuy
-                )} ` + `${sellingCoin} per coin bought`;
+              exchangeRateCoinsToSellPerCoinToBuy
+            )} ` + `${sellingCoin} per coin bought`;
           const exchangeRateCoinsToBuyPerCoinsToSellPhrase =
             exchangeRateCoinsToSellPerCoinToBuy === 0
               ? `for ${buyingCoin} at any exchange rate`
               : `at an exchange rate of ${this.toFixedLengthDecimalString(
-                  1 / exchangeRateCoinsToSellPerCoinToBuy
-                )} ` + `${buyingCoin} per coin sold`;
+              1 / exchangeRateCoinsToSellPerCoinToBuy
+            )} ` + `${buyingCoin} per coin sold`;
 
           const daoCoinLimitOrderFillTypePhrase =
             daoCoinLimitOrderFillType === '1'
               ? 'a Good-Till-Cancelled'
               : daoCoinLimitOrderFillType === '2'
-              ? 'an Immediate-Or-Cancel'
-              : daoCoinLimitOrderFillType === '3'
-              ? 'a Fill-Or-Kill'
-              : `an unknown fill type (${daoCoinLimitOrderFillType})`;
+                ? 'an Immediate-Or-Cancel'
+                : daoCoinLimitOrderFillType === '3'
+                  ? 'a Fill-Or-Kill'
+                  : `an unknown fill type (${daoCoinLimitOrderFillType})`;
 
           if (daoCoinLimitOrderOperationType === '1') {
             // -- ASK Order --

@@ -51,7 +51,7 @@ export class GetDesoComponent implements OnInit {
 
   publicKeyCopied = false;
 
-  @ViewChild('captchaElem', { static: false }) captchaElem: any;
+  @ViewChild('captchaElem', {static: false}) captchaElem: any;
 
   constructor(
     public entropyService: EntropyService,
@@ -136,7 +136,7 @@ export class GetDesoComponent implements OnInit {
 
   stepThreeNextPhone(): void {
     this.router.navigate(['/', RouteNames.VERIFY_PHONE_NUMBER], {
-      queryParams: { public_key: this.publicKeyAdded },
+      queryParams: {public_key: this.publicKeyAdded},
       queryParamsHandling: 'merge',
     });
   }
@@ -165,10 +165,10 @@ export class GetDesoComponent implements OnInit {
 
   onCaptchaVerify(token: string): void {
     this.backendAPIService.VerifyHCaptcha(token, this.publicKeyAdded).subscribe(
-      (res) => {
+      async (res) => {
         if (res.Success) {
           this.isFinishFlowDisabled = false;
-          this.finishFlow();
+          await this.finishFlow();
         } else {
           this.captchaFailed = true;
         }
@@ -225,23 +225,23 @@ export class GetDesoComponent implements OnInit {
       ? this.userBalanceNanos < 1e4
       : false;
 
-  finishFlow(): void {
+  async finishFlow(): Promise<void> {
     if (this.isFinishFlowDisabled) {
       return;
     }
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKeyAdded },
+      await this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {publicKey: this.publicKeyAdded},
         queryParamsHandling: 'merge',
       });
     } else {
-      this.login();
+      await this.login();
     }
   }
 
-  login(): void {
+  async login(): Promise<void> {
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKeyAdded,
       signedUp: this.globalVars.signedUp,
     });

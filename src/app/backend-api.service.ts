@@ -269,7 +269,8 @@ export class BackendAPIService {
     private signingService: SigningService,
     private accountService: AccountService,
     private globalVars: GlobalVarsService
-  ) {}
+  ) {
+  }
 
   getRoute(path: string): string {
     let endpoint = this.endpoint;
@@ -305,7 +306,7 @@ export class BackendAPIService {
     const isDerived = this.accountService.isMetamaskAccount(account);
 
     const jwt = this.signingService.signJWT(account.seedHex, isDerived);
-    return this.post(path, { ...body, ...{ JWT: jwt } });
+    return this.post(path, {...body, ...{JWT: jwt}});
   }
 
   // Error parsing
@@ -434,15 +435,15 @@ export class BackendAPIService {
           if (res.DerivedKeys.hasOwnProperty(derivedKey)) {
             derivedKeys[
               res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check
-            ] = {
+              ] = {
               derivedPublicKeyBase58Check:
-                res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
+              res.DerivedKeys[derivedKey]?.DerivedPublicKeyBase58Check,
               ownerPublicKeyBase58Check:
-                res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
+              res.DerivedKeys[derivedKey]?.OwnerPublicKeyBase58Check,
               expirationBlock: res.DerivedKeys[derivedKey]?.ExpirationBlock,
               isValid: res.DerivedKeys[derivedKey]?.IsValid,
               transactionSpendingLimit:
-                res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
+              res.DerivedKeys[derivedKey]?.TransactionSpendingLimit,
             };
           }
         }
@@ -684,39 +685,6 @@ export class BackendAPIService {
 
         return Promise.all(txnPromises).then((xxx) => res);
       }),
-      catchError((err) => {
-        console.error(JSON.stringify(err));
-        return throwError(err);
-      })
-    );
-  }
-
-  ExchangeBitcoin(
-    LatestBitcionAPIResponse: any,
-    BTCDepositAddress: string,
-    PublicKeyBase58Check: string,
-    BurnAmountSatoshis: number,
-    FeeRateSatoshisPerKB: number,
-    SignedHashes: string[],
-    Broadcast: boolean
-  ): Observable<any> {
-    // Check if the user is logged in with a derived key and operating as the owner key.
-    const DerivedPublicKeyBase58Check =
-      this.accountService.getEncryptedUsers()[PublicKeyBase58Check]
-        ?.derivedPublicKeyBase58Check;
-
-    const req = this.post('exchange-bitcoin', {
-      PublicKeyBase58Check,
-      DerivedPublicKeyBase58Check,
-      BurnAmountSatoshis,
-      LatestBitcionAPIResponse,
-      BTCDepositAddress,
-      FeeRateSatoshisPerKB,
-      SignedHashes,
-      Broadcast,
-    });
-
-    return req.pipe(
       catchError((err) => {
         console.error(JSON.stringify(err));
         return throwError(err);

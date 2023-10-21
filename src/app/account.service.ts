@@ -177,15 +177,15 @@ export class AccountService {
    * this to look up the account number and the seed from the public key.
    */
   private updateSubAccountReverseLookupMap({
-    lookupKey,
-    accountNumber,
-  }: SubAccountReversLookupEntry) {
+                                             lookupKey,
+                                             accountNumber,
+                                           }: SubAccountReversLookupEntry) {
     const keyMap = this.getSubAccountReverseLookupMap();
     const subAccountPublicKey = this.getAccountPublicKeyBase58(
       lookupKey,
       accountNumber
     );
-    keyMap[subAccountPublicKey] = { lookupKey, accountNumber };
+    keyMap[subAccountPublicKey] = {lookupKey, accountNumber};
 
     window.localStorage.setItem(
       SUB_ACCOUNT_REVERSE_LOOKUP_KEY,
@@ -193,7 +193,7 @@ export class AccountService {
     );
   }
 
-  getEncryptedUsers(): { [key: string]: PublicUserInfo } {
+  async getEncryptedUsers(): Promise<{ [key: string]: PublicUserInfo }> {
     const hostname = this.globalVars.hostname;
     const rootUsers = this.getRootLevelUsers();
     const publicUsers: { [key: string]: PublicUserInfo } = {};
@@ -206,13 +206,13 @@ export class AccountService {
         continue;
       }
 
-      const encryptedSeedHex = this.cryptoService.encryptSeedHex(
+      const encryptedSeedHex = await this.cryptoService.encryptSeedHex(
         privateUser.seedHex,
         hostname
       );
       let encryptedMessagingKeyRandomness: string | undefined;
       if (privateUser.messagingKeyRandomness) {
-        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(
+        encryptedMessagingKeyRandomness = await this.cryptoService.encryptSeedHex(
           privateUser.messagingKeyRandomness,
           hostname
         );
@@ -245,13 +245,13 @@ export class AccountService {
       // unique seed hex that can be used for signing transactions, as well as a
       // unique accessLevel hmac.
       const subAccounts = privateUser.subAccounts || [];
-      subAccounts.forEach((subAccount) => {
+      for (const subAccount of subAccounts) {
         const subAccountPublicKey = this.getAccountPublicKeyBase58(
           rootPublicKey,
           subAccount.accountNumber
         );
         const accountInfo = this.getAccountInfo(subAccountPublicKey);
-        const subAccountEncryptedSeedHex = this.cryptoService.encryptSeedHex(
+        const subAccountEncryptedSeedHex = await this.cryptoService.encryptSeedHex(
           accountInfo.seedHex,
           hostname
         );
@@ -265,7 +265,7 @@ export class AccountService {
           encryptedSeedHex: subAccountEncryptedSeedHex,
           accessLevelHmac: subAccountAccessLevelHmac,
         };
-      });
+      }
     }
 
     return publicUsers;
@@ -319,7 +319,7 @@ export class AccountService {
     let jwt = '';
     let derivedJwt = '';
     const numDaysBeforeExpiration = expirationDays || 30;
-    const options = { expiration: `${numDaysBeforeExpiration} days` };
+    const options = {expiration: `${numDaysBeforeExpiration} days`};
     if (!derivedPublicKeyBase58CheckInput) {
       const derivedKeyData = this.generateDerivedKey(network);
       derivedPublicKeyBase58Check = derivedKeyData.derivedPublicKeyBase58Check;
@@ -426,7 +426,7 @@ export class AccountService {
           }
           await this.metamaskService.connectWallet();
         }
-        const { signature } =
+        const {signature} =
           await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
             accessBytesHex
           );
@@ -482,7 +482,7 @@ export class AccountService {
       'raw',
       'pem'
     );
-    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, {
+    const jwt = jsonwebtoken.sign({appPublicKey}, encodedPrivateKey, {
       algorithm: 'ES256',
       expiresIn: '30 minutes',
     });
@@ -605,7 +605,7 @@ export class AccountService {
       network,
       loginMethod,
       version: PrivateUserVersion.V2,
-      ...(lastLoginTimestamp && { lastLoginTimestamp }),
+      ...(lastLoginTimestamp && {lastLoginTimestamp}),
     });
   }
 
@@ -830,7 +830,7 @@ export class AccountService {
           );
         }
         try {
-          const { message, signature, publicEthAddress } =
+          const {message, signature, publicEthAddress} =
             await this.metamaskService.signMessageWithMetamaskAndGetEthAddress(
               randomnessString
             );
@@ -918,7 +918,7 @@ export class AccountService {
     const decryptedHexes: { [key: string]: any } = {};
     for (const encryptedHex of encryptedHexes) {
       const encryptedBytes = new Buffer(encryptedHex, 'hex');
-      const opts = { legacy: true };
+      const opts = {legacy: true};
       try {
         decryptedHexes[encryptedHex] = ecies
           .decrypt(privateKeyBuffer, encryptedBytes, opts)
@@ -957,7 +957,7 @@ export class AccountService {
         // If message was encrypted using public key, check the sender to determine if message is decryptable.
         try {
           if (!encryptedMessage.IsSender) {
-            const opts = { legacy: true };
+            const opts = {legacy: true};
             decryptedHexes[encryptedMessage.EncryptedHex] = ecies
               .decrypt(privateKeyBuffer, encryptedBytes, opts)
               .toString();
@@ -1115,7 +1115,7 @@ export class AccountService {
     if (
       privateUsers[publicKey]?.derivedPublicKeyBase58Check &&
       privateUsers[publicKey]?.derivedPublicKeyBase58Check !==
-        userInfo.derivedPublicKeyBase58Check
+      userInfo.derivedPublicKeyBase58Check
     ) {
       const previousUserInfo = privateUsers[publicKey];
       const archivedUserData = JSON.parse(
@@ -1247,7 +1247,7 @@ export class AccountService {
     // account, but for historical reasons its public key is used to index the
     // main users map in local storage.
     if (options.accountNumber === 0) {
-      this.updateAccountInfo(rootPublicKey, { isHidden: false });
+      this.updateAccountInfo(rootPublicKey, {isHidden: false});
       return 0;
     }
 
@@ -1264,8 +1264,8 @@ export class AccountService {
     const foundAccountIndex =
       typeof options.accountNumber === 'number'
         ? subAccounts.findIndex(
-            (a) => a.accountNumber === options.accountNumber
-          )
+          (a) => a.accountNumber === options.accountNumber
+        )
         : -1;
     const accountNumbers = new Set(subAccounts.map((a) => a.accountNumber));
     const accountNumber =
@@ -1301,7 +1301,7 @@ export class AccountService {
       );
     }
 
-    this.updateAccountInfo(rootPublicKey, { subAccounts: newSubAccounts });
+    this.updateAccountInfo(rootPublicKey, {subAccounts: newSubAccounts});
 
     return accountNumber;
   }

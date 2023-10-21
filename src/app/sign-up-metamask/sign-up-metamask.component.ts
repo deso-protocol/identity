@@ -18,16 +18,19 @@ export const getSpendingLimitsForMetamask = () => {
     IsUnlimited: true,
   };
 };
+
 enum SCREEN {
   CREATE_ACCOUNT = 0,
   LOADING = 1,
   AUTHORIZE_MESSAGES = 3,
 }
+
 enum METAMASK {
   START = 0,
   CONNECT = 1,
   ERROR = 2,
 }
+
 @Component({
   selector: 'app-sign-up-metamask',
   templateUrl: './sign-up-metamask.component.html',
@@ -44,6 +47,7 @@ export class SignUpMetamaskComponent implements OnInit {
   errorMessage = '';
   existingConnectedWallet = '';
   showAlternative = false;
+
   constructor(
     private accountService: AccountService,
     private identityService: IdentityService,
@@ -53,7 +57,9 @@ export class SignUpMetamaskComponent implements OnInit {
     private signingService: SigningService,
     private metamaskService: MetamaskService,
     private router: Router
-  ) {}
+  ) {
+  }
+
   async ngOnInit(): Promise<void> {
     if (this.globalVars.isMobile()) {
       this.currentScreen = SCREEN.LOADING;
@@ -92,7 +98,7 @@ export class SignUpMetamaskComponent implements OnInit {
     const network = this.globalVars.network;
     const expirationBlock =
       SignUpMetamaskComponent.UNLIMITED_DERIVED_KEY_EXPIRATION;
-    const { keychain, mnemonic, derivedPublicKeyBase58Check, derivedKeyPair } =
+    const {keychain, mnemonic, derivedPublicKeyBase58Check, derivedKeyPair} =
       this.accountService.generateDerivedKey(network);
 
     this.metamaskState = METAMASK.CONNECT;
@@ -271,20 +277,20 @@ export class SignUpMetamaskComponent implements OnInit {
     });
   }
 
-  public login(): void {
+  public async login(): Promise<void> {
     this.accountService.setAccessLevel(
       this.publicKey,
       this.globalVars.hostname,
       this.globalVars.accessLevelRequest
     );
     if (this.globalVars.derive) {
-      this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKey },
+      await this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {publicKey: this.publicKey},
         queryParamsHandling: 'merge',
       });
     } else {
       this.identityService.login({
-        users: this.accountService.getEncryptedUsers(),
+        users: await this.accountService.getEncryptedUsers(),
         publicKeyAdded: this.publicKey,
         signedUp: true,
       });

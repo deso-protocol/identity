@@ -21,16 +21,17 @@ export class BuyDeSoCompleteComponent implements OnInit {
     private backendApi: BackendAPIService,
     private identityService: IdentityService,
     private accountService: AccountService
-  ) {}
+  ) {
+  }
 
   triggerBuyMoreDeSo(): void {
     this.buyMoreDeSoClicked.emit();
   }
 
-  close(): void {
+  async close(): Promise<void> {
     this.closeModal.emit();
     this.identityService.login({
-      users: this.accountService.getEncryptedUsers(),
+      users: await this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,
       signedUp: this.globalVars.signedUp,
     });
