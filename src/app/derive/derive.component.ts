@@ -58,7 +58,6 @@ export class DeriveComponent implements OnInit {
   ngOnInit(): void {
     // Load profile pictures and usernames
     const publicKeys = this.accountService.getPublicKeys();
-    this.hasUsers = publicKeys.length > 0;
 
     this.backendApi
       .GetAppState()
