@@ -12,6 +12,7 @@ import {
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
 import { IdentityService } from '../identity.service';
+
 type Accounts = { [key: string]: UserProfile } | {};
 type DeriveParams = {
   publicKey?: string;
@@ -20,6 +21,7 @@ type DeriveParams = {
   transactionSpendingLimitResponse?: any;
   expirationDays?: string;
 };
+
 @Component({
   selector: 'app-derive',
   templateUrl: './derive.component.html',
@@ -40,6 +42,7 @@ export class DeriveComponent implements OnInit {
   isSingleAccount = false;
   validationErrors = false;
   blockHeight = 0;
+  loading = true;
   onApproveClick = async () =>
     this.approveDerivedKey(this.publicKeyBase58Check);
 
@@ -53,9 +56,16 @@ export class DeriveComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.backendApi.GetAppState().subscribe((res) => {
-      this.blockHeight = res.BlockHeight;
-    });
+    // Load profile pictures and usernames
+    const publicKeys = this.accountService.getPublicKeys();
+    this.hasUsers = publicKeys.length > 0;
+
+    this.backendApi
+      .GetAppState()
+      .subscribe((res) => {
+        this.blockHeight = res.BlockHeight;
+      })
+      .add(() => (this.loading = false));
     // first grab the query params
     this.activatedRoute.queryParams.subscribe((params: DeriveParams) => {
       // verify they sent the correct parameter permutation

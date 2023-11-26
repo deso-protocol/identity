@@ -1,8 +1,14 @@
 <app-banner></app-banner>
-
+<div *ngIf="loading" class="container text--center">
+  <div class="spinner-border" style="width: 12rem; height: 12rem"></div>
+</div>
 <div
   *ngIf="
-    !globalVars.callbackInvalid && !deleteKey && validationErrors === false
+    !globalVars.callbackInvalid &&
+    !deleteKey &&
+    validationErrors === false &&
+    !loading &&
+    blockHeight > 0
   "
   class="container text--center"
 >
@@ -87,4 +93,8 @@
 </div>
 <div *ngIf="validationErrors" class="warning--error container">
   There was an issue rendering this page, are the query parameters correct?
+</div>
+<div *ngIf="blockHeight === 0 && !loading" class="warning--error container">
+  There was an issue fetching the latest block height, please check your
+  internet connection and try again later.
 </div>
