@@ -5,8 +5,8 @@ import { ec as EC } from 'elliptic';
 import HDKey from 'hdkey';
 import * as jsonwebtoken from 'jsonwebtoken';
 import KeyEncoder from 'key-encoder';
-import { CookieService } from 'ngx-cookie';
 import sha256 from 'sha256';
+import { generateAccountNumber } from '../lib/account-number';
 import { uint64ToBufBigEndian } from '../lib/bindata/util';
 import {
   Transaction,
@@ -24,6 +24,7 @@ import {
   PrivateUserInfo,
   PrivateUserVersion,
   PublicUserInfo,
+  SubAccountMetadata,
 } from '../types/identity';
 import {
   BackendAPIService,
@@ -39,6 +40,35 @@ import { SigningService } from './signing.service';
 
 export const ERROR_USER_NOT_FOUND = 'User not found';
 
+/**
+ * The key used to store the sub-account reverse lookup map in local storage.
+ * This map is used to look up the account number for a sub-account given the
+ * public key. Application developers provide the "owner" public key in certain
+ * scenarios (generating derived keys, for example), and we need to be able to
+ * look up the account number for that public key in order to generate the
+ * private key for signing. The structure of the map is:
+ *
+ * ```json
+ * {
+ *    "subAccountPublicKey": {
+ *      "lookupKey": "rootPublicKey",
+ *      "accountNumber": 1
+ *    }
+ * }
+ * ```
+ *
+ * For historical reasons, the "lookupKey" is the root public key, which is the
+ * sub-account generated for account number 0. This is the "root" account, and
+ * is used to store the common data for all accounts in a particular account
+ * group, including its mnemonic and all its sub-account account numbers.
+ */
+const SUB_ACCOUNT_REVERSE_LOOKUP_KEY = 'subAccountReverseLookup';
+
+export interface SubAccountReversLookupEntry {
+  lookupKey: string;
+  accountNumber: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -51,26 +81,127 @@ export class AccountService {
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService,
-    private cookieService: CookieService,
     private entropyService: EntropyService,
     private signingService: SigningService,
     private metamaskService: MetamaskService
-  ) {}
+  ) {
+    /**
+     * We rebuild the sub-account reverse lookup map on every page load. This is
+     * to ensure there are no stale or missing entries in the map. The number of
+     * users in local storage is generally small, so this should not be a
+     * performance issue. If it does become a performance issue, we can consider
+     * a more sophisticated approach, but the number of users would need to be
+     * on the order of hundreds or thousands (very unlikely, and maybe literally
+     * impossible) before this would be a problem.
+     */
+    this.initializeSubAccountReverseLookup();
+  }
 
   // Public Getters
 
-  getPublicKeys(): any {
-    return Object.keys(this.getPrivateUsers());
+  getPublicKeys(): string[] {
+    const publicKeys: string[] = [];
+    const rootUsers = this.getRootLevelUsers();
+
+    Object.keys(rootUsers).forEach((publicKey) => {
+      publicKeys.push(publicKey);
+      const subAccounts = rootUsers[publicKey].subAccounts || [];
+      subAccounts.forEach((subAccount) => {
+        publicKeys.push(
+          this.getAccountPublicKeyBase58(publicKey, subAccount.accountNumber)
+        );
+      });
+    });
+
+    return publicKeys;
+  }
+
+  getAccountInfo(publicKey: string): PrivateUserInfo & SubAccountMetadata {
+    const privateUsers = this.getRootLevelUsers();
+    let info = null;
+
+    if (publicKey in privateUsers) {
+      info = {
+        ...privateUsers[publicKey],
+        // If the user is in the top level users map, their keys were generated
+        // with account number 0. This is the "root/parent" account.
+        accountNumber: 0,
+      };
+    }
+
+    // If the user is not found at the top level, it should be a sub account public key.
+    const lookup = this.getSubAccountReverseLookupMap();
+    const mapping = lookup[publicKey];
+
+    if (mapping) {
+      const rootUser = privateUsers[mapping.lookupKey];
+
+      const foundAccount = rootUser.subAccounts?.find(
+        (a) => a.accountNumber === mapping.accountNumber
+      );
+
+      if (foundAccount) {
+        const keychain = this.cryptoService.mnemonicToKeychain(
+          rootUser.mnemonic,
+          {
+            extraText: rootUser.extraText,
+            accountNumber: foundAccount.accountNumber,
+          }
+        );
+        const subAccountSeedHex =
+          this.cryptoService.keychainToSeedHex(keychain);
+        info = {
+          ...rootUser,
+          ...foundAccount,
+          seedHex: subAccountSeedHex,
+        };
+      }
+    }
+
+    if (info === null) {
+      throw new Error(`No user found for public key ${publicKey}`);
+    }
+
+    return info;
+  }
+
+  getSubAccountReverseLookupMap(): {
+    [subAccountKey: string]: SubAccountReversLookupEntry | undefined;
+  } {
+    const json = window.localStorage.getItem(SUB_ACCOUNT_REVERSE_LOOKUP_KEY);
+    return json ? JSON.parse(json) : {};
+  }
+
+  /**
+   * Add the sub-account public key to a reverse lookup map. We'll need
+   * this to look up the account number and the seed from the public key.
+   */
+  private updateSubAccountReverseLookupMap({
+    lookupKey,
+    accountNumber,
+  }: SubAccountReversLookupEntry) {
+    const keyMap = this.getSubAccountReverseLookupMap();
+    const subAccountPublicKey = this.getAccountPublicKeyBase58(
+      lookupKey,
+      accountNumber
+    );
+    keyMap[subAccountPublicKey] = { lookupKey, accountNumber };
+
+    window.localStorage.setItem(
+      SUB_ACCOUNT_REVERSE_LOOKUP_KEY,
+      JSON.stringify(keyMap)
+    );
   }
 
   getEncryptedUsers(): { [key: string]: PublicUserInfo } {
     const hostname = this.globalVars.hostname;
-    const privateUsers = this.getPrivateUsers();
+    const rootUsers = this.getRootLevelUsers();
     const publicUsers: { [key: string]: PublicUserInfo } = {};
 
-    for (const publicKey of Object.keys(privateUsers)) {
-      const privateUser = privateUsers[publicKey];
-      const accessLevel = this.getAccessLevel(publicKey, hostname);
+    for (const rootPublicKey of Object.keys(rootUsers)) {
+      const privateUser = rootUsers[rootPublicKey];
+
+      const accessLevel = this.getAccessLevel(rootPublicKey, hostname);
       if (accessLevel === AccessLevel.None) {
         continue;
       }
@@ -91,19 +222,50 @@ export class AccountService {
         privateUser.seedHex
       );
 
-      publicUsers[publicKey] = {
+      const commonFields = {
         hasExtraText: privateUser.extraText?.length > 0,
         btcDepositAddress: privateUser.btcDepositAddress,
         ethDepositAddress: privateUser.ethDepositAddress,
         version: privateUser.version,
-        encryptedSeedHex,
         network: privateUser.network,
         loginMethod: privateUser.loginMethod || LoginMethod.DESO,
         accessLevel,
+      };
+
+      publicUsers[rootPublicKey] = {
+        ...commonFields,
+        encryptedSeedHex,
         accessLevelHmac,
         derivedPublicKeyBase58Check: privateUser.derivedPublicKeyBase58Check,
         encryptedMessagingKeyRandomness,
       };
+
+      // To support sub-accounts for the legacy identity flow, we need to return
+      // a flat map of all users and their sub-accounts. Each sub-account has a
+      // unique seed hex that can be used for signing transactions, as well as a
+      // unique accessLevel hmac.
+      const subAccounts = privateUser.subAccounts || [];
+      subAccounts.forEach((subAccount) => {
+        const subAccountPublicKey = this.getAccountPublicKeyBase58(
+          rootPublicKey,
+          subAccount.accountNumber
+        );
+        const accountInfo = this.getAccountInfo(subAccountPublicKey);
+        const subAccountEncryptedSeedHex = this.cryptoService.encryptSeedHex(
+          accountInfo.seedHex,
+          hostname
+        );
+        const subAccountAccessLevelHmac = this.cryptoService.accessLevelHmac(
+          accessLevel,
+          accountInfo.seedHex
+        );
+
+        publicUsers[subAccountPublicKey] = {
+          ...commonFields,
+          encryptedSeedHex: subAccountEncryptedSeedHex,
+          accessLevelHmac: subAccountAccessLevelHmac,
+        };
+      });
     }
 
     return publicUsers;
@@ -115,14 +277,8 @@ export class AccountService {
   }
 
   requiresMessagingKeyRandomness(publicKey: string): boolean {
-    const privateUser = this.getPrivateUsers()[publicKey];
-    if (!privateUser) {
-      console.error('private user not found');
-      throw new Error('private user not found');
-    }
-    return (
-      this.isMetamaskAccount(privateUser) && !privateUser.messagingKeyRandomness
-    );
+    const account = this.getAccountInfo(publicKey);
+    return this.isMetamaskAccount(account) && !account.messagingKeyRandomness;
   }
 
   getAccessLevel(publicKey: string, hostname: string): AccessLevel {
@@ -153,13 +309,9 @@ export class AccountService {
     derivedPublicKeyBase58CheckInput?: string,
     expirationDays?: number
   ): Promise<DerivedPrivateUserInfo | undefined> {
-    if (!(publicKeyBase58Check in this.getPrivateUsers())) {
-      return undefined;
-    }
-
-    const privateUser = this.getPrivateUsers()[publicKeyBase58Check];
-    const network = privateUser.network;
-    const isMetamask = this.isMetamaskAccount(privateUser);
+    const account = this.getAccountInfo(publicKeyBase58Check);
+    const network = account.network;
+    const isMetamask = this.isMetamaskAccount(account);
 
     let derivedSeedHex = '';
     let derivedPublicKeyBuffer: number[];
@@ -167,7 +319,7 @@ export class AccountService {
     let jwt = '';
     let derivedJwt = '';
     const numDaysBeforeExpiration = expirationDays || 30;
-
+    const options = { expiration: `${numDaysBeforeExpiration} days` };
     if (!derivedPublicKeyBase58CheckInput) {
       const derivedKeyData = this.generateDerivedKey(network);
       derivedPublicKeyBase58Check = derivedKeyData.derivedPublicKeyBase58Check;
@@ -179,11 +331,7 @@ export class AccountService {
         .encode('array', true);
 
       // Derived keys JWT with the same expiration as the derived key. This is needed for some backend endpoints.
-      derivedJwt = this.signingService.signJWT(
-        derivedSeedHex,
-        true,
-        `${numDaysBeforeExpiration} days`
-      );
+      derivedJwt = this.signingService.signJWT(derivedSeedHex, true, options);
     } else {
       // If the user has passed in a derived public key, use that instead.
       // Don't define the derived seed hex (a private key presumably already exists).
@@ -195,11 +343,7 @@ export class AccountService {
     }
     // Compute the owner-signed JWT with the same expiration as the derived key. This is needed for some backend endpoints.
     // In case of the metamask log-in, jwt will be signed by a derived key.
-    jwt = this.signingService.signJWT(
-      privateUser.seedHex,
-      isMetamask,
-      `${numDaysBeforeExpiration} days`
-    );
+    jwt = this.signingService.signJWT(account.seedHex, isMetamask, options);
 
     // Generate new btc and eth deposit addresses for the derived key.
     // const btcDepositAddress = this.cryptoService.keychainToBtcAddress(derivedKeychain, network);
@@ -295,7 +439,7 @@ export class AccountService {
         );
       }
     } else {
-      accessSignature = this.signingService.signHashes(privateUser.seedHex, [
+      accessSignature = this.signingService.signHashes(account.seedHex, [
         accessHash,
       ])[0];
     }
@@ -329,7 +473,7 @@ export class AccountService {
   }
 
   getDefaultKeyPrivateUser(publicKey: string, appPublicKey: string): any {
-    const privateUser = this.getPrivateUsers()[publicKey];
+    const privateUser = this.getRootLevelUsers()[publicKey];
     const network = privateUser.network;
     // create jwt with private key and app public key
     const keyEncoder = new KeyEncoder('secp256k1');
@@ -435,21 +579,22 @@ export class AccountService {
     mnemonic: string,
     extraText: string,
     network: Network,
-    google?: boolean
+    {
+      lastLoginTimestamp,
+      loginMethod = LoginMethod.DESO,
+    }: {
+      lastLoginTimestamp?: number;
+      loginMethod?: LoginMethod;
+    } = {}
   ): string {
     const seedHex = this.cryptoService.keychainToSeedHex(keychain);
-    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const keyPair = this.cryptoService.seedHexToKeyPair(seedHex);
     const btcDepositAddress = this.cryptoService.keychainToBtcAddress(
       // @ts-ignore TODO: add "identifier" to type definition
       keychain.identifier,
       network
     );
     const ethDepositAddress = this.cryptoService.publicKeyToEthAddress(keyPair);
-
-    let loginMethod: LoginMethod = LoginMethod.DESO;
-    if (google) {
-      loginMethod = LoginMethod.GOOGLE;
-    }
 
     return this.addPrivateUser({
       seedHex,
@@ -460,11 +605,12 @@ export class AccountService {
       network,
       loginMethod,
       version: PrivateUserVersion.V2,
+      ...(lastLoginTimestamp && { lastLoginTimestamp }),
     });
   }
 
   addUserWithSeedHex(seedHex: string, network: Network): string {
-    const keyPair = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const keyPair = this.cryptoService.seedHexToKeyPair(seedHex);
     const helperKeychain = new HDKey();
     helperKeychain.privateKey = Buffer.from(seedHex, 'hex');
     // @ts-ignore TODO: add "identifier" to type definition
@@ -556,7 +702,7 @@ export class AccountService {
       // Migrate from V0 -> V1
       if (privateUser.version === PrivateUserVersion.V0) {
         // Add ethDepositAddress field
-        const keyPair = this.cryptoService.seedHexToPrivateKey(
+        const keyPair = this.cryptoService.seedHexToKeyPair(
           privateUser.seedHex
         );
         privateUser.ethDepositAddress =
@@ -589,12 +735,8 @@ export class AccountService {
     ownerPublicKeyBase58Check: string,
     publicKey: string
   ): string {
-    const privateUsers = this.getPrivateUsers();
-    if (!(ownerPublicKeyBase58Check in privateUsers)) {
-      return '';
-    }
-    const seedHex = privateUsers[ownerPublicKeyBase58Check].seedHex;
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const account = this.getAccountInfo(ownerPublicKeyBase58Check);
+    const privateKey = this.cryptoService.seedHexToKeyPair(account.seedHex);
     const privateKeyBytes = privateKey.getPrivate().toBuffer(undefined, 32);
     const publicKeyBytes = this.cryptoService.publicKeyToECBuffer(publicKey);
     const sharedPx = ecies.derive(privateKeyBytes, publicKeyBytes);
@@ -606,17 +748,12 @@ export class AccountService {
     ownerPublicKeyBase58Check: string,
     messagingKeyName: string
   ): Promise<DefaultKeyPrivateInfo> {
-    const privateUsers = this.getPrivateUsers();
-    if (!(ownerPublicKeyBase58Check in privateUsers)) {
-      throw new Error(ERROR_USER_NOT_FOUND);
-    }
-    const privateUser = privateUsers[ownerPublicKeyBase58Check];
-    const seedHex = privateUser.seedHex;
+    const account = this.getAccountInfo(ownerPublicKeyBase58Check);
     // Compute messaging private key as sha256x2( sha256x2(secret key) || sha256x2(messageKeyname) )
     let messagingPrivateKeyBuff;
     try {
       messagingPrivateKeyBuff = await this.getMessagingKey(
-        privateUser,
+        account,
         messagingKeyName
       );
     } catch (e) {
@@ -644,7 +781,7 @@ export class AccountService {
 
     let messagingKeySignature = '';
     if (messagingKeyName === this.globalVars.defaultMessageKeyName) {
-      messagingKeySignature = this.signingService.signHashes(seedHex, [
+      messagingKeySignature = this.signingService.signHashes(account.seedHex, [
         messagingKeyHash,
       ])[0];
     }
@@ -740,9 +877,9 @@ export class AccountService {
     senderGroupKeyName: string,
     recipientPublicKey: string,
     message: string,
-    messagingKeyRandomness: string | undefined
+    messagingKeyRandomness?: string
   ): any {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
     const publicKeyBuffer =
@@ -775,7 +912,7 @@ export class AccountService {
     seedHex: string,
     encryptedHexes: any
   ): { [key: string]: any } {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
     const privateKeyBuffer = privateKey.getPrivate().toBuffer(undefined, 32);
 
     const decryptedHexes: { [key: string]: any } = {};
@@ -798,10 +935,10 @@ export class AccountService {
     seedHex: string,
     encryptedMessages: EncryptedMessage[],
     messagingGroups: MessagingGroup[],
-    messagingKeyRandomness: string | undefined,
-    ownerPublicKeyBase58Check: string | undefined
+    messagingKeyRandomness?: string,
+    ownerPublicKeyBase58Check?: string
   ): Promise<{ [key: string]: any }> {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
 
     const myPublicKey =
       ownerPublicKeyBase58Check ||
@@ -953,12 +1090,9 @@ export class AccountService {
     return decryptedHexes;
   }
 
-  // Private Getters and Modifiers
-
-  // TEMP: public for import flow
-  public addPrivateUser(userInfo: PrivateUserInfo): string {
+  addPrivateUser(userInfo: PrivateUserInfo): string {
     const privateUsers = this.getPrivateUsersRaw();
-    const privateKey = this.cryptoService.seedHexToPrivateKey(userInfo.seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(userInfo.seedHex);
 
     // Metamask login will be added with the master public key.
     let publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
@@ -1020,11 +1154,11 @@ export class AccountService {
   getLoginMethodWithPublicKeyBase58Check(
     publicKeyBase58Check: string
   ): LoginMethod {
-    const account = this.getPrivateUsers()[publicKeyBase58Check];
+    const account = this.getRootLevelUsers()[publicKeyBase58Check];
     return account.loginMethod || LoginMethod.DESO;
   }
 
-  private getPrivateUsers(): { [key: string]: PrivateUserInfo } {
+  getRootLevelUsers(): { [key: string]: PrivateUserInfo } {
     const privateUsers = this.getPrivateUsersRaw();
     const filteredPrivateUsers: { [key: string]: PrivateUserInfo } = {};
 
@@ -1048,26 +1182,170 @@ export class AccountService {
     return filteredPrivateUsers;
   }
 
+  updateAccountInfo(publicKey: string, attrs: Partial<PrivateUserInfo>): void {
+    const privateUsers = this.getPrivateUsersRaw();
+
+    if (!privateUsers[publicKey]) {
+      // we could be dealing with a sub account.
+      const lookupMap = this.getSubAccountReverseLookupMap();
+      const mapping = lookupMap[publicKey];
+
+      if (!mapping) {
+        throw new Error(`User not found for public key: ${publicKey}`);
+      }
+
+      const rootUser = privateUsers[mapping.lookupKey];
+
+      if (!rootUser) {
+        throw new Error(`Root user not found for public key: ${publicKey}`);
+      }
+
+      const subAccounts = rootUser.subAccounts ?? [];
+      const subAccountIndex = subAccounts.findIndex(
+        (a) => a.accountNumber === mapping.accountNumber
+      );
+
+      if (subAccountIndex < 0) {
+        throw new Error(
+          `Sub account not found for root user public key: ${publicKey} with account number: ${mapping.accountNumber}}`
+        );
+      }
+
+      subAccounts[subAccountIndex] = {
+        ...subAccounts[subAccountIndex],
+        ...attrs,
+      };
+
+      privateUsers[mapping.lookupKey] = {
+        ...rootUser,
+        subAccounts,
+      };
+    } else {
+      privateUsers[publicKey] = {
+        ...privateUsers[publicKey],
+        ...attrs,
+      };
+    }
+
+    this.setPrivateUsersRaw(privateUsers);
+  }
+
+  /**
+   * Adds a new sub account entry to the root user's subAccounts array.  If the
+   * account number is provided, we will use it. Otherwise we will generate a
+   * new account number that is not already in use. If the account number
+   * provided matches an existing account, we will just make sure it appears in
+   * the UI again if it had been hidden before. If it matches and the account is
+   * NOT hidden, then nothing happens.
+   */
+  addSubAccount(
+    rootPublicKey: string,
+    options: { accountNumber?: number } = {}
+  ): number {
+    // The zeroth account represents the "root" account key so we don't allow it
+    // for sub-accounts.  There is nothing particularly special about the root
+    // account, but for historical reasons its public key is used to index the
+    // main users map in local storage.
+    if (options.accountNumber === 0) {
+      this.updateAccountInfo(rootPublicKey, { isHidden: false });
+      return 0;
+    }
+
+    const privateUsers = this.getPrivateUsersRaw();
+    const parentAccount = privateUsers[rootPublicKey];
+
+    if (!parentAccount) {
+      throw new Error(
+        `Parent account not found for public key: ${rootPublicKey}`
+      );
+    }
+
+    const subAccounts = parentAccount.subAccounts ?? [];
+    const foundAccountIndex =
+      typeof options.accountNumber === 'number'
+        ? subAccounts.findIndex(
+            (a) => a.accountNumber === options.accountNumber
+          )
+        : -1;
+    const accountNumbers = new Set(subAccounts.map((a) => a.accountNumber));
+    const accountNumber =
+      options.accountNumber ?? generateAccountNumber(accountNumbers);
+
+    let newSubAccounts: SubAccountMetadata[] = [];
+
+    if (foundAccountIndex !== -1) {
+      // If accountNumber is provided and we already have it, we just make sure
+      // the existing account is not hidden.
+      subAccounts[foundAccountIndex].isHidden = false;
+      newSubAccounts = subAccounts;
+    } else {
+      // otherwise we create a new sub account
+      newSubAccounts = subAccounts.concat({
+        accountNumber,
+        isHidden: false,
+      });
+
+      this.updateSubAccountReverseLookupMap({
+        lookupKey: rootPublicKey,
+        accountNumber,
+      });
+    }
+
+    // sanity check that we're not adding a duplicate account number before we save.
+    const accountNumbersSet = new Set(
+      newSubAccounts.map((a) => a.accountNumber)
+    );
+    if (accountNumbersSet.size !== newSubAccounts.length) {
+      throw new Error(
+        `Duplicate account number ${accountNumber} found for root user public key: ${rootPublicKey}`
+      );
+    }
+
+    this.updateAccountInfo(rootPublicKey, { subAccounts: newSubAccounts });
+
+    return accountNumber;
+  }
+
+  getAccountPublicKeyBase58(
+    rootPublicKeyBase58: string,
+    accountNumber: number = 0
+  ) {
+    // Account number 0 is reserved for the parent account, so we can just
+    // return the parent key directly in this case.
+    if (accountNumber === 0) {
+      return rootPublicKeyBase58;
+    }
+
+    const users = this.getRootLevelUsers();
+    const parentAccount = users[rootPublicKeyBase58];
+
+    if (!parentAccount) {
+      throw new Error(
+        `Account not found for public key: ${rootPublicKeyBase58}`
+      );
+    }
+
+    const childKey = this.cryptoService.mnemonicToKeychain(
+      parentAccount.mnemonic,
+      {
+        accountNumber,
+        extraText: parentAccount.extraText,
+      }
+    );
+    const ec = new EC('secp256k1');
+    const keyPair = ec.keyFromPrivate(childKey.privateKey);
+
+    return this.cryptoService.publicKeyToDeSoPublicKey(
+      keyPair,
+      parentAccount.network
+    );
+  }
+
+  // Private Getters and Modifiers
+
   private getPrivateUsersRaw(): { [key: string]: PrivateUserInfo } {
     return JSON.parse(
       localStorage.getItem(AccountService.USERS_STORAGE_KEY) || '{}'
-    );
-  }
-
-  encryptedSeedHexToPublicKeyBase58Check(encryptedSeedHex: string): string {
-    return this.seedHexToPublicKeyBase58Check(
-      this.cryptoService.decryptSeedHex(
-        encryptedSeedHex,
-        this.globalVars.hostname
-      )
-    );
-  }
-
-  seedHexToPublicKeyBase58Check(seedHex: string): string {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
-    return this.cryptoService.privateKeyToDeSoPublicKey(
-      privateKey,
-      this.globalVars.network
     );
   }
 
@@ -1077,6 +1355,35 @@ export class AccountService {
     localStorage.setItem(
       AccountService.USERS_STORAGE_KEY,
       JSON.stringify(privateUsers)
+    );
+  }
+
+  /**
+   * It's possible for the reverse lookup to get out of sync, especially during
+   * development or testing. This method will fix any discrepancies by iterating
+   * through all the accounts and adding any missing entries.
+   */
+  private initializeSubAccountReverseLookup() {
+    const lookupMap = this.getSubAccountReverseLookupMap();
+    const users = this.getRootLevelUsers();
+
+    Object.keys(users).forEach((lookupKey) => {
+      const subAccounts = users[lookupKey].subAccounts ?? [];
+      subAccounts.forEach((subAccount) => {
+        const publicKey = this.getAccountPublicKeyBase58(
+          lookupKey,
+          subAccount.accountNumber
+        );
+        lookupMap[publicKey] = {
+          lookupKey,
+          accountNumber: subAccount.accountNumber,
+        };
+      });
+    });
+
+    window.localStorage.setItem(
+      SUB_ACCOUNT_REVERSE_LOOKUP_KEY,
+      JSON.stringify(lookupMap)
     );
   }
 }

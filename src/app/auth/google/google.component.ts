@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { GoogleAuthState } from '../../../types/identity';
+import { GoogleAuthState, LoginMethod } from '../../../types/identity';
 import { AccountService } from '../../account.service';
 import { RouteNames } from '../../app-routing.module';
 import { BackendAPIService } from '../../backend-api.service';
@@ -83,17 +83,18 @@ export class GoogleComponent implements OnInit {
           const mnemonic = fileContents.mnemonic;
           const extraText = fileContents.extraText;
           const network = fileContents.network;
-          const keychain = this.cryptoService.mnemonicToKeychain(
-            mnemonic,
-            extraText
-          );
+          const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+            extraText,
+          });
 
           this.publicKey = this.accountService.addUser(
             keychain,
             mnemonic,
             extraText,
             network,
-            true
+            {
+              loginMethod: LoginMethod.GOOGLE,
+            }
           );
         } catch (err) {
           console.error(err);
@@ -137,16 +138,17 @@ export class GoogleComponent implements OnInit {
     this.googleDrive
       .uploadFile(this.fileName(), JSON.stringify(userInfo))
       .subscribe(() => {
-        const keychain = this.cryptoService.mnemonicToKeychain(
-          mnemonic,
-          extraText
-        );
+        const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+          extraText,
+        });
         this.publicKey = this.accountService.addUser(
           keychain,
           mnemonic,
           extraText,
           network,
-          true
+          {
+            loginMethod: LoginMethod.GOOGLE,
+          }
         );
         this.loading = false;
       });

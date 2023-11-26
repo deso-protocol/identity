@@ -1,0 +1,57 @@
+<div class="dialog">
+  <header class="dialog__header">
+    <button class="dialog__x" style="top: 0; right: 0" (click)="cancel()">
+      <i-feather name="x" />
+    </button>
+    <h1 class="dialog__title">Remove Account</h1>
+  </header>
+  <div class="dialog__body">
+    <ng-container
+      *ngIf="this.data.isLastAccountInGroup; else simpleRecoverMessage"
+    >
+      <p class="margin-bottom--medium">
+        Make sure you have backed up your seed phrase before continuing!
+      </p>
+      <p class="margin-bottom--small warning--error warning--error--medium">
+        Your account will be irrecoverable if you lose your seed phrase.
+      </p>
+    </ng-container>
+    <ng-template #simpleRecoverMessage>
+      <p class="margin-bottom--small">
+        You can recover this account as long as you have the account number.
+      </p>
+      <div class="padding-bottom--medium padding-top--medium">
+        <span class="font-size--small margin-right--small text--text-lightest"
+          >Account number:&nbsp;&nbsp;<code>{{
+            this.data.accountNumber
+          }}</code></span
+        >
+        <button
+          (click)="copyAccountNumber()"
+          class="button--primary button--xsmall margin-left--auto"
+          style="width: auto"
+        >
+          <i-feather
+            [name]="copySuccess ? 'check' : 'copy'"
+            style="height: 12px; width: 12px"
+          />
+          Copy
+        </button>
+      </div>
+    </ng-template>
+  </div>
+  <footer class="display--flex flex--column">
+    <button
+      class="button--medium button--primary margin-bottom--medium"
+      (click)="confirm()"
+    >
+      Confirm
+    </button>
+    <button
+      class="button--medium button--primary--outline margin-right--small"
+      (click)="cancel()"
+    >
+      Cancel
+    </button>
+  </footer>
+</div>

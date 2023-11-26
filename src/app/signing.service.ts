@@ -21,12 +21,17 @@ export class SigningService {
   signJWT(
     seedHex: string,
     isDerived: boolean,
-    expiration: string | number = 60 * 10
+    { expiration = 60 * 10 }: { expiration?: string | number } = {}
   ): string {
     const keyEncoder = new KeyEncoder('secp256k1');
-    const encodedPrivateKey = keyEncoder.encodePrivate(seedHex, 'raw', 'pem');
+    const keys = this.cryptoService.seedHexToKeyPair(seedHex);
+    const encodedPrivateKey = keyEncoder.encodePrivate(
+      keys.getPrivate('hex'),
+      'raw',
+      'pem'
+    );
     if (isDerived) {
-      const derivedPrivateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+      const derivedPrivateKey = this.cryptoService.seedHexToKeyPair(seedHex);
       const derivedPublicKeyBase58Check =
         this.cryptoService.privateKeyToDeSoPublicKey(
           derivedPrivateKey,
@@ -54,7 +59,7 @@ export class SigningService {
     transactionHex: string,
     isDerivedKey: boolean
   ): string {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
 
     const transactionBytes = new Buffer(transactionHex, 'hex');
     const [_, v1FieldsBuffer] = TransactionV0.fromBytes(transactionBytes) as [
@@ -84,7 +89,7 @@ export class SigningService {
   }
 
   signHashes(seedHex: string, unsignedHashes: string[]): string[] {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
     const signedHashes = [];
 
     for (const unsignedHash of unsignedHashes) {
@@ -100,7 +105,7 @@ export class SigningService {
     seedHex: string,
     unsignedHashes: string[]
   ): { s: any; r: any; v: number | null }[] {
-    const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+    const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
     const signedHashes = [];
 
     for (const unsignedHash of unsignedHashes) {

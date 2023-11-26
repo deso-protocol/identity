@@ -164,6 +164,7 @@ $colors: (
 // SPACING UNITS
 //-------------------------------
 $spacing-units: (
+  'auto': auto,
   'none': 0,
   'xsmall': 4px,
   'small': 8px,
@@ -353,7 +354,8 @@ h6 {
   }
 }
 
-p {
+p,
+label {
   @include spacing('margin', 'none');
   font-weight: normal;
   line-height: 1.5;
@@ -465,12 +467,21 @@ a,
     text-decoration: none;
   }
 }
+
+.button--icon {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
 .button--primary {
   @extend %button;
   @include color('blue', 'base', 'background-color');
   @include color('neutral', 'white', 'color');
   &:hover {
-    @include color('blue', 'darker', 'background-color');
+    @include color('blue', 'dark', 'background-color');
   }
 }
 .button--primary--outline {
@@ -480,6 +491,7 @@ a,
   @include color('neutral', 'transparent', 'background-color');
   @include color('text', 'lighter', 'color');
   &:hover {
+    @include color('neutral', 'white', 'color');
     @include color('blue', 'darker', 'background-color');
   }
 }
@@ -536,6 +548,13 @@ a,
 //-------------------------------
 // BUTTONS = Sizes
 //-------------------------------
+.button--xsmall {
+  @include font-size('xsmall');
+  @include spacing('padding-top', 'xsmall');
+  @include spacing('padding-bottom', 'xsmall');
+  @include spacing('padding-left', 'medium');
+  @include spacing('padding-right', 'medium');
+}
 .button--small {
   @include font-size('small');
   @include spacing('padding-top', 'small');
@@ -617,6 +636,17 @@ a,
     flex-direction: row-reverse;
   }
 }
+
+//-------------------------------
+// POSITION
+//-------------------------------
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+
 //-------------------------------
 // LAYOUT
 //-------------------------------
@@ -788,9 +818,8 @@ a,
   flex-direction: column;
   gap: 8px;
   max-height: 245px;
-  overflow: scroll;
   border: 1px solid;
-  @include spacing('padding', 'medium');
+  scroll-behavior: smooth;
   @include spacing('padding-top', 'small');
   @include color('blue', 'dark', 'border-color');
   @include border-radius('base');
@@ -802,11 +831,12 @@ a,
   display: flex;
   align-items: center;
   @include border-radius('pill');
+  @include spacing('margin-left', 'medium');
+  @include spacing('margin-right', 'base');
   @include spacing('padding-left', 'small');
   @include spacing('padding-right', 'medium');
   @include spacing('padding-top', 'small');
   @include spacing('padding-bottom', 'small');
-  @include spacing('margin-top', 'small');
   @include color('text', 'lighter', 'color');
   @include color('blue', 'darker', 'background-color');
   @include color('blue', 'dark', 'border-color');
@@ -814,9 +844,59 @@ a,
   @include font-size('small');
 
   &:hover {
-    @include color('blue', 'light', 'border-color');
+    @include color('text', 'lighter', 'border-color');
     cursor: pointer;
   }
+
+  &--just-added {
+    @include color('blue', 'light', 'border-color');
+    @include color('blue', 'dark', 'background-color');
+  }
+}
+.section--accounts__remove {
+  border-radius: 99px;
+  position: relative;
+  width: 26px;
+  height: 26px;
+  @include color('blue', 'darker', 'background-color');
+  @include spacing('right', 'medium');
+  @include spacing('padding', 'xsmall');
+  i-feather[name='power'] {
+    @include color('text', 'base', 'color');
+    width: 16px;
+    height: 16px;
+  }
+  &:hover {
+    @include color('red', 'dark', 'background-color');
+    cursor: pointer;
+    i-feather[name='power'] {
+      @include color('red', 'lighter', 'color');
+    }
+  }
+}
+.section--accounts__recover {
+  border: 1px solid;
+  border-radius: 20px;
+  @include color('blue', 'dark', 'border-color');
+  @include spacing('padding', 'medium');
+}
+.section--accounts__recover--actions {
+  display: flex;
+  flex-direction: row;
+  @include spacing('gap', 'small');
+  @include media(mobile) {
+    flex-direction: column;
+  }
+}
+//-------------------------------
+// SECTION = Sub Actions
+//-------------------------------
+.section--subactions {
+  border-top: 1px solid;
+  @include spacing('padding', 'medium');
+  @include color('blue', 'dark', 'border-color');
+  @include spacing('padding-top', 'medium');
+  @include spacing('margin-top', 'small');
 }
 //-------------------------------
 // SECTION = Create Seed Phrase
@@ -844,6 +924,11 @@ a,
   display: flex;
   align-items: center;
   @include spacing('gap', 'small');
+  @include media(mobile) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
 }
 .section--seed__advanced {
   border-top: 1px solid;
@@ -862,6 +947,17 @@ a,
   @include spacing('padding', 'large');
   @include color('blue', 'dark', 'border-color');
   @include border-radius('base');
+}
+.section--starter__option--captcha {
+  border: 1px solid;
+  @include spacing('padding', 'large');
+  @include color('blue', 'dark', 'border-color');
+  @include border-radius('base');
+  @include media(mobile) {
+    padding: 0;
+    border-radius: none;
+    border: none;
+  }
 }
 //-------------------------------
 // SECTION = Phone Page
@@ -911,6 +1007,10 @@ a,
   @include font-size('medium');
   @include spacing('padding', 'medium');
   @include color('blue', 'dark', 'border-color');
+}
+.input--textarea--small {
+  @include spacing('padding', 'small');
+  @include font-size('small');
 }
 .input--phone {
   width: 100%;
@@ -1030,6 +1130,8 @@ a,
 .warning--error {
   text-align: center;
   line-height: 1.5;
+  border: 1px solid;
+  @include color('red', 'dark', 'border-color');
   @include border-radius('base');
   @include font-size('small');
   @include spacing('padding', 'small');
@@ -1119,14 +1221,16 @@ a,
 }
 .spinner-border {
   display: inline-block;
-  width: 2rem;
-  height: 2rem;
+  width: 30px;
+  height: 30px;
   vertical-align: text-bottom;
   border: 0.25em solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
   -webkit-animation: 0.75s linear infinite spinner-border;
   animation: 0.75s linear infinite spinner-border;
+  padding: 40px;
+  margin: 40px;
 }
 
 //-------------------------
@@ -1162,3 +1266,52 @@ a,
     background-color: rgba(0, 0, 0, 0.8) !important;
   }
 }
+//-------------------------
+// Material Dialog
+//-------------------------
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: transparent !important;
+}
+.cdk-overlay-pane {
+  overflow-y: auto;
+}
+.cdk-overlay-dark-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(5px);
+}
+.dialog {
+  border-radius: 20px;
+  max-width: 600px;
+  box-shadow: 0 0 10px black;
+  @include color('blue', 'darker', 'background-color');
+  @include spacing('padding', 'base');
+}
+.dialog__header {
+  position: relative;
+  @include color('neutral', 'white', 'color');
+}
+.dialog__x {
+  border: none;
+  background: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  @include color('text', 'base', 'color');
+  &:hover {
+    @include color('neutral', 'white', 'color');
+  }
+}
+.dialog__title {
+  @include font-size('large');
+  @include color('neutral', 'white', 'color');
+  @include font-weight('medium');
+}
+.dialog__body {
+  padding: 12px 0;
+}
+//-------------------------
+// Material Dialog
+//-------------------------

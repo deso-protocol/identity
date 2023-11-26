@@ -1,0 +1,210 @@
+<div class="spinner-border" *ngIf="loadingAccounts; else accountsSection"></div>
+<ng-template #accountsSection>
+  <div class="section--accounts" *ngIf="this.accountGroups.size > 0">
+    <div class="section--accounts__header margin-bottom--medium">
+      Select an account
+    </div>
+
+    <ng-container
+      *ngFor="
+        let group of accountGroups | keyvalue : keyValueSort;
+        let i = index
+      "
+    >
+      <div *ngIf="group.value.accounts.length" class="margin-bottom--medium">
+        <p class="margin-bottom--small font-size--xsmall">Account Group</p>
+        <ul
+          [id]="'account-select-group-' + group.key"
+          class="section--accounts__list container--scrollbar margin-bottom--small relative"
+        >
+          <li
+            [id]="'account-select-' + account.publicKey"
+            *ngFor="let account of group.value.accounts; let j = index"
+          >
+            <div
+              class="display--flex items--center margin-top--small"
+              [ngClass]="{
+                'margin-bottom-medium': isMetaMaskAccountGroup(group.key)
+              }"
+            >
+              <button
+                class="section--accounts__item margin-right--small"
+                data-control-name="account-select-item"
+                (click)="selectAccount(account.publicKey)"
+                role="button"
+                [ngClass]="{
+                  'section--accounts__item--just-added': account.publicKey === this.justAddedPublicKey,
+                }"
+              >
+                <div class="display--flex items--center">
+                  <img
+                    class="avatar--rounded avatar--large margin-right--small"
+                    [appAvatar]="account.publicKey"
+                  />
+                  <div>
+                    <div>
+                      <span
+                        [ngClass]="{
+                          'font-weight--bold': account.publicKey === this.justAddedPublicKey,
+                          'text--neutral-white': account.publicKey === this.justAddedPublicKey,
+                        }"
+                        [title]="getAccountDisplayName(account)"
+                        >{{
+                          getAccountDisplayName(account)
+                            | truncateAddressOrUsername
+                        }}</span
+                      >
+                      <span
+                        *ngIf="account.lastUsed && !this.globalVars.isMobile()"
+                        class="font-size--xsmall text--green-lighter margin-left--small"
+                        >Last used</span
+                      >
+                    </div>
+                    <div
+                      *ngIf="this.globalVars.isMobile()"
+                      class="display--flex"
+                      [ngClass]="{
+                        'font-weight--bold': account.publicKey === this.justAddedPublicKey,
+                        'text--neutral-white': account.publicKey === this.justAddedPublicKey,
+                      }"
+                    >
+                      <span class="font-size--xsmall"
+                        >account #{{ account.accountNumber }}</span
+                      >
+                      <span
+                        *ngIf="account.lastUsed"
+                        class="font-size--xsmall text--green-lighter margin-left--auto"
+                        >Last used</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="display--flex items--center">
+                  <div
+                    *ngIf="!this.globalVars.isMobile()"
+                    class="display--flex flex--column items--end"
+                    [ngClass]="{
+                      'font-weight--bold': account.publicKey === this.justAddedPublicKey,
+                      'text--neutral-white': account.publicKey === this.justAddedPublicKey,
+                    }"
+                  >
+                    <span
+                      class="font-weight--bold font-size--xsmall margin-right--small text--text-lightest"
+                      >{{
+                        globalVars.abbreviateNumber(account.balanceNanos / 1e9)
+                      }}
+                      $DESO</span
+                    >
+                    <span class="font-size--xsmall margin-right--small"
+                      >account #{{ account.accountNumber }}</span
+                    >
+                  </div>
+                  <img
+                    [src]="
+                      getLoginMethodIcon(
+                        accountService.getLoginMethodWithPublicKeyBase58Check(
+                          group.key
+                        )
+                      )
+                    "
+                    class="section--accounts__icon"
+                  />
+                </div>
+              </button>
+              <div class="section--accounts__remove">
+                <button
+                  class="button--icon"
+                  (click)="hideAccount(group.key, account)"
+                >
+                  <i-feather name="power"></i-feather>
+                </button>
+              </div>
+            </div>
+          </li>
+          <!-- Group Actions -->
+          <div
+            *ngIf="!isMetaMaskAccountGroup(group.key)"
+            class="section--subactions"
+          >
+            <div class="display--flex">
+              <button
+                class="button--xsmall button--primary display--flex items--center margin-right--small"
+                style="width: auto; white-space: nowrap"
+                aria-label="Add account"
+                (click)="addSubAccount(group.key)"
+              >
+                <i-feather
+                  name="user-plus"
+                  class="margin-right--xsmall"
+                  style="height: 14px; width: 14px"
+                />
+                Account
+              </button>
+              <button
+                class="button--xsmall button--primary--outline display--flex items--center margin-right--small"
+                style="width: auto; white-space: nowrap"
+                (click)="toggleRecoverSubAccountForm(group.key)"
+              >
+                <i-feather
+                  name="power"
+                  class="margin-right--xsmall"
+                  style="height: 12px; width: 12px"
+                />
+                Recover
+              </button>
+              <button
+                *ngIf="shouldShowExportSeedButton(group.key)"
+                class="button--xsmall button--red display--flex items--center"
+                style="width: auto; white-space: nowrap"
+                (click)="exportSeed(group.key)"
+              >
+                <i-feather
+                  name="save"
+                  class="margin-right--xsmall"
+                  style="height: 14px; width: 14px"
+                />
+                Backup
+              </button>
+            </div>
+            <form
+              *ngIf="group.value.showRecoverSubAccountInput"
+              (submit)="recoverSubAccount($event, group.key)"
+              class="margin-top--medium section--accounts__recover"
+            >
+              <label
+                for="account-number"
+                class="display--block font-size--small margin-bottom--medium"
+                >To recover your account, please enter the
+                <span class="text--text-lightest">account number</span> that was
+                associated with it:</label
+              >
+              <input
+                [(ngModel)]="accountNumberToRecover"
+                name="account-number"
+                id="account-number"
+                type="number"
+                class="input--textarea input--textarea--small"
+                style="width: 100px"
+                step="1"
+              />
+              <button
+                type="submit"
+                class="button--primary button--small margin-left--small displ"
+                style="width: auto; white-space: nowrap"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+        </ul>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+<div
+  *ngIf="this.accountGroups.size > 0"
+  class="text--divider margin-top--medium margin-bottom--medium"
+>
+  or
+</div>
+<app-log-in-options></app-log-in-options>

@@ -24,9 +24,9 @@ import {
   TransactionMetadataDeleteUserAssociation,
   TransactionMetadataFollow,
   TransactionMetadataLike,
-  TransactionMetadataNewMessage,
   TransactionMetadataNFTBid,
   TransactionMetadataNFTTransfer,
+  TransactionMetadataNewMessage,
   TransactionMetadataPrivateMessage,
   TransactionMetadataSubmitPost,
   TransactionMetadataSwapIdentity,
@@ -295,9 +295,7 @@ export class IdentityService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-
     const isDerived = !!derivedPublicKeyBase58Check;
-
     const signedTransactionHex = this.signingService.signTransaction(
       seedHex,
       transactionHex,
@@ -308,6 +306,7 @@ export class IdentityService {
       signedTransactionHex,
     });
   }
+
   // Encrypt with shared secret
   private handleEncrypt(data: any): void {
     if (!this.approve(data, AccessLevel.ApproveAll)) {
@@ -475,7 +474,11 @@ export class IdentityService {
     }
 
     // check for cookie access
-    this.cookieService.put('deso-test-access', 'true');
+    this.cookieService.put('deso-test-access', 'true', {
+      path: '/',
+      secure: true,
+      sameSite: 'none',
+    });
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
     // store if browser is supported or not
@@ -541,7 +544,6 @@ export class IdentityService {
     if (accessLevel < requiredAccessLevel) {
       return false;
     }
-
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname

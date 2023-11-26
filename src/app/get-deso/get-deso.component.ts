@@ -94,7 +94,11 @@ export class GetDesoComponent implements OnInit {
         '&destinationTickers=DESO',
         '&destinationTicker=DESO',
         `&destinationAddress=${this.publicKeyAdded || ''}`, // TODO: confirm publicKeyAdded is correct.
-        `&affiliateAddress=BC1YLgHhMFnUrzQRpZCpK7TDxVGoGnAk539JqpYWgJ8uW9R7zCCdGHK`,
+        `&affiliateAddress=${
+          this.globalVars.network === Network.mainnet
+            ? 'BC1YLgHhMFnUrzQRpZCpK7TDxVGoGnAk539JqpYWgJ8uW9R7zCCdGHK'
+            : 'tBCKX1RURo8HRUcYVNrpYj1JZcY1yvWuhSi6NDfKXRudwQpDkAd8YC'
+        }`,
         `&now=${Date.now()}`,
       ].join('')
     );

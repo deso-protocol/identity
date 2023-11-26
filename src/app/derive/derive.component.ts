@@ -34,7 +34,6 @@ export class DeriveComponent implements OnInit {
   transactionSpendingLimitResponse:
     | TransactionSpendingLimitResponse
     | undefined;
-  hasUsers = false;
   hoveredAccount = -1;
   publicKeyBase58Check: string | undefined = undefined;
   derivedPublicKeyBase58Check: string | undefined = undefined;
@@ -75,6 +74,11 @@ export class DeriveComponent implements OnInit {
         throw Error('invalid query parameter permutation');
       }
       if (params.publicKey) {
+        if (!this.publicKeyBase58Check) {
+          this.accountService.updateAccountInfo(params.publicKey, {
+            lastLoginTimestamp: Date.now(),
+          });
+        }
         this.publicKeyBase58Check = params.publicKey;
         this.isSingleAccount = true;
       }

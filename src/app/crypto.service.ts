@@ -43,16 +43,7 @@ export class CryptoService {
       return false;
     }
 
-    const supportsStorageAccess =
-      typeof document.hasStorageAccess === 'function';
-    const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
-    const isSafari = !isChrome && navigator.userAgent.indexOf('Safari') > -1;
-
-    // Firefox and Edge support the storage access API but do not enforce it.
-    // For now, only use cookies if we support storage access and use Safari.
-    const mustUseStorageAccess = supportsStorageAccess && isSafari;
-
-    return mustUseStorageAccess;
+    return typeof document.hasStorageAccess === 'function';
   }
 
   // 32 bytes = 256 bits is plenty of entropy for encryption
@@ -86,6 +77,9 @@ export class CryptoService {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.put(storageKey, encryptionKey, {
           expires: new Date('2100/01/01 00:00:00'),
+          path: '/',
+          secure: true,
+          sameSite: 'none',
         });
       }
     } else {
@@ -138,20 +132,29 @@ export class CryptoService {
 
   mnemonicToKeychain(
     mnemonic: string,
-    extraText?: string,
-    nonStandard?: boolean
+    {
+      extraText,
+      nonStandard,
+      accountNumber = 0,
+    }: {
+      extraText?: string;
+      nonStandard?: boolean;
+      accountNumber?: number;
+    } = {}
   ): HDNode {
     const seed = bip39.mnemonicToSeedSync(mnemonic, extraText);
-    // @ts-ignore
-    return HDKey.fromMasterSeed(seed).derive("m/44'/0'/0'/0/0", nonStandard);
+    return generateSubAccountKeys(seed, accountNumber, {
+      nonStandard,
+    });
   }
 
   keychainToSeedHex(keychain: HDNode): string {
     return keychain.privateKey.toString('hex');
   }
 
-  seedHexToPrivateKey(seedHex: string): EC.KeyPair {
+  seedHexToKeyPair(seedHex: string): EC.KeyPair {
     const ec = new EC('secp256k1');
+
     return ec.keyFromPrivate(seedHex);
   }
 
@@ -160,7 +163,7 @@ export class CryptoService {
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    const privateKey = this.seedHexToPrivateKey(seedHex);
+    const privateKey = this.seedHexToKeyPair(seedHex);
     return this.privateKeyToDeSoPublicKey(privateKey, this.globalVars.network);
   }
 
@@ -278,4 +281,23 @@ export class CryptoService {
 
     return ethAddressChecksum;
   }
+}
+
+/**
+ * We set the account according to the following derivation path scheme:
+ * m / purpose' / coin_type' / account' / change / address_index
+ * See for more details: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account
+ */
+function generateSubAccountKeys(
+  seedBytes: Buffer,
+  accountIndex: number,
+  options?: { nonStandard?: boolean }
+) {
+  // We are using a customized version of hdkey and the derive signature types
+  // are not compatible with the "nonStandard" flag. Hence the ts-ignore.
+  return HDKey.fromMasterSeed(seedBytes).derive(
+    `m/44'/0'/${accountIndex}'/0/0`,
+    // @ts-ignore
+    !!options?.nonStandard
+  );
 }

@@ -72,14 +72,15 @@ export class LogInSeedComponent implements OnInit {
         return;
       }
 
-      const keychain = this.cryptoService.mnemonicToKeychain(
-        mnemonic,
-        extraText
-      );
+      const keychain = this.cryptoService.mnemonicToKeychain(mnemonic, {
+        extraText,
+      });
       const keychainNonStandard = this.cryptoService.mnemonicToKeychain(
         mnemonic,
-        extraText,
-        true
+        {
+          extraText,
+          nonStandard: true,
+        }
       );
       userPublicKey = this.accountService.addUser(
         keychain,
@@ -92,7 +93,7 @@ export class LogInSeedComponent implements OnInit {
       if (keychain.publicKey !== keychainNonStandard.publicKey) {
         const seedHex =
           this.cryptoService.keychainToSeedHex(keychainNonStandard);
-        const privateKey = this.cryptoService.seedHexToPrivateKey(seedHex);
+        const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
         const publicKey = this.cryptoService.privateKeyToDeSoPublicKey(
           privateKey,
           network
