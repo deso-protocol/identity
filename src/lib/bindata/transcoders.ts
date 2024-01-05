@@ -50,6 +50,31 @@ export const VarBuffer: Transcoder<Buffer> = {
   write: (bytes) => Buffer.concat([uvarint64ToBuf(bytes.length), bytes]),
 };
 
+export const VarBufferArray: Transcoder<Buffer[]> = {
+  read: (bytes) => {
+    let [count, buffer] = bufToUvarint64(bytes);
+
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      let size;
+      [size, buffer] = bufToUvarint64(buffer);
+      result.push(buffer.slice(0, size));
+      buffer = buffer.slice(size);
+    }
+
+    return [result, buffer];
+  },
+  write: (buffers) => {
+    const count = uvarint64ToBuf(buffers.length);
+    return Buffer.concat([
+      count,
+      ...buffers.map((buffer) =>
+        Buffer.concat([uvarint64ToBuf(buffer.length), buffer])
+      ),
+    ]);
+  },
+};
+
 export const TransactionNonceTranscoder: Transcoder<TransactionNonce | null> = {
   read: (bytes) => {
     return TransactionNonce.fromBytes(bytes) as [TransactionNonce, Buffer];

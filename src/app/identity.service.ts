@@ -35,6 +35,7 @@ import {
   TransactionMetadataUpdateGlobalParams,
   TransactionMetadataUpdateNFT,
   TransactionMetadataUpdateProfile,
+  TransactionMetadataRegisterAsValidator,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 import { AccessLevel, PublicUserInfo } from '../types/identity';
@@ -518,6 +519,7 @@ export class IdentityService {
       case TransactionMetadataDAOCoin:
       case TransactionMetadataTransferDAOCoin:
       case TransactionMetadataDAOCoinLimitOrder:
+      case TransactionMetadataRegisterAsValidator:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

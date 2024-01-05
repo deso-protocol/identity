@@ -11,6 +11,7 @@ import {
   Uint8,
   Uvarint64,
   VarBuffer,
+  VarBufferArray,
 } from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {
@@ -581,6 +582,31 @@ export class TransactionMetadataNewMessage extends BinaryRecord {
   newMessageOperation: number = 0;
 }
 
+export class TransactionMetadataRegisterAsValidator extends TransactionMetadata {
+  @Transcode(VarBufferArray)
+  domains: Buffer[] = [];
+
+  @Transcode(Boolean)
+  disableDelegatedStake: boolean = false;
+
+  @Transcode(Uvarint64)
+  delegatedStakeCommissionBasisPoints: number = 0;
+
+  // TODO: Technically this is a bls public key,
+  // but under the hood it's really just a byte array.
+  // The challenge is converting this into something human
+  // readable in the UI.
+  @Transcode(VarBuffer)
+  votingPublicKey: Buffer = Buffer.alloc(0);
+
+  // TODO: Technically this is a bls signature,
+  // but under the hood it's really just a byte array.
+  // The challenge is converting this into something human
+  // readable in the UI.
+  @Transcode(VarBuffer)
+  votingAuthorization: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -614,6 +640,7 @@ export const TransactionTypeMetadataMap = {
   31: TransactionMetadataAccessGroup,
   32: TransactionMetadataAccessGroupMembers,
   33: TransactionMetadataNewMessage,
+  34: TransactionMetadataRegisterAsValidator,
 };
 
 export class Transaction extends BinaryRecord {
