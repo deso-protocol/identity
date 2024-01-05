@@ -2,6 +2,7 @@ import { BinaryRecord, Transcode } from '../bindata';
 import {
   ArrayOf,
   Boolean,
+  BoolOptional,
   ChunkBuffer,
   Enum,
   FixedBuffer,
@@ -609,6 +610,18 @@ export class TransactionMetadataRegisterAsValidator extends TransactionMetadata 
 
 export class TransactionMetadataUnregisterAsValidator extends TransactionMetadata {}
 
+export class TransactionMetadataStake extends TransactionMetadata {
+  @Transcode(VarBuffer)
+  validatorPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Uint8)
+  rewardMethod: number = 0;
+
+  // TODO: We may want a better way to handle uint256s.
+  @Transcode(BoolOptional(VarBuffer))
+  stakeAmountNanos: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -644,6 +657,7 @@ export const TransactionTypeMetadataMap = {
   33: TransactionMetadataNewMessage,
   34: TransactionMetadataRegisterAsValidator,
   35: TransactionMetadataUnregisterAsValidator,
+  36: TransactionMetadataStake,
 };
 
 export class Transaction extends BinaryRecord {

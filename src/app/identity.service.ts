@@ -37,6 +37,7 @@ import {
   TransactionMetadataUpdateProfile,
   TransactionMetadataRegisterAsValidator,
   TransactionMetadataUnregisterAsValidator,
+  TransactionMetadataStake,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 import { AccessLevel, PublicUserInfo } from '../types/identity';
@@ -522,6 +523,7 @@ export class IdentityService {
       case TransactionMetadataDAOCoinLimitOrder:
       case TransactionMetadataRegisterAsValidator:
       case TransactionMetadataUnregisterAsValidator:
+      case TransactionMetadataStake:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

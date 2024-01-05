@@ -96,6 +96,26 @@ export function Optional<T>(transcoder: Transcoder<T>): Transcoder<T | null> {
   };
 }
 
+export function BoolOptional<T>(
+  transcoder: Transcoder<T>
+): Transcoder<T | null> {
+  return {
+    read: (bytes: Buffer) => {
+      const existence = bytes.readUInt8(0) != 0;
+      if (!existence) {
+        return [null, bytes.slice(1)];
+      }
+      return transcoder.read(bytes.slice(1));
+    },
+    write: (value: T | null) => {
+      if (value === null) {
+        return Buffer.alloc(1);
+      }
+      return Buffer.concat([Buffer.alloc(1, 1), transcoder.write(value)]);
+    },
+  };
+}
+
 export const ChunkBuffer = (width: number): Transcoder<Buffer[]> => ({
   read: (bytes) => {
     let [count, buffer] = bufToUvarint64(bytes);

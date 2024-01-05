@@ -39,6 +39,7 @@ import {
   TransactionSpendingLimit,
   TransactionMetadataRegisterAsValidator,
   TransactionMetadataUnregisterAsValidator,
+  TransactionMetadataStake,
 } from '../../lib/deso/transaction';
 import { ExtraData } from '../../types/identity';
 import { AccountService } from '../account.service';
@@ -597,6 +598,18 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataUnregisterAsValidator:
         description = 'unregister as a validator';
         break;
+      case TransactionMetadataStake:
+        const stakeMetadata = this.transaction
+          .metadata as TransactionMetadataStake;
+        const stakeValidatorPublicKey = this.base58KeyCheck(
+          stakeMetadata.validatorPublicKey
+        );
+        publicKeys = [stakeValidatorPublicKey];
+        const stakeAmountNanos = this.hexNanosToUnitString(
+          stakeMetadata.stakeAmountNanos
+        );
+        description = `stake ${stakeAmountNanos} $DESO to ${stakeValidatorPublicKey}`;
+        break;
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -617,6 +630,8 @@ export class ApproveComponent implements OnInit {
     return bs58check.encode(Buffer.from([...prefix, ...keyBytes]));
   }
 
+  // TODO: create hexBaseUnitsToUnitString function to support proper
+  // DAO Coin base unit conversions.
   hexNanosToUnitString(nanos: Buffer): string {
     return this.nanosToUnitString(parseInt(nanos.toString('hex'), 16));
   }
