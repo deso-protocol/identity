@@ -39,6 +39,7 @@ import {
   TransactionMetadataUnregisterAsValidator,
   TransactionMetadataStake,
   TransactionMetadataUnstake,
+  TransactionMetadataUnlockStake,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 import { AccessLevel, PublicUserInfo } from '../types/identity';
@@ -526,6 +527,7 @@ export class IdentityService {
       case TransactionMetadataUnregisterAsValidator:
       case TransactionMetadataStake:
       case TransactionMetadataUnstake:
+      case TransactionMetadataUnlockStake:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

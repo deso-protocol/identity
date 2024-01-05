@@ -41,6 +41,7 @@ import {
   TransactionMetadataUnregisterAsValidator,
   TransactionMetadataStake,
   TransactionMetadataUnstake,
+  TransactionMetadataUnlockStake,
 } from '../../lib/deso/transaction';
 import { ExtraData } from '../../types/identity';
 import { AccountService } from '../account.service';
@@ -622,6 +623,17 @@ export class ApproveComponent implements OnInit {
           unstakeMetadata.unstakeAmountNanos
         );
         description = `unstake ${unstakeAmountNanos} $DESO from ${unstakeValidatorPublicKey}`;
+        break;
+      case TransactionMetadataUnlockStake:
+        const unlockStakeMetadata = this.transaction
+          .metadata as TransactionMetadataUnlockStake;
+        const unlockStakeValidatorPublicKey = this.base58KeyCheck(
+          unlockStakeMetadata.validatorPublicKey
+        );
+        publicKeys = [unlockStakeValidatorPublicKey];
+        description =
+          `unlock stake from ${unlockStakeValidatorPublicKey}, ` +
+          `starting from epochs ${unlockStakeMetadata.startEpochNumber} to ${unlockStakeMetadata.endEpochNumber}`;
         break;
     }
 
