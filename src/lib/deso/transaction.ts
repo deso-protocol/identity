@@ -622,6 +622,15 @@ export class TransactionMetadataStake extends TransactionMetadata {
   stakeAmountNanos: Buffer = Buffer.alloc(0);
 }
 
+export class TransactionMetadataUnstake extends TransactionMetadata {
+  @Transcode(VarBuffer)
+  validatorPublicKey: Buffer = Buffer.alloc(0);
+
+  // TODO: We may want a better way to handle uint256s.
+  @Transcode(BoolOptional(VarBuffer))
+  unstakeAmountNanos: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -658,6 +667,7 @@ export const TransactionTypeMetadataMap = {
   34: TransactionMetadataRegisterAsValidator,
   35: TransactionMetadataUnregisterAsValidator,
   36: TransactionMetadataStake,
+  37: TransactionMetadataUnstake,
 };
 
 export class Transaction extends BinaryRecord {

@@ -40,6 +40,7 @@ import {
   TransactionMetadataRegisterAsValidator,
   TransactionMetadataUnregisterAsValidator,
   TransactionMetadataStake,
+  TransactionMetadataUnstake,
 } from '../../lib/deso/transaction';
 import { ExtraData } from '../../types/identity';
 import { AccountService } from '../account.service';
@@ -609,6 +610,18 @@ export class ApproveComponent implements OnInit {
           stakeMetadata.stakeAmountNanos
         );
         description = `stake ${stakeAmountNanos} $DESO to ${stakeValidatorPublicKey}`;
+        break;
+      case TransactionMetadataUnstake:
+        const unstakeMetadata = this.transaction
+          .metadata as TransactionMetadataUnstake;
+        const unstakeValidatorPublicKey = this.base58KeyCheck(
+          unstakeMetadata.validatorPublicKey
+        );
+        publicKeys = [unstakeValidatorPublicKey];
+        const unstakeAmountNanos = this.hexNanosToUnitString(
+          unstakeMetadata.unstakeAmountNanos
+        );
+        description = `unstake ${unstakeAmountNanos} $DESO from ${unstakeValidatorPublicKey}`;
         break;
     }
 
