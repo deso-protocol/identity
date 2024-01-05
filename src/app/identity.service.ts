@@ -40,6 +40,7 @@ import {
   TransactionMetadataStake,
   TransactionMetadataUnstake,
   TransactionMetadataUnlockStake,
+  TransactionMetadataUnjailValidator,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 import { AccessLevel, PublicUserInfo } from '../types/identity';
@@ -541,6 +542,7 @@ export class IdentityService {
       case TransactionMetadataAccessGroup:
       case TransactionMetadataAccessGroupMembers:
       case TransactionMetadataNewMessage:
+      case TransactionMetadataUnjailValidator:
         return AccessLevel.ApproveLarge;
     }
 

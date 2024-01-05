@@ -642,6 +642,8 @@ export class TransactionMetadataUnlockStake extends TransactionMetadata {
   endEpochNumber: number = 0;
 }
 
+export class TransactionMetadataUnjailValidator extends TransactionMetadata {}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -680,6 +682,7 @@ export const TransactionTypeMetadataMap = {
   36: TransactionMetadataStake,
   37: TransactionMetadataUnstake,
   38: TransactionMetadataUnlockStake,
+  39: TransactionMetadataUnjailValidator,
 };
 
 export class Transaction extends BinaryRecord {

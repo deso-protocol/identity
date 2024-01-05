@@ -42,6 +42,7 @@ import {
   TransactionMetadataStake,
   TransactionMetadataUnstake,
   TransactionMetadataUnlockStake,
+  TransactionMetadataUnjailValidator,
 } from '../../lib/deso/transaction';
 import { ExtraData } from '../../types/identity';
 import { AccountService } from '../account.service';
@@ -634,6 +635,9 @@ export class ApproveComponent implements OnInit {
         description =
           `unlock stake from ${unlockStakeValidatorPublicKey}, ` +
           `starting from epochs ${unlockStakeMetadata.startEpochNumber} to ${unlockStakeMetadata.endEpochNumber}`;
+        break;
+      case TransactionMetadataUnjailValidator:
+        description = 'unjail your validator';
         break;
     }
 
