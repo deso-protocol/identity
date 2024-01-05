@@ -607,6 +607,8 @@ export class TransactionMetadataRegisterAsValidator extends TransactionMetadata 
   votingAuthorization: Buffer = Buffer.alloc(0);
 }
 
+export class TransactionMetadataUnregisterAsValidator extends TransactionMetadata {}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -641,6 +643,7 @@ export const TransactionTypeMetadataMap = {
   32: TransactionMetadataAccessGroupMembers,
   33: TransactionMetadataNewMessage,
   34: TransactionMetadataRegisterAsValidator,
+  35: TransactionMetadataUnregisterAsValidator,
 };
 
 export class Transaction extends BinaryRecord {

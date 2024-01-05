@@ -38,6 +38,7 @@ import {
   TransactionMetadataUpdateProfile,
   TransactionSpendingLimit,
   TransactionMetadataRegisterAsValidator,
+  TransactionMetadataUnregisterAsValidator,
 } from '../../lib/deso/transaction';
 import { ExtraData } from '../../types/identity';
 import { AccountService } from '../account.service';
@@ -592,6 +593,9 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataRegisterAsValidator:
         // TODO: Do we want any additional details in the approve component?
         description = 'register as a validator';
+        break;
+      case TransactionMetadataUnregisterAsValidator:
+        description = 'unregister as a validator';
         break;
     }
 
