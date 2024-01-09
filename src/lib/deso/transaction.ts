@@ -13,6 +13,7 @@ import {
   Uvarint64,
   VarBuffer,
   VarBufferArray,
+  Varint64,
 } from '../bindata/transcoders';
 
 export class TransactionInput extends BinaryRecord {
@@ -644,6 +645,61 @@ export class TransactionMetadataUnlockStake extends TransactionMetadata {
 
 export class TransactionMetadataUnjailValidator extends TransactionMetadata {}
 
+export class TransactionMetadataCoinLockup extends TransactionMetadata {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  recipientPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Varint64)
+  unlockTimestampNanoSecs: number = 0;
+
+  @Transcode(Varint64)
+  vestingEndTimestampNanoSecs: number = 0;
+
+  // TODO: We may want a better way to handle uint256s.
+  @Transcode(BoolOptional(VarBuffer))
+  lockupAmountBaseUnits: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataUpdateCoinLockupParams extends TransactionMetadata {
+  @Transcode(Varint64)
+  lockupYieldDurationNanoSecs: number = 0;
+
+  @Transcode(Uvarint64)
+  lockupYieldAPYBasisPoints: number = 0;
+
+  @Transcode(Boolean)
+  removeYieldCurvePoint: boolean = false;
+
+  @Transcode(Boolean)
+  newLockupTransferRestrictions: boolean = false;
+
+  @Transcode(Uint8)
+  lockupTransferRestrictionStatus: number = 0;
+}
+
+export class TransactionMetadataCoinLockupTransfer extends TransactionMetadata {
+  @Transcode(VarBuffer)
+  recipientPublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+
+  @Transcode(Varint64)
+  unlockTimestampNanoSecs: number = 0;
+
+  // TODO: We may want a better way to handle uint256s.
+  @Transcode(BoolOptional(VarBuffer))
+  lockedCoinsToTransferBaseUnits: Buffer = Buffer.alloc(0);
+}
+
+export class TransactionMetadataCoinUnlock extends TransactionMetadata {
+  @Transcode(VarBuffer)
+  profilePublicKey: Buffer = Buffer.alloc(0);
+}
+
 export const TransactionTypeMetadataMap = {
   1: TransactionMetadataBlockReward,
   2: TransactionMetadataBasicTransfer,
@@ -683,6 +739,10 @@ export const TransactionTypeMetadataMap = {
   37: TransactionMetadataUnstake,
   38: TransactionMetadataUnlockStake,
   39: TransactionMetadataUnjailValidator,
+  40: TransactionMetadataCoinLockup,
+  41: TransactionMetadataUpdateCoinLockupParams,
+  42: TransactionMetadataCoinLockupTransfer,
+  43: TransactionMetadataCoinUnlock,
 };
 
 export class Transaction extends BinaryRecord {

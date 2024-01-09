@@ -41,6 +41,10 @@ import {
   TransactionMetadataUnstake,
   TransactionMetadataUnlockStake,
   TransactionMetadataUnjailValidator,
+  TransactionMetadataCoinLockup,
+  TransactionMetadataUpdateCoinLockupParams,
+  TransactionMetadataCoinLockupTransfer,
+  TransactionMetadataCoinUnlock,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 import { AccessLevel, PublicUserInfo } from '../types/identity';
@@ -529,6 +533,10 @@ export class IdentityService {
       case TransactionMetadataStake:
       case TransactionMetadataUnstake:
       case TransactionMetadataUnlockStake:
+      case TransactionMetadataCoinLockup:
+      case TransactionMetadataUpdateCoinLockupParams:
+      case TransactionMetadataCoinLockupTransfer:
+      case TransactionMetadataCoinUnlock:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:

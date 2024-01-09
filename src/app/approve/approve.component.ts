@@ -43,6 +43,10 @@ import {
   TransactionMetadataUnstake,
   TransactionMetadataUnlockStake,
   TransactionMetadataUnjailValidator,
+  TransactionMetadataCoinLockup,
+  TransactionMetadataUpdateCoinLockupParams,
+  TransactionMetadataCoinLockupTransfer,
+  TransactionMetadataCoinUnlock,
 } from '../../lib/deso/transaction';
 import { ExtraData } from '../../types/identity';
 import { AccountService } from '../account.service';
@@ -310,12 +314,12 @@ export class ApproveComponent implements OnInit {
         );
         publicKeys = [daoCoinPublicKey];
         if (daoCoinMetadata.operationType === 0) {
-          const mintAmount = this.hexNanosToUnitString(
+          const mintAmount = this.hexBaseUnitsToUnitString(
             daoCoinMetadata.coinsToMintNanos
           );
           description = `mint ${mintAmount} ${daoCoinPublicKey} DAO coins`;
         } else if (daoCoinMetadata.operationType === 1) {
-          const burnAmount = this.hexNanosToUnitString(
+          const burnAmount = this.hexBaseUnitsToUnitString(
             daoCoinMetadata.coinsToBurnNanos
           );
           description = `burn ${burnAmount} ${daoCoinPublicKey} DAO coins`;
@@ -328,7 +332,7 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataTransferDAOCoin:
         const daoCoinTransferMetadata = this.transaction
           .metadata as TransactionMetadataTransferDAOCoin;
-        const daoCoinTransferAmount = this.hexNanosToUnitString(
+        const daoCoinTransferAmount = this.hexBaseUnitsToUnitString(
           daoCoinTransferMetadata.daoCoinToTransferNanos
         );
         const daoCoinTransferPublicKey = this.base58KeyCheck(
@@ -394,6 +398,7 @@ export class ApproveComponent implements OnInit {
             this.hexScaledExchangeRateToFloat(
               daoCoinLimitOrderMetadata.scaledExchangeRateCoinsToSellPerCoinToBuy
             );
+          // TODO: figure out if we need to use hexBaseUnitsToUnitString here.
           const quantityToFill = this.hexNanosToUnitString(
             daoCoinLimitOrderMetadata.quantityToFillInBaseUnits
           );
@@ -639,6 +644,75 @@ export class ApproveComponent implements OnInit {
       case TransactionMetadataUnjailValidator:
         description = 'unjail your validator';
         break;
+      case TransactionMetadataCoinLockup:
+        // NOTE: we don't need a special case for DESO right now
+        // as lockups are not allowed for DESO at this time.
+        const coinLockupMetadata = this.transaction
+          .metadata as TransactionMetadataCoinLockup;
+        const lockupAmount = this.hexBaseUnitsToUnitString(
+          coinLockupMetadata.lockupAmountBaseUnits
+        );
+        const lockupProfilePubKey = this.base58KeyCheck(
+          coinLockupMetadata.profilePublicKey
+        );
+        const lockUpRecipientPubKey = this.base58KeyCheck(
+          coinLockupMetadata.recipientPublicKey
+        );
+        publicKeys = [lockupProfilePubKey, lockUpRecipientPubKey];
+        description = `lockup ${lockupAmount} of your ${lockupProfilePubKey} coins`;
+        break;
+      case TransactionMetadataUpdateCoinLockupParams:
+        const updateCoinLockupParamsMetadata = this.transaction
+          .metadata as TransactionMetadataUpdateCoinLockupParams;
+        description =
+          `update your coin lockup params\n` +
+          `${
+            updateCoinLockupParamsMetadata.removeYieldCurvePoint
+              ? 'Remove'
+              : 'Add'
+          } yield curve point with
+          ${
+            updateCoinLockupParamsMetadata.lockupYieldAPYBasisPoints / 100
+          }% APY for a lockup of
+           ${
+             updateCoinLockupParamsMetadata.lockupYieldDurationNanoSecs
+           } nanoseconds
+          ${
+            !updateCoinLockupParamsMetadata.newLockupTransferRestrictions
+              ? ''
+              : 'and update your lockup transfer restrictions'
+          }`;
+
+        break;
+      case TransactionMetadataCoinLockupTransfer:
+        // NOTE: we don't need a special case for DESO right now
+        // as lockups are not allowed for DESO at this time.
+        const coinLockupTransferMetadata = this.transaction
+          .metadata as TransactionMetadataCoinLockupTransfer;
+        const lockupTransferAmount = this.hexBaseUnitsToUnitString(
+          coinLockupTransferMetadata.lockedCoinsToTransferBaseUnits
+        );
+        const lockupTransferProfilePubKey = this.base58KeyCheck(
+          coinLockupTransferMetadata.profilePublicKey
+        );
+        const lockupTransferRecipientPubKey = this.base58KeyCheck(
+          coinLockupTransferMetadata.recipientPublicKey
+        );
+        publicKeys = [
+          lockupTransferProfilePubKey,
+          lockupTransferRecipientPubKey,
+        ];
+        description = `transfer ${lockupTransferAmount} of your locked ${lockupTransferProfilePubKey} coins to ${lockupTransferRecipientPubKey}`;
+        break;
+      case TransactionMetadataCoinUnlock:
+        const coinUnlockMetadata = this.transaction
+          .metadata as TransactionMetadataCoinUnlock;
+        const unlockProfilePubKey = this.base58KeyCheck(
+          coinUnlockMetadata.profilePublicKey
+        );
+        publicKeys = [unlockProfilePubKey];
+        description = `unlock your locked ${unlockProfilePubKey} coins`;
+        break;
     }
 
     // Set the transaction description based on the description populated with public keys.
@@ -659,14 +733,22 @@ export class ApproveComponent implements OnInit {
     return bs58check.encode(Buffer.from([...prefix, ...keyBytes]));
   }
 
-  // TODO: create hexBaseUnitsToUnitString function to support proper
-  // DAO Coin base unit conversions.
+  // uint256 to DESO nano conversions.
   hexNanosToUnitString(nanos: Buffer): string {
     return this.nanosToUnitString(parseInt(nanos.toString('hex'), 16));
   }
 
+  // unit256 to base unit conversions.
+  hexBaseUnitsToUnitString(baseUnits: Buffer): string {
+    return this.baseUnitsToUnitString(parseInt(baseUnits.toString('hex'), 16));
+  }
+
   nanosToUnitString(nanos: number): string {
     return this.toFixedLengthDecimalString(nanos / 1e9);
+  }
+
+  baseUnitsToUnitString(baseUnits: number): string {
+    return this.toFixedLengthDecimalString(baseUnits / 1e18);
   }
 
   hexScaledExchangeRateToFloat(hex: Buffer): number {

@@ -1,4 +1,9 @@
-import { bufToUvarint64, uvarint64ToBuf } from './util';
+import {
+  bufToUvarint64,
+  bufToVarint64,
+  uvarint64ToBuf,
+  varint64ToBuf,
+} from './util';
 import { TransactionNonce } from '../deso/transaction';
 
 export interface Transcoder<T> {
@@ -17,6 +22,11 @@ export interface Deserializable<T> {
 export const Uvarint64: Transcoder<number> = {
   read: (bytes) => bufToUvarint64(bytes),
   write: (uint) => uvarint64ToBuf(uint),
+};
+
+export const Varint64: Transcoder<number> = {
+  read: (bytes) => bufToVarint64(bytes),
+  write: (int) => varint64ToBuf(int),
 };
 
 export const Boolean: Transcoder<boolean> = {
