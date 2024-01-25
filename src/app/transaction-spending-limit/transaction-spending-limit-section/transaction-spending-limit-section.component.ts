@@ -9,9 +9,15 @@ import {
   DAOCoinLimitOrderLimitItem,
   DAOCoinLimitOrderLimitMap,
   DAOCoinOperationLimitMap,
+  LockupLimitMapItem,
+  LockupLimitOperationString,
+  LockupLimitScopeType,
   NFTLimitOperationString,
   NFTOperationLimitMap,
   OperationToCountMap,
+  StakeLimitMapItem,
+  UnlockStakeLimitMapItem,
+  UnstakeLimitMapItem,
   User,
 } from '../../backend-api.service';
 import { GlobalVarsService } from '../../global-vars.service';
@@ -31,7 +37,11 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     | DAOCoinLimitOrderLimitMap
     | AssociationLimitMapItem[]
     | AccessGroupLimitMapItem[]
-    | AccessGroupMemberLimitMapItem[] = {};
+    | AccessGroupMemberLimitMapItem[]
+    | StakeLimitMapItem[]
+    | UnstakeLimitMapItem[]
+    | UnlockStakeLimitMapItem[]
+    | LockupLimitMapItem[] = {};
   @Input() sectionTitle: string = '';
 
   @Input() userMap: { [k: string]: User } = {};
@@ -44,6 +54,12 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
     | OperationToCountMap<DAOCoinLimitOperationString>
     | undefined;
   anyNFTItem: OperationToCountMap<NFTLimitOperationString> | undefined;
+  anyLockupLimitItems: LockupLimitMapItem[] = [];
+  anyValidatorItem:
+    | StakeLimitMapItem
+    | UnstakeLimitMapItem
+    | UnlockStakeLimitMapItem
+    | undefined;
 
   coinLimitMap: CreatorCoinOperationLimitMap | DAOCoinOperationLimitMap = {};
   txnLimitMap: { [k: string]: number } = {};
@@ -53,6 +69,10 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
   associationLimitMap: AssociationLimitMapItem[] = [];
   accessGroupLimitMap: AccessGroupLimitMapItem[] = [];
   accessGroupMemberLimitMap: AccessGroupMemberLimitMapItem[] = [];
+  stakeLimitMap: StakeLimitMapItem[] = [];
+  unstakeLimitMap: UnstakeLimitMapItem[] = [];
+  unlockStakeLimitMap: UnlockStakeLimitMapItem[] = [];
+  lockupLimitMap: LockupLimitMapItem[] = [];
 
   constructor(public globalVars: GlobalVarsService) {}
 
@@ -113,6 +133,47 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
       case TransactionSpendingLimitComponent.AccessGroupMemberSection:
         this.accessGroupMemberLimitMap = this
           .sectionMap as AccessGroupMemberLimitMapItem[];
+        break;
+      case TransactionSpendingLimitComponent.StakeSection:
+        this.stakeLimitMap = this.sectionMap as StakeLimitMapItem[];
+        this.anyValidatorItem = this.stakeLimitMap.find(
+          (item) => item.ValidatorPublicKeyBase58Check === ''
+        );
+        this.stakeLimitMap = this.stakeLimitMap.filter(
+          (item) => item.ValidatorPublicKeyBase58Check !== ''
+        );
+        break;
+      case TransactionSpendingLimitComponent.UnstakeSection:
+        this.unstakeLimitMap = this.sectionMap as UnstakeLimitMapItem[];
+        this.anyValidatorItem = this.unstakeLimitMap.find(
+          (item) => item.ValidatorPublicKeyBase58Check === ''
+        );
+        this.unstakeLimitMap = this.unstakeLimitMap.filter(
+          (item) => item.ValidatorPublicKeyBase58Check !== ''
+        );
+        break;
+      case TransactionSpendingLimitComponent.UnlockStakeSection:
+        this.unlockStakeLimitMap = this.sectionMap as UnlockStakeLimitMapItem[];
+        this.anyValidatorItem = this.unlockStakeLimitMap.find(
+          (item) => item.ValidatorPublicKeyBase58Check === ''
+        );
+        this.unlockStakeLimitMap = this.unlockStakeLimitMap.filter(
+          (item) => item.ValidatorPublicKeyBase58Check !== ''
+        );
+        break;
+      case TransactionSpendingLimitComponent.LockupSection:
+        this.lockupLimitMap = this.sectionMap as LockupLimitMapItem[];
+        this.anyLockupLimitItems = this.lockupLimitMap.filter(
+          (item) =>
+            item.ProfilePublicKeyBase58Check === '' &&
+            item.ScopeType === LockupLimitScopeType.ANY
+        );
+        this.lockupLimitMap = this.lockupLimitMap.filter(
+          (item) =>
+            item.ProfilePublicKeyBase58Check !== '' ||
+            item.ScopeType !== LockupLimitScopeType.ANY
+        );
+        break;
     }
 
     this.showAll = this.getSectionMapLength() <= this.defaultNumShown;
@@ -136,6 +197,12 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return 'Access Group';
       case TransactionSpendingLimitComponent.AccessGroupMemberSection:
         return 'Access Group Member';
+      case TransactionSpendingLimitComponent.StakeSection:
+      case TransactionSpendingLimitComponent.UnstakeSection:
+      case TransactionSpendingLimitComponent.UnlockStakeSection:
+        return 'Validator';
+      case TransactionSpendingLimitComponent.LockupSection:
+        return 'Lockup';
       default:
         return '';
     }
@@ -148,18 +215,33 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return !!this.anyCreatorItem;
       case TransactionSpendingLimitComponent.NFTLimitsSection:
         return !!this.anyNFTItem;
+      case TransactionSpendingLimitComponent.StakeSection:
+      case TransactionSpendingLimitComponent.UnstakeSection:
+      case TransactionSpendingLimitComponent.UnlockStakeSection:
+        return !!this.anyValidatorItem;
+      case TransactionSpendingLimitComponent.LockupSection:
+        return !!this.anyLockupLimitItems.length;
     }
     return false;
   }
 
   sectionSummary(): string {
-    const operationsStr =
-      this.sectionTitle !==
-        TransactionSpendingLimitComponent.TransactionLimitsSection &&
-      this.sectionTitle !==
-        TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection
-        ? 'operations on '
-        : '';
+    let operationsStr = 'operations on ';
+    switch (this.sectionTitle) {
+      case TransactionSpendingLimitComponent.TransactionLimitsSection:
+      case TransactionSpendingLimitComponent.DAOCoinLimitOrderLimitSection:
+        operationsStr = '';
+        break;
+      case TransactionSpendingLimitComponent.StakeSection:
+        operationsStr = 'stake operations on ';
+        break;
+      case TransactionSpendingLimitComponent.UnstakeSection:
+        operationsStr = 'unstake operations on ';
+        break;
+      case TransactionSpendingLimitComponent.UnlockStakeSection:
+        operationsStr = 'unlock stake operations on ';
+        break;
+    }
     const keyLen = this.getSectionMapLength();
     const sectionItemType = this.sectionItemType();
     return `This app can execute the following ${operationsStr}${keyLen} specific ${sectionItemType}${
@@ -181,6 +263,14 @@ export class TransactionSpendingLimitSectionComponent implements OnInit {
         return this.accessGroupLimitMap.length;
       case TransactionSpendingLimitComponent.AccessGroupMemberSection:
         return this.accessGroupMemberLimitMap.length;
+      case TransactionSpendingLimitComponent.StakeSection:
+        return this.stakeLimitMap.length;
+      case TransactionSpendingLimitComponent.UnstakeSection:
+        return this.unstakeLimitMap.length;
+      case TransactionSpendingLimitComponent.UnlockStakeSection:
+        return this.unlockStakeLimitMap.length;
+      case TransactionSpendingLimitComponent.LockupSection:
+        return this.lockupLimitMap.length;
       default:
         return this.globalVars.ObjectKeyLength(this.sectionMap);
     }
