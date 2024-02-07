@@ -1,4 +1,9 @@
-import { bufToUvarint64, uvarint64ToBuf } from './util';
+import {
+  bufToUvarint64,
+  bufToVarint64,
+  uvarint64ToBuf,
+  varint64ToBuf,
+} from './util';
 import { TransactionNonce } from '../deso/transaction';
 
 export interface Transcoder<T> {
@@ -17,6 +22,11 @@ export interface Deserializable<T> {
 export const Uvarint64: Transcoder<number> = {
   read: (bytes) => bufToUvarint64(bytes),
   write: (uint) => uvarint64ToBuf(uint),
+};
+
+export const Varint64: Transcoder<number> = {
+  read: (bytes) => bufToVarint64(bytes),
+  write: (int) => varint64ToBuf(int),
 };
 
 export const Boolean: Transcoder<boolean> = {
@@ -50,6 +60,31 @@ export const VarBuffer: Transcoder<Buffer> = {
   write: (bytes) => Buffer.concat([uvarint64ToBuf(bytes.length), bytes]),
 };
 
+export const VarBufferArray: Transcoder<Buffer[]> = {
+  read: (bytes) => {
+    let [count, buffer] = bufToUvarint64(bytes);
+
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      let size;
+      [size, buffer] = bufToUvarint64(buffer);
+      result.push(buffer.slice(0, size));
+      buffer = buffer.slice(size);
+    }
+
+    return [result, buffer];
+  },
+  write: (buffers) => {
+    const count = uvarint64ToBuf(buffers.length);
+    return Buffer.concat([
+      count,
+      ...buffers.map((buffer) =>
+        Buffer.concat([uvarint64ToBuf(buffer.length), buffer])
+      ),
+    ]);
+  },
+};
+
 export const TransactionNonceTranscoder: Transcoder<TransactionNonce | null> = {
   read: (bytes) => {
     return TransactionNonce.fromBytes(bytes) as [TransactionNonce, Buffer];
@@ -68,6 +103,26 @@ export function Optional<T>(transcoder: Transcoder<T>): Transcoder<T | null> {
       !bytes.length ? [null, bytes] : transcoder.read(bytes),
     write: (value: T | null) =>
       value === null ? Buffer.alloc(0) : transcoder.write(value),
+  };
+}
+
+export function BoolOptional<T>(
+  transcoder: Transcoder<T>
+): Transcoder<T | null> {
+  return {
+    read: (bytes: Buffer) => {
+      const existence = bytes.readUInt8(0) != 0;
+      if (!existence) {
+        return [null, bytes.slice(1)];
+      }
+      return transcoder.read(bytes.slice(1));
+    },
+    write: (value: T | null) => {
+      if (value === null) {
+        return Buffer.alloc(1);
+      }
+      return Buffer.concat([Buffer.alloc(1, 1), transcoder.write(value)]);
+    },
   };
 }
 
