@@ -50,3 +50,21 @@ export const uint64ToBufBigEndian = (uint: number): Buffer => {
 
   return new Buffer(result.reverse());
 };
+
+// TODO: Verify these are correct....
+export const varint64ToBuf = (int: number): Buffer => {
+  let ux = BigInt(int) << BigInt(1);
+  if (int < 0) {
+    ux = ~ux;
+  }
+  return uvarint64ToBuf(Number(ux));
+};
+
+export const bufToVarint64 = (buffer: Buffer): [number, Buffer] => {
+  const [ux, n] = bufToUvarint64(buffer);
+  let x = BigInt(ux) >> BigInt(1);
+  if (ux & 1) {
+    x = ~x;
+  }
+  return [Number(x), n];
+};
