@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class TruncateAddressOrUsernamePipe implements PipeTransform {
   transform(key: string | undefined) {
     if (!key) return '';
-    if (key.length <= 12) {
+    if (key.length <= 15) {
       return key;
     }
     return `${key.substring(0, 7)}...${key.substring(

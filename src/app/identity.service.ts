@@ -35,6 +35,16 @@ import {
   TransactionMetadataUpdateGlobalParams,
   TransactionMetadataUpdateNFT,
   TransactionMetadataUpdateProfile,
+  TransactionMetadataRegisterAsValidator,
+  TransactionMetadataUnregisterAsValidator,
+  TransactionMetadataStake,
+  TransactionMetadataUnstake,
+  TransactionMetadataUnlockStake,
+  TransactionMetadataUnjailValidator,
+  TransactionMetadataCoinLockup,
+  TransactionMetadataUpdateCoinLockupParams,
+  TransactionMetadataCoinLockupTransfer,
+  TransactionMetadataCoinUnlock,
 } from '../lib/deso/transaction';
 import { SwalHelper } from '../lib/helpers/swal-helper';
 import { AccessLevel, PublicUserInfo } from '../types/identity';
@@ -518,6 +528,15 @@ export class IdentityService {
       case TransactionMetadataDAOCoin:
       case TransactionMetadataTransferDAOCoin:
       case TransactionMetadataDAOCoinLimitOrder:
+      case TransactionMetadataRegisterAsValidator:
+      case TransactionMetadataUnregisterAsValidator:
+      case TransactionMetadataStake:
+      case TransactionMetadataUnstake:
+      case TransactionMetadataUnlockStake:
+      case TransactionMetadataCoinLockup:
+      case TransactionMetadataUpdateCoinLockupParams:
+      case TransactionMetadataCoinLockupTransfer:
+      case TransactionMetadataCoinUnlock:
         return AccessLevel.Full;
 
       case TransactionMetadataFollow:
@@ -531,6 +550,7 @@ export class IdentityService {
       case TransactionMetadataAccessGroup:
       case TransactionMetadataAccessGroupMembers:
       case TransactionMetadataNewMessage:
+      case TransactionMetadataUnjailValidator:
         return AccessLevel.ApproveLarge;
     }
 

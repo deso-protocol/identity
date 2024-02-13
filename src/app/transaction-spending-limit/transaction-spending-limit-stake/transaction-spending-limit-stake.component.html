@@ -1,0 +1,20 @@
+<div class="display--flex justify--between margin-bottom--small">
+  <div>
+    <img
+      class="avatar--medium avatar--rounded margin-right--xsmall"
+      [appAvatar]="stakeLimitMapItem?.ValidatorPublicKeyBase58Check"
+      *ngIf="
+        stakeLimitMapItem?.ValidatorPublicKeyBase58Check &&
+        appUser?.ProfileEntryResponse?.Username
+      "
+    />
+    {{
+      appUser?.ProfileEntryResponse?.Username ||
+        stakeLimitMapItem?.ValidatorPublicKeyBase58Check ||
+        'Any Validator' | truncateAddressOrUsername
+    }}
+  </div>
+  <code>
+    {{ getOpCountString() }}
+  </code>
+</div>

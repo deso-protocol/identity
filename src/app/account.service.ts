@@ -351,8 +351,8 @@ export class AccountService {
     const btcDepositAddress = 'Not implemented yet';
     const ethDepositAddress = 'Not implemented yet';
 
-    // days * (24 hours / day) * (60 minutes / hour) * (1 block / 5 minutes) = blocks
-    const numBlocksBeforeExpiration = (numDaysBeforeExpiration * 24 * 60) / 5;
+    // days * (24 hours / day) * (60 minutes / hour) * (60 seconds / minute) * (1 block / second) = blocks
+    const numBlocksBeforeExpiration = numDaysBeforeExpiration * 24 * 60 * 60;
 
     // By default, we authorize this derived key for 8640 blocks, which is about 30 days.
     const expirationBlock = blockHeight + numBlocksBeforeExpiration;

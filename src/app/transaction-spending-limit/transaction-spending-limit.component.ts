@@ -7,7 +7,11 @@ import {
   CoinLimitOperationString,
   CoinOperationLimitMap,
   DAOCoinLimitOrderLimitMap,
+  LockupLimitMapItem,
+  StakeLimitMapItem,
   TransactionSpendingLimitResponse,
+  UnlockStakeLimitMapItem,
+  UnstakeLimitMapItem,
   User,
 } from '../backend-api.service';
 import { GlobalVarsService } from '../global-vars.service';
@@ -35,6 +39,10 @@ export class TransactionSpendingLimitComponent implements OnInit {
   static AssociationSection = 'Associations';
   static AccessGroupSection = 'Access Groups';
   static AccessGroupMemberSection = 'Access Group Members';
+  static StakeSection = 'Stake';
+  static UnstakeSection = 'Unstake';
+  static UnlockStakeSection = 'Unlock Stake';
+  static LockupSection = 'Lockup';
 
   TransactionSpendingLimitComponent = TransactionSpendingLimitComponent;
 
@@ -48,32 +56,35 @@ export class TransactionSpendingLimitComponent implements OnInit {
       ...new Set<string>(
         this.getPublicKeysFromCoinOperationLimitMap(
           this.transactionSpendingLimitResponse?.CreatorCoinOperationLimitMap
+        ).concat(
+          this.getPublicKeysFromCoinOperationLimitMap(
+            this.transactionSpendingLimitResponse?.DAOCoinOperationLimitMap
+          ),
+          this.getPublicKeysFromDAOCoinLimitOrderLimitMap(
+            this.transactionSpendingLimitResponse?.DAOCoinLimitOrderLimitMap
+          ),
+          this.getPublicKeysFromAssociationLimitMap(
+            this.transactionSpendingLimitResponse?.AssociationLimitMap
+          ),
+          this.getPublicKeysFromAccessGroupLimitMap(
+            this.transactionSpendingLimitResponse?.AccessGroupLimitMap
+          ),
+          this.getPublicKeysFromAccessGroupLimitMap(
+            this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap
+          ),
+          this.getPublicKeysFromStakeLimitMap(
+            this.transactionSpendingLimitResponse?.StakeLimitMap
+          ),
+          this.getPublicKeysFromStakeLimitMap(
+            this.transactionSpendingLimitResponse?.UnstakeLimitMap
+          ),
+          this.getPublicKeysFromStakeLimitMap(
+            this.transactionSpendingLimitResponse?.UnlockStakeLimitMap
+          ),
+          this.getPublicKeysFromLockupLimitMap(
+            this.transactionSpendingLimitResponse?.LockupLimitMap
+          )
         )
-          .concat(
-            this.getPublicKeysFromCoinOperationLimitMap(
-              this.transactionSpendingLimitResponse?.DAOCoinOperationLimitMap
-            )
-          )
-          .concat(
-            this.getPublicKeysFromDAOCoinLimitOrderLimitMap(
-              this.transactionSpendingLimitResponse?.DAOCoinLimitOrderLimitMap
-            )
-          )
-          .concat(
-            this.getPublicKeysFromAssociationLimitMap(
-              this.transactionSpendingLimitResponse?.AssociationLimitMap
-            )
-          )
-          .concat(
-            this.getPublicKeysFromAccessGroupLimitMap(
-              this.transactionSpendingLimitResponse?.AccessGroupLimitMap
-            )
-          )
-          .concat(
-            this.getPublicKeysFromAccessGroupLimitMap(
-              this.transactionSpendingLimitResponse?.AccessGroupMemberLimitMap
-            )
-          )
       ),
     ];
 
@@ -134,8 +145,41 @@ export class TransactionSpendingLimitComponent implements OnInit {
       return [];
     }
     let allPublicKeys = new Set<string>();
-    accessGroupLimitMap.forEach((item) =>
-      allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check)
+    accessGroupLimitMap.forEach(
+      (item: AccessGroupLimitMapItem | AccessGroupMemberLimitMapItem) =>
+        allPublicKeys.add(item.AccessGroupOwnerPublicKeyBase58Check)
+    );
+    return Array.from(allPublicKeys);
+  }
+
+  getPublicKeysFromStakeLimitMap(
+    stakeLimitMap:
+      | StakeLimitMapItem[]
+      | UnstakeLimitMapItem[]
+      | UnlockStakeLimitMapItem[]
+      | undefined
+  ): string[] {
+    if (!stakeLimitMap) {
+      return [];
+    }
+    let allPublicKeys = new Set<string>();
+    stakeLimitMap.forEach(
+      (
+        item: StakeLimitMapItem | UnstakeLimitMapItem | UnlockStakeLimitMapItem
+      ) => allPublicKeys.add(item.ValidatorPublicKeyBase58Check)
+    );
+    return Array.from(allPublicKeys);
+  }
+
+  getPublicKeysFromLockupLimitMap(
+    lockupLimitMap: LockupLimitMapItem[] | undefined
+  ): string[] {
+    if (!lockupLimitMap) {
+      return [];
+    }
+    let allPublicKeys = new Set<string>();
+    lockupLimitMap.forEach((item: LockupLimitMapItem) =>
+      allPublicKeys.add(item.ProfilePublicKeyBase58Check)
     );
     return Array.from(allPublicKeys);
   }

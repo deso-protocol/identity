@@ -1,0 +1,29 @@
+<div class="display--flex justify--between margin-bottom--small">
+  <div class="text--left width--25">
+    <img
+      class="avatar--medium avatar--rounded margin-right--xsmall"
+      [appAvatar]="lockupLimitMapItem?.ProfilePublicKeyBase58Check"
+      *ngIf="
+        lockupLimitMapItem?.ProfilePublicKeyBase58Check &&
+        appUser?.ProfileEntryResponse?.Username
+      "
+    />
+    {{
+      appUser?.ProfileEntryResponse?.Username ||
+        lockupLimitMapItem?.ProfilePublicKeyBase58Check ||
+        (lockupLimitMapItem?.ScopeType === LockupLimitScopeType.ANY
+          ? 'Any Profile'
+          : 'DESO') | truncateAddressOrUsername
+    }}
+  </div>
+  <div class="display-flex justify--center width--50">
+    <code>
+      {{ getOperationString() }}
+    </code>
+  </div>
+  <div class="width--25 text--right">
+    <code>
+      {{ globalVars.formatTxCountLimit(lockupLimitMapItem?.OpCount) }}
+    </code>
+  </div>
+</div>

@@ -147,7 +147,8 @@ export type LimitOperationString =
   | NFTLimitOperationString
   | AssociationOperationString
   | AccessGroupOperationString
-  | AccessGroupMemberOperationString;
+  | AccessGroupMemberOperationString
+  | LockupLimitOperationString;
 export type CreatorCoinOperationLimitMap =
   CoinOperationLimitMap<CreatorCoinLimitOperationString>;
 export type DAOCoinOperationLimitMap =
@@ -236,6 +237,42 @@ export type AccessGroupMemberLimitMapItem = {
   OpCount: number;
 };
 
+export type StakeLimitMapItem = {
+  ValidatorPublicKeyBase58Check: string;
+  StakeLimit: string; // Hex string
+};
+
+export type UnstakeLimitMapItem = {
+  ValidatorPublicKeyBase58Check: string;
+  UnstakeLimit: string; // Hex string
+};
+
+export type UnlockStakeLimitMapItem = {
+  ValidatorPublicKeyBase58Check: string;
+  OpCount: number;
+};
+
+export enum LockupLimitScopeType {
+  ANY = 'AnyCoins',
+  SCOPED = 'ScopedCoins',
+}
+
+export enum LockupLimitOperationString {
+  ANY = 'Any',
+  COIN_LOCKUP = 'CoinLockup',
+  UPDATE_COIN_LOCKUP_YIELD_CURVE = 'UpdateCoinLockupYieldCurve',
+  UPDATE_COIN_LOCKUP_TRANSFER_RESTRICTIONS = 'UpdateCoinLockupTransferRestrictions',
+  COIN_LOCKUP_TRANSFER = 'CoinLockupTransferOperationString',
+  COIN_UNLOCK = 'CoinLockupUnlock',
+}
+
+export type LockupLimitMapItem = {
+  ProfilePublicKeyBase58Check: string;
+  ScopeType: LockupLimitScopeType;
+  Operation: LockupLimitOperationString;
+  OpCount: number;
+};
+
 export interface TransactionSpendingLimitResponse {
   GlobalDESOLimit: number;
   // TODO: make enum for transaction type string
@@ -247,6 +284,10 @@ export interface TransactionSpendingLimitResponse {
   AssociationLimitMap?: AssociationLimitMapItem[];
   AccessGroupLimitMap?: AccessGroupLimitMapItem[];
   AccessGroupMemberLimitMap?: AccessGroupMemberLimitMapItem[];
+  StakeLimitMap?: StakeLimitMapItem[];
+  UnstakeLimitMap?: UnstakeLimitMapItem[];
+  UnlockStakeLimitMap?: UnlockStakeLimitMapItem[];
+  LockupLimitMap?: LockupLimitMapItem[];
   IsUnlimited?: boolean;
   DerivedKeyMemo?: string;
 }

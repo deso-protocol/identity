@@ -60,6 +60,8 @@ import { TransactionSpendingLimitDaoCoinLimitOrderComponent } from './transactio
 import { TransactionSpendingLimitNftComponent } from './transaction-spending-limit/transaction-spending-limit-nft/transaction-spending-limit-nft.component';
 import { TransactionSpendingLimitSectionComponent } from './transaction-spending-limit/transaction-spending-limit-section/transaction-spending-limit-section.component';
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
+import { TransactionSpendingLimitStakeComponent } from './transaction-spending-limit/transaction-spending-limit-stake/transaction-spending-limit-stake.component';
+import { TransactionSpendingLimitLockupComponent } from './transaction-spending-limit/transaction-spending-limit-lockup/transaction-spending-limit-lockup.component';
 
 @NgModule({
   declarations: [
@@ -107,6 +109,8 @@ import { TransactionSpendingLimitComponent } from './transaction-spending-limit/
     RecoverySecretComponent,
     BackupSeedDialogComponent,
     RemoveAccountDialogComponent,
+    TransactionSpendingLimitStakeComponent,
+    TransactionSpendingLimitLockupComponent,
   ],
   imports: [
     BrowserModule,
