@@ -134,5 +134,29 @@
       [userMap]="userMap"
       *ngIf="transactionSpendingLimitResponse.AccessGroupMemberLimitMap"
     ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.StakeLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.StakeSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.StakeLimitMap"
+    ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.UnstakeLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.UnstakeSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.UnstakeLimitMap"
+    ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.UnlockStakeLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.UnlockStakeSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.UnlockStakeLimitMap"
+    ></app-transaction-spending-limit-section>
+    <app-transaction-spending-limit-section
+      [sectionMap]="transactionSpendingLimitResponse.LockupLimitMap"
+      [sectionTitle]="TransactionSpendingLimitComponent.LockupSection"
+      [userMap]="userMap"
+      *ngIf="transactionSpendingLimitResponse.LockupLimitMap"
+    ></app-transaction-spending-limit-section>
   </div>
 </div>

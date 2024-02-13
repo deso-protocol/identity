@@ -418,6 +418,7 @@ export class TransactionDAOCoinLimitOrderLimitMapItem extends BinaryRecord {
   value: number = 0;
 }
 
+// TODO: does this need to be updated? Where is it really used?
 export class TransactionSpendingLimit extends BinaryRecord {
   @Transcode(Uvarint64)
   globalDESOLimit: number = 0;

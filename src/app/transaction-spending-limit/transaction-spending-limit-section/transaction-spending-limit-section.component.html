@@ -220,6 +220,135 @@
           ></app-transaction-spending-limit-access-group-member>
         </div>
       </ng-container>
+      <ng-container
+        *ngIf="sectionTitle === TransactionSpendingLimitComponent.StakeSection"
+      >
+        <div class="display--flex justify--between items--center">
+          <div class="text--text-lightest">Validator</div>
+          <div class="text--text-lightest">Amount</div>
+        </div>
+        <div
+          *ngIf="anyValidatorItem"
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-stake
+            [stakeLimitMapItem]="anyValidatorItem"
+            [operationName]="'Stake'"
+          ></app-transaction-spending-limit-stake>
+        </div>
+        <div
+          *ngFor="
+            let stakeLimitMapItem of stakeLimitMap
+              | slice : 0 : (showAll ? stakeLimitMap.length : defaultNumShown)
+          "
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-stake
+            [stakeLimitMapItem]="stakeLimitMapItem"
+            [appUser]="userMap[stakeLimitMapItem.ValidatorPublicKeyBase58Check]"
+            [operationName]="'Stake'"
+          ></app-transaction-spending-limit-stake>
+        </div>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.UnstakeSection
+        "
+      >
+        <div class="display--flex justify--between items--center">
+          <div class="text--text-lightest">Validator</div>
+          <div class="text--text-lightest">Amount</div>
+        </div>
+        <div
+          *ngIf="anyValidatorItem"
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-stake
+            [stakeLimitMapItem]="anyValidatorItem"
+            [operationName]="'Unstake'"
+          ></app-transaction-spending-limit-stake>
+        </div>
+        <div
+          *ngFor="
+            let unstakeLimitMapItem of unstakeLimitMap
+              | slice : 0 : (showAll ? unstakeLimitMap.length : defaultNumShown)
+          "
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-stake
+            [stakeLimitMapItem]="unstakeLimitMapItem"
+            [appUser]="
+              userMap[unstakeLimitMapItem.ValidatorPublicKeyBase58Check]
+            "
+            [operationName]="'Unstake'"
+          ></app-transaction-spending-limit-stake>
+        </div>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          sectionTitle === TransactionSpendingLimitComponent.UnlockStakeSection
+        "
+      >
+        <div class="display--flex justify--between items--center">
+          <div class="text--text-lightest">Validator</div>
+          <div class="text--text-lightest">Txn Limit</div>
+        </div>
+        <div
+          *ngIf="anyValidatorItem"
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-stake
+            [stakeLimitMapItem]="anyValidatorItem"
+            [operationName]="'Unlock Stake'"
+          ></app-transaction-spending-limit-stake>
+        </div>
+        <div
+          *ngFor="
+            let unlockStakeLimitMapItem of unlockStakeLimitMap
+              | slice
+                : 0
+                : (showAll ? unlockStakeLimitMap.length : defaultNumShown)
+          "
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-stake
+            [stakeLimitMapItem]="unlockStakeLimitMapItem"
+            [appUser]="
+              userMap[unlockStakeLimitMapItem.ValidatorPublicKeyBase58Check]
+            "
+            [operationName]="'Unlock Stake'"
+          ></app-transaction-spending-limit-stake>
+        </div>
+      </ng-container>
+      <ng-container
+        *ngIf="sectionTitle === TransactionSpendingLimitComponent.LockupSection"
+      >
+        <div class="display--flex justify--between items--center">
+          <div class="text--text-lightest">Profile</div>
+          <div class="text--text-lightest">Operation</div>
+          <div class="text--text-lightest">Txn Limit</div>
+        </div>
+        <div
+          *ngFor="let lockupLimitItem of anyLockupLimitItems"
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-lockup
+            [lockupLimitMapItem]="lockupLimitItem"
+          ></app-transaction-spending-limit-lockup>
+        </div>
+        <div
+          *ngFor="
+            let lockupLimitMapItem of lockupLimitMap
+              | slice : 0 : (showAll ? lockupLimitMap.length : defaultNumShown)
+          "
+          class="display--flex flex--column padding-top--small justify--between"
+        >
+          <app-transaction-spending-limit-lockup
+            [lockupLimitMapItem]="lockupLimitMapItem"
+            [appUser]="userMap[lockupLimitMapItem.ProfilePublicKeyBase58Check]"
+          ></app-transaction-spending-limit-lockup>
+        </div>
+      </ng-container>
     </div>
   </div>
 
