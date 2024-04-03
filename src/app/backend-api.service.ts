@@ -271,8 +271,11 @@ export class BackendAPIService {
     private globalVars: GlobalVarsService
   ) {}
 
-  getRoute(path: string): string {
-    let endpoint = this.endpoint;
+  getRoute(path: string, endpoint?: string): string {
+    // If endpoint is undefined, set to the constructor endpoint
+    if (endpoint === undefined) {
+      endpoint = this.endpoint;
+    }
     if (
       this.globalVars.network === Network.testnet &&
       this.endpoint.startsWith('https://node.deso.org')
@@ -286,11 +289,11 @@ export class BackendAPIService {
     return this.httpClient.get<any>(this.getRoute(path));
   }
 
-  post(path: string, body: any): Observable<any> {
-    return this.httpClient.post<any>(this.getRoute(path), body);
+  post(path: string, body: any, endpoint?: string): Observable<any> {
+    return this.httpClient.post<any>(this.getRoute(path, endpoint), body);
   }
 
-  jwtPost(path: string, publicKey: string, body: any): Observable<any> {
+  jwtPost(path: string, publicKey: string, body: any, endpoint?: string): Observable<any> {
     const account = this.accountService.getAccountInfo(publicKey);
     // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
@@ -305,7 +308,7 @@ export class BackendAPIService {
     const isDerived = this.accountService.isMetamaskAccount(account);
 
     const jwt = this.signingService.signJWT(account.seedHex, isDerived);
-    return this.post(path, { ...body, ...{ JWT: jwt } });
+    return this.post(path, { ...body, ...{ JWT: jwt } }, endpoint);
   }
 
   // Error parsing
@@ -338,7 +341,7 @@ export class BackendAPIService {
     return this.jwtPost('verify-captcha', publicKey, {
       Token: token,
       PublicKeyBase58Check: publicKey,
-    });
+    }, 'https://desoverification.com/api/v0');
   }
 
   GetUserProfiles(

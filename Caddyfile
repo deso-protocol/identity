@@ -75,6 +75,7 @@ header @html Content-Security-Policy "
     https://www.googleapis.com/drive/v3/files
     https://www.googleapis.com/drive/v3/files/
     https://www.googleapis.com/upload/drive/v3/files
+    https://desoverification.com/api/v0/verify-captcha
     https://api.blockchain.com/mempool/fees
     https://registry.walletconnect.com/
     https://explorer-api.walletconnect.com/
