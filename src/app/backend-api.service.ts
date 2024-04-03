@@ -293,7 +293,12 @@ export class BackendAPIService {
     return this.httpClient.post<any>(this.getRoute(path, endpoint), body);
   }
 
-  jwtPost(path: string, publicKey: string, body: any, endpoint?: string): Observable<any> {
+  jwtPost(
+    path: string,
+    publicKey: string,
+    body: any,
+    endpoint?: string
+  ): Observable<any> {
     const account = this.accountService.getAccountInfo(publicKey);
     // NOTE: there are some cases where derived user's were not being sent phone number
     // verification texts due to missing public user info. This is to log how often
@@ -338,10 +343,15 @@ export class BackendAPIService {
     token: string,
     publicKey: string
   ): Observable<{ Success: boolean; TxnHashHex: string }> {
-    return this.jwtPost('verify-captcha', publicKey, {
-      Token: token,
-      PublicKeyBase58Check: publicKey,
-    }, 'https://desoverification.com/api/v0');
+    return this.jwtPost(
+      'verify-captcha',
+      publicKey,
+      {
+        Token: token,
+        PublicKeyBase58Check: publicKey,
+      },
+      'https://desoverification.com/api/v0'
+    );
   }
 
   GetUserProfiles(
