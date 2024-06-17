@@ -17,3 +17,4 @@ After proper configuration of `environment.ts` and `environment.prod.ts`, run `n
 ## Format
 
 Formatting will happen upon commit. Developers can also run `npm run format` or `npx npm run format` if npm isn't installed to format all source files
+
