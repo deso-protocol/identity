@@ -161,7 +161,7 @@ export class SignUpMetamaskComponent implements OnInit {
       this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
 
     try {
-      const { TxnHash }  = await this.backendApi
+      const { TxnHash } = await this.backendApi
         .SendStarterDeSoForMetamaskAccount({
           Signer: metamaskKeyPair.getPublic().encode('array', true),
           AmountNanos: 1000,

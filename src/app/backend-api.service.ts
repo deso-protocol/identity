@@ -855,10 +855,13 @@ export class BackendAPIService {
     );
   }
 
-  GetTxn(TxnHashHex: string, TxnStatus: 'InMempool' | 'Committed'): Observable<any> {
+  GetTxn(
+    TxnHashHex: string,
+    TxnStatus: 'InMempool' | 'Committed'
+  ): Observable<any> {
     return this.post('get-txn', {
       TxnHashHex,
-      ...TxnStatus ? ({ TxnStatus }) : {},
+      ...(TxnStatus ? { TxnStatus } : {}),
     });
   }
 
