@@ -161,7 +161,7 @@ export class SignUpMetamaskComponent implements OnInit {
       this.cryptoService.publicKeyToDeSoPublicKey(metamaskKeyPair, network);
 
     try {
-      await this.backendApi
+      const { TxnHash } = await this.backendApi
         .SendStarterDeSoForMetamaskAccount({
           Signer: metamaskKeyPair.getPublic().encode('array', true),
           AmountNanos: 1000,
@@ -171,6 +171,8 @@ export class SignUpMetamaskComponent implements OnInit {
           ],
         })
         .toPromise();
+      const txnHashHex = Buffer.from(TxnHash).toString('hex');
+      await this.backendApi.GetTxn(txnHashHex, 'Committed').toPromise();
     } catch (e) {
       // if they received the account, or if they have funds don't error out of the flow,
       //  just move on to the next step

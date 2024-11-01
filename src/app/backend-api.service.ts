@@ -603,7 +603,7 @@ export class BackendAPIService {
 
   SendStarterDeSoForMetamaskAccount(
     request: MetamaskSignInRequest
-  ): Observable<any> {
+  ): Observable<{ TxnHash: number[] }> {
     return this.post('send-starter-deso-for-metamask-account', request).pipe(
       catchError((err) => {
         console.error(JSON.stringify(err));
@@ -855,9 +855,13 @@ export class BackendAPIService {
     );
   }
 
-  GetTxn(TxnHashHex: string): Observable<any> {
+  GetTxn(
+    TxnHashHex: string,
+    TxnStatus: 'InMempool' | 'Committed'
+  ): Observable<any> {
     return this.post('get-txn', {
       TxnHashHex,
+      ...(TxnStatus ? { TxnStatus } : {}),
     });
   }
 
