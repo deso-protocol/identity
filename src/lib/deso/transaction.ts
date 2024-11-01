@@ -796,3 +796,8 @@ export class TransactionV0 extends BinaryRecord {
   @Transcode(VarBuffer)
   signature: Buffer | null = null;
 }
+
+export class TransactionMetdataAtomicWrapper extends TransactionMetadata {
+  @Transcode(ArrayOf(Transaction))
+  metadata: Transaction[] = [];
+}

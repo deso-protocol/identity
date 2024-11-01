@@ -180,7 +180,7 @@ export class WalletProvider {
       const provider = await EthereumProvider.init({
         projectId: 'bea679efaf1bb0481c4974e65c510200',
         chains: [1 /* Mainnet */],
-        optionalChains: [5 /* Goerli */],
+        optionalChains: [11155111 /* Sepolia */],
         optionalMethods: ['eth_requestAccounts'],
         metadata: {
           description:
