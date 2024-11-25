@@ -202,25 +202,6 @@ export class AccountService {
       const privateUser = rootUsers[rootPublicKey];
 
       const accessLevel = this.getAccessLevel(rootPublicKey, hostname);
-      if (accessLevel === AccessLevel.None) {
-        continue;
-      }
-
-      const encryptedSeedHex = this.cryptoService.encryptSeedHex(
-        privateUser.seedHex,
-        hostname
-      );
-      let encryptedMessagingKeyRandomness: string | undefined;
-      if (privateUser.messagingKeyRandomness) {
-        encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(
-          privateUser.messagingKeyRandomness,
-          hostname
-        );
-      }
-      const accessLevelHmac = this.cryptoService.accessLevelHmac(
-        accessLevel,
-        privateUser.seedHex
-      );
 
       const commonFields = {
         hasExtraText: privateUser.extraText?.length > 0,
@@ -229,16 +210,34 @@ export class AccountService {
         version: privateUser.version,
         network: privateUser.network,
         loginMethod: privateUser.loginMethod || LoginMethod.DESO,
-        accessLevel,
       };
 
-      publicUsers[rootPublicKey] = {
-        ...commonFields,
-        encryptedSeedHex,
-        accessLevelHmac,
-        derivedPublicKeyBase58Check: privateUser.derivedPublicKeyBase58Check,
-        encryptedMessagingKeyRandomness,
-      };
+      if (accessLevel !== AccessLevel.None) {
+        const encryptedSeedHex = this.cryptoService.encryptSeedHex(
+          privateUser.seedHex,
+          hostname
+        );
+
+        let encryptedMessagingKeyRandomness: string | undefined;
+        if (privateUser.messagingKeyRandomness) {
+          encryptedMessagingKeyRandomness = this.cryptoService.encryptSeedHex(
+            privateUser.messagingKeyRandomness,
+            hostname
+          );
+        }
+        const accessLevelHmac = this.cryptoService.accessLevelHmac(
+          accessLevel,
+          privateUser.seedHex
+        );
+        publicUsers[rootPublicKey] = {
+          ...commonFields,
+          encryptedSeedHex,
+          accessLevelHmac,
+          derivedPublicKeyBase58Check: privateUser.derivedPublicKeyBase58Check,
+          encryptedMessagingKeyRandomness,
+          accessLevel,
+        };
+      }
 
       // To support sub-accounts for the legacy identity flow, we need to return
       // a flat map of all users and their sub-accounts. Each sub-account has a
@@ -250,20 +249,28 @@ export class AccountService {
           rootPublicKey,
           subAccount.accountNumber
         );
-        const accountInfo = this.getAccountInfo(subAccountPublicKey);
+        const subAccountAccessLevel = this.getAccessLevel(
+          subAccountPublicKey,
+          hostname
+        );
+        if (subAccountAccessLevel === AccessLevel.None) {
+          return;
+        }
+        const subAccountInfo = this.getAccountInfo(subAccountPublicKey);
         const subAccountEncryptedSeedHex = this.cryptoService.encryptSeedHex(
-          accountInfo.seedHex,
+          subAccountInfo.seedHex,
           hostname
         );
         const subAccountAccessLevelHmac = this.cryptoService.accessLevelHmac(
-          accessLevel,
-          accountInfo.seedHex
+          subAccountAccessLevel,
+          subAccountInfo.seedHex
         );
 
         publicUsers[subAccountPublicKey] = {
           ...commonFields,
           encryptedSeedHex: subAccountEncryptedSeedHex,
           accessLevelHmac: subAccountAccessLevelHmac,
+          accessLevel: subAccountAccessLevel,
         };
       });
     }
