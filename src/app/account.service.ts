@@ -245,7 +245,10 @@ export class AccountService {
       // unique accessLevel hmac.
       const subAccounts = privateUser.subAccounts || [];
       subAccounts.forEach((subAccount) => {
-        const subAccountAccessLevel = this.getAccessLevel(rootPublicKey, hostname);
+        const subAccountAccessLevel = this.getAccessLevel(
+          rootPublicKey,
+          hostname
+        );
         if (subAccountAccessLevel === AccessLevel.None) {
           return;
         }
