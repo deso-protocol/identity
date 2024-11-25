@@ -245,17 +245,17 @@ export class AccountService {
       // unique accessLevel hmac.
       const subAccounts = privateUser.subAccounts || [];
       subAccounts.forEach((subAccount) => {
-        const subAccountAccessLevel = this.getAccessLevel(
+        const subAccountPublicKey = this.getAccountPublicKeyBase58(
           rootPublicKey,
+          subAccount.accountNumber
+        );
+        const subAccountAccessLevel = this.getAccessLevel(
+          subAccountPublicKey,
           hostname
         );
         if (subAccountAccessLevel === AccessLevel.None) {
           return;
         }
-        const subAccountPublicKey = this.getAccountPublicKeyBase58(
-          rootPublicKey,
-          subAccount.accountNumber
-        );
         const subAccountInfo = this.getAccountInfo(subAccountPublicKey);
         const subAccountEncryptedSeedHex = this.cryptoService.encryptSeedHex(
           subAccountInfo.seedHex,
