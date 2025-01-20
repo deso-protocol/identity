@@ -81,10 +81,6 @@ export class GetDesoComponent implements OnInit {
     if (!environment.heroswapURL) {
       return;
     }
-    if (this.globalVars.captchaDeSoNanos === 0) {
-      this.captchaAvailable = false;
-      this.alternativeOptionsEnabled = true;
-    }
 
     this.heroswapIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
       [
