@@ -63,6 +63,7 @@
         (click)="setAlternativeEarnOptions(true)"
         class="margin-top--large button--primary--outline button--medium"
         data-control-name="skip-get-deso-button"
+        [disabled]="captchaFlowSpinner"
       >
         Try Another Way
       </button>
