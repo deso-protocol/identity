@@ -48,6 +48,8 @@ export class GetDesoComponent implements OnInit {
   captchaFailed = false;
   // Whether the backend is offering rewards for solving captchas.
   captchaAvailable = true;
+  // Loader shown while waiting for DESO to arrive.
+  captchaFlowSpinner = false;
 
   publicKeyCopied = false;
 
@@ -160,19 +162,26 @@ export class GetDesoComponent implements OnInit {
   }
 
   onCaptchaVerify(token: string): void {
-    this.backendAPIService.VerifyHCaptcha(token, this.publicKeyAdded).subscribe(
-      (res) => {
-        if (res.Success) {
-          this.isFinishFlowDisabled = false;
-          this.finishFlow();
-        } else {
+    this.captchaFlowSpinner = true;
+    this.backendAPIService
+      .VerifyHCaptcha(token, this.publicKeyAdded)
+      .subscribe(
+        async (res) => {
+          if (res.Success) {
+            await this.backendAPIService
+              .GetTxn(res.TxnHashHex, 'InMempool')
+              .toPromise();
+            this.isFinishFlowDisabled = false;
+            this.finishFlow();
+          } else {
+            this.captchaFailed = true;
+          }
+        },
+        (err) => {
           this.captchaFailed = true;
         }
-      },
-      (err) => {
-        this.captchaFailed = true;
-      }
-    );
+      )
+      .add(() => (this.captchaFlowSpinner = false));
   }
 
   onCaptchaExpired(event: any): void {

@@ -285,6 +285,13 @@
       </div>
     </div>
     <div class="margin-top--medium">
+      <div
+        *ngIf="submittingPhoneNumberVerificationCode"
+        class="padding-top--medium display--flex flex--column items--center"
+      >
+        <div>Waiting for your $DESO to arrive.</div>
+        <div class="spinner-border" style="width: 6rem; height: 6rem"></div>
+      </div>
       <button
         data-control-name="get-starter-deso-confirm-code-button"
         (click)="submitVerificationCode()"
@@ -292,6 +299,7 @@
           disabled: !verificationCodeForm.valid,
           'btn-loading': submittingPhoneNumberVerificationCode
         }"
+        [disabled]="submittingPhoneNumberVerificationCode"
         class="button--primary button--medium margin-bottom--medium"
       >
         Confirm
@@ -300,6 +308,7 @@
         data-control-name="get-starter-deso-back-button"
         *ngIf="displayForSignupFlow"
         (click)="backButtonClickedOnSubmitVerificationScreen()"
+        [disabled]="submittingPhoneNumberVerificationCode"
         class="button--primary--outline button--medium"
       >
         Back
