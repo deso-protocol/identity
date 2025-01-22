@@ -169,7 +169,7 @@ export class GetDesoComponent implements OnInit {
         async (res) => {
           if (res.Success) {
             await this.backendAPIService
-              .GetTxn(res.TxnHashHex, 'Committed')
+              .GetTxn(res.TxnHashHex, 'InMempool')
               .toPromise();
             this.isFinishFlowDisabled = false;
             this.finishFlow();

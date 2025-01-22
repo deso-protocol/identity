@@ -301,7 +301,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       )
       .subscribe(
         async (res) => {
-          await this.backendApi.GetTxn(res.TxnHashHex, 'Committed').toPromise();
+          await this.backendApi.GetTxn(res.TxnHashHex, 'InMempool').toPromise();
           this.screenToShow =
             SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
           this.phoneNumberVerified.emit();
