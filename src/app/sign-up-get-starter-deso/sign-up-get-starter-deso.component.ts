@@ -301,12 +301,14 @@ export class SignUpGetStarterDESOComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          this.backendApi.GetTxn(res.TxnHashHex, 'InMempool').subscribe((res) => {
-            this.screenToShow =
-              SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
-            this.phoneNumberVerified.emit();
-            this.isPhoneNumberSuccess = true;
-          });
+          this.backendApi
+            .GetTxn(res.TxnHashHex, 'InMempool')
+            .subscribe((res) => {
+              this.screenToShow =
+                SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
+              this.phoneNumberVerified.emit();
+              this.isPhoneNumberSuccess = true;
+            });
         },
         (err) => {
           this._parseSubmitPhoneNumberVerificationCodeServerErrors(err);
