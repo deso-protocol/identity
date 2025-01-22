@@ -45,6 +45,10 @@
           (error)="onCaptchaError($event)"
         >
         </ng-hcaptcha>
+        <div *ngIf="captchaFlowSpinner" class="padding-top--medium display--flex flex--column items--center">
+            <div>Waiting for your $DESO to arrive.</div>
+            <div class="spinner-border" style="width: 6rem; height: 6rem"></div>
+        </div>
         <div *ngIf="captchaFailed" class="warning--error margin-top--small">
           There was an issue verifying your captcha. Please
           <a (click)="resetCaptcha()">reset the captcha</a> and try again, or
