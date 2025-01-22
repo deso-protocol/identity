@@ -163,21 +163,25 @@ export class GetDesoComponent implements OnInit {
 
   onCaptchaVerify(token: string): void {
     this.captchaFlowSpinner = true;
-    this.backendAPIService.VerifyHCaptcha(token, this.publicKeyAdded).subscribe(
-      async (res) => {
-        if (res.Success) {
-
-          await this.backendAPIService.GetTxn(res.TxnHashHex, 'Committed').toPromise();
-          this.isFinishFlowDisabled = false;
-          this.finishFlow();
-        } else {
+    this.backendAPIService
+      .VerifyHCaptcha(token, this.publicKeyAdded)
+      .subscribe(
+        async (res) => {
+          if (res.Success) {
+            await this.backendAPIService
+              .GetTxn(res.TxnHashHex, 'Committed')
+              .toPromise();
+            this.isFinishFlowDisabled = false;
+            this.finishFlow();
+          } else {
+            this.captchaFailed = true;
+          }
+        },
+        (err) => {
           this.captchaFailed = true;
         }
-      },
-      (err) => {
-        this.captchaFailed = true;
-      }
-    ).add(() => this.captchaFlowSpinner = false);
+      )
+      .add(() => (this.captchaFlowSpinner = false));
   }
 
   onCaptchaExpired(event: any): void {

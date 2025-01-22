@@ -300,7 +300,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
         this.verificationCodeForm.value.verificationCode
       )
       .subscribe(
-        async(res) => {
+        async (res) => {
           await this.backendApi.GetTxn(res.TxnHashHex, 'Committed').toPromise();
           this.screenToShow =
             SignUpGetStarterDESOComponent.COMPLETED_PHONE_NUMBER_VERIFICATION_SCREEN;
