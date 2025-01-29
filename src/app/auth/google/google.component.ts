@@ -162,6 +162,34 @@ export class GoogleComponent implements OnInit {
       this.globalVars.accessLevelRequest
     );
 
+    if (!this.globalVars.getFreeDeso) {
+      this.login(signedUp);
+      return;
+    }
+    if (!signedUp || !this.globalVars.getFreeDeso) {
+      this.backendApi
+        .GetUsersStateless([this.publicKey], true, true)
+        .subscribe((res) => {
+          if (res?.UserList?.length) {
+            if (res.UserList[0].BalanceNanos !== 0) {
+              this.login(signedUp);
+              return;
+            }
+          }
+          this.router.navigate(['/', RouteNames.GET_DESO], {
+            queryParams: { publicKey: this.publicKey, signedUp },
+            queryParamsHandling: 'merge',
+          });
+        });
+    } else {
+      this.router.navigate(['/', RouteNames.GET_DESO], {
+        queryParams: { publicKey: this.publicKey, signedUp },
+        queryParamsHandling: 'merge',
+      });
+    }
+  }
+
+  login(signedUp: boolean): void {
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
         queryParams: {
@@ -174,35 +202,8 @@ export class GoogleComponent implements OnInit {
         },
         queryParamsHandling: 'merge',
       });
-    } else {
-      if (!this.globalVars.getFreeDeso) {
-        this.login(signedUp);
-      }
-      if (!signedUp) {
-        this.backendApi
-          .GetUsersStateless([this.publicKey], true, true)
-          .subscribe((res) => {
-            if (res?.UserList?.length) {
-              if (res.UserList[0].BalanceNanos !== 0) {
-                this.login(signedUp);
-                return;
-              }
-            }
-            this.router.navigate(['/', RouteNames.GET_DESO], {
-              queryParams: { publicKey: this.publicKey, signedUp },
-              queryParamsHandling: 'merge',
-            });
-          });
-      } else {
-        this.router.navigate(['/', RouteNames.GET_DESO], {
-          queryParams: { publicKey: this.publicKey, signedUp },
-          queryParamsHandling: 'merge',
-        });
-      }
+      return;
     }
-  }
-
-  login(signedUp: boolean): void {
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),
       publicKeyAdded: this.publicKey,

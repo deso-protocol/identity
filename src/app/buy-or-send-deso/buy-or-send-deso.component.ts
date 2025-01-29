@@ -107,7 +107,14 @@ export class BuyOrSendDesoComponent implements OnInit {
   finishFlow(): void {
     if (this.globalVars.derive) {
       this.router.navigate(['/', RouteNames.DERIVE], {
-        queryParams: { publicKey: this.publicKeyAdded },
+        queryParams: {
+          publicKey: this.publicKeyAdded,
+          transactionSpendingLimitResponse:
+            this.globalVars.transactionSpendingLimitResponse,
+          deleteKey: this.globalVars.deleteKey || undefined,
+          derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
+          expirationDays: this.globalVars.expirationDays || undefined,
+        },
         queryParamsHandling: 'merge',
       });
     } else {
