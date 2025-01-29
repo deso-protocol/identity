@@ -166,7 +166,7 @@ export class GoogleComponent implements OnInit {
       this.login(signedUp);
       return;
     }
-    if (!signedUp) {
+    if (!signedUp || !this.globalVars.getFreeDeso) {
       this.backendApi
         .GetUsersStateless([this.publicKey], true, true)
         .subscribe((res) => {
