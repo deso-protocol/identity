@@ -191,18 +191,18 @@ export class GoogleComponent implements OnInit {
 
   login(signedUp: boolean): void {
     if (this.globalVars.derive) {
-        this.router.navigate(['/', RouteNames.DERIVE], {
-          queryParams: {
-            publicKey: this.publicKey,
-            transactionSpendingLimitResponse:
+      this.router.navigate(['/', RouteNames.DERIVE], {
+        queryParams: {
+          publicKey: this.publicKey,
+          transactionSpendingLimitResponse:
             this.globalVars.transactionSpendingLimitResponse,
-            deleteKey: this.globalVars.deleteKey || undefined,
-            derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
-            expirationDays: this.globalVars.expirationDays || undefined,
-          },
-          queryParamsHandling: 'merge',
-        });
-        return;
+          deleteKey: this.globalVars.deleteKey || undefined,
+          derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
+          expirationDays: this.globalVars.expirationDays || undefined,
+        },
+        queryParamsHandling: 'merge',
+      });
+      return;
     }
     this.identityService.login({
       users: this.accountService.getEncryptedUsers(),

@@ -324,7 +324,7 @@ export class SignUpGetStarterDESOComponent implements OnInit {
         queryParams: {
           publicKey: this.publicKey,
           transactionSpendingLimitResponse:
-          this.globalVars.transactionSpendingLimitResponse,
+            this.globalVars.transactionSpendingLimitResponse,
           deleteKey: this.globalVars.deleteKey || undefined,
           derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
           expirationDays: this.globalVars.expirationDays || undefined,

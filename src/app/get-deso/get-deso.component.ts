@@ -240,7 +240,7 @@ export class GetDesoComponent implements OnInit {
         queryParams: {
           publicKey: this.publicKeyAdded,
           transactionSpendingLimitResponse:
-          this.globalVars.transactionSpendingLimitResponse,
+            this.globalVars.transactionSpendingLimitResponse,
           deleteKey: this.globalVars.deleteKey || undefined,
           derivedPublicKey: this.globalVars.derivedPublicKey || undefined,
           expirationDays: this.globalVars.expirationDays || undefined,
