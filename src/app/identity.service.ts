@@ -488,7 +488,6 @@ export class IdentityService {
       secure: true,
       sameSite: 'None',
       partitioned: true,
-      domain:
     });
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
