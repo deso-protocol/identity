@@ -61,7 +61,7 @@ import { TransactionSpendingLimitSectionComponent } from './transaction-spending
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
 import { TransactionSpendingLimitStakeComponent } from './transaction-spending-limit/transaction-spending-limit-stake/transaction-spending-limit-stake.component';
 import { TransactionSpendingLimitLockupComponent } from './transaction-spending-limit/transaction-spending-limit-lockup/transaction-spending-limit-lockup.component';
-import { CookieService } from "ngx-cookie-service";
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
