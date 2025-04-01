@@ -1,4 +1,4 @@
-FROM node:16-alpine3.15 AS identity
+FROM node:22-alpine AS identity
 
 WORKDIR /identity
 
