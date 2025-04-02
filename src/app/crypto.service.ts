@@ -69,14 +69,10 @@ export class CryptoService {
   // previous key is overwritten, which is useful in logging out users.
   seedHexEncryptionKey(hostname: string, reset: boolean = false): string {
     const storageKey = this.seedHexEncryptionStorageKey(hostname);
-    console.log(storageKey);
     let encryptionKey;
 
     if (this.mustUseStorageAccess()) {
-      console.log(this.mustUseStorageAccess());
       encryptionKey = this.cookieService.get(storageKey);
-      console.log(encryptionKey);
-      console.log(reset);
       if (!encryptionKey || reset) {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.set(storageKey, encryptionKey, {
@@ -113,8 +109,6 @@ export class CryptoService {
   }
 
   decryptSeedHex(encryptedSeedHex: string, hostname: string): string {
-    console.log(hostname);
-    console.log(encryptedSeedHex);
     const encryptionKey = this.seedHexEncryptionKey(hostname, false);
     const decipher = createDecipher('aes-256-gcm', encryptionKey);
     return decipher.update(Buffer.from(encryptedSeedHex, 'hex')).toString();
