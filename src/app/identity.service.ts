@@ -606,6 +606,7 @@ export class IdentityService {
     );
 
     if (!hasAccess || !hasEncryptionKey) {
+      console.log("hasAccess: ", hasAccess, "\nhasEncryptionKey:", hasEncryptionKey);
       this.respond(data.id, { approvalRequired: true });
       return false;
     }
