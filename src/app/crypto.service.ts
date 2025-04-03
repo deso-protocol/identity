@@ -125,6 +125,7 @@ export class CryptoService {
     hmac: string
   ): boolean {
     if (!hmac || !seedHex) {
+      console.log("hmac: ", hmac, "\nseedHex: ", seedHex);
       return false;
     }
 

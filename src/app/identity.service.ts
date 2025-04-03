@@ -562,17 +562,20 @@ export class IdentityService {
       payload: { encryptedSeedHex, accessLevel, accessLevelHmac },
     } = data;
     if (accessLevel < requiredAccessLevel) {
+      console.log("accessLevel < requiredAccessLevel: ", accessLevel, "<", requiredAccessLevel);
       return false;
     }
     const seedHex = this.cryptoService.decryptSeedHex(
       encryptedSeedHex,
       this.globalVars.hostname
     );
-    return this.cryptoService.validAccessLevelHmac(
+    const validAccessLevelHmacVal = this.cryptoService.validAccessLevelHmac(
       accessLevel,
       seedHex,
       accessLevelHmac
     );
+    console.log("validAccessLevelHmacVal: ", validAccessLevelHmacVal);
+    return validAccessLevelHmacVal;
   }
 
   // This method checks if transaction in the payload has correct outputs for requested AccessLevel.
@@ -606,6 +609,7 @@ export class IdentityService {
     );
 
     if (!hasAccess || !hasEncryptionKey) {
+      console.log("hasAccess:", hasAccess, "\nhasEncryptionKey:", hasEncryptionKey);
       this.respond(data.id, { approvalRequired: true });
       return false;
     }
