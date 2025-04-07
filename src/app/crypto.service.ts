@@ -73,6 +73,14 @@ export class CryptoService {
 
     if (this.mustUseStorageAccess()) {
       encryptionKey = this.cookieService.get(storageKey);
+      if (!encryptionKey) {
+        // Try local storage?
+        console.log('trying local storage');
+        encryptionKey = localStorage.getItem(storageKey) || '';
+        if (encryptionKey === '') {
+          console.log('no encryption key found');
+        }
+      }
       if (!encryptionKey || reset) {
         encryptionKey = this.newEncryptionKey();
         this.cookieService.set(storageKey, encryptionKey, {
@@ -82,6 +90,8 @@ export class CryptoService {
           sameSite: 'None',
           partitioned: true,
         });
+        // Also set it in local storage.
+        localStorage.setItem(storageKey, encryptionKey);
       }
     } else {
       encryptionKey = localStorage.getItem(storageKey) || '';
@@ -125,7 +135,7 @@ export class CryptoService {
     hmac: string
   ): boolean {
     if (!hmac || !seedHex) {
-      console.log("hmac: ", hmac, "\nseedHex: ", seedHex);
+      console.log('hmac: ', hmac, '\nseedHex: ', seedHex);
       return false;
     }
 
