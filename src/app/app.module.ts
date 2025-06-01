@@ -7,7 +7,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
-import { CookieModule } from 'ngx-cookie';
 import { SanitizePostBodyPipe } from 'src/lib/pipes/sanitize-and-auto-link-pipe';
 import { SanitizeVideoUrlPipe } from 'src/lib/pipes/sanitize-video-url-pipe';
 import { TruncateAddressOrUsernamePipe } from 'src/lib/pipes/truncate-deso-address.pipe';
@@ -62,6 +61,7 @@ import { TransactionSpendingLimitSectionComponent } from './transaction-spending
 import { TransactionSpendingLimitComponent } from './transaction-spending-limit/transaction-spending-limit.component';
 import { TransactionSpendingLimitStakeComponent } from './transaction-spending-limit/transaction-spending-limit-stake/transaction-spending-limit-stake.component';
 import { TransactionSpendingLimitLockupComponent } from './transaction-spending-limit/transaction-spending-limit-lockup/transaction-spending-limit-lockup.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
@@ -126,7 +126,6 @@ import { TransactionSpendingLimitLockupComponent } from './transaction-spending-
       siteKey: environment.hCaptchaSitekey,
     }),
     BuyDeSoComponentWrapper,
-    CookieModule.forRoot(),
     MatDialogModule,
   ],
   providers: [
@@ -135,6 +134,7 @@ import { TransactionSpendingLimitLockupComponent } from './transaction-spending-
     AccountService,
     MetamaskService,
     TruncateAddressOrUsernamePipe,
+    CookieService,
   ],
 
   bootstrap: [AppComponent],

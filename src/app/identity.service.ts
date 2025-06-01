@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable, Subject } from 'rxjs';
 import { v4 as uuid } from 'uuid';
 import {
@@ -483,11 +483,10 @@ export class IdentityService {
       hasLocalStorageAccess = false;
     }
 
-    // check for cookie access
-    this.cookieService.put('deso-test-access', 'true', {
+    this.cookieService.set('deso-test-access', 'true', {
       path: '/',
       secure: true,
-      sameSite: 'none',
+      sameSite: 'None',
     });
     const hasCookieAccess = !!this.cookieService.get('deso-test-access');
 
