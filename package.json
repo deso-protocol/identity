@@ -13,7 +13,8 @@
     "format": "npx prettier --write src",
     "prepare": "husky install",
     "pre-commit": "tsc --noEmit && pretty-quick --staged",
-    "quality-check": "tsc --noEmit && npx prettier --check src"
+    "quality-check": "tsc --noEmit && npx prettier --check src",
+    "test_signing_ci": "ng test --watch=false --browsers=ChromeHeadless --include=src/app/signing.service.spec.ts"
   },
   "private": true,
   "dependencies": {
@@ -44,16 +45,16 @@
     "bip39": "^3.0.3",
     "crypto-browserify": "^3.12.0",
     "currency-symbol-map": "^5.0.1",
-    "elliptic": "^6.5.4",
+    "elliptic": "6.6.1",
     "ethereumjs-tx": "^2.1.2",
     "ethereumjs-util": "^7.1.4",
     "ethers": "^5.6.9",
     "feather-icons": "^4.29.0",
     "hdkey": "github:deso-protocol/hdkey",
     "intl-tel-input": "^18.1.7",
-    "jsonwebtoken": "^8.5.1",
+    "jws": "4.0.1",
     "key-encoder": "^2.0.3",
-    "lodash": "^4.17.21",
+    "lodash": "4.18.1",
     "ng-hcaptcha": "^2.2.0",
     "ngx-cookie": "^6.0.1",
     "process": "^0.11.10",
@@ -82,7 +83,7 @@
     "@types/hdkey": "^0.7.1",
     "@types/intl-tel-input": "^18.1.0",
     "@types/jasmine": "~3.8.0",
-    "@types/jsonwebtoken": "^8.5.1",
+    "@types/jws": "3.2.11",
     "@types/node": "^12.11.1",
     "@types/readable-stream": "^2.3.14",
     "@types/reflect-metadata": "^0.1.0",
@@ -103,6 +104,14 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~5.1.6"
+  },
+  "overrides": {
+    "elliptic": "$elliptic",
+    "browserify-sign": "4.2.6",
+    "cipher-base": "1.0.7",
+    "pbkdf2": "3.1.6",
+    "secp256k1": "4.0.3",
+    "sha.js": "2.4.12"
   },
   "volta": {
     "node": "16.19.0",
