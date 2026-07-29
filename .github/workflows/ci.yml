@@ -22,7 +22,16 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run quality-check
         run: npm run quality-check
+
+      - name: Reject critical runtime advisories
+        run: npm audit --omit=dev --audit-level=critical
+
+      - name: Run signing security regression tests
+        run: npm run test_signing_ci
+
+      - name: Build production bundle
+        run: npm run build_prod

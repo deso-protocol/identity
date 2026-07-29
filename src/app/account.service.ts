@@ -3,7 +3,6 @@ import assert from 'assert';
 import bs58check from 'bs58check';
 import { ec as EC } from 'elliptic';
 import HDKey from 'hdkey';
-import * as jsonwebtoken from 'jsonwebtoken';
 import KeyEncoder from 'key-encoder';
 import sha256 from 'sha256';
 import { generateAccountNumber } from '../lib/account-number';
@@ -14,6 +13,7 @@ import {
 } from '../lib/deso/transaction';
 import * as ecies from '../lib/ecies';
 import { SwalHelper } from '../lib/helpers/swal-helper';
+import { signJwtES256 } from '../lib/jwt';
 import {
   AccessLevel,
   DefaultKeyPrivateInfo,
@@ -489,10 +489,7 @@ export class AccountService {
       'raw',
       'pem'
     );
-    const jwt = jsonwebtoken.sign({ appPublicKey }, encodedPrivateKey, {
-      algorithm: 'ES256',
-      expiresIn: '30 minutes',
-    });
+    const jwt = signJwtES256({ appPublicKey }, encodedPrivateKey, '30 minutes');
     return {
       publicKey,
       appPublicKey,

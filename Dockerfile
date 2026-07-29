@@ -10,7 +10,7 @@ COPY ./.npmrc .
 
 # install frontend dependencies before copying the frontend code
 # into the container so we get docker cache benefits
-RUN npm install
+RUN npm ci
 
 # don't allow any dependencies with vulnerabilities
 #RUN npx audit-ci --low

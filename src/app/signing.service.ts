@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { ec } from 'elliptic';
-import * as jsonwebtoken from 'jsonwebtoken';
 import KeyEncoder from 'key-encoder';
 import * as sha256 from 'sha256';
 import { uvarint64ToBuf } from '../lib/bindata/util';
 import { TransactionV0 } from '../lib/deso/transaction';
 import * as ecies from '../lib/ecies';
+import { signJwtES256 } from '../lib/jwt';
 import { CryptoService } from './crypto.service';
 import { GlobalVarsService } from './global-vars.service';
 
@@ -13,6 +13,10 @@ import { GlobalVarsService } from './global-vars.service';
   providedIn: 'root',
 })
 export class SigningService {
+  private static readonly HASH_LENGTH_BYTES = 32;
+  private static readonly MAX_HASHES_PER_REQUEST = 1000;
+  private static readonly HASH_HEX_PATTERN = /^[0-9a-fA-F]{64}$/;
+
   constructor(
     private cryptoService: CryptoService,
     private globalVars: GlobalVarsService
@@ -38,19 +42,16 @@ export class SigningService {
           this.globalVars.network
         );
 
-      return jsonwebtoken.sign(
+      return signJwtES256(
         {
           [this.globalVars.claimJwtDerivedPublicKey]:
             derivedPublicKeyBase58Check,
         },
         encodedPrivateKey,
-        { algorithm: 'ES256', expiresIn: expiration }
+        expiration
       );
     } else {
-      return jsonwebtoken.sign({}, encodedPrivateKey, {
-        algorithm: 'ES256',
-        expiresIn: expiration,
-      });
+      return signJwtES256({}, encodedPrivateKey, expiration);
     }
   }
 
@@ -88,13 +89,14 @@ export class SigningService {
     ]).toString('hex');
   }
 
-  signHashes(seedHex: string, unsignedHashes: string[]): string[] {
+  signHashes(seedHex: string, unsignedHashes: unknown): string[] {
+    const hashBuffers = this.validateUnsignedHashes(unsignedHashes);
     const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
-    const signedHashes = [];
+    const signedHashes: string[] = [];
 
-    for (const unsignedHash of unsignedHashes) {
-      const signature = privateKey.sign(unsignedHash);
-      const signatureBytes = new Buffer(signature.toDER());
+    for (const hashBuffer of hashBuffers) {
+      const signature = privateKey.sign(hashBuffer);
+      const signatureBytes = Buffer.from(signature.toDER());
       signedHashes.push(signatureBytes.toString('hex'));
     }
 
@@ -103,13 +105,14 @@ export class SigningService {
 
   signHashesETH(
     seedHex: string,
-    unsignedHashes: string[]
+    unsignedHashes: unknown
   ): { s: any; r: any; v: number | null }[] {
+    const hashBuffers = this.validateUnsignedHashes(unsignedHashes);
     const privateKey = this.cryptoService.seedHexToKeyPair(seedHex);
     const signedHashes = [];
 
-    for (const unsignedHash of unsignedHashes) {
-      const signature = privateKey.sign(unsignedHash, { canonical: true });
+    for (const hashBuffer of hashBuffers) {
+      const signature = privateKey.sign(hashBuffer, { canonical: true });
 
       signedHashes.push({
         s: '0x' + signature.s.toString('hex'),
@@ -119,6 +122,39 @@ export class SigningService {
     }
 
     return signedHashes;
+  }
+
+  private validateUnsignedHashes(unsignedHashes: unknown): Buffer[] {
+    if (!Array.isArray(unsignedHashes)) {
+      throw new Error('Unsigned hashes must be an array');
+    }
+    if (unsignedHashes.length === 0) {
+      throw new Error('At least one unsigned hash is required');
+    }
+    if (unsignedHashes.length > SigningService.MAX_HASHES_PER_REQUEST) {
+      throw new Error(
+        `A maximum of ${SigningService.MAX_HASHES_PER_REQUEST} hashes may be signed at once`
+      );
+    }
+
+    return unsignedHashes.map((unsignedHash, index) => {
+      if (
+        typeof unsignedHash !== 'string' ||
+        !SigningService.HASH_HEX_PATTERN.test(unsignedHash)
+      ) {
+        throw new Error(
+          `Unsigned hash at index ${index} must be exactly 32 bytes encoded as hexadecimal`
+        );
+      }
+
+      const hashBuffer = Buffer.from(unsignedHash, 'hex');
+      if (hashBuffer.length !== SigningService.HASH_LENGTH_BYTES) {
+        throw new Error(
+          `Unsigned hash at index ${index} must decode to exactly 32 bytes`
+        );
+      }
+      return hashBuffer;
+    });
   }
 
   encryptGroupMessagingPrivateKeyToMember(

@@ -4,8 +4,8 @@ import { BackendAPIService } from '../backend-api.service';
 import { CryptoService } from '../crypto.service';
 import { GlobalVarsService } from '../global-vars.service';
 import KeyEncoder from 'key-encoder';
-import * as jsonwebtoken from 'jsonwebtoken';
 import { HttpParams } from '@angular/common/http';
+import { verifyJwtES256 } from '../../lib/jwt';
 
 @Component({
   selector: 'app-shared-secret',
@@ -70,9 +70,7 @@ export class SharedSecretComponent implements OnInit {
           'raw',
           'pem'
         );
-        const decoded = jsonwebtoken.verify(JWT, encodedPublicKey, {
-          algorithms: ['ES256'],
-        });
+        verifyJwtES256(JWT, encodedPublicKey);
       } catch (e) {
         console.error(e);
         this.errorMsg = 'Failed to verify JWT';
